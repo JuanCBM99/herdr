@@ -15,11 +15,11 @@ RoxygenNote: 7.3.2
 Imports: 
     knitr,
     dplyr,
-	rgcam,
-	markdown
+    markdown,
+    tidyverse,
+    magrittr
 Suggests: 
     rmarkdown,
     testthat
-Remotes: github::JGCRI/rgcam
 VignetteBuilder: 
     knitr
