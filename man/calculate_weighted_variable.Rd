@@ -13,20 +13,19 @@ calculate_weighted_variable(
 }
 \arguments{
 \item{animal}{Character string specifying the animal type.
-Must be one of: `"vaca"`, `"oveja"`, or `"cabra"`.}
+Must exist in the `animal_type` column of the dataset.}
 
-\item{type}{For `"vaca"` only: specify production system.
-Must be one of `"Dairy"`, `"Beef"`, or `"Feedlot"`.
+\item{type}{For `"Cattle"` only: specify production system.
 If `NULL`, all available systems are included.}
 
 \item{zones}{Optional character vector of zones.
-Only applies when `animal = "vaca"` and `type` includes `"Dairy"` or `"Beef"`.}
+Only applies when `animal = "Cattle"` and `type` includes `"Dairy"` or `"Beef"`.}
 
-\item{saveoutput}{Para guardar el resultado final. Por defecto TRUE.}
+\item{saveoutput}{If TRUE, saves the result as CSV in `"output/variables.csv"`.}
 }
 \value{
 A tibble with weighted nutritional values (`CP [%]`, `DE [%]`,
-  `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `Code`.
+  `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `code`.
 }
 \description{
 Computes weighted averages of nutritional variables (CP, DE, Ash, NDF)
@@ -44,11 +43,11 @@ The weighting is based on dietary proportions of Feed, Forage, and Milk.
 }
 \examples{
 \dontrun{
-# For dairy cows, filtering by zone A
-calculate_weighted_variable(animal = "vaca", type = "Dairy", zones = "A")
+# For dairy cattle, filtering by zone A
+calculate_weighted_variable(animal = "Cattle", type = "Dairy", zones = "A")
 
 # For sheep (no type or zone needed)
-calculate_weighted_variable(animal = "oveja")
+calculate_weighted_variable(animal = "Sheep")
 }
 
 }

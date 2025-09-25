@@ -7,41 +7,57 @@
 calculate_NE_pregnancy(animal = NULL)
 }
 \arguments{
-\item{animal}{Character string (optional). If provided, filters the results
-to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
-If \code{NULL}, all animals are returned.}
+\item{animal}{Character (optional). Filter results by animal type (e.g.
+`"Cattle"`, `"Sheep"`, `"Goat"`). If \code{NULL}, returns all available
+animals.}
 }
 \value{
-A tibble with the following columns:
-\describe{
-  \item{code}{Unique code identifying the animal category.}
-  \item{animal_type}{Type of animal (Cattle, Sheep, Goat).}
-  \item{c_pregnancy}{Pregnancy coefficient (species-specific).}
-  \item{NEm}{Net Energy for Maintenance (MJ/day).}
-  \item{NE_pregnancy}{Net Energy for Pregnancy (MJ/day).}
+A data frame with columns:
+\itemize{
+  \item \code{code}: Unique category code.
+  \item \code{animal_type}: Species type (Cattle, Sheep, Goat).
+  \item \code{c_pregnancy}: Pregnancy coefficient used in calculation.
+  \item \code{NEm}: Net energy for maintenance.
+  \item \code{NE_pregnancy}: Net energy required for pregnancy.
 }
 }
 \description{
-Calculates the Net Energy required for pregnancy, based on species-specific
-formulas for the pregnancy coefficient (\eqn{c_pregnancy}).
+Computes the net energy required for pregnancy based on species-specific
+coefficients and pregnancy rate. The calculation method depends on the
+animal type:
 }
 \details{
 \itemize{
-  \item Cattle: \eqn{c_pregnancy} is matched from \code{coefficients} using
-        the \code{c_pregnancy} column in \code{categories}.
-  \item Sheep/Goat: \eqn{c_pregnancy = (0.126 \times double\_birth\_fraction) +
-        (0.077 \times single\_birth\_fraction)}, where:
-        \deqn{double\_birth\_fraction = \max(pr - 1, 0)}
-        \deqn{single\_birth\_fraction = 1 - double\_birth\_fraction}
+  \item \strong{Cattle}: Uses species-specific coefficients (\code{c_pregnancy})
+        from the \code{coefficients} table, matched by category.
+  \item \strong{Sheep and Goat}:
+    \itemize{
+      \item If pregnancy rate (\code{pr}) = 0 → energy requirement is set to 0.
+      \item If \code{pr} > 0 → a weighted coefficient is calculated based on
+            single and double birth fractions:
+            \deqn{c_pregnancy = 0.077 \times (1 - (pr - 1)) + 0.126 \times (pr - 1)}
+    }
+}
+
+Final NE for pregnancy is computed as:
+\deqn{NE_{pregnancy} = NEm \times c_{pregnancy}}
+
+
+This function requires:
+\itemize{
+  \item \code{calculate_NEm()} to provide maintenance net energy (\code{NEm}).
+  \item A \code{coefficients} data frame with at least columns:
+        \code{coefficient}, \code{description}, \code{value}.
+  \item A \code{categories} data frame with at least columns:
+        \code{code}, \code{c_pregnancy}, \code{pr}.
 }
 }
 \examples{
-\dontrun{
-# All animals
-calculate_NE_pregnancy()
+\donttest{
+  # Calculate for all animals
+  calculate_NE_pregnancy()
 
-# Only goats
-calculate_NE_pregnancy(animal = "Goat")
+  # Filter for cattle only
+  calculate_NE_pregnancy(animal = "Cattle")
 }
-
 }
