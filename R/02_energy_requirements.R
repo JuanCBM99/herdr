@@ -200,13 +200,13 @@ calculate_NEg <- function(animal) {
 #'        to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
 #'        If \code{NULL}, all animals with valid milk yield and fat content are returned.
 #'
-#' @return A tibble with the following columns:
+#' @return A `tibble` with the following columns:
 #' \describe{
-#'   \item{code}{Unique code identifying the animal category.}
-#'   \item{animal_type}{Type of animal (Cattle, Sheep, Goat).}
-#'   \item{Milk_yield_kg_day_head}{Average daily milk yield per head (kg/day).}
-#'   \item{fat_content}{Milk fat content (%).}
-#'   \item{NEl}{Net Energy for Lactation (MJ/day).}
+#'   \item{code}{Character. Unique code identifying the animal category.}
+#'   \item{animal_type}{Character. Type of animal (Cattle, Sheep, Goat).}
+#'   \item{Milk_yield_kg_day_head}{Numeric. Average daily milk yield per head (kg/day).}
+#'   \item{fat_content}{Numeric. Milk fat content (\%).}
+#'   \item{NEl}{Numeric. Net Energy for Lactation (MJ/day).}
 #' }
 #'
 #' @examples
