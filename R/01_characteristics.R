@@ -4,16 +4,15 @@
 #' for different livestock animals based on dietary composition.
 #'
 #' @param animal Character string specifying the animal type.
-#'   Must be one of: `"vaca"`, `"oveja"`, or `"cabra"`.
-#' @param type For `"vaca"` only: specify production system.
-#'   Must be one of `"Dairy"`, `"Beef"`, or `"Feedlot"`.
+#'   Must exist in the `animal_type` column of the dataset.
+#' @param type For `"Cattle"` only: specify production system.
 #'   If `NULL`, all available systems are included.
 #' @param zones Optional character vector of zones.
-#'   Only applies when `animal = "vaca"` and `type` includes `"Dairy"` or `"Beef"`.
-#' @param saveoutput Para guardar el resultado final. Por defecto TRUE.
+#'   Only applies when `animal = "Cattle"` and `type` includes `"Dairy"` or `"Beef"`.
+#' @param saveoutput If TRUE, saves the result as CSV in `"output/variables.csv"`.
 #'
 #' @return A tibble with weighted nutritional values (`CP [%]`, `DE [%]`,
-#'   `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `Code`.
+#'   `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `code`.
 #'
 #' @details
 #' The function uses three datasets loaded by `load_all_data()`:
@@ -27,11 +26,11 @@
 #'
 #' @examples
 #' \dontrun{
-#' # For dairy cows, filtering by zone A
-#' calculate_weighted_variable(animal = "vaca", type = "Dairy", zones = "A")
+#' # For dairy cattle, filtering by zone A
+#' calculate_weighted_variable(animal = "Cattle", type = "Dairy", zones = "A")
 #'
 #' # For sheep (no type or zone needed)
-#' calculate_weighted_variable(animal = "oveja")
+#' calculate_weighted_variable(animal = "Sheep")
 #' }
 #'
 #' @importFrom dplyr filter left_join mutate across group_by summarise arrange
@@ -42,30 +41,33 @@ calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveo
   if (!requireNamespace("dplyr", quietly = TRUE)) stop("Necesitas 'dplyr'")
   if (!requireNamespace("assertthat", quietly = TRUE)) stop("Necesitas 'assertthat'")
 
-  # --- Validaciones con assertthat ---
-  assertthat::assert_that(animal %in% c("Cattle", "Sheep", "Goat"),
-                          msg = "animal debe ser 'Cattle', 'Sheep' o 'Goat'")
+  # --- Validaciones dinámicas ---
+  animales_validos <- unique(diet$animal_type)
+  assertthat::assert_that(animal %in% animales_validos,
+                          msg = paste0("El animal debe estar en los datos. Opciones: ",
+                                       paste(animales_validos, collapse = ", ")))
 
   if (!is.null(type)) {
-    # Solo para vacas
     if (animal == "Cattle") {
       tipos_validos <- unique(diet$animal_subtype)
       assertthat::assert_that(type %in% tipos_validos,
-                              msg = paste0("type debe estar en los valores disponibles: ", paste(tipos_validos, collapse = ", ")))
+                              msg = paste0("type debe estar en: ",
+                                           paste(tipos_validos, collapse = ", ")))
     } else {
-      warning("El parámetro `type` solo aplica para vacas. Se ignorará para otros animales.")
+      warning("El parámetro `type` solo aplica para `Cattle`. Se ignorará para otros animales.")
     }
   }
 
   if (!is.null(zones)) {
     zonas_validas <- unique(diet$zone)
     assertthat::assert_that(all(zones %in% zonas_validas),
-                            msg = "Alguna zona especificada no existe en los datos")
+                            msg = paste("Alguna zona no existe. Opciones: ",
+                                        paste(zonas_validas, collapse = ", ")))
   }
 
   # --- Filtrado de datos ---
   if (animal == "Cattle") {
-    if (!is.null(type)) diet <- dplyr::filter(diet, animal_subtype %in% type)
+    if (!is.null(type))  diet <- dplyr::filter(diet, animal_subtype %in% type)
     if (!is.null(zones)) diet <- dplyr::filter(diet, zone %in% zones)
   } else {
     diet <- dplyr::filter(diet, animal_type == animal)
@@ -73,9 +75,10 @@ calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveo
 
   # --- Joins ---
   joined <- ingredients %>%
-    dplyr::inner_join(characteristics, by = c("ingredient", "animal_type","animal_subtype", "ingredient_type")) %>%
-    dplyr::inner_join(diet, by = c("code", "animal_type","animal_subtype", "zone"))
-
+    dplyr::inner_join(characteristics,
+                      by = c("ingredient", "animal_type", "animal_subtype", "ingredient_type")) %>%
+    dplyr::inner_join(diet,
+                      by = c("code", "animal_type", "animal_subtype", "zone"))
 
   # --- Variables a calcular ---
   vars <- intersect(c("cp", "de", "ash", "ndf"), names(joined))
@@ -86,25 +89,27 @@ calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveo
   # --- Cálculo ponderado ---
   variables <- joined %>%
     dplyr::mutate(weight = dplyr::case_when(
-      ingredient_type == "Feed"   ~ `feed_share`,
-      ingredient_type == "Forage" ~ `forage_share`,
-      ingredient_type == "Milk"   ~ `milk_share`,
+      ingredient_type == "Feed"   ~ feed_share,
+      ingredient_type == "Forage" ~ forage_share,
+      ingredient_type == "Milk"   ~ milk_share,
       TRUE ~ 0
     )) %>%
     dplyr::mutate(dplyr::across(dplyr::all_of(vars),
-                                ~ . * `ingredient_share` * weight / 10000,
+                                ~ . * ingredient_share * weight / 10000,
                                 .names = "{.col}"
     )) %>%
     dplyr::group_by(animal_type, animal_subtype, zone, code) %>%
     dplyr::summarise(dplyr::across(dplyr::all_of(vars), sum, na.rm = TRUE), .groups = "drop") %>%
-    dplyr::arrange(animal_type, animal_subtype, zone, code)
+    dplyr::arrange(code, zone, animal_type, animal_subtype)
 
   # --- Guardar salida ---
   if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
     write.csv(variables, "output/variables.csv", row.names = FALSE)
   }
 
   return(invisible(variables))
 }
+
 
 

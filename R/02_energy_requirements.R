@@ -34,7 +34,7 @@
 #'
 #' @export
 
-calculate_NEm <- function(animal = NULL) {
+calculate_NEm <- function(animal = NULL,type= NULL) {
 
   # Obtener tabla de coeficientes CFI
   cfi_tbl <- coefficients %>%
@@ -48,12 +48,12 @@ calculate_NEm <- function(animal = NULL) {
       cfi_value = cfi_tbl$value[match(cfi, cfi_tbl$description)],
       NEm = cfi_value * (average_weight^0.75)
     ) %>%
-    dplyr::select(code, animal_type, average_weight, cfi_value, NEm) %>%
+    dplyr::select(code, animal_type, animal_subtype, average_weight, cfi_value, NEm) %>%
     dplyr::arrange(code)
 
   # Filtrar si se pasa un animal
   if (!is.null(animal)) {
-    result <- result %>% dplyr::filter(animal_type == animal)
+    result <- result %>% dplyr::filter(animal_type == animal, animal_subtype == type)
   }
 
   return(result)
@@ -81,18 +81,18 @@ calculate_NEm <- function(animal = NULL) {
 #' @export
 calculate_NEa <- function(animal) {
 
-  # Validación dinámica según lo que hay en categories
+  # Validación dinámica
   valid_animals <- unique(categories$animal_type)
   assertthat::assert_that(animal %in% valid_animals,
                           msg = paste0("The selected animal must be: ", paste(valid_animals, collapse = ", ")))
 
   # NEm
-  NEm <- calculate_NEm()
+  NEm <- calculate_NEm(animal=animal)
 
   # Filtrar categories por animal
   categories_sub <- categories %>%
     dplyr::filter(animal_type == animal) %>%
-    dplyr::select(code, housing_type, duration)
+    dplyr::select(code, ca, duration)  # ca es ahora la “clave” para el coeficiente
 
   # Coeficientes Ca
   ca_coeff <- coefficients %>%
@@ -106,20 +106,26 @@ calculate_NEa <- function(animal) {
     dplyr::left_join(categories_sub, by = "code") %>%
     dplyr::mutate(
       ca = dplyr::case_when(
-        animal == "Cattle" & housing_type %in% c("Stall", "Pasture") ~
-          (duration / 12) * ca_coeff[housing_type] +
-          ((12 - duration) / 12) * ca_coeff[ifelse(housing_type == "Stall", "Pasture", "Stall")],
-        animal == "Cattle" & housing_type == "Grazing large areas" ~
-          ca_coeff["Grazing large areas"],
-        housing_type %in% names(ca_coeff) ~ ca_coeff[housing_type],
+        # Cattle con Stall/Pasture: mezcla ponderada según duration
+        animal == "Cattle" & ca %in% c("Stall", "Pasture") ~
+          (duration / 12) * ca_coeff[ca] +
+          ((12 - duration) / 12) * ca_coeff[ifelse(ca == "Stall", "Pasture", "Stall")],
+
+        # Cattle con Grazing large areas: coeficiente directo
+        animal == "Cattle" & ca == "Grazing large areas" ~ ca_coeff["Grazing large areas"],
+
+        # Otros animales: coeficiente directo
+        ca %in% names(ca_coeff) ~ ca_coeff[ca],
+
         TRUE ~ NA_real_
       ),
       NEa = ca * NEm
     ) %>%
-    dplyr::select(code, animal_type, cfi_value, NEm, housing_type, duration, ca, NEa)
+    dplyr::select(code, animal_type, cfi_value, NEm, ca, NEa)
 
   return(result)
 }
+
 
 #' Calculate Net Energy for Growth (NEg) by animal
 #'
@@ -270,15 +276,17 @@ calculate_NEl <- function(animal = NULL) {
 #'
 #' @export
 calculate_NE_work <- function(animal = NULL) {
-  datos <- load_all_data()
-  NEm <- calculate_NEm()
+  # Get NEm calculations - excluir animal_type si existe en NEm
+  NEm <- calculate_NEm(animal = animal) %>%
+    dplyr::select(-dplyr::any_of("animal_type"))
 
-  result <- datos$categories %>%
+  # Join con categories manteniendo solo animal_type de categories
+  result <- categories %>%
     dplyr::inner_join(NEm, by = "code") %>%
     dplyr::mutate(NE_work = hours * NEm) %>%
     dplyr::select(code, animal_type, hours, NEm, NE_work)
 
-  # Filtrar si se pasa un animal
+  # Filtrar si se especifica un animal
   if (!is.null(animal)) {
     result <- result %>% dplyr::filter(animal_type == animal)
   }
@@ -334,63 +342,82 @@ calculate_NE_wool <- function(animal = NULL) {
   return(result)
 }
 
-
 #' Calculate Net Energy for Pregnancy (NE_pregnancy)
 #'
-#' Calculates the Net Energy required for pregnancy, based on species-specific
-#' formulas for the pregnancy coefficient (\eqn{c_pregnancy}).
+#' Computes the net energy required for pregnancy based on species-specific
+#' coefficients and pregnancy rate. The calculation method depends on the
+#' animal type:
 #'
 #' \itemize{
-#'   \item Cattle: \eqn{c_pregnancy} is matched from \code{coefficients} using
-#'         the \code{c_pregnancy} column in \code{categories}.
-#'   \item Sheep/Goat: \eqn{c_pregnancy = (0.126 \times double\_birth\_fraction) +
-#'         (0.077 \times single\_birth\_fraction)}, where:
-#'         \deqn{double\_birth\_fraction = \max(pr - 1, 0)}
-#'         \deqn{single\_birth\_fraction = 1 - double\_birth\_fraction}
+#'   \item \strong{Cattle}: Uses species-specific coefficients (\code{c_pregnancy})
+#'         from the \code{coefficients} table, matched by category.
+#'   \item \strong{Sheep and Goat}:
+#'     \itemize{
+#'       \item If pregnancy rate (\code{pr}) = 0 → energy requirement is set to 0.
+#'       \item If \code{pr} > 0 → a weighted coefficient is calculated based on
+#'             single and double birth fractions:
+#'             \deqn{c_pregnancy = 0.077 \times (1 - (pr - 1)) + 0.126 \times (pr - 1)}
+#'     }
 #' }
 #'
-#' @param animal Character string (optional). If provided, filters the results
-#'        to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
-#'        If \code{NULL}, all animals are returned.
+#' Final NE for pregnancy is computed as:
+#' \deqn{NE_{pregnancy} = NEm \times c_{pregnancy}}
 #'
-#' @return A tibble with the following columns:
-#' \describe{
-#'   \item{code}{Unique code identifying the animal category.}
-#'   \item{animal_type}{Type of animal (Cattle, Sheep, Goat).}
-#'   \item{c_pregnancy}{Pregnancy coefficient (species-specific).}
-#'   \item{NEm}{Net Energy for Maintenance (MJ/day).}
-#'   \item{NE_pregnancy}{Net Energy for Pregnancy (MJ/day).}
+#' @param animal Character (optional). Filter results by animal type (e.g.
+#'   `"Cattle"`, `"Sheep"`, `"Goat"`). If \code{NULL}, returns all available
+#'   animals.
+#'
+#' @details
+#' This function requires:
+#' \itemize{
+#'   \item \code{calculate_NEm()} to provide maintenance net energy (\code{NEm}).
+#'   \item A \code{coefficients} data frame with at least columns:
+#'         \code{coefficient}, \code{description}, \code{value}.
+#'   \item A \code{categories} data frame with at least columns:
+#'         \code{code}, \code{c_pregnancy}, \code{pr}.
+#' }
+#'
+#' @return A data frame with columns:
+#' \itemize{
+#'   \item \code{code}: Unique category code.
+#'   \item \code{animal_type}: Species type (Cattle, Sheep, Goat).
+#'   \item \code{c_pregnancy}: Pregnancy coefficient used in calculation.
+#'   \item \code{NEm}: Net energy for maintenance.
+#'   \item \code{NE_pregnancy}: Net energy required for pregnancy.
 #' }
 #'
 #' @examples
-#' \dontrun{
-#' # All animals
-#' calculate_NE_pregnancy()
+#' \donttest{
+#'   # Calculate for all animals
+#'   calculate_NE_pregnancy()
 #'
-#' # Only goats
-#' calculate_NE_pregnancy(animal = "Goat")
+#'   # Filter for cattle only
+#'   calculate_NE_pregnancy(animal = "Cattle")
 #' }
-#'
 #' @export
+
 calculate_NE_pregnancy <- function(animal = NULL) {
+  # Cargar datos
   NEm <- calculate_NEm()  # Debe devolver code, animal_type, NEm
 
+  # Tabla de coeficientes para cattle
   c_preg_tbl <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
     dplyr::select(description, value)
 
-  # Tomamos solo columnas necesarias de categories
+  # Solo columnas necesarias de categories y renombrar para evitar conflictos
   cat_df <- categories %>%
-    dplyr::select(code, c_pregnancy, pr)
+    dplyr::select(code, c_pregnancy_cat = c_pregnancy, pr)
 
-  # Join con NEm
+  # Hacer join desde NEm
   df <- NEm %>%
     dplyr::left_join(cat_df, by = "code") %>%
     dplyr::mutate(
       c_pregnancy_value = dplyr::case_when(
-        animal_type == "Cattle" ~ c_preg_tbl$value[match(c_pregnancy, c_preg_tbl$description)],
-        animal_type %in% c("Sheep", "Goat") ~ {
-          double_birth_fraction <- ifelse(pr == 0, 0, pmax(pr - 1, 0))
+        animal_type == "Cattle" ~ c_preg_tbl$value[match(c_pregnancy_cat, c_preg_tbl$description)],
+        animal_type %in% c("Sheep", "Goat") & pr == 0 ~ 0,
+        animal_type %in% c("Sheep", "Goat") & pr > 0 ~ {
+          double_birth_fraction <- pmax(pr - 1, 0)
           single_birth_fraction <- 1 - double_birth_fraction
           (0.126 * double_birth_fraction) + (0.077 * single_birth_fraction)
         },
@@ -400,12 +427,14 @@ calculate_NE_pregnancy <- function(animal = NULL) {
     ) %>%
     dplyr::select(code, animal_type, c_pregnancy = c_pregnancy_value, NEm, NE_pregnancy)
 
+  # Filtrar por animal si se indica
   if (!is.null(animal)) {
     df <- df %>% dplyr::filter(animal_type == animal)
   }
 
   return(df)
 }
+
 
 
 
