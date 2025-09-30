@@ -5,49 +5,34 @@
 \title{Calculate Weighted Nutritional Variables}
 \usage{
 calculate_weighted_variable(
-  animal,
+  animal = NULL,
   type = NULL,
   zones = NULL,
   saveoutput = TRUE
 )
 }
 \arguments{
-\item{animal}{Character string specifying the animal type.
-Must exist in the `animal_type` column of the dataset.}
+\item{animal}{Animal type to filter by (optional)}
 
-\item{type}{For `"Cattle"` only: specify production system.
-If `NULL`, all available systems are included.}
+\item{type}{Animal subtype (only for Cattle, optional)}
 
-\item{zones}{Optional character vector of zones.
-Only applies when `animal = "Cattle"` and `type` includes `"Dairy"` or `"Beef"`.}
+\item{zones}{Geographical zones to include (optional)}
 
-\item{saveoutput}{If TRUE, saves the result as CSV in `"output/variables.csv"`.}
+\item{saveoutput}{Save results to CSV? Default TRUE}
 }
 \value{
-A tibble with weighted nutritional values (`CP [%]`, `DE [%]`,
-  `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `code`.
+A data frame with weighted nutritional values by animal category and zone
 }
 \description{
-Computes weighted averages of nutritional variables (CP, DE, Ash, NDF)
-for different livestock animals based on dietary composition.
-}
-\details{
-The function uses three datasets loaded by `load_all_data()`:
-\itemize{
-  \item `ingredients`
-  \item `diet_characteristics`
-  \item `diet`
-}
-
-The weighting is based on dietary proportions of Feed, Forage, and Milk.
+Computes weighted averages of nutritional variables based on animal diets.
 }
 \examples{
 \dontrun{
-# For dairy cattle, filtering by zone A
-calculate_weighted_variable(animal = "Cattle", type = "Dairy", zones = "A")
+# All Dairy Cattle
+calculate_weighted_variable(animal = "Cattle", type = "Dairy")
 
-# For sheep (no type or zone needed)
-calculate_weighted_variable(animal = "Sheep")
+# Sheep in specific zones
+calculate_weighted_variable(animal = "Sheep", zones = c("North", "South"))
 }
 
 }

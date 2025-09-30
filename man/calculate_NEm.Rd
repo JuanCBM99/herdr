@@ -7,38 +7,15 @@
 calculate_NEm(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string (optional). If provided, filters the results
-to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
-If \code{NULL}, all animals are returned.}
+\item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat").
+If NULL, all animals are returned.}
+
+\item{type}{Character string (optional). Only applies to "Cattle" (e.g., "Dairy", "Beef").}
 }
 \value{
-A tibble with the following columns:
-\describe{
-  \item{code}{Unique code identifying the animal category.}
-  \item{animal_type}{Type of animal (e.g., Cattle, Sheep, Goat).}
-  \item{average_weight}{Average body weight of the animal (kg).}
-  \item{cfi_value}{CFI coefficient value matched from the coefficients table.}
-  \item{NEm}{Net Energy for Maintenance (MJ/day).}
-}
+A tibble with columns: code, animal_type, animal_subtype, average_weight, cfi_value, NEm
 }
 \description{
 Computes the Net Energy for Maintenance (NEm) for livestock animals
 based on their average weight and CFI coefficients.
-The function merges animal weights with category information and applies
-the corresponding CFI coefficient to estimate maintenance energy.
-}
-\details{
-The calculation follows the formula:
-\deqn{NEm = CFI \times (average\_weight^{0.75})}
-where \eqn{CFI} is obtained from the coefficients dataset.
-}
-\examples{
-\dontrun{
-# Calculate for all animals
-calculate_NEm()
-
-# Calculate only for cattle
-calculate_NEm(animal = "Cattle")
-}
-
 }

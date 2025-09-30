@@ -2,21 +2,20 @@
 % Please edit documentation in R/03_calculate_GE.R
 \name{calculate_ge}
 \alias{calculate_ge}
-\title{calculate gross energy (ge)}
+\title{Calculate Gross Energy (GE)}
 \usage{
-calculate_ge(animal)
+calculate_ge(animal = NULL, type = NULL, zone = NULL)
 }
 \arguments{
-\item{animal}{character. type of animal ("cattle", "sheep", "goat", etc.).}
+\item{animal}{Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.}
+
+\item{type}{Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").}
+}
+\value{
+A tibble with gross energy (GE), its components, animal type/subtype, and zone.
 }
 \description{
-computes gross energy requirements by summing net energy components for maintenance,
-activity, growth, work, pregnancy, lactation, and wool production, then adjusting by
-digestible energy (de). coefficients for maintenance (rem) and growth (reg) follow nrc methodology.
-}
-\examples{
-\donttest{
-  library(efch4)
-  calculate_ge(animal = "cattle")
-}
+Computes gross energy requirements by summing net energy components
+for maintenance, activity, growth, work, pregnancy, lactation, and wool production,
+then adjusting by digestible energy (DE). Coefficients for maintenance (rem) and growth (reg) follow NRC methodology.
 }

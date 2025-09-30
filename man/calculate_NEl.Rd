@@ -4,31 +4,16 @@
 \alias{calculate_NEl}
 \title{Calculate Net Energy for Lactation (NEl)}
 \usage{
-calculate_NEl(animal = NULL)
+calculate_NEl(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string (optional). If provided, filters the results
-to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
-If \code{NULL}, all animals with valid milk yield and fat content are returned.}
+\item{animal}{Character string (optional). Animal type.}
+
+\item{type}{Character string (optional). Only for Cattle subtype.}
 }
 \value{
-
+A tibble with code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl
 }
 \description{
-Calculates the Net Energy for Lactation (NEl) for livestock animals,
-based on daily milk yield and fat content. The formula differs by species:
-\itemize{
-  \item Cattle: \eqn{NEl = Milk\_yield\_kg\_day\_head \times (1.47 + 0.4 \times fat\_content)}
-  \item Sheep/Goat: \eqn{NEl = Milk\_yield\_kg\_day\_head \times 4.6}
-}
-}
-\examples{
-\dontrun{
-# All animals
-calculate_NEl()
-
-# Only cattle
-calculate_NEl(animal = "Cattle")
-}
-
+Computes NEl based on milk yield and fat content.
 }

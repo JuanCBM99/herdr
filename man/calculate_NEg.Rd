@@ -2,16 +2,18 @@
 % Please edit documentation in R/02_energy_requirements.R
 \name{calculate_NEg}
 \alias{calculate_NEg}
-\title{Calculate Net Energy for Growth (NEg) by animal}
+\title{Calculate Net Energy for Growth (NEg)}
 \usage{
-calculate_NEg(animal)
+calculate_NEg(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string. Must match an existing animal_type in categories.}
+\item{animal}{Character string (required). Animal type.}
+
+\item{type}{Character string (optional). Only for Cattle subtype.}
 }
 \value{
-A tibble including calculated NEg per category for the specified animal.
+A tibble with columns: code, animal_type, animal_subtype, c, a, b, average_weight, adult_weight, weight_gain, NEg
 }
 \description{
-Computes net energy for growth for Cattle, Sheep, or Goat using the appropriate formula.
+Computes NEg for Cattle, Sheep, or Goat.
 }

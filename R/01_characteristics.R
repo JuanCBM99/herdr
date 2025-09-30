@@ -1,84 +1,60 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (CP, DE, Ash, NDF)
-#' for different livestock animals based on dietary composition.
+#' Computes weighted averages of nutritional variables based on animal diets.
 #'
-#' @param animal Character string specifying the animal type.
-#'   Must exist in the `animal_type` column of the dataset.
-#' @param type For `"Cattle"` only: specify production system.
-#'   If `NULL`, all available systems are included.
-#' @param zones Optional character vector of zones.
-#'   Only applies when `animal = "Cattle"` and `type` includes `"Dairy"` or `"Beef"`.
-#' @param saveoutput If TRUE, saves the result as CSV in `"output/variables.csv"`.
+#' @param animal Animal type to filter by (optional)
+#' @param type Animal subtype (only for Cattle, optional)
+#' @param zones Geographical zones to include (optional)
+#' @param saveoutput Save results to CSV? Default TRUE
 #'
-#' @return A tibble with weighted nutritional values (`CP [%]`, `DE [%]`,
-#'   `Ash [%]`, `NDF [%]`) by `animal_type`, `zone`, and `code`.
-#'
-#' @details
-#' The function uses three datasets loaded by `load_all_data()`:
-#' \itemize{
-#'   \item `ingredients`
-#'   \item `diet_characteristics`
-#'   \item `diet`
-#' }
-#'
-#' The weighting is based on dietary proportions of Feed, Forage, and Milk.
+#' @return A data frame with weighted nutritional values by animal category and zone
 #'
 #' @examples
 #' \dontrun{
-#' # For dairy cattle, filtering by zone A
-#' calculate_weighted_variable(animal = "Cattle", type = "Dairy", zones = "A")
+#' # All Dairy Cattle
+#' calculate_weighted_variable(animal = "Cattle", type = "Dairy")
 #'
-#' # For sheep (no type or zone needed)
-#' calculate_weighted_variable(animal = "Sheep")
-#' }
-#'
-#' @importFrom dplyr filter left_join mutate across group_by summarise arrange
-#' @importFrom assertthat assert_that
 #' @export
-calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveoutput = TRUE) {
-
-  if (!requireNamespace("dplyr", quietly = TRUE)) stop("Necesitas 'dplyr'")
-  if (!requireNamespace("assertthat", quietly = TRUE)) stop("Necesitas 'assertthat'")
+calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL, saveoutput = TRUE) {
 
   # --- Validaciones dinámicas ---
-  animales_validos <- unique(diet$animal_type)
-  assertthat::assert_that(animal %in% animales_validos,
-                          msg = paste0("El animal debe estar en los datos. Opciones: ",
-                                       paste(animales_validos, collapse = ", ")))
+  if (!is.null(animal)) {
+    animales_validos <- unique(diet$animal_type)
+    assert_that(animal %in% animales_validos,
+                msg = paste0("El animal debe estar en los datos. Opciones: ",
+                             paste(animales_validos, collapse = ", ")))
+  }
 
-  if (!is.null(type)) {
-    if (animal == "Cattle") {
-      tipos_validos <- unique(diet$animal_subtype)
-      assertthat::assert_that(type %in% tipos_validos,
-                              msg = paste0("type debe estar en: ",
-                                           paste(tipos_validos, collapse = ", ")))
-    } else {
-      warning("El parámetro `type` solo aplica para `Cattle`. Se ignorará para otros animales.")
-    }
+  if (!is.null(type) && !is.null(animal) && animal == "Cattle") {
+    tipos_validos <- unique(diet$animal_subtype)
+    assert_that(type %in% tipos_validos,
+                msg = paste0("type debe estar en: ",
+                             paste(tipos_validos, collapse = ", ")))
+  } else if (!is.null(type)) {
+    warning("El parámetro `type` solo aplica para `Cattle`. Se ignorará para otros animales.")
   }
 
   if (!is.null(zones)) {
     zonas_validas <- unique(diet$zone)
-    assertthat::assert_that(all(zones %in% zonas_validas),
-                            msg = paste("Alguna zona no existe. Opciones: ",
-                                        paste(zonas_validas, collapse = ", ")))
+    assert_that(all(zones %in% zonas_validas),
+                msg = paste("Alguna zona no existe. Opciones: ",
+                            paste(zonas_validas, collapse = ", ")))
   }
 
   # --- Filtrado de datos ---
-  if (animal == "Cattle") {
-    if (!is.null(type))  diet <- dplyr::filter(diet, animal_subtype %in% type)
-    if (!is.null(zones)) diet <- dplyr::filter(diet, zone %in% zones)
-  } else {
-    diet <- dplyr::filter(diet, animal_type == animal)
+  diet_sub <- diet
+  if (!is.null(animal)) {
+    diet_sub <- filter(diet_sub, animal_type == animal)
+    if (!is.null(type))  diet_sub <- filter(diet_sub, animal_subtype %in% type)
+    if (!is.null(zones)) diet_sub <- filter(diet_sub, zone %in% zones)
   }
 
   # --- Joins ---
   joined <- ingredients %>%
-    dplyr::inner_join(characteristics,
-                      by = c("ingredient", "animal_type", "animal_subtype", "ingredient_type")) %>%
-    dplyr::inner_join(diet,
-                      by = c("code", "animal_type", "animal_subtype", "zone"))
+    inner_join(characteristics,
+               by = c("ingredient", "animal_type", "animal_subtype", "ingredient_type")) %>%
+    inner_join(diet_sub,
+               by = c("code", "animal_type", "animal_subtype", "zone"))
 
   # --- Variables a calcular ---
   vars <- intersect(c("cp", "de", "ash", "ndf"), names(joined))
@@ -88,19 +64,18 @@ calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveo
 
   # --- Cálculo ponderado ---
   variables <- joined %>%
-    dplyr::mutate(weight = dplyr::case_when(
+    mutate(weight = case_when(
       ingredient_type == "Feed"   ~ feed_share,
       ingredient_type == "Forage" ~ forage_share,
       ingredient_type == "Milk"   ~ milk_share,
       TRUE ~ 0
     )) %>%
-    dplyr::mutate(dplyr::across(dplyr::all_of(vars),
-                                ~ . * ingredient_share * weight / 10000,
-                                .names = "{.col}"
-    )) %>%
-    dplyr::group_by(animal_type, animal_subtype, zone, code) %>%
-    dplyr::summarise(dplyr::across(dplyr::all_of(vars), sum, na.rm = TRUE), .groups = "drop") %>%
-    dplyr::arrange(code, zone, animal_type, animal_subtype)
+    mutate(across(all_of(vars),
+                  ~ . * ingredient_share * weight / 10000,
+                  .names = "{.col}")) %>%
+    group_by(animal_type, animal_subtype, zone, code) %>%
+    summarise(across(all_of(vars), sum, na.rm = TRUE), .groups = "drop") %>%
+    arrange(code, zone, animal_type, animal_subtype)
 
   # --- Guardar salida ---
   if (saveoutput) {
@@ -108,7 +83,7 @@ calculate_weighted_variable <- function(animal, type = NULL, zones = NULL, saveo
     write.csv(variables, "output/variables.csv", row.names = FALSE)
   }
 
-  return(invisible(variables))
+  variables
 }
 
 

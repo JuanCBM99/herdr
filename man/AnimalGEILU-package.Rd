@@ -12,20 +12,18 @@ emissions and land use metrics for animal systems.
 \details{
 For more information, see:
 \itemize{
-\item GitHub: \url{https://github.com/JGCRI/Animal_GEI_LU}
-\item Webpage: \url{https://jgcri.github.io/Animal_GEI_LU/}
+\item GitHub: \url{https://github.com/JuanCBM99/Animal_GEI_LU}
 }
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/JGCRI/AnimalGEILU}
-  \item Report bugs at \url{https://github.com/JGCRI/AnimalGEILU/issues}
+  \item \url{https://github.com/JuanCBM99/Animal_GEI_LU}
 }
 
 }
 \author{
-\strong{Maintainer}: Zarrar Khan \email{zarrar.khan@pnnl.gov} (\href{https://orcid.org/0000-0002-8147-8553}{ORCID})
+\strong{Maintainer}: Juan Carlos Baez \email{juancarlos.baez@bc3research.org} (\href{https://orcid.org/0000-0002-7067-265X}{ORCID})
 
 }
 \keyword{internal}

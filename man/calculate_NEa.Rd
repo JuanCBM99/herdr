@@ -4,25 +4,16 @@
 \alias{calculate_NEa}
 \title{Calculate Net Energy for Activity (NEa)}
 \usage{
-calculate_NEa(animal)
+calculate_NEa(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string. Must be one of: "Cattle", "Sheep", "Goat".}
+\item{animal}{Character string (optional). Filter by animal type.}
+
+\item{type}{Character string (optional). Only applies for Cattle.}
 }
 \value{
-A tibble with columns:
-  \itemize{
-    \item code
-    \item animal_type
-    \item cfi
-    \item NEm
-    \item housing_type
-    \item duration
-    \item ca
-    \item NEa
-  }
+A tibble with columns: code, animal_type, animal_subtype, cfi_value, NEm, ca, NEa
 }
 \description{
-Computes NEa for a given animal type (Cattle, Sheep, Goat),
-using NEm, housing type, and coefficients.
+Computes NEa for a given animal type using NEm, housing/activity coefficients.
 }

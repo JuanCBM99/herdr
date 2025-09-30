@@ -2,36 +2,40 @@
 % Please edit documentation in R/04_emissions_enteric.R
 \name{calculate_emissions_enteric}
 \alias{calculate_emissions_enteric}
-\title{calculate methane emissions from enteric fermentation}
+\title{Calculate methane emissions from enteric fermentation}
 \usage{
-calculate_emissions_enteric(animal)
+calculate_emissions_enteric(animal = NULL, type = NULL, zone = NULL)
 }
 \arguments{
-\item{animal}{character. type of animal ("cattle", "sheep", "goat").}
+\item{animal}{character. Type of animal ("Cattle", "Sheep", "Goat").}
+
+\item{type}{Optional character. Only for "Cattle" (e.g., "Dairy", "Beef").}
+
+\item{zone}{Optional character vector. Only for "Cattle" when type is specified.}
 }
 \value{
-a data frame with columns:
+A tibble with columns:
 \itemize{
   \item code: category code
-  \item de: digestible energy (% of ge)
+  \item de: digestible energy (% of GE)
   \item ndf: neutral detergent fiber fraction
-  \item ge: gross energy (mj/day)
+  \item ge: gross energy (MJ/day)
   \item ym: methane conversion factor (%)
-  \item ef_kg_animal_year: emission factor (kg ch4/animal/year)
+  \item ef_kg_animal_year: emission factor (kg CH4/animal/year)
   \item n_population: animal population
-  \item emissions_total: total emissions (kt ch4/year)
+  \item emissions_total: total emissions (kt CH4/year)
 }
 }
 \description{
-estimates methane emissions using ipcc tier 2 methodology based on
-digestible energy (de), neutral detergent fiber (ndf), gross energy (ge),
-and animal population. category-specific methane conversion factors (ym)
+Estimates methane emissions using IPCC Tier 2 methodology based on
+digestible energy (DE), neutral detergent fiber (NDF), gross energy (GE),
+and animal population. Category-specific methane conversion factors (Ym)
 are applied depending on animal type and diet quality.
 }
 \examples{
 \donttest{
-  calculate_emissions_enteric(animal = "Cattle")
-  calculate_emissions_enteric(animal = "Sheep")
-  calculate_emissions_enteric(animal = "Goat")
+calculate_emissions_enteric(animal = "Cattle", type = "Dairy", zone = "A")
+calculate_emissions_enteric(animal = "Sheep")
+calculate_emissions_enteric(animal = "Goat")
 }
 }

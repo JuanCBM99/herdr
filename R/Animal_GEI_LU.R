@@ -7,8 +7,7 @@
 #' @details
 #' For more information, see:
 #' \itemize{
-#' \item GitHub: \url{https://github.com/JGCRI/Animal_GEI_LU}
-#' \item Webpage: \url{https://jgcri.github.io/Animal_GEI_LU/}
+#' \item GitHub: \url{https://github.com/JuanCBM99/Animal_GEI_LU}
 #' }
 #'
 #' @keywords internal

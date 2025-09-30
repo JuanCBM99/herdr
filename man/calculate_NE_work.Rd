@@ -4,36 +4,16 @@
 \alias{calculate_NE_work}
 \title{Calculate Net Working Energy (NE_work)}
 \usage{
-calculate_NE_work(animal = NULL)
+calculate_NE_work(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string (optional). If provided, filters the results
-to include only the specified animal type (e.g., "Cattle", "Sheep", "Goat").
-If \code{NULL}, all animals are returned.}
+\item{animal}{Character string (optional)}
+
+\item{type}{Character string (optional, only for Cattle)}
 }
 \value{
-A tibble with the following columns:
-\describe{
-  \item{code}{Unique code identifying the animal category.}
-  \item{animal_type}{Type of animal (Cattle, Sheep, Goat).}
-  \item{hours}{Daily activity hours for the category.}
-  \item{NEm}{Net Energy for Maintenance (MJ/day).}
-  \item{NE_work}{Net Energy for work (MJ/day).}
-}
+A tibble with code, animal_type, animal_subtype, hours, NEm, NE_work
 }
 \description{
-Calculates the Net Working Energy (NE_work) for livestock animals by
-multiplying Net Energy for Maintenance (NEm) by hours of activity.
-Although the formula is the same across animals, an optional filter
-allows restricting the calculation to a specific animal type.
-}
-\examples{
-\dontrun{
-# All animals
-calculate_NE_work()
-
-# Only sheep
-calculate_NE_work(animal = "Sheep")
-}
-
+NE_work = NEm * hours of activity.
 }

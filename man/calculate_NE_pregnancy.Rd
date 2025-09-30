@@ -4,60 +4,16 @@
 \alias{calculate_NE_pregnancy}
 \title{Calculate Net Energy for Pregnancy (NE_pregnancy)}
 \usage{
-calculate_NE_pregnancy(animal = NULL)
+calculate_NE_pregnancy(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character (optional). Filter results by animal type (e.g.
-`"Cattle"`, `"Sheep"`, `"Goat"`). If \code{NULL}, returns all available
-animals.}
+\item{animal}{Character (optional)}
+
+\item{type}{Character (optional, only for Cattle)}
 }
 \value{
-A data frame with columns:
-\itemize{
-  \item \code{code}: Unique category code.
-  \item \code{animal_type}: Species type (Cattle, Sheep, Goat).
-  \item \code{c_pregnancy}: Pregnancy coefficient used in calculation.
-  \item \code{NEm}: Net energy for maintenance.
-  \item \code{NE_pregnancy}: Net energy required for pregnancy.
-}
+Tibble with code, animal_type, animal_subtype, c_pregnancy, NEm, NE_pregnancy
 }
 \description{
-Computes the net energy required for pregnancy based on species-specific
-coefficients and pregnancy rate. The calculation method depends on the
-animal type:
-}
-\details{
-\itemize{
-  \item \strong{Cattle}: Uses species-specific coefficients (\code{c_pregnancy})
-        from the \code{coefficients} table, matched by category.
-  \item \strong{Sheep and Goat}:
-    \itemize{
-      \item If pregnancy rate (\code{pr}) = 0 → energy requirement is set to 0.
-      \item If \code{pr} > 0 → a weighted coefficient is calculated based on
-            single and double birth fractions:
-            \deqn{c_pregnancy = 0.077 \times (1 - (pr - 1)) + 0.126 \times (pr - 1)}
-    }
-}
-
-Final NE for pregnancy is computed as:
-\deqn{NE_{pregnancy} = NEm \times c_{pregnancy}}
-
-
-This function requires:
-\itemize{
-  \item \code{calculate_NEm()} to provide maintenance net energy (\code{NEm}).
-  \item A \code{coefficients} data frame with at least columns:
-        \code{coefficient}, \code{description}, \code{value}.
-  \item A \code{categories} data frame with at least columns:
-        \code{code}, \code{c_pregnancy}, \code{pr}.
-}
-}
-\examples{
-\donttest{
-  # Calculate for all animals
-  calculate_NE_pregnancy()
-
-  # Filter for cattle only
-  calculate_NE_pregnancy(animal = "Cattle")
-}
+Computes NE_pregnancy with species-specific rules.
 }

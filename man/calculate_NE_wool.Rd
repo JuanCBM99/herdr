@@ -4,38 +4,16 @@
 \alias{calculate_NE_wool}
 \title{Calculate Net Energy for Wool Production (NE_wool)}
 \usage{
-calculate_NE_wool(animal = NULL)
+calculate_NE_wool(animal = NULL, type = NULL)
 }
 \arguments{
-\item{animal}{Character string (optional). If provided, filters the results
-to include only the specified animal type (e.g., "Sheep", "Goat").
-If \code{NULL}, all animals with non-missing wool yield are returned.}
+\item{animal}{Character string (optional)}
+
+\item{type}{Character string (optional, only for Cattle)}
 }
 \value{
-A tibble with the following columns:
-\describe{
-  \item{code}{Unique code identifying the animal category.}
-  \item{animal_type}{Type of animal (e.g., Sheep, Goat).}
-  \item{wool_yield}{Annual wool yield per head (kg/year).}
-  \item{NE_wool}{Net Energy for wool production (MJ/day).}
-}
+Tibble with code, animal_type, animal_subtype, wool_yield, NE_wool
 }
 \description{
-Calculates the Net Energy required for wool production, based on the
-annual wool yield and a fixed energy coefficient.
-}
-\details{
-The calculation follows the formula:
-\deqn{NE\_wool = (wool\_yield \times 24) / 365}
-where 24 MJ/kg is the default energy value of each kg of wool produced.
-}
-\examples{
-\dontrun{
-# All animals with wool yield
-calculate_NE_wool()
-
-# Only sheep
-calculate_NE_wool(animal = "Sheep")
-}
-
+NE_wool = (wool_yield * 24) / 365
 }
