@@ -2,7 +2,7 @@
 library(usethis)
 library(magrittr)
 
-data_folder <- "C:/Users/juancarlos.baez/Desktop/CSV_R/Ruminants_csv"
+data_folder <- "C:/Users/juancarlos.baez/Desktop/CSV_R/Cattle_csv"
 
 #=========================================================
 # Constants
@@ -20,6 +20,4 @@ characteristics <- read.csv(paste0(data_folder,"/","characteristics.csv"))
 weights <- read.csv(paste0(data_folder,"/","weights.csv"))
 coefficients <- read.csv(paste0(data_folder,"/","coefficients.csv"))
 categories <- read.csv(paste0(data_folder,"/","categories.csv"))
-mcf <- read.csv(paste0(data_folder,"/","mcf.csv"))
-ch4_mm <- read.csv(paste0(data_folder,"/","CH4_M_M.csv"))
-use_data(diet, ingredients, characteristics, coefficients, categories, weights,mcf, ch4_mm, overwrite = TRUE)
+use_data(diet, ingredients, characteristics, coefficients, categories, weights, overwrite = TRUE)
