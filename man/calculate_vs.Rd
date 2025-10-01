@@ -4,7 +4,13 @@
 \alias{calculate_vs}
 \title{Calculate Volatile Solids (VS) for Animals}
 \usage{
-calculate_vs(animal = NULL, type = NULL, zone = NULL, urinary_energy = 0.04)
+calculate_vs(
+  animal = NULL,
+  type = NULL,
+  zone = NULL,
+  urinary_energy = 0.04,
+  saveoutput = TRUE
+)
 }
 \arguments{
 \item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
@@ -14,20 +20,8 @@ calculate_vs(animal = NULL, type = NULL, zone = NULL, urinary_energy = 0.04)
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
 \item{urinary_energy}{Numeric. Fraction of energy lost in urine. Default 0.04.}
-}
-\value{
-A tibble with columns:
-\describe{
-  \item{Code}{Animal category code.}
-  \item{animal_type}{Animal species (Cattle, Sheep, Goat).}
-  \item{animal_subtype}{Subtype (only for Cattle).}
-  \item{zone}{Geographical zone.}
-  \item{GE}{Gross Energy (MJ/day).}
-  \item{DE}{Digestible Energy fraction (0-1).}
-  \item{Ash}{Ash content fraction (0-1).}
-  \item{urinary_energy}{Urinary energy fraction used in calculation.}
-  \item{VS}{Calculated Volatile Solids (MJ/day).}
-}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \description{
 Computes volatile solids (VS) for animal categories based on gross energy (GE),

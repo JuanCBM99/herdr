@@ -4,7 +4,12 @@
 \alias{calculate_CH4_manure}
 \title{Calculate CH₄ Emissions from Manure Management}
 \usage{
-calculate_CH4_manure(animal = NULL, type = NULL, zone = NULL)
+calculate_CH4_manure(
+  animal = NULL,
+  type = NULL,
+  zone = NULL,
+  saveoutput = TRUE
+)
 }
 \arguments{
 \item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
@@ -12,6 +17,8 @@ calculate_CH4_manure(animal = NULL, type = NULL, zone = NULL)
 \item{type}{Character string (optional). Only applies if `animal = "Cattle"` (e.g., "Dairy", "Beef"). Default NULL.}
 
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \description{
 Computes the CH₄ emission factor (EF) in kg CH₄/year/animal
@@ -21,10 +28,7 @@ and Average annual fraction of manure handled with each system (AWMS).
 }
 \examples{
 \dontrun{
-# All Cattle
-calculate_CH4_manure(animal = "Cattle")
-
-# Dairy Cattle in specific zones
+calculate_CH4_manure(animal = "Cattle", saveoutput = TRUE)
 calculate_CH4_manure(animal = "Cattle", type = "Dairy", zone = c("A", "B"))
 }
 
