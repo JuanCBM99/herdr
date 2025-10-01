@@ -4,7 +4,7 @@
 \alias{calculate_NEa}
 \title{Calculate Net Energy for Activity (NEa)}
 \usage{
-calculate_NEa(animal = NULL, type = NULL)
+calculate_NEa(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (optional). Filter by animal type.}

@@ -11,9 +11,8 @@
 #'
 #' @examples
 #' \dontrun{
-#' # All Dairy Cattle
 #' calculate_weighted_variable(animal = "Cattle", type = "Dairy")
-#'
+#' }
 #' @export
 calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL, saveoutput = TRUE) {
 
@@ -58,7 +57,7 @@ calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL
 
   # --- Variables a calcular ---
   vars <- intersect(c("cp", "de", "ash", "ndf"), names(joined))
-  req <- c("ingredient_share", "feed_share", "forage_share", "milk_share")
+  req <- c("ingredient_share", "feed_share", "forage_share", "milk_share","milk_replacer_share")
   miss <- setdiff(req, names(joined))
   if (length(miss) > 0) stop("Faltan columnas: ", paste(miss, collapse = ", "))
 
@@ -68,6 +67,7 @@ calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL
       ingredient_type == "Feed"   ~ feed_share,
       ingredient_type == "Forage" ~ forage_share,
       ingredient_type == "Milk"   ~ milk_share,
+      ingredient_type == "Lactoreemplazante"   ~ milk_replacer_share,
       TRUE ~ 0
     )) %>%
     mutate(across(all_of(vars),

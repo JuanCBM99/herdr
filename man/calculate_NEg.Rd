@@ -4,12 +4,14 @@
 \alias{calculate_NEg}
 \title{Calculate Net Energy for Growth (NEg)}
 \usage{
-calculate_NEg(animal = NULL, type = NULL)
+calculate_NEg(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (required). Animal type.}
 
 \item{type}{Character string (optional). Only for Cattle subtype.}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 A tibble with columns: code, animal_type, animal_subtype, c, a, b, average_weight, adult_weight, weight_gain, NEg

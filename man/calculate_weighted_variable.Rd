@@ -28,11 +28,6 @@ Computes weighted averages of nutritional variables based on animal diets.
 }
 \examples{
 \dontrun{
-# All Dairy Cattle
 calculate_weighted_variable(animal = "Cattle", type = "Dairy")
-
-# Sheep in specific zones
-calculate_weighted_variable(animal = "Sheep", zones = c("North", "South"))
 }
-
 }

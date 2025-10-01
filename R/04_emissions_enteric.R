@@ -8,6 +8,7 @@
 #' @param animal character. Type of animal ("Cattle", "Sheep", "Goat").
 #' @param type Optional character. Only for "Cattle" (e.g., "Dairy", "Beef").
 #' @param zone Optional character vector. Only for "Cattle" when type is specified.
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #'
 #' @return A tibble with columns:
 #' \itemize{
@@ -28,13 +29,12 @@
 #' calculate_emissions_enteric(animal = "Sheep")
 #' calculate_emissions_enteric(animal = "Goat")
 #' }
-calculate_emissions_enteric <- function(animal = NULL, type = NULL, zone = NULL) {
+calculate_emissions_enteric <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
 
   # 1️⃣ Detectar automáticamente animales y tipos si no se especifica
   animals_available <- unique(categories$animal_type)
   if (is.null(animal)) animal <- animals_available
 
-  # Inicializar lista para ir almacenando resultados por animal
   resultados_list <- list()
 
   for (animal in animal) {
@@ -47,28 +47,28 @@ calculate_emissions_enteric <- function(animal = NULL, type = NULL, zone = NULL)
 
       # DE y NDF
       diet_vars <- calculate_weighted_variable(animal = animal, type = typ, zone = zone) %>%
-        dplyr::select(code, animal_type, animal_subtype, de, ndf, zone)
+        select(code, animal_type, animal_subtype, de, ndf, zone)
 
       if (nrow(diet_vars) == 0) next  # saltar si no hay datos
 
       # GE
       ge_df <- calculate_ge(animal = animal, type = typ, zone = zone) %>%
-        dplyr::select(code, ge, animal_type, animal_subtype, zone)
+        select(code, ge, animal_type, animal_subtype, zone)
 
       # Población
       pop_df <- categories %>%
-        dplyr::filter(animal_type == animal, animal_subtype == typ) %>%
-        dplyr::select(code, animal_type, animal_subtype, n_population)
+        filter(animal_type == animal, animal_subtype == typ) %>%
+        select(code, animal_type, animal_subtype, n_population)
 
       # Join de diet, ge y población
       df <- diet_vars %>%
-        dplyr::inner_join(ge_df, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
-        dplyr::inner_join(pop_df, by = c("code", "animal_type", "animal_subtype"))
+        inner_join(ge_df, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
+        inner_join(pop_df, by = c("code", "animal_type", "animal_subtype"))
 
       # Calcular emisiones
       df <- df %>%
-        dplyr::mutate(
-          ym = dplyr::case_when(
+        mutate(
+          ym = case_when(
             animal == "Sheep" ~ 6.7,
             animal == "Goat"  ~ 5.5,
             animal == "Cattle" & code == "k23" & de >= 70 & ndf <= 35 ~ 5.7,
@@ -84,18 +84,25 @@ calculate_emissions_enteric <- function(animal = NULL, type = NULL, zone = NULL)
           ef_kg_animal_year = (ge * (ym / 100) * 365) / 55.65,
           emissions_total = ef_kg_animal_year * (n_population / 1e6)
         ) %>%
-        dplyr::select(code, animal_type, animal_subtype, zone, de, ndf, ge, ym,
-                      ef_kg_animal_year, n_population, emissions_total)
+        select(code, animal_type, animal_subtype, zone, de, ndf, ge, ym,
+               ef_kg_animal_year, n_population, emissions_total)
 
       resultados_list[[paste0(animal, "_", typ)]] <- df
     }
   }
 
-  # Combinar todos los resultados en un solo tibble
-  resultado_final <- dplyr::bind_rows(resultados_list)
+  resultado_final <- bind_rows(resultados_list)
 
-  return(resultado_final)
+  # Guardar CSV si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(resultado_final, "output/enteric_emissions.csv", row.names = FALSE)
+  }
+
+  resultado_final
 }
+
+
 
 
 

@@ -4,7 +4,12 @@
 \alias{calculate_emissions_enteric}
 \title{Calculate methane emissions from enteric fermentation}
 \usage{
-calculate_emissions_enteric(animal = NULL, type = NULL, zone = NULL)
+calculate_emissions_enteric(
+  animal = NULL,
+  type = NULL,
+  zone = NULL,
+  saveoutput = TRUE
+)
 }
 \arguments{
 \item{animal}{character. Type of animal ("Cattle", "Sheep", "Goat").}
@@ -12,6 +17,8 @@ calculate_emissions_enteric(animal = NULL, type = NULL, zone = NULL)
 \item{type}{Optional character. Only for "Cattle" (e.g., "Dairy", "Beef").}
 
 \item{zone}{Optional character vector. Only for "Cattle" when type is specified.}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 A tibble with columns:

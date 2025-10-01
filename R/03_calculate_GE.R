@@ -6,10 +6,12 @@
 #'
 #' @param animal Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.
 #' @param type Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").
+#' @param zone Character vector (optional). Filter by zone.
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #'
 #' @return A tibble with gross energy (GE), its components, animal type/subtype, and zone.
 #' @export
-calculate_ge <- function(animal = NULL, type = NULL, zone = NULL) {
+calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
 
   if (is.null(animal)) type <- NULL
 
@@ -64,8 +66,17 @@ calculate_ge <- function(animal = NULL, type = NULL, zone = NULL) {
                   NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool,
                   de, rem, reg, ge)
 
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(final, "output/ge_result.csv", row.names = FALSE)
+  }
+
   return(final)
 }
+
+
+
 
 
 

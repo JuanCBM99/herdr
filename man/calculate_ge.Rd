@@ -4,12 +4,16 @@
 \alias{calculate_ge}
 \title{Calculate Gross Energy (GE)}
 \usage{
-calculate_ge(animal = NULL, type = NULL, zone = NULL)
+calculate_ge(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.}
 
 \item{type}{Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").}
+
+\item{zone}{Character vector (optional). Filter by zone.}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 A tibble with gross energy (GE), its components, animal type/subtype, and zone.

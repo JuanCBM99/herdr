@@ -4,7 +4,7 @@
 \alias{calculate_NEm}
 \title{Calculate Net Energy for Maintenance (NEm)}
 \usage{
-calculate_NEm(animal = NULL, type = NULL)
+calculate_NEm(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat").

@@ -4,12 +4,14 @@
 \alias{calculate_NE_wool}
 \title{Calculate Net Energy for Wool Production (NE_wool)}
 \usage{
-calculate_NE_wool(animal = NULL, type = NULL)
+calculate_NE_wool(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (optional)}
 
 \item{type}{Character string (optional, only for Cattle)}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 Tibble with code, animal_type, animal_subtype, wool_yield, NE_wool

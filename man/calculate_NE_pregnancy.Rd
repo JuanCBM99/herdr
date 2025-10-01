@@ -4,12 +4,14 @@
 \alias{calculate_NE_pregnancy}
 \title{Calculate Net Energy for Pregnancy (NE_pregnancy)}
 \usage{
-calculate_NE_pregnancy(animal = NULL, type = NULL)
+calculate_NE_pregnancy(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character (optional)}
 
 \item{type}{Character (optional, only for Cattle)}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 Tibble with code, animal_type, animal_subtype, c_pregnancy, NEm, NE_pregnancy

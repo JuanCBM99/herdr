@@ -4,12 +4,14 @@
 \alias{calculate_NEl}
 \title{Calculate Net Energy for Lactation (NEl)}
 \usage{
-calculate_NEl(animal = NULL, type = NULL)
+calculate_NEl(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (optional). Animal type.}
 
 \item{type}{Character string (optional). Only for Cattle subtype.}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 A tibble with code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl

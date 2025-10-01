@@ -9,13 +9,13 @@
 #'
 #' @return A tibble with columns: code, animal_type, animal_subtype, average_weight, cfi_value, NEm
 #' @export
-calculate_NEm <- function(animal = NULL, type = NULL) {
+calculate_NEm <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   cfi_tbl <- coefficients %>%
     filter(tolower(coefficient) == "cfi") %>%
     select(description, value) %>%
     deframe()
 
-  result <- weights %>%
+  NEm_result <- weights %>%
     left_join(categories, by = c("code", "animal_type", "animal_subtype")) %>%
     mutate(
       cfi_value = cfi_tbl[cfi],
@@ -25,13 +25,17 @@ calculate_NEm <- function(animal = NULL, type = NULL) {
     arrange(code)
 
   if (!is.null(animal)) {
-    result <- result %>% filter(animal_type == animal)
+    NEm_result <- NEm_result %>% filter(animal_type == animal)
     if (!is.null(type) && animal == "Cattle") {
-      result <- result %>% filter(animal_subtype == type)
+      NEm_result <- NEm_result %>% filter(animal_subtype == type)
     }
   }
-
-  result
+  # --- Guardar salida ---
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(NEm_result, "output/NEm_result.csv", row.names = FALSE)
+  }
+  NEm_result
 }
 
 
@@ -44,7 +48,7 @@ calculate_NEm <- function(animal = NULL, type = NULL) {
 #'
 #' @return A tibble with columns: code, animal_type, animal_subtype, cfi_value, NEm, ca, NEa
 #' @export
-calculate_NEa <- function(animal = NULL, type = NULL) {
+calculate_NEa <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   NEm <- calculate_NEm(animal, type)
 
   categories_sub <- categories %>% select(code, animal_type, animal_subtype, ca, duration)
@@ -64,7 +68,7 @@ calculate_NEa <- function(animal = NULL, type = NULL) {
   categories_sub <- categories_sub %>%
     mutate(duration = ifelse(is.na(duration), 0, duration))
 
-  result <- NEm %>%
+  NEa_result <- NEm %>%
     inner_join(categories_sub, by = c("code", "animal_type", "animal_subtype")) %>%
     mutate(
       ca_val = ca_coeff[ca],
@@ -80,7 +84,12 @@ calculate_NEa <- function(animal = NULL, type = NULL) {
     ) %>%
     select(code, animal_type, animal_subtype, cfi_value, NEm, ca, NEa)
 
-  result
+  # --- Guardar salida ---
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(NEa_result, "output/NEa_result.csv", row.names = FALSE)
+  }
+  NEa_result
 }
 
 
@@ -90,10 +99,12 @@ calculate_NEa <- function(animal = NULL, type = NULL) {
 #'
 #' @param animal Character string (required). Animal type.
 #' @param type Character string (optional). Only for Cattle subtype.
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #'
 #' @return A tibble with columns: code, animal_type, animal_subtype, c, a, b, average_weight, adult_weight, weight_gain, NEg
 #' @export
-calculate_NEg <- function(animal = NULL, type = NULL) {
+calculate_NEg <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
+
   weights_sub <- weights
   categories_sub <- categories
 
@@ -135,8 +146,15 @@ calculate_NEg <- function(animal = NULL, type = NULL) {
     ) %>%
     ungroup()
 
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(df, "output/NEg_result.csv", row.names = FALSE)
+  }
+
   df %>% select(code, animal_type, animal_subtype, c, a, b, average_weight, adult_weight, weight_gain, NEg)
 }
+
 
 
 #' Calculate Net Energy for Lactation (NEl)
@@ -145,25 +163,36 @@ calculate_NEg <- function(animal = NULL, type = NULL) {
 #'
 #' @param animal Character string (optional). Animal type.
 #' @param type Character string (optional). Only for Cattle subtype.
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #'
 #' @return A tibble with code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl
 #' @export
-calculate_NEl <- function(animal = NULL, type = NULL) {
+calculate_NEl <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
+
   result <- categories %>%
     filter(!is.na(milk_yield), !is.na(fat_content), !is.na(code)) %>%
     mutate(
       Milk_yield_kg_day_head = milk_yield / 365,
       NEl = case_when(
-        animal_type=="Cattle" ~ Milk_yield_kg_day_head*(1.47+0.4*fat_content),
+        animal_type == "Cattle" ~ Milk_yield_kg_day_head*(1.47 + 0.4*fat_content),
         animal_type %in% c("Sheep","Goat") ~ Milk_yield_kg_day_head*4.6,
         TRUE ~ NA_real_
       )
     ) %>%
     select(code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl)
 
+  # Filtrar por animal/type si se especifica
   if (!is.null(animal)) {
-    result <- result %>% filter(animal_type==animal)
-    if (!is.null(type) && animal=="Cattle") result <- result %>% filter(animal_subtype==type)
+    result <- result %>% filter(animal_type == animal)
+    if (!is.null(type) && animal == "Cattle") {
+      result <- result %>% filter(animal_subtype == type)
+    }
+  }
+
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(result, "output/NEl_result.csv", row.names = FALSE)
   }
 
   result
@@ -176,18 +205,29 @@ calculate_NEl <- function(animal = NULL, type = NULL) {
 #'
 #' @param animal Character string (optional)
 #' @param type Character string (optional, only for Cattle)
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #' @return A tibble with code, animal_type, animal_subtype, hours, NEm, NE_work
 #' @export
-calculate_NE_work <- function(animal = NULL, type = NULL) {
-  NEm <- calculate_NEm(animal, type)
-  categories_sub <- categories
-  if (!is.null(animal)) categories_sub <- categories_sub %>% filter(animal_type==animal)
-  if (!is.null(type) && animal=="Cattle") categories_sub <- categories_sub %>% filter(animal_subtype==type)
+calculate_NE_work <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
 
-  categories_sub %>%
-    inner_join(NEm, by=c("code","animal_type","animal_subtype")) %>%
-    mutate(NE_work = hours*NEm) %>%
+  NEm <- calculate_NEm(animal, type)
+
+  categories_sub <- categories
+  if (!is.null(animal)) categories_sub <- categories_sub %>% filter(animal_type == animal)
+  if (!is.null(type) && animal == "Cattle") categories_sub <- categories_sub %>% filter(animal_subtype == type)
+
+  result <- categories_sub %>%
+    inner_join(NEm, by = c("code","animal_type","animal_subtype")) %>%
+    mutate(NE_work = hours * NEm) %>%
     select(code, animal_type, animal_subtype, hours, NEm, NE_work)
+
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(result, "output/NE_work_result.csv", row.names = FALSE)
+  }
+
+  result
 }
 
 
@@ -197,17 +237,26 @@ calculate_NE_work <- function(animal = NULL, type = NULL) {
 #'
 #' @param animal Character string (optional)
 #' @param type Character string (optional, only for Cattle)
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #' @return Tibble with code, animal_type, animal_subtype, wool_yield, NE_wool
 #' @export
-calculate_NE_wool <- function(animal = NULL, type = NULL) {
+calculate_NE_wool <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
+
   result <- categories %>%
     filter(!is.na(wool_yield)) %>%
-    mutate(NE_wool = (wool_yield*24)/365) %>%
+    mutate(NE_wool = (wool_yield * 24) / 365) %>%
     select(code, animal_type, animal_subtype, wool_yield, NE_wool)
 
+  # Filtrar por animal/type si se especifica
   if (!is.null(animal)) {
-    result <- result %>% filter(animal_type==animal)
-    if (!is.null(type) && animal=="Cattle") result <- result %>% filter(animal_subtype==type)
+    result <- result %>% filter(animal_type == animal)
+    if (!is.null(type) && animal == "Cattle") result <- result %>% filter(animal_subtype == type)
+  }
+
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(result, "output/NE_wool_result.csv", row.names = FALSE)
   }
 
   result
@@ -220,37 +269,53 @@ calculate_NE_wool <- function(animal = NULL, type = NULL) {
 #'
 #' @param animal Character (optional)
 #' @param type Character (optional, only for Cattle)
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
 #' @return Tibble with code, animal_type, animal_subtype, c_pregnancy, NEm, NE_pregnancy
 #' @export
-calculate_NE_pregnancy <- function(animal = NULL, type = NULL) {
+calculate_NE_pregnancy <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
+
   NEm <- calculate_NEm(animal, type)
 
-  cat_df <- categories %>% select(code, animal_type, animal_subtype, c_pregnancy_cat=c_pregnancy, pr)
+  cat_df <- categories %>%
+    select(code, animal_type, animal_subtype, c_pregnancy_cat = c_pregnancy, pr)
+
+  # Filtrar por animal/type si se especifica
   if (!is.null(animal)) {
-    cat_df <- cat_df %>% filter(animal_type==animal)
-    if (!is.null(type) && animal=="Cattle") cat_df <- cat_df %>% filter(animal_subtype==type)
+    cat_df <- cat_df %>% filter(animal_type == animal)
+    if (!is.null(type) && animal == "Cattle") {
+      cat_df <- cat_df %>% filter(animal_subtype == type)
+    }
   }
 
   c_preg_tbl <- coefficients %>%
-    filter(tolower(coefficient)=="c_pregnancy") %>%
+    filter(tolower(coefficient) == "c_pregnancy") %>%
     select(description, value) %>%
     deframe()
 
-  NEm %>%
-    left_join(cat_df, by=c("code","animal_type","animal_subtype")) %>%
+  result <- NEm %>%
+    left_join(cat_df, by = c("code","animal_type","animal_subtype")) %>%
     mutate(
       c_pregnancy_value = case_when(
-        animal_type=="Cattle" ~ c_preg_tbl[c_pregnancy_cat],
-        animal_type %in% c("Sheep","Goat") & pr==0 ~ 0,
-        animal_type %in% c("Sheep","Goat") & pr>0 ~ {
+        animal_type == "Cattle" ~ c_preg_tbl[c_pregnancy_cat],
+        animal_type %in% c("Sheep","Goat") & pr == 0 ~ 0,
+        animal_type %in% c("Sheep","Goat") & pr > 0 ~ {
           double_birth_fraction <- pmax(pr-1,0)
-          single_birth_fraction <- 1-double_birth_fraction
+          single_birth_fraction <- 1 - double_birth_fraction
           0.126*double_birth_fraction + 0.077*single_birth_fraction
         },
         TRUE ~ 0
       ),
-      c_pregnancy_value = ifelse(is.na(c_pregnancy_value),0,c_pregnancy_value),
-      NE_pregnancy = c_pregnancy_value*NEm
+      c_pregnancy_value = ifelse(is.na(c_pregnancy_value), 0, c_pregnancy_value),
+      NE_pregnancy = c_pregnancy_value * NEm
     ) %>%
-    select(code, animal_type, animal_subtype, c_pregnancy=c_pregnancy_value, NEm, NE_pregnancy)
+    select(code, animal_type, animal_subtype, c_pregnancy = c_pregnancy_value, NEm, NE_pregnancy)
+
+  # Guardar salida si saveoutput = TRUE
+  if (saveoutput) {
+    dir.create("output", showWarnings = FALSE)
+    write.csv(result, "output/NE_pregnancy_result.csv", row.names = FALSE)
+  }
+
+  result
 }
+

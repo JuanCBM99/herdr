@@ -4,12 +4,14 @@
 \alias{calculate_NE_work}
 \title{Calculate Net Working Energy (NE_work)}
 \usage{
-calculate_NE_work(animal = NULL, type = NULL)
+calculate_NE_work(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
 \item{animal}{Character string (optional)}
 
 \item{type}{Character string (optional, only for Cattle)}
+
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
 \value{
 A tibble with code, animal_type, animal_subtype, hours, NEm, NE_work
