@@ -11,11 +11,12 @@ calculate_NE_wool(animal = NULL, type = NULL, saveoutput = TRUE)
 
 \item{type}{Character string (optional, only for Cattle)}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
 Tibble with code, animal_type, animal_subtype, wool_yield, NE_wool
 }
 \description{
 NE_wool = (wool_yield * 24) / 365
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }

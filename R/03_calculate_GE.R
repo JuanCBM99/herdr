@@ -7,48 +7,48 @@
 #' @param animal Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.
 #' @param type Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").
 #' @param zone Character vector (optional). Filter by zone.
-#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default FALSE.
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
 #'
 #' @return A tibble with gross energy (GE), its components, animal type/subtype, and zone.
 #' @export
 calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
 
-  if (is.null(animal)) type <- NULL
+  message("🟢 Calculating gross energy (GE)...")
 
-  # 1️⃣ Calcular NE (sin zone)
-  NEm <- calculate_NEm(animal = animal, type = type)
-  NEa <- calculate_NEa(animal = animal, type = type)
-  NEg <- calculate_NEg(animal = animal, type = type)
-  NE_work <- calculate_NE_work(animal = animal, type = type)
-  NE_pregnancy <- calculate_NE_pregnancy(animal = animal, type = type)
-  NEl <- calculate_NEl(animal = animal, type = type)
-  NE_wool <- calculate_NE_wool(animal = animal, type = type)
+  # --- Calcular NE (usando funciones adaptadas) ---
+  NEm <- calculate_NEm(animal = animal, type = type, saveoutput = FALSE)
+  NEa <- calculate_NEa(animal = animal, type = type, saveoutput = FALSE)
+  NEg <- calculate_NEg(animal = animal, type = type, saveoutput = FALSE)
+  NE_work <- calculate_NE_work(animal = animal, type = type, saveoutput = FALSE)
+  NE_pregnancy <- calculate_NE_pregnancy(animal = animal, type = type, saveoutput = FALSE)
+  NEl <- calculate_NEl(animal = animal, type = type, saveoutput = FALSE)
+  NE_wool <- calculate_NE_wool(animal = animal, type = type, saveoutput = FALSE)
 
-  # 2️⃣ Combinar NE
+  # --- Combinar NE ---
   NE_all <- NEm %>%
     dplyr::select(code, animal_type, animal_subtype, NEm) %>%
-    left_join(NEa %>% dplyr::select(code, animal_type, animal_subtype, NEa),
-              by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NEg %>% dplyr::select(code, animal_type, animal_subtype, NEg),
-              by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NE_work %>% dplyr::select(code, animal_type, animal_subtype, NE_work),
-              by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NE_pregnancy %>% dplyr::select(code, animal_type, animal_subtype, NE_pregnancy),
-              by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NEl %>% dplyr::select(code, animal_type, animal_subtype, NEl),
-              by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NE_wool %>% dplyr::select(code, animal_type, animal_subtype, NE_wool),
-              by = c("code", "animal_type", "animal_subtype"))
+    dplyr::left_join(NEa %>% dplyr::select(code, animal_type, animal_subtype, NEa),
+                     by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NEg %>% dplyr::select(code, animal_type, animal_subtype, NEg),
+                     by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NE_work %>% dplyr::select(code, animal_type, animal_subtype, NE_work),
+                     by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NE_pregnancy %>% dplyr::select(code, animal_type, animal_subtype, NE_pregnancy),
+                     by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NEl %>% dplyr::select(code, animal_type, animal_subtype, NEl),
+                     by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NE_wool %>% dplyr::select(code, animal_type, animal_subtype, NE_wool),
+                     by = c("code", "animal_type", "animal_subtype"))
 
-  # 3️⃣ Calcular DE por zone
-  de_df <- calculate_weighted_variable(animal = animal, type = type, zone = zone)
+  # --- Calcular DE por zone ---
+  de_df <- calculate_weighted_variable(animal = animal, type = type, zones = zone, saveoutput = FALSE)
 
   # Filtrar por zona(s) si se especifica
   if (!is.null(zone)) {
     de_df <- de_df %>% dplyr::filter(zone %in% zone)
   }
 
-  # 4️⃣ Combinar NE con DE y calcular GE
+  # --- Combinar NE con DE y calcular GE ---
   final <- NE_all %>%
     dplyr::inner_join(de_df, by = c("code", "animal_type", "animal_subtype")) %>%
     dplyr::mutate(
@@ -66,17 +66,12 @@ calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = T
                   NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool,
                   de, rem, reg, ge)
 
-  # Guardar salida si saveoutput = TRUE
+  # --- Guardar salida ---
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
     write.csv(final, "output/ge_result.csv", row.names = FALSE)
+    message("💾 Saved output to output/ge_result.csv")
   }
 
   return(final)
 }
-
-
-
-
-
-

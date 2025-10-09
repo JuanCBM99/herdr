@@ -29,80 +29,56 @@
 #' calculate_emissions_enteric(animal = "Sheep")
 #' calculate_emissions_enteric(animal = "Goat")
 #' }
-calculate_emissions_enteric <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
+calculate_emissions_enteric <- function(animal=NULL,type=NULL,zone=NULL,saveoutput=TRUE){
+  categories <- load_dataset("categories")
+  resultado_list <- list()
 
-  # 1️⃣ Detectar automáticamente animales y tipos si no se especifica
-  animals_available <- unique(categories$animal_type)
-  if (is.null(animal)) animal <- animals_available
+  animals_use <- if(is.null(animal)) unique(categories$animal_type) else animal
 
-  resultados_list <- list()
+  for(an in animals_use){
+    types_use <- if(is.null(type)) unique(categories$animal_subtype[categories$animal_type==an]) else type[type %in% unique(categories$animal_subtype[categories$animal_type==an])]
+    for(tp in types_use){
+      diet_vars <- calculate_weighted_variable(animal=an,type=tp,zone=zone,saveoutput=FALSE) %>%
+        dplyr::select(code,animal_type,animal_subtype,de,ndf,zone)
+      if(nrow(diet_vars)==0) next
 
-  for (animal in animal) {
+      ge_df <- calculate_ge(animal=an,type=tp,zone=zone,saveoutput=FALSE) %>%
+        dplyr::select(code,ge,animal_type,animal_subtype,zone)
+      pop_df <- categories %>% dplyr::filter(animal_type==an,animal_subtype==tp) %>% dplyr::select(code,animal_type,animal_subtype,n_population)
 
-    # Detectar tipos disponibles para ese animal
-    types_available <- unique(categories$animal_subtype[categories$animal_type == animal])
-    types_to_use <- if (is.null(type)) types_available else type[type %in% types_available]
-
-    for (typ in types_to_use) {
-
-      # DE y NDF
-      diet_vars <- calculate_weighted_variable(animal = animal, type = typ, zone = zone) %>%
-        select(code, animal_type, animal_subtype, de, ndf, zone)
-
-      if (nrow(diet_vars) == 0) next  # saltar si no hay datos
-
-      # GE
-      ge_df <- calculate_ge(animal = animal, type = typ, zone = zone) %>%
-        select(code, ge, animal_type, animal_subtype, zone)
-
-      # Población
-      pop_df <- categories %>%
-        filter(animal_type == animal, animal_subtype == typ) %>%
-        select(code, animal_type, animal_subtype, n_population)
-
-      # Join de diet, ge y población
       df <- diet_vars %>%
-        inner_join(ge_df, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
-        inner_join(pop_df, by = c("code", "animal_type", "animal_subtype"))
+        dplyr::inner_join(ge_df,by=c("code","animal_type","animal_subtype","zone")) %>%
+        dplyr::inner_join(pop_df,by=c("code","animal_type","animal_subtype"))
 
-      # Calcular emisiones
       df <- df %>%
-        mutate(
-          ym = case_when(
-            animal == "Sheep" ~ 6.7,
-            animal == "Goat"  ~ 5.5,
-            animal == "Cattle" & code == "k23" & de >= 70 & ndf <= 35 ~ 5.7,
-            animal == "Cattle" & code == "k23" & de >= 70 & ndf > 35  ~ 6.0,
-            animal == "Cattle" & code == "k23" & de >= 63 & de < 70 & ndf > 37 ~ 6.3,
-            animal == "Cattle" & code == "k23" & de <= 62 & ndf > 38 ~ 6.5,
-            animal == "Cattle" & code != "k23" & de >= 75 ~ 3.0,
-            animal == "Cattle" & code != "k23" & de >= 72 ~ 4.0,
-            animal == "Cattle" & code != "k23" & de >= 62 & de <= 71 ~ 6.3,
-            animal == "Cattle" & code != "k23" & de < 62 ~ 7.0,
+        dplyr::mutate(
+          ym = dplyr::case_when(
+            an=="Sheep" ~ 6.7,
+            an=="Goat" ~ 5.5,
+            an=="Cattle" & code=="k23" & de>=70 & ndf<=35 ~ 5.7,
+            an=="Cattle" & code=="k23" & de>=70 & ndf>35  ~ 6.0,
+            an=="Cattle" & code=="k23" & de>=63 & de<70 & ndf>37 ~ 6.3,
+            an=="Cattle" & code=="k23" & de<=62 & ndf>38 ~ 6.5,
+            an=="Cattle" & code!="k23" & de>=75 ~ 3.0,
+            an=="Cattle" & code!="k23" & de>=72 ~ 4.0,
+            an=="Cattle" & code!="k23" & de>=62 & de<=71 ~ 6.3,
+            an=="Cattle" & code!="k23" & de<62 ~ 7.0,
             TRUE ~ NA_real_
           ),
-          ef_kg_animal_year = (ge * (ym / 100) * 365) / 55.65,
-          emissions_total = ef_kg_animal_year * (n_population / 1e6)
+          ef_kg_animal_year = (ge*(ym/100)*365)/55.65,
+          emissions_total = ef_kg_animal_year*(n_population/1e6)
         ) %>%
-        select(code, animal_type, animal_subtype, zone, de, ndf, ge, ym,
-               ef_kg_animal_year, n_population, emissions_total)
+        dplyr::select(code,animal_type,animal_subtype,zone,de,ndf,ge,ym,
+                      ef_kg_animal_year,n_population,emissions_total)
 
-      resultados_list[[paste0(animal, "_", typ)]] <- df
+      resultado_list[[paste0(an,"_",tp)]] <- df
     }
   }
 
-  resultado_final <- bind_rows(resultados_list)
-
-  # Guardar CSV si saveoutput = TRUE
-  if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    write.csv(resultado_final, "output/enteric_emissions.csv", row.names = FALSE)
+  final <- dplyr::bind_rows(resultado_list)
+  if(saveoutput){
+    dir.create("output",showWarnings=FALSE)
+    write.csv(final,"output/enteric_emissions.csv",row.names=FALSE)
   }
-
-  resultado_final
+  final
 }
-
-
-
-
-

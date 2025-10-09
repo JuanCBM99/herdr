@@ -10,10 +10,13 @@ calculate_NEa(animal = NULL, type = NULL, saveoutput = TRUE)
 \item{animal}{Character string (optional). Filter by animal type.}
 
 \item{type}{Character string (optional). Only applies for Cattle.}
+
+\item{saveoutput}{Logical. Save results to CSV? Default TRUE}
 }
 \value{
 A tibble with columns: code, animal_type, animal_subtype, cfi_value, NEm, ca, NEa
 }
 \description{
-Computes NEa for a given animal type using NEm, housing/activity coefficients.
+Computes NEa for a given animal type using NEm and housing/activity coefficients.
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }

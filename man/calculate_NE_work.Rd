@@ -11,11 +11,12 @@ calculate_NE_work(animal = NULL, type = NULL, saveoutput = TRUE)
 
 \item{type}{Character string (optional, only for Cattle)}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
 A tibble with code, animal_type, animal_subtype, hours, NEm, NE_work
 }
 \description{
 NE_work = NEm * hours of activity.
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }

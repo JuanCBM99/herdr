@@ -11,11 +11,12 @@ calculate_NE_pregnancy(animal = NULL, type = NULL, saveoutput = TRUE)
 
 \item{type}{Character (optional, only for Cattle)}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
 Tibble with code, animal_type, animal_subtype, c_pregnancy, NEm, NE_pregnancy
 }
 \description{
 Computes NE_pregnancy with species-specific rules.
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }

@@ -2,27 +2,22 @@
 % Please edit documentation in R/10_land_use.R
 \name{calculate_land_use}
 \alias{calculate_land_use}
-\title{Calcular uso de tierra}
+\title{Calculate land use}
 \usage{
 calculate_land_use(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (opcional). Tipo de ganado (columna `animal_type`). Default NULL.}
+\item{animal}{Character string (optional). Animal type (column `animal_type`). Default NULL.}
 
-\item{type}{Character string (opcional). Subtipo de ganado (columna `animal_subtype`). Default NULL.}
+\item{type}{Character string (optional). Subtype of animal (column `animal_subtype`). Default NULL.}
 
-\item{zone}{Character vector (opcional). Filtrar por zona (columna `Zone`). Default NULL.}
+\item{zone}{Character vector (optional). Filter by zone (column `zone`). Default NULL.}
 
-\item{saveoutput}{Logical. Si TRUE, guarda el resultado en "output/Land_use.csv". Default FALSE.}
+\item{saveoutput}{Logical. If TRUE, saves the result to "output/Land_use.csv". Default TRUE.}
 }
 \value{
-Tibble con uso de tierra por ingrediente.
+Tibble with land use per ingredient.
 }
 \description{
-Calcula el uso de tierra (m²) basado en consumo de ingredientes y rendimiento de cultivos.
-}
-\examples{
-\donttest{
-calculate_land_use(animal = "Cattle", type = "Dairy", zone = c("A"), saveoutput = TRUE)
-}
+Computes land use (m²) based on ingredient consumption and crop yields.
 }

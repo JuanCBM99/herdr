@@ -13,7 +13,7 @@ calculate_ge(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE)
 
 \item{zone}{Character vector (optional). Filter by zone.}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
 A tibble with gross energy (GE), its components, animal type/subtype, and zone.

@@ -18,7 +18,7 @@ calculate_N2O_direct_manure(
 
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
-\item{saveoutput}{Logical. If TRUE, saves output as CSV in "output/N2O_direct_manure.csv". Default FALSE.}
+\item{saveoutput}{Logical. If TRUE, saves output as CSV. Default TRUE.}
 }
 \value{
 A tibble with N₂O emissions per category
@@ -26,9 +26,4 @@ A tibble with N₂O emissions per category
 \description{
 Computes direct N₂O emissions based on nitrogen excretion, emission factors,
 management system, and climate.
-}
-\examples{
-\donttest{
-calculate_N2O_direct_manure(animal = "Cattle", type = "Dairy", zone = c("A"), saveoutput = TRUE)
-}
 }

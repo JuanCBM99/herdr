@@ -2,7 +2,7 @@
 % Please edit documentation in R/08_N2O_indirect_volatilization.R
 \name{calculate_N2O_indirect_volatilization}
 \alias{calculate_N2O_indirect_volatilization}
-\title{Calcula las emisiones indirectas de N₂O por volatilización}
+\title{Calculate indirect N₂O emissions from volatilization}
 \usage{
 calculate_N2O_indirect_volatilization(
   animal = NULL,
@@ -12,22 +12,17 @@ calculate_N2O_indirect_volatilization(
 )
 }
 \arguments{
-\item{animal}{Character string (opcional). Tipo de ganado ("cattle", "sheep", "goat"). Default NULL.}
+\item{animal}{Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
 
-\item{type}{Character string (opcional). Subtipo solo para cattle. Default NULL.}
+\item{type}{Character string (optional). Subtype only for Cattle. Default NULL.}
 
-\item{zone}{Character vector (opcional). Filtrar por zona. Default NULL.}
+\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
-\item{saveoutput}{Logical. Si TRUE, guarda el resultado en "output/N2O_indirect_volatilization.csv". Default FALSE.}
+\item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_volatilization.csv". Default TRUE.}
 }
 \value{
-Tibble con emisiones indirectas por categoría
+Tibble with indirect N₂O emissions per category
 }
 \description{
-Details: Calcula emisiones indirectas de N₂O derivadas de la volatilización de nitrógeno excretado.
-}
-\examples{
-\donttest{
-  calculate_N2O_indirect_volatilization(animal = "cattle", type = "dairy", zone = c("a"), saveoutput = TRUE)
-}
+Computes indirect N₂O emissions derived from volatilization of excreted nitrogen.
 }

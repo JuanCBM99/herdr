@@ -13,28 +13,19 @@ calculate_vs(
 )
 }
 \arguments{
-\item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
+\item{animal}{Character string (optional). Filter by animal type. Default NULL.}
 
-\item{type}{Character string (optional). Only applies if `animal = "Cattle"` (e.g., "Dairy", "Beef"). Default NULL.}
+\item{type}{Character string (optional). Only applies if `animal = "Cattle"`. Default NULL.}
 
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
 \item{urinary_energy}{Numeric. Fraction of energy lost in urine. Default 0.04.}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical. If TRUE, saves the result as CSV. Default TRUE.}
+}
+\value{
+Tibble with code, animal_type, animal_subtype, zone, ge, de, ash, urinary_energy, vs.
 }
 \description{
-Computes volatile solids (VS) for animal categories based on gross energy (GE),
-digestible energy (DE), ash content, and urinary energy fraction.
-Uses outputs from `calculate_GE()` and `calculate_weighted_variable()`.
-}
-\examples{
-\dontrun{
-# All Cattle
-calculate_VS(animal = "Cattle")
-
-# Dairy Cattle in specific zones
-calculate_VS(animal = "Cattle", type = "Dairy", zone = c("North", "South"))
-}
-
+Computes volatile solids (VS) based on GE, DE, ash, and urinary energy fraction.
 }

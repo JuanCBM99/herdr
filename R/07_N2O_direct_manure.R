@@ -6,59 +6,58 @@
 #' @param animal Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.
 #' @param type Character string (optional). Only for "Cattle" subtype. Default NULL.
 #' @param zone Character vector (optional). Filter by zone. Default NULL.
-#' @param saveoutput Logical. If TRUE, saves output as CSV in "output/N2O_direct_manure.csv". Default FALSE.
+#' @param saveoutput Logical. If TRUE, saves output as CSV. Default TRUE.
 #' @return A tibble with N₂O emissions per category
 #' @export
-#' @examples
-#' \donttest{
-#' calculate_N2O_direct_manure(animal = "Cattle", type = "Dairy", zone = c("A"), saveoutput = TRUE)
-#' }
 calculate_N2O_direct_manure <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
 
-  # --- Preparar tablas base ---
-  categories_df <- categories %>%
-    select(code, animal_type, animal_subtype, milk_yield, fat_content, n_population)
+  message("🟢 Calculating direct N₂O emissions from manure...")
 
-  weights_df <- weights %>% select(code, animal_type, animal_subtype, weight_gain)
-  direct_df <- n2o_direct
+  # --- 1️⃣ Cargar datasets base ---
+  categories_df <- load_dataset("categories") %>%
+    dplyr::select(code, animal_type, animal_subtype, milk_yield, fat_content, n_population)
 
-  ef_tab <- emission_factors_direct %>%
-    select(management_system, climate, value)
+  weights_df <- load_dataset("weights") %>%
+    dplyr::select(code, animal_type, animal_subtype, weight_gain)
 
-  # --- Filtrar por animal y type ---
-  if (!is.null(animal)) categories_df <- categories_df %>% filter(animal_type == animal)
-  if (!is.null(type)) categories_df <- categories_df %>% filter(animal_subtype == type)
+  direct_df <- load_dataset("n2o_direct")
+
+  ef_tab <- load_dataset("emission_factors_direct") %>%
+    dplyr::select(management_system, climate, value)
+
+  # --- 2️⃣ Filtrar por animal/type ---
+  if (!is.null(animal)) categories_df <- categories_df %>% dplyr::filter(animal_type == animal)
+  if (!is.null(type)) categories_df <- categories_df %>% dplyr::filter(animal_subtype == type)
 
   codes_validos <- categories_df$code
 
-  # --- Filtrar otras tablas por códigos válidos ---
-  ge <- calculate_ge(animal = animal, type = type, zone = zone) %>%
-    filter(code %in% codes_validos) %>%
-    select(code, animal_type, animal_subtype, zone, ge)
+  # --- 3️⃣ Filtrar otras tablas por códigos válidos ---
+  ge <- calculate_ge(animal = animal, type = type, zone = zone, saveoutput = FALSE) %>%
+    dplyr::filter(code %in% codes_validos) %>%
+    dplyr::select(code, animal_type, animal_subtype, zone, ge)
 
-  cp <- calculate_weighted_variable(animal = animal, type = type, zone = zone) %>%
-    filter(code %in% codes_validos) %>%
-    select(code, animal_type, animal_subtype, zone, cp)
+  cp <- calculate_weighted_variable(animal = animal, type = type, zones = zone, saveoutput = FALSE) %>%
+    dplyr::filter(code %in% codes_validos) %>%
+    dplyr::select(code, animal_type, animal_subtype, zone, cp)
 
-  NEg <- calculate_NEg(animal = animal, type = type) %>%
-    filter(code %in% codes_validos) %>%
-    select(code, animal_type, animal_subtype, NEg)
+  NEg <- calculate_NEg(animal = animal, type = type, saveoutput = FALSE) %>%
+    dplyr::filter(code %in% codes_validos) %>%
+    dplyr::select(code, animal_type, animal_subtype, NEg)
 
-  direct_df <- direct_df %>% filter(code %in% codes_validos)
+  direct_df <- direct_df %>% dplyr::filter(code %in% codes_validos)
 
-  # --- Calcular emisiones ---
+  # --- 4️⃣ Calcular emisiones ---
   df <- ge %>%
-    inner_join(cp, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
-    left_join(categories_df, by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(weights_df, by = c("code", "animal_type", "animal_subtype")) %>%
-    left_join(NEg, by = c("code", "animal_type", "animal_subtype")) %>%
-    inner_join(direct_df, by = c("code", "animal_type", "animal_subtype")) %>%
-    # ⬇️ unir EF por management_system + climate
-    left_join(ef_tab, by = c("management_system", "climate")) %>%
-    mutate(
+    dplyr::inner_join(cp, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
+    dplyr::left_join(categories_df, by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(weights_df, by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(NEg, by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::inner_join(direct_df, by = c("code", "animal_type", "animal_subtype")) %>%
+    dplyr::left_join(ef_tab, by = c("management_system", "climate")) %>%
+    dplyr::mutate(
       milk_protein = 1.9 + 0.4 * fat_content,
-      N_retention = case_when(
-        animal_type %in% c("Sheep", "Goat") ~ 0.1,  # Para Sheep y Goat
+      N_retention = dplyr::case_when(
+        animal_type %in% c("Sheep", "Goat") ~ 0.1,
         !is.na(milk_yield) & !is.na(milk_protein) &
           !is.na(weight_gain) & !is.na(NEg) & weight_gain != 0 ~
           ((milk_yield * milk_protein) / 6.38) +
@@ -73,14 +72,13 @@ calculate_N2O_direct_manure <- function(animal = NULL, type = NULL, zone = NULL,
       Emisiones_N2O = n_population * N_excreted * awms * value * (44 / 28)
     )
 
-  # --- Guardar salida si saveoutput = TRUE ---
+  # --- 5️⃣ Guardar salida ---
   if (saveoutput) {
-    if (!dir.exists("output")) dir.create("output")
+    dir.create("output", showWarnings = FALSE)
     readr::write_csv(df, "output/N2O_direct_manure.csv")
+    message("💾 Saved output to output/N2O_direct_manure.csv")
   }
 
-  return(df)
+  df
 }
-
-
 

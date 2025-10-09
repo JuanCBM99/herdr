@@ -25,6 +25,7 @@ A data frame with weighted nutritional values by animal category and zone
 }
 \description{
 Computes weighted averages of nutritional variables based on animal diets.
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }
 \examples{
 \dontrun{

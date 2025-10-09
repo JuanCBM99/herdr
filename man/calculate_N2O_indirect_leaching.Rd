@@ -2,7 +2,7 @@
 % Please edit documentation in R/09_N2O_indirect_leaching.R
 \name{calculate_N2O_indirect_leaching}
 \alias{calculate_N2O_indirect_leaching}
-\title{Calcula las emisiones indirectas de N₂O por lixiviación}
+\title{Calculate indirect N₂O emissions from leaching}
 \usage{
 calculate_N2O_indirect_leaching(
   animal = NULL,
@@ -12,22 +12,17 @@ calculate_N2O_indirect_leaching(
 )
 }
 \arguments{
-\item{animal}{Character string (optional). Tipo de ganado ("Cattle", "Sheep", "Goat"). Default NULL.}
+\item{animal}{Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
 
-\item{type}{Character string (optional). Solo para "Cattle" subtype. Default NULL.}
+\item{type}{Character string (optional). Subtype only for Cattle. Default NULL.}
 
-\item{zone}{Character vector (optional). Filtrar por zona. Default NULL.}
+\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
-\item{saveoutput}{Logical. Si TRUE, guarda el resultado en "output/N2O_indirect_leaching.csv". Default FALSE.}
+\item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_leaching.csv". Default TRUE.}
 }
 \value{
-Tibble con las emisiones de N₂O por lixiviación.
+Tibble with N₂O emissions per category from leaching
 }
 \description{
-Details: Calcula las emisiones indirectas de N₂O generadas por lixiviación de nitrógeno excretado.
-}
-\examples{
-\donttest{
-calculate_N2O_indirect_leaching(animal = "Cattle", type = "Dairy", zone = c("A"), saveoutput = TRUE)
-}
+Computes indirect N₂O emissions from nitrogen leaching.
 }

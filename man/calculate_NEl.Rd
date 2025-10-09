@@ -11,11 +11,12 @@ calculate_NEl(animal = NULL, type = NULL, saveoutput = TRUE)
 
 \item{type}{Character string (optional). Only for Cattle subtype.}
 
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
-A tibble with code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl
+A tibble with columns: code, animal_type, animal_subtype, Milk_yield_kg_day_head, fat_content, NEl
 }
 \description{
 Computes NEl based on milk yield and fat content.
+Allows using user-provided datasets in 'user_data/' or defaults from the package.
 }

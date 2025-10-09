@@ -13,46 +13,21 @@ resumen_emisiones_land_use(
 )
 }
 \arguments{
-\item{animal}{Character string (opcional). Tipo de ganado (`animal_type`). Default `NULL` (todos).}
+\item{animal}{Character string (opcional). Tipo de ganado (`animal_type`). Default `NULL`.}
 
-\item{type}{Character string (opcional). Subtipo de ganado (`animal_subtype`). Default `NULL` (todos).}
+\item{type}{Character string (opcional). Subtipo de ganado (`animal_subtype`). Default `NULL`.}
 
-\item{zone}{Character vector (opcional). Zonas a filtrar (`zone`). Default `NULL` (todas).}
+\item{zone}{Character vector (opcional). Zonas a filtrar (`zone`). Default `NULL`.}
 
 \item{saveoutput}{Logical. Si `TRUE`, guarda el resultado en `"output/Resumen_emisiones_land_use.csv"`. Default `TRUE`.}
 
-\item{group_by_code}{Logical. Si `TRUE` (default) devuelve los resultados al nivel de
-`code` + `animal_type` + `animal_subtype` + `zone`. Si `FALSE`, agrupa
-únicamente por `animal_type` + `animal_subtype` + `zone` (sumando todos los `code`).}
+\item{group_by_code}{Logical. Si `TRUE` devuelve resultados al nivel de `code`. Si `FALSE`, agrega todos los `code`.}
 }
 \value{
 Un `tibble` con columnas para cada tipo de emisión y uso de tierra.
-Si `saveoutput = TRUE`, además guarda un CSV en `"output/Resumen_emisiones_land_use.csv"`.
 }
 \description{
 Calcula un resumen de emisiones de CH₄ y N₂O (directas e indirectas) y de uso de tierra
 agrupado por código, tipo de animal, subtipo y zona. Permite opcionalmente
-agrupar a un nivel más agregado (por ejemplo, sumando todos los `code` de un mismo animal).
-}
-\details{
-Internamente llama a:
-* `calculate_emissions_enteric()`
-* `calculate_CH4_manure()`
-* `calculate_N2O_direct_manure()`
-* `calculate_N2O_indirect_volatilization()`
-* `calculate_N2O_indirect_leaching()`
-* `calculate_land_use()`
-
-Agrupa y suma los resultados por las variables seleccionadas.
-}
-\examples{
-\donttest{
-# Resumen al nivel de cada code:
-resumen <- resumen_emisiones_land_use(animal = "Cattle", type = "Dairy", zone = c("A"))
-
-# Resumen agregando todos los code de Cattle juntos:
-resumen2 <- resumen_emisiones_land_use(animal = "Cattle", group_by_code = FALSE)
-print(resumen2)
-}
-
+agrupar a un nivel más agregado.
 }

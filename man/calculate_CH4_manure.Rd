@@ -20,16 +20,12 @@ calculate_CH4_manure(
 
 \item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
 }
+\value{
+Tibble with CH₄ emissions per animal category.
+}
 \description{
 Computes the CH₄ emission factor (EF) in kg CH₄/year/animal
 and total CH₄ emissions per animal category in Mg (million kg CH₄/year),
 based on Volatile Solids (VS), B₀, Methane Conversion Factor (MCF),
 and Average annual fraction of manure handled with each system (AWMS).
-}
-\examples{
-\dontrun{
-calculate_CH4_manure(animal = "Cattle", saveoutput = TRUE)
-calculate_CH4_manure(animal = "Cattle", type = "Dairy", zone = c("A", "B"))
-}
-
 }

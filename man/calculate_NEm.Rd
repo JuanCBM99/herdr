@@ -7,15 +7,16 @@
 calculate_NEm(animal = NULL, type = NULL, saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat").
-If NULL, all animals are returned.}
+\item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat").}
 
-\item{type}{Character string (optional). Only applies to "Cattle" (e.g., "Dairy", "Beef").}
+\item{type}{Character string (optional). Only applies to "Cattle".}
+
+\item{saveoutput}{Logical. Save CSV? Default TRUE}
 }
 \value{
-A tibble with columns: code, animal_type, animal_subtype, average_weight, cfi_value, NEm
+Tibble with code, animal_type, animal_subtype, average_weight, cfi_value, NEm
 }
 \description{
 Computes the Net Energy for Maintenance (NEm) for livestock animals
-based on their average weight and CFI coefficients.
+based on average weight and CFI coefficients.
 }
