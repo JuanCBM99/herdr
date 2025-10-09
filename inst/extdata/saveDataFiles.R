@@ -22,4 +22,12 @@ coefficients <- read.csv(paste0(data_folder,"/","coefficients.csv"))
 categories <- read.csv(paste0(data_folder,"/","categories.csv"))
 ch4_mm <- read.csv(paste0(data_folder,"/","CH4_M_M.csv"))
 mcf <- read.csv(paste0(data_folder,"/","mcf.csv"))
-use_data(diet, ingredients, characteristics, coefficients, categories, weights, ch4_mm, mcf, overwrite = TRUE)
+emission_factors_direct <- read.csv(paste0(data_folder,"/","emission_factors_direct.csv"))
+n2o_direct <- read.csv(paste0(data_folder,"/","n2o_direct.csv"))
+n2o_indirect <- read.csv(paste0(data_folder,"/","n2o_indirect.csv"))
+fractions <- read.csv(paste0(data_folder,"/","fractions.csv"))
+emission_factors_volatilization <- read.csv(paste0(data_folder,"/","emission_factors_volatilization.csv"))
+crops <- read.csv(paste0(data_folder,"/","crops.csv"))
+#Load data
+use_data(diet, ingredients, characteristics, coefficients, categories, weights,
+         ch4_mm, mcf,emission_factors_direct, n2o_direct, n2o_indirect, emission_factors_volatilization, fractions, crops, overwrite = TRUE)
