@@ -1,26 +1,42 @@
-title: AnimalGEILU
+# Título de la web
+title: "AnimalGEILU"
 
+# Tema moderno
+template:
+  bootstrap: 5
+  bootswatch: flatly
+
+# Navbar
 navbar:
   type: inverse
   left:
     - icon: fa-home
       href: index.html
-    - text: "Tab1"
+    - text: "Vignettes"
       icon: fas fa-book
       menu:
-      -  text: text for newVignetteName1
-         href: articles/newVignetteName1.html
-      -  text: text for newVignetteName2
-         href: articles/newVignetteName2.html
-    - icon: fas fa-anchor
-      text: "Tab2"
-      href: articles/newVignetteName3.html
+        - text: "Introduction"
+          href: articles/newVignetteName1.html
+        - text: "Data exploration"
+          href: articles/newVignetteName2.html
+        - text: "Practical cases"
+          href: articles/newVignetteName3.html
     - icon: fa-file-code-o
       text: "Reference"
       href: reference/index.html
-    - icon: fa-newspaper-o
-      text: "News"
-      href: news/index.html
-      
+    - icon: fa-download
+      text: "Download"
+      href: https://github.com/JuanCBM99/Animal_GEI_LU
+    - icon: fa-github
+      text: "GitHub"
+      href: https://github.com/JuanCBM99/Animal_GEI_LU
+
+# Table of contents
 toc:
   depth: 2
+
+# Logo y meta
+logo: man_logo.png
+favicon: favicon.ico
+meta:
+  description: "AnimalGEILU: cálculo de emisiones de CH4 y N2O y uso de tierra para ganado."

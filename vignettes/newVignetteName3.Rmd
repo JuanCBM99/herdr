@@ -1,0 +1,114 @@
+---
+title: "Running Calculations with AnimalGEILU"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Running Calculations}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+---
+
+# Running Calculations with AnimalGEILU
+This vignette shows how to use the AnimalGEILU functions to calculate greenhouse gas (GHG) emissions and land use.
+
+We will cover:
+
+* The main summary function (the easiest way to get results).
+
+* How to run individual calculation steps.
+
+* How to filter calculations by animal, type, or zone.
+
+Let's load the package to get started.
+
+```{r load_package}
+library(AnimalGEILU)
+```
+
+---
+
+## 1. The Easy Way: The Summary Function
+
+*For most uses, you only need one function: resumen_emisiones_land_use().*
+
+This function automatically runs all the individual calculations ($CH_4$, $N_2O$, Land Use) and combines them into a single summary table.
+
+By default, this function also saves a file named Resumen_emisiones_land_use.csv inside an output/ folder in your project.
+
+```{r calculate_all, eval= FALSE}
+# Run all calculations for all animals
+summary_all <- resumen_emisiones_land_use()
+
+# View the first few rows of the result
+head(summary_all)
+```
+
+---
+
+## 2. Filtering Your Calculations
+
+You can easily filter the calculations for specific animals, types, or zones. These parameters work for the main summary function and for all individual functions.
+
+* animal: "Cattle", "Sheep", or "Goat"
+
+* type: e.g., "Dairy", "Beef" (specific to "Cattle")
+
+* zone: e.g., "A", "B" (specific to "Cattle" types)
+
+### Example 1: Calculate for Dairy Cattle in Zone A
+
+```{r calculate_example_1, eval= FALSE}
+# Run calculations only for Dairy Cattle in Zone A
+dairy_A_summary <- resumen_emisiones_land_use(animal = "Cattle", 
+                                              type = "Dairy", 
+                                              zone = "A")
+                                                      
+head(dairy_A_summary)
+```
+
+Example 2: Calculate for all Sheep
+
+```{r calculate_example_2, eval= FALSE}
+# Run calculations for all sheep categories
+sheep_summary <- resumen_emisiones_land_use(animal = "Sheep")
+        
+head(sheep_summary)
+```
+
+
+## 3. Advanced: Running Individual Calculations
+
+You can also run each calculation step individually. 
+
+This is useful if you are only interested in one specific emission source (like enteric methane) or if you want to analyze the intermediate steps.
+
+All functions follow the same pattern: calculate_...()
+
+Methane ($CH_4$) Emissions
+
+Enteric Fermentation:
+
+ch4_enteric <- calculate_emissions_enteric(animal = "Cattle")
+head(ch4_enteric)
+
+Manure Management:
+ch4_manure <- calculate_CH4_manure(animal = "Cattle")
+head(ch4_manure)
+
+Nitrous Oxide ($N_2O$) EmissionsDirect Emissions (from Manure):
+n2o_direct <- calculate_N2O_direct_manure(animal = "Cattle")
+head(n2o_direct)
+Indirect Emissions (from Volatilization):Fragmento de códigon2o_volatilization <- calculate_N2O_indirect_volatilization(animal = "Cattle")
+head(n2o_volatilization)
+Indirect Emissions (from Leaching):Fragmento de códigon2o_leaching <- calculate_N2O_indirect_leaching(animal = "Cattle")
+head(n2o_leaching)
+Land UseLand Use for Feed:Fragmento de códigolu_feed <- calculate_land_use(animal = "Cattle")
+head(lu_feed)
