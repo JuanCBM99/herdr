@@ -34,7 +34,7 @@ calculate_NEm <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   # --- Filtrado ---
   if (!is.null(animal)) {
     NEm_result <- NEm_result %>% dplyr::filter(animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       NEm_result <- NEm_result %>% dplyr::filter(animal_subtype == type)
     }
   }
@@ -78,7 +78,7 @@ calculate_NEa <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
 
   if (!is.null(animal)) {
     categories_sub <- categories_sub %>% dplyr::filter(animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       categories_sub <- categories_sub %>% dplyr::filter(animal_subtype == type)
     }
   }
@@ -98,12 +98,12 @@ calculate_NEa <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
     dplyr::mutate(
       ca_val = ca_coeff[ca],
       ca_val = ifelse(is.na(ca_val), 0, ca_val),
-      second_ca_val = ca_coeff[ifelse(ca == "Stall", "Pasture",
-                                      ifelse(ca == "Pasture", "Stall", ca))],
+      second_ca_val = ca_coeff[ifelse(ca == "stall", "pasture",
+                                      ifelse(ca == "pasture", "stall", ca))],
       second_ca_val = ifelse(is.na(second_ca_val), 0, second_ca_val),
       ca = dplyr::case_when(
-        animal_type == "Cattle" & ca %in% c("Stall", "Pasture") ~ (duration/12)*ca_val + ((12-duration)/12)*second_ca_val,
-        animal_type == "Cattle" & ca == "Grazing large areas" ~ ca_val,
+        animal_type == "Cattle" & ca %in% c("stall", "pasture") ~ (duration/12)*ca_val + ((12-duration)/12)*second_ca_val,
+        animal_type == "Cattle" & ca == "grazing large areas" ~ ca_val,
         TRUE ~ ca_val
       ),
       NEa = ca * NEm
@@ -148,7 +148,7 @@ calculate_NEg <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   if (!is.null(animal)) {
     weights_sub <- dplyr::filter(weights_sub, animal_type == animal)
     categories_sub <- dplyr::filter(categories_sub, animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       weights_sub <- dplyr::filter(weights_sub, animal_subtype == type)
       categories_sub <- dplyr::filter(categories_sub, animal_subtype == type)
     }
@@ -167,23 +167,48 @@ calculate_NEg <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
     dplyr::rowwise() %>%
     dplyr::mutate(
       NEg = dplyr::case_when(
-        animal_type == "Cattle" ~ {
-          C_val <- coeff_vector$value[coeff_vector$animal_type=="Cattle" & coeff_vector$description==c]
-          C_val <- if(length(C_val)==0) 0 else C_val
-          ifelse(is.na(C_val)|is.na(average_weight)|is.na(adult_weight)|is.na(weight_gain),
-                 0, 22.02*((average_weight/(C_val*adult_weight))^0.75)*(weight_gain^1.097))
+        animal_type == "cattle" ~ {
+          # Extraer el valor del coeficiente C (solo 1)
+          C_val <- coeff_vector$value[
+            coeff_vector$animal_type == "cattle" &
+              coeff_vector$description == c
+          ]
+          C_val <- if (length(C_val) == 0 || all(is.na(C_val))) 0 else C_val[1]
+
+          # Calcular NEg para ganado bovino
+          ifelse(
+            is.na(C_val) | is.na(average_weight) | is.na(adult_weight) | is.na(weight_gain),
+            0,
+            22.02 * ((average_weight / (C_val * adult_weight))^0.75) * (weight_gain^1.097)
+          )
         },
-        animal_type %in% c("Sheep","Goat") ~ {
-          a_val <- coeff_vector$value[coeff_vector$animal_type==animal_type & coeff_vector$description==a]
-          b_val <- coeff_vector$value[coeff_vector$animal_type==animal_type & coeff_vector$description==b]
-          a_val <- if(length(a_val)==0) 0 else a_val
-          b_val <- if(length(b_val)==0) 0 else b_val
-          ifelse(is.na(a_val)|is.na(b_val)|is.na(weight_gain),0,(a_val+0.5*b_val)*weight_gain)
+
+        animal_type %in% c("Sheep", "Goat") ~ {
+          # Extraer los valores a y b (solo 1 cada uno)
+          a_val <- coeff_vector$value[
+            coeff_vector$animal_type == animal_type &
+              coeff_vector$description == a
+          ]
+          b_val <- coeff_vector$value[
+            coeff_vector$animal_type == animal_type &
+              coeff_vector$description == b
+          ]
+          a_val <- if (length(a_val) == 0 || all(is.na(a_val))) 0 else a_val[1]
+          b_val <- if (length(b_val) == 0 || all(is.na(b_val))) 0 else b_val[1]
+
+          # Calcular NEg para ovinos/caprinos
+          ifelse(
+            is.na(a_val) | is.na(b_val) | is.na(weight_gain),
+            0,
+            (a_val + 0.5 * b_val) * weight_gain
+          )
         },
+
         TRUE ~ 0
       )
     ) %>%
     dplyr::ungroup()
+
 
   # --- Guardar salida ---
   if (saveoutput) {
@@ -224,8 +249,8 @@ calculate_NEl <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
     dplyr::mutate(
       Milk_yield_kg_day_head = milk_yield / 365,
       NEl = dplyr::case_when(
-        animal_type == "Cattle" ~ Milk_yield_kg_day_head * (1.47 + 0.4 * fat_content),
-        animal_type %in% c("Sheep", "Goat") ~ Milk_yield_kg_day_head * 4.6,
+        animal_type == "cattle" ~ Milk_yield_kg_day_head * (1.47 + 0.4 * fat_content),
+        animal_type %in% c("sheep", "goat") ~ Milk_yield_kg_day_head * 4.6,
         TRUE ~ NA_real_
       )
     ) %>%
@@ -234,7 +259,7 @@ calculate_NEl <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   # --- Filtrado por animal / tipo ---
   if (!is.null(animal)) {
     result <- result %>% dplyr::filter(animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       result <- result %>% dplyr::filter(animal_subtype == type)
     }
   }
@@ -275,7 +300,7 @@ calculate_NE_work <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   # --- Filtrado por animal / tipo ---
   categories_sub <- categories
   if (!is.null(animal)) categories_sub <- dplyr::filter(categories_sub, animal_type == animal)
-  if (!is.null(type) && animal == "Cattle") categories_sub <- dplyr::filter(categories_sub, animal_subtype == type)
+  if (!is.null(type) && animal == "cattle") categories_sub <- dplyr::filter(categories_sub, animal_subtype == type)
 
   # --- Cálculo NE_work ---
   result <- categories_sub %>%
@@ -322,7 +347,7 @@ calculate_NE_wool <- function(animal = NULL, type = NULL, saveoutput = TRUE) {
   # --- Filtrado por animal / tipo ---
   if (!is.null(animal)) {
     result <- result %>% dplyr::filter(animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       result <- result %>% dplyr::filter(animal_subtype == type)
     }
   }
@@ -363,12 +388,12 @@ calculate_NE_pregnancy <- function(animal = NULL, type = NULL, saveoutput = TRUE
 
   # --- Preparar dataframe categories ---
   cat_df <- categories %>%
-    dplyr::select(code, animal_type, animal_subtype, c_pregnancy_cat = c_pregnancy, pr)
+    dplyr::select(code, animal_type, animal_subtype, c_pregnancy, pr)
 
   # Filtrado por animal / tipo
   if (!is.null(animal)) {
     cat_df <- cat_df %>% dplyr::filter(animal_type == animal)
-    if (!is.null(type) && animal == "Cattle") {
+    if (!is.null(type) && animal == "cattle") {
       cat_df <- cat_df %>% dplyr::filter(animal_subtype == type)
     }
   }
@@ -377,6 +402,8 @@ calculate_NE_pregnancy <- function(animal = NULL, type = NULL, saveoutput = TRUE
   c_preg_tbl <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
     dplyr::select(description, value) %>%
+    # MODIFICACIÓN: Normalizar los nombres para que la búsqueda no falle
+    dplyr::mutate(description = tolower(trimws(description))) %>%
     deframe()
 
   # --- Cálculo NE_pregnancy ---
@@ -384,12 +411,16 @@ calculate_NE_pregnancy <- function(animal = NULL, type = NULL, saveoutput = TRUE
     dplyr::left_join(cat_df, by = c("code","animal_type","animal_subtype")) %>%
     dplyr::mutate(
       c_pregnancy_value = dplyr::case_when(
-        animal_type=="Cattle" ~ {
-          val <- c_preg_tbl[as.character(c_pregnancy_cat)]
-          ifelse(length(val)==0, 0, val)
+        animal_type=="cattle" ~ {
+          # MODIFICACIÓN: Normalizar la clave de búsqueda (el texto de c_pregnancy)
+          lookup_key <- tolower(trimws(as.character(c_pregnancy)))
+          # MODIFICACIÓN: Buscar usando la clave normalizada.
+          # La lógica anterior de 'ifelse(length(val)==0...)' se elimina
+          # porque la conversión de NA a 0 ya se hace más abajo.
+          c_preg_tbl[lookup_key]
         },
-        animal_type %in% c("Sheep","Goat") & pr==0 ~ 0,
-        animal_type %in% c("Sheep","Goat") & pr>0 ~ {
+        animal_type %in% c("sheep","goat") & pr==0 ~ 0,
+        animal_type %in% c("sheep","goat") & pr>0 ~ {
           double_birth <- pmax(pr-1,0)
           single_birth <- 1-double_birth
           0.126*double_birth + 0.077*single_birth
@@ -397,6 +428,7 @@ calculate_NE_pregnancy <- function(animal = NULL, type = NULL, saveoutput = TRUE
         TRUE ~ 0
       )
       ,
+      # Esta línea es la que convierte los NA (búsquedas fallidas) en 0.
       c_pregnancy_value = ifelse(is.na(c_pregnancy_value), 0, c_pregnancy_value),
       NE_pregnancy = c_pregnancy_value * NEm
     ) %>%

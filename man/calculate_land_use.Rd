@@ -4,20 +4,30 @@
 \alias{calculate_land_use}
 \title{Calculate land use}
 \usage{
-calculate_land_use(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE)
+calculate_land_use(
+  animal = NULL,
+  type = NULL,
+  zone = NULL,
+  saveoutput = TRUE,
+  population_df = NULL
+)
 }
 \arguments{
-\item{animal}{Character string (optional). Animal type (column `animal_type`). Default NULL.}
+\item{animal}{Character string/vector (optional). Animal type (column `animal_type`). Default NULL.}
 
-\item{type}{Character string (optional). Subtype of animal (column `animal_subtype`). Default NULL.}
+\item{type}{Character string/vector (optional). Subtype of animal (column `animal_subtype`). Default NULL.}
 
 \item{zone}{Character vector (optional). Filter by zone (column `zone`). Default NULL.}
 
 \item{saveoutput}{Logical. If TRUE, saves the result to "output/Land_use.csv". Default TRUE.}
+
+\item{population_df}{(Opcional) Un dataframe de población ya calculado.
+Si es NULL (por defecto), la función llamará a `calculate_population()` interactivamente.}
 }
 \value{
-Tibble with land use per ingredient.
+Tibble with total land use per ingredient.
 }
 \description{
-Computes land use (m²) based on ingredient consumption and crop yields.
+Computes total land use (m²) based on ingredient consumption, crop yields,
+and animal population.
 }

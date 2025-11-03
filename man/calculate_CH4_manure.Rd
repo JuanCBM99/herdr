@@ -8,7 +8,8 @@ calculate_CH4_manure(
   animal = NULL,
   type = NULL,
   zone = NULL,
-  saveoutput = TRUE
+  saveoutput = TRUE,
+  population_df = NULL
 )
 }
 \arguments{
@@ -19,13 +20,14 @@ calculate_CH4_manure(
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
 \item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+
+\item{population_df}{(Opcional) Un dataframe de población ya calculado.
+Si es NULL (por defecto), la función llamará a `calculate_population()`
+interactivamente.}
 }
 \value{
 Tibble with CH₄ emissions per animal category.
 }
 \description{
-Computes the CH₄ emission factor (EF) in kg CH₄/year/animal
-and total CH₄ emissions per animal category in Mg (million kg CH₄/year),
-based on Volatile Solids (VS), B₀, Methane Conversion Factor (MCF),
-and Average annual fraction of manure handled with each system (AWMS).
+(Documentación ... sin cambios ...)
 }

@@ -32,13 +32,13 @@ calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL
                                          paste(animales_validos, collapse = ", ")))
   }
 
-  if (!is.null(type) && !is.null(animal) && animal == "Cattle") {
+  if (!is.null(type) && !is.null(animal) && animal == "cattle") {
     tipos_validos <- unique(diet$animal_subtype)
     assertthat::assert_that(type %in% tipos_validos,
                             msg = paste0("type debe estar en: ",
                                          paste(tipos_validos, collapse = ", ")))
   } else if (!is.null(type)) {
-    warning("El parámetro `type` solo aplica para `Cattle`. Se ignorará para otros animales.")
+    warning("El parámetro `type` solo aplica para `cattle`. Se ignorará para otros animales.")
   }
 
   if (!is.null(zones)) {
@@ -71,10 +71,10 @@ calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL
   # --- Cálculo ponderado ---
   variables <- joined %>%
     dplyr::mutate(weight = dplyr::case_when(
-      ingredient_type == "Feed"   ~ feed_share,
-      ingredient_type == "Forage" ~ forage_share,
-      ingredient_type == "Milk"   ~ milk_share,
-      ingredient_type == "Lactoreemplazante" ~ milk_replacer_share,
+      ingredient_type == "feed"   ~ feed_share,
+      ingredient_type == "forage" ~ forage_share,
+      ingredient_type == "milk"   ~ milk_share,
+      ingredient_type == "milk_replacer" ~ milk_replacer_share,
       TRUE ~ 0
     )) %>%
     dplyr::mutate(dplyr::across(all_of(vars),

@@ -13,7 +13,7 @@
 #' @export
 calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
 
-  message("🟢 Calculating gross energy (GE)...")
+  message("🟢 Calculating Gross Energy (GE)...")
 
   # --- Calcular NE (usando funciones adaptadas) ---
   NEm <- calculate_NEm(animal = animal, type = type, saveoutput = FALSE)

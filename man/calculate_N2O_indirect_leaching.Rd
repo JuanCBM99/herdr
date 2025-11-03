@@ -8,7 +8,8 @@ calculate_N2O_indirect_leaching(
   animal = NULL,
   type = NULL,
   zone = NULL,
-  saveoutput = TRUE
+  saveoutput = TRUE,
+  population_df = NULL
 )
 }
 \arguments{
@@ -19,6 +20,10 @@ calculate_N2O_indirect_leaching(
 \item{zone}{Character vector (optional). Filter by zone. Default NULL.}
 
 \item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_leaching.csv". Default TRUE.}
+
+\item{population_df}{(Opcional) Un dataframe de población ya calculado.
+Si es NULL (por defecto), la función llamará a `calculate_population()`
+interactivamente.}
 }
 \value{
 Tibble with N₂O emissions per category from leaching

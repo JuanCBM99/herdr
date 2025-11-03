@@ -9,14 +9,27 @@ load_dataset <- function(name) {
   csv_path <- file.path(user_path, paste0(name, ".csv"))
 
   if (file.exists(csv_path)) {
-    message("   → Using user_data/", name, ".csv")
+    # Mensaje de éxito claro
+    message("   → ¡Éxito! Usando archivo de usuario: user_data/", name, ".csv")
     df <- read.csv(csv_path, stringsAsFactors = FALSE)
   } else {
-    message("   → Using default dataset: ", name)
+
+    # --- INICIO DE LA MEJORA ---
+    # Comprobamos si 'user_data' existe
+    if (dir.exists(user_path)) {
+      # Si existe, pero el archivo NO, avisamos al usuario.
+      message("   → AVISO: La carpeta 'user_data' existe, pero no se encontró '", name, ".csv'.")
+      message("   → Asegúrate de que el nombre del archivo es correcto.")
+      message("   → Usando dataset por defecto del paquete: ", name)
+    } else {
+      # Si 'user_data' ni siquiera existe, es normal.
+      message("   → Usando dataset por defecto del paquete: ", name)
+    }
+    # --- FIN DE LA MEJORA ---
+
     # Cargar dataset por defecto del paquete (.rda en data/)
     df <- get(name, envir = asNamespace("AnimalGEILU"))
   }
 
   return(df)
 }
-

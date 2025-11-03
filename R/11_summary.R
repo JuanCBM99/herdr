@@ -14,40 +14,70 @@
 resumen_emisiones_land_use <- function(animal = NULL, type = NULL, zone = NULL,
                                        saveoutput = TRUE, group_by_code = TRUE) {
 
-  message("🟢 Calculating summary of emissions and land use...")
+  message("🟢 Iniciando resumen... Se pedirá la población 1 vez.")
 
-  # --- Llamadas a funciones individuales ---
-  ch4_enteric <- calculate_emissions_enteric(animal = animal, type = type, zone = zone) %>%
+  # --- ¡PASO CLAVE 1! ---
+  # Llamamos a calculate_population() UNA SOLA VEZ al principio.
+  # El usuario introduce los números aquí.
+  pop_data <- calculate_population(saveoutput = FALSE)
+
+  message("✅ Población obtenida. Calculando todas las emisiones...")
+
+  # --- ¡PASO CLAVE 2! ---
+  # Ahora "pasamos" pop_data a todas las funciones que lo necesiten
+  # usando el nuevo argumento 'population_df'.
+
+  ch4_enteric <- calculate_emissions_enteric(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Emissions_CH4_enteric = sum(emissions_total, na.rm = TRUE), .groups = "drop")
 
-  ch4_manure <- calculate_CH4_manure(animal = animal, type = type, zone = zone) %>%
+  ch4_manure <- calculate_CH4_manure(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Emissions_CH4_manure = sum(Emissions_CH4_Mg_year, na.rm = TRUE), .groups = "drop")
 
-  direct_n2o <- calculate_N2O_direct_manure(animal = animal, type = type, zone = zone) %>%
+  direct_n2o <- calculate_N2O_direct_manure(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Emissions_N2O_direct = sum(Emisiones_N2O, na.rm = TRUE), .groups = "drop")
 
-  n2o_indirect_vol <- calculate_N2O_indirect_volatilization(animal = animal, type = type, zone = zone) %>%
+  n2o_indirect_vol <- calculate_N2O_indirect_volatilization(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Emissions_N2O_indirect_vol = sum(n2o_g, na.rm = TRUE), .groups = "drop")
 
-  n2o_indirect_leach <- calculate_N2O_indirect_leaching(animal = animal, type = type, zone = zone) %>%
+  n2o_indirect_leach <- calculate_N2O_indirect_leaching(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Emissions_N2O_indirect_leach = sum(N2O_L, na.rm = TRUE), .groups = "drop")
 
-  land_use <- calculate_land_use(animal = animal, type = type, zone = zone) %>%
+  land_use <- calculate_land_use(
+    animal = animal, type = type, zone = zone,
+    population_df = pop_data # <-- ¡AÑADIDO!
+  ) %>%
     dplyr::group_by(code, animal_type, animal_subtype, zone) %>%
     dplyr::summarise(Land_use_m2 = sum(Land_use, na.rm = TRUE), .groups = "drop")
 
   # --- Combinar todos los resultados ---
+  # (Esta parte no cambia)
   resumen <- list(ch4_enteric, ch4_manure, direct_n2o,
                   n2o_indirect_vol, n2o_indirect_leach, land_use) %>%
     purrr::reduce(dplyr::full_join, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), \(x) tidyr::replace_na(x, 0)))
 
   # --- Agregación opcional sin code ---
+  # (Esta parte no cambia)
   if (!group_by_code) {
     resumen <- resumen %>%
       dplyr::group_by(animal_type, animal_subtype, zone) %>%
@@ -55,6 +85,7 @@ resumen_emisiones_land_use <- function(animal = NULL, type = NULL, zone = NULL,
   }
 
   # --- Guardar CSV ---
+  # (Esta parte no cambia)
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
     readr::write_csv(resumen, "output/Resumen_emisiones_land_use.csv")
@@ -63,5 +94,3 @@ resumen_emisiones_land_use <- function(animal = NULL, type = NULL, zone = NULL,
 
   resumen
 }
-
-

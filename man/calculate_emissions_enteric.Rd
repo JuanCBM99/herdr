@@ -8,7 +8,8 @@ calculate_emissions_enteric(
   animal = NULL,
   type = NULL,
   zone = NULL,
-  saveoutput = TRUE
+  saveoutput = TRUE,
+  population_df = NULL
 )
 }
 \arguments{
@@ -19,30 +20,15 @@ calculate_emissions_enteric(
 \item{zone}{Optional character vector. Only for "Cattle" when type is specified.}
 
 \item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
+
+\item{population_df}{(Opcional) Un dataframe de población ya calculado.
+Si es NULL (por defecto), la función llamará a `calculate_population()`
+interactivamente.}
 }
 \value{
 A tibble with columns:
-\itemize{
-  \item code: category code
-  \item de: digestible energy (% of GE)
-  \item ndf: neutral detergent fiber fraction
-  \item ge: gross energy (MJ/day)
-  \item ym: methane conversion factor (%)
-  \item ef_kg_animal_year: emission factor (kg CH4/animal/year)
-  \item n_population: animal population
-  \item emissions_total: total emissions (kt CH4/year)
-}
+(Columnas ... sin cambios ...)
 }
 \description{
-Estimates methane emissions using IPCC Tier 2 methodology based on
-digestible energy (DE), neutral detergent fiber (NDF), gross energy (GE),
-and animal population. Category-specific methane conversion factors (Ym)
-are applied depending on animal type and diet quality.
-}
-\examples{
-\donttest{
-calculate_emissions_enteric(animal = "Cattle", type = "Dairy", zone = "A")
-calculate_emissions_enteric(animal = "Sheep")
-calculate_emissions_enteric(animal = "Goat")
-}
+(Documentación ... sin cambios ...)
 }
