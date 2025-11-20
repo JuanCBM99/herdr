@@ -5,23 +5,26 @@
 \title{Resumen de emisiones de CH4, N2O y uso de tierra}
 \usage{
 resumen_emisiones_land_use(
+  group = NULL,
+  zone = NULL,
   animal = NULL,
   type = NULL,
-  zone = NULL,
   saveoutput = TRUE,
-  group_by_code = TRUE
+  group_by_identification = TRUE
 )
 }
 \arguments{
+\item{group}{Character/Numeric vector (opcional). Grupos a filtrar. Default `NULL`.}
+
+\item{zone}{Character vector (opcional). Zonas a filtrar. Default `NULL`.}
+
 \item{animal}{Character string (opcional). Tipo de ganado (`animal_type`). Default `NULL`.}
 
 \item{type}{Character string (opcional). Subtipo de ganado (`animal_subtype`). Default `NULL`.}
 
-\item{zone}{Character vector (opcional). Zonas a filtrar (`zone`). Default `NULL`.}
-
 \item{saveoutput}{Logical. Si `TRUE`, guarda el resultado en `"output/Resumen_emisiones_land_use.csv"`. Default `TRUE`.}
 
-\item{group_by_code}{Logical. Si `TRUE` devuelve resultados al nivel de `code`. Si `FALSE`, agrega todos los `code`.}
+\item{group_by_identification}{Logical. Si `TRUE` devuelve resultados al nivel de `identification`. Si `FALSE`, agrega todos los `identification`.}
 }
 \value{
 Un `tibble` con columnas para cada tipo de emisión y uso de tierra.

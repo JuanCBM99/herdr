@@ -4,31 +4,15 @@
 \alias{calculate_emissions_enteric}
 \title{Calculate methane emissions from enteric fermentation}
 \usage{
-calculate_emissions_enteric(
-  animal = NULL,
-  type = NULL,
-  zone = NULL,
-  saveoutput = TRUE,
-  population_df = NULL
-)
+calculate_emissions_enteric(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{character. Type of animal ("Cattle", "Sheep", "Goat").}
-
-\item{type}{Optional character. Only for "Cattle" (e.g., "Dairy", "Beef").}
-
-\item{zone}{Optional character vector. Only for "Cattle" when type is specified.}
-
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
-
-\item{population_df}{(Opcional) Un dataframe de población ya calculado.
-Si es NULL (por defecto), la función llamará a `calculate_population()`
-interactivamente.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
-A tibble with columns:
-(Columnas ... sin cambios ...)
+A tibble with enteric fermentation emissions.
 }
 \description{
-(Documentación ... sin cambios ...)
+Computes enteric methane emissions for all animal categories, groups,
+and zones by loading the census data internally.
 }

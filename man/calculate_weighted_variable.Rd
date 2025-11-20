@@ -4,31 +4,15 @@
 \alias{calculate_weighted_variable}
 \title{Calculate Weighted Nutritional Variables}
 \usage{
-calculate_weighted_variable(
-  animal = NULL,
-  type = NULL,
-  zones = NULL,
-  saveoutput = TRUE
-)
+calculate_weighted_variable(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Animal type to filter by (optional)}
-
-\item{type}{Animal subtype (only for Cattle, optional)}
-
-\item{zones}{Geographical zones to include (optional)}
-
-\item{saveoutput}{Save results to CSV? Default TRUE}
+\item{saveoutput}{Logical. Save results to CSV? Default TRUE}
 }
 \value{
-A data frame with weighted nutritional values by animal category and zone
+A data frame with weighted nutritional values by all key properties.
 }
 \description{
-Computes weighted averages of nutritional variables based on animal diets.
-Allows using user-provided datasets in 'user_data/' or defaults from the package.
-}
-\examples{
-\dontrun{
-calculate_weighted_variable(animal = "Cattle", type = "Dairy")
-}
+Computes weighted averages of nutritional variables based on animal diets,
+using the 'diet_tag' architecture.
 }

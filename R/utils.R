@@ -10,25 +10,34 @@ load_dataset <- function(name) {
 
   if (file.exists(csv_path)) {
     # Mensaje de éxito claro
-    message("   → ¡Éxito! Usando archivo de usuario: user_data/", name, ".csv")
-    df <- read.csv(csv_path, stringsAsFactors = FALSE)
-  } else {
+    message("    → ¡Éxito! Usando archivo de usuario: user_data/", name, ".csv")
 
-    # --- INICIO DE LA MEJORA ---
-    # Comprobamos si 'user_data' existe
+    # --- ¡ARREGLO! ---
+    # na.strings = "NA" (por defecto) + "" (para celdas en blanco)
+    # Esto convierte las celdas vacías "" en NA
+    df <- read.csv(csv_path, stringsAsFactors = FALSE, na.strings = c("NA", ""))
+
+  } else {
+    # (El resto de la función no cambia)
     if (dir.exists(user_path)) {
-      # Si existe, pero el archivo NO, avisamos al usuario.
-      message("   → AVISO: La carpeta 'user_data' existe, pero no se encontró '", name, ".csv'.")
-      message("   → Asegúrate de que el nombre del archivo es correcto.")
-      message("   → Usando dataset por defecto del paquete: ", name)
+      message("    → AVISO: La carpeta 'user_data' existe, pero no se encontró '", name, ".csv'.")
+      message("    → Asegúrate de que el nombre del archivo es correcto.")
+      message("    → Usando dataset por defecto del paquete: ", name)
     } else {
-      # Si 'user_data' ni siquiera existe, es normal.
-      message("   → Usando dataset por defecto del paquete: ", name)
+      message("    → Usando dataset por defecto del paquete: ", name)
     }
-    # --- FIN DE LA MEJORA ---
 
     # Cargar dataset por defecto del paquete (.rda en data/)
-    df <- get(name, envir = asNamespace("AnimalGEILU"))
+    # ¡MODIFICACIÓN! Aplicamos la misma lógica de NA a los .rda
+    df_raw <- get(name, envir = asNamespace("AnimalGEILU"))
+
+    if (is.data.frame(df_raw)) {
+      # Reemplaza "" por NA en todas las columnas de texto
+      df <- df_raw %>%
+        dplyr::mutate(dplyr::across(where(is.character), ~ na_if(., "")))
+    } else {
+      df <- df_raw
+    }
   }
 
   return(df)

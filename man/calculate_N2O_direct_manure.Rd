@@ -4,31 +4,15 @@
 \alias{calculate_N2O_direct_manure}
 \title{Calculate direct N₂O emissions from manure}
 \usage{
-calculate_N2O_direct_manure(
-  animal = NULL,
-  type = NULL,
-  zone = NULL,
-  saveoutput = TRUE,
-  population_df = NULL
-)
+calculate_N2O_direct_manure(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
-
-\item{type}{Character string (optional). Only for "Cattle" subtype. Default NULL.}
-
-\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
-
 \item{saveoutput}{Logical. If TRUE, saves output as CSV. Default TRUE.}
-
-\item{population_df}{(Opcional) Un dataframe de población ya calculado.
-Si es NULL (por defecto), la función llamará a `calculate_population()`
-interactivamente.}
 }
 \value{
 A tibble with N₂O emissions per category
 }
 \description{
 Computes direct N₂O emissions based on nitrogen excretion, emission factors,
-management system, and climate.
+management system, and climate for all animals.
 }

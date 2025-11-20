@@ -4,30 +4,15 @@
 \alias{calculate_CH4_manure}
 \title{Calculate CH₄ Emissions from Manure Management}
 \usage{
-calculate_CH4_manure(
-  animal = NULL,
-  type = NULL,
-  zone = NULL,
-  saveoutput = TRUE,
-  population_df = NULL
-)
+calculate_CH4_manure(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (optional). Filter by animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
-
-\item{type}{Character string (optional). Only applies if `animal = "Cattle"` (e.g., "Dairy", "Beef"). Default NULL.}
-
-\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
-
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default FALSE.}
-
-\item{population_df}{(Opcional) Un dataframe de población ya calculado.
-Si es NULL (por defecto), la función llamará a `calculate_population()`
-interactivamente.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
 Tibble with CH₄ emissions per animal category.
 }
 \description{
-(Documentación ... sin cambios ...)
+Computes CH₄ emissions from manure for all animal categories, groups,
+and zones.
 }

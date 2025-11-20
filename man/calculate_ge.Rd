@@ -4,22 +4,16 @@
 \alias{calculate_ge}
 \title{Calculate Gross Energy (GE)}
 \usage{
-calculate_ge(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE)
+calculate_ge(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.}
-
-\item{type}{Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").}
-
-\item{zone}{Character vector (optional). Filter by zone.}
-
 \item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
-A tibble with gross energy (GE), its components, animal type/subtype, and zone.
+A tibble with gross energy (GE) and its components for all
+animal categories, groups, and zones.
 }
 \description{
-Computes gross energy requirements by summing net energy components
-for maintenance, activity, growth, work, pregnancy, lactation, and wool production,
-then adjusting by digestible energy (DE). Coefficients for maintenance (rem) and growth (reg) follow NRC methodology.
+Computes gross energy requirements for all animals by summing all
+net energy components and adjusting by digestible energy (DE).
 }

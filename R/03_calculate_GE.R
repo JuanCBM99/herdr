@@ -1,59 +1,71 @@
 #' Calculate Gross Energy (GE)
 #'
-#' Computes gross energy requirements by summing net energy components
-#' for maintenance, activity, growth, work, pregnancy, lactation, and wool production,
-#' then adjusting by digestible energy (DE). Coefficients for maintenance (rem) and growth (reg) follow NRC methodology.
+#' Computes gross energy requirements for all animals by summing all
+#' net energy components and adjusting by digestible energy (DE).
 #'
-#' @param animal Character. Optional. Type of animal ("Cattle", "Sheep", "Goat", etc.). If NULL, all animals are returned.
-#' @param type Character. Optional. Only applies if animal = "Cattle" (e.g., "Dairy", "Beef").
-#' @param zone Character vector (optional). Filter by zone.
 #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
 #'
-#' @return A tibble with gross energy (GE), its components, animal type/subtype, and zone.
+#' @return A tibble with gross energy (GE) and its components for all
+#' animal categories, groups, and zones.
 #' @export
-calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE) {
+calculate_ge <- function(saveoutput = TRUE) {
 
   message("🟢 Calculating Gross Energy (GE)...")
 
-  # --- Calcular NE (usando funciones adaptadas) ---
-  NEm <- calculate_NEm(animal = animal, type = type, saveoutput = FALSE)
-  NEa <- calculate_NEa(animal = animal, type = type, saveoutput = FALSE)
-  NEg <- calculate_NEg(animal = animal, type = type, saveoutput = FALSE)
-  NE_work <- calculate_NE_work(animal = animal, type = type, saveoutput = FALSE)
-  NE_pregnancy <- calculate_NE_pregnancy(animal = animal, type = type, saveoutput = FALSE)
-  NEl <- calculate_NEl(animal = animal, type = type, saveoutput = FALSE)
-  NE_wool <- calculate_NE_wool(animal = animal, type = type, saveoutput = FALSE)
+  # --- 1. Calcular todos los componentes de NE (sin filtros) ---
+  message("  -> 1/3: Calculating all Net Energy components...")
+  # (Estas funciones devuelven 'identification', 'animal_type', 'animal_subtype'
+  # y el valor NE. NO tienen 'group' ni 'zone' para categorías
+  # universales como k1)
+  NEm <- calculate_NEm(saveoutput = FALSE)
+  NEa <- calculate_NEa(saveoutput = FALSE)
+  NEg <- calculate_NEg(saveoutput = FALSE)
+  NE_work <- calculate_NE_work(saveoutput = FALSE)
+  NE_pregnancy <- calculate_NE_pregnancy(saveoutput = FALSE)
+  NEl <- calculate_NEl(saveoutput = FALSE)
+  NE_wool <- calculate_NE_wool(saveoutput = FALSE)
 
-  # --- Combinar NE ---
-  NE_all <- NEm %>%
-    dplyr::select(code, animal_type, animal_subtype, NEm) %>%
-    dplyr::left_join(NEa %>% dplyr::select(code, animal_type, animal_subtype, NEa),
-                     by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NEg %>% dplyr::select(code, animal_type, animal_subtype, NEg),
-                     by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NE_work %>% dplyr::select(code, animal_type, animal_subtype, NE_work),
-                     by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NE_pregnancy %>% dplyr::select(code, animal_type, animal_subtype, NE_pregnancy),
-                     by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NEl %>% dplyr::select(code, animal_type, animal_subtype, NEl),
-                     by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NE_wool %>% dplyr::select(code, animal_type, animal_subtype, NE_wool),
-                     by = c("code", "animal_type", "animal_subtype"))
+  # --- 2. Combinar todos los componentes de NE ---
+  message("  -> 2/3: Combining Net Energy components...")
 
-  # --- Calcular DE por zone ---
-  de_df <- calculate_weighted_variable(animal = animal, type = type, zones = zone, saveoutput = FALSE)
+  # Claves de unión universales
+  join_keys_universal <- c("identification", "animal_type", "animal_subtype")
 
-  # Filtrar por zona(s) si se especifica
-  if (!is.null(zone)) {
-    de_df <- de_df %>% dplyr::filter(zone %in% zone)
-  }
+  ne_list <- list(
+    NEm,
+    NEa %>% dplyr::select(all_of(join_keys_universal), NEa),
+    NEg %>% dplyr::select(all_of(join_keys_universal), NEg),
+    NE_work %>% dplyr::select(all_of(join_keys_universal), NE_work),
+    NE_pregnancy %>% dplyr::select(all_of(join_keys_universal), NE_pregnancy),
+    NEl %>% dplyr::select(all_of(join_keys_universal), NEl),
+    NE_wool %>% dplyr::select(all_of(join_keys_universal), NE_wool)
+  )
 
-  # --- Combinar NE con DE y calcular GE ---
-  final <- NE_all %>%
-    dplyr::inner_join(de_df, by = c("code", "animal_type", "animal_subtype")) %>%
+  # NE_all contiene las propiedades "universales"
+  NE_all <- ne_list %>%
+    purrr::reduce(dplyr::left_join, by = join_keys_universal)
+
+  # --- 3. Calcular DE (sin filtros) ---
+  message("  -> 3/3: Calculating weighted diet variables (DE)...")
+  # de_df contiene las propiedades "específicas" (por group y zone)
+  de_df <- calculate_weighted_variable(saveoutput = FALSE)
+
+  # --- 4. Combinar NE con DE y calcular GE ---
+  message("  -> 4/4: Calculating final Gross Energy (GE)...")
+
+  # --- ¡ESTE ES EL CAMBIO CLAVE! ---
+  # Unimos las propiedades 'universales' (NE_all) a las 'específicas' (de_df)
+  # usando *solo* las claves universales.
+  # Esto "difunde" el NEm de k1 (universal) a las filas de k1 en Zona A y Zona B.
+
+  final <- de_df %>% # <-- Empezamos con 'de_df' (que tiene group/zone)
+    dplyr::inner_join(NE_all, by = join_keys_universal) %>%
+
     dplyr::mutate(
-      dplyr::across(c(NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool, de),
-                    ~ tidyr::replace_na(., 0))
+      dplyr::across(
+        c(NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool, de),
+        ~ tidyr::replace_na(., 0)
+      )
     ) %>%
     dplyr::mutate(
       de_percent = ifelse(de == 0, 0.60, de / 100),
@@ -62,14 +74,17 @@ calculate_ge <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = T
       ge = ((NEm + NEa + NEl + NE_work + NE_pregnancy) / ifelse(rem == 0, 1, rem) +
               (NEg + NE_wool) / ifelse(reg == 0, 1, reg)) / de_percent
     ) %>%
-    dplyr::select(code, animal_type, animal_subtype, zone,
-                  NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool,
-                  de, rem, reg, ge)
+    # Reordenamos las columnas para que se vea bien
+    dplyr::select(
+      group, zone, identification, animal_type, animal_subtype,
+      NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool,
+      de, rem, reg, ge
+    )
 
   # --- Guardar salida ---
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
-    write.csv(final, "output/ge_result.csv", row.names = FALSE)
+    readr::write_csv(final, "output/ge_result.csv")
     message("💾 Saved output to output/ge_result.csv")
   }
 

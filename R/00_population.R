@@ -1,153 +1,83 @@
-#' Calcula la población animal (Versión Paquete)
+#' Calculate total animal population (non-interactive version)
 #'
-#' Carga los datos internos del paquete (categories, rate_parameters),
-#' pide al usuario la población base (k18, k23, k24) de forma interactiva
-#' y calcula la población restante.
+#' Loads base population data (census.csv) and calculates the full
+#' population structure for all animal types (cattle, sheep, etc.).
 #'
-#' @details Esta función asume que los dataframes 'rate_parameters' y
-#'   'categories' están disponibles en el entorno del paquete (cargados
-#'   desde los archivos .rda en la carpeta 'data' del paquete).
+#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
 #'
-#' @param saveoutput Logical (opcional). Si es TRUE, guarda el resultado
-#'   como CSV. Por defecto es TRUE.
-#'
-#' @return Un tibble con la población completa (base + calculada) incluyendo
-#'   columnas descriptivas del dataframe de categorías.
+#' @return A tibble with the full population, including columns 'group' and 'zone'.
 #' @export
 #'
 calculate_population <- function(saveoutput = TRUE) {
 
-  # --- 1. Pedir datos de población al usuario ---
-  message("Por favor, introduce los datos de población base:")
+  message("🟢 Loading census, rates, and categories...")
 
-  pop_k18_char <- readline("Población de 'k18' (Toros de carne): ")
-  pop_k23_char <- readline("Población de 'k23' (Vacas de leche): ")
-  pop_k24_char <- readline("Población de 'k24' (Vacas de carne): ")
+  # --- 1. Load datasets safely ---
+  tryCatch({
+    census_base     <- load_dataset("census")
+    rate_parameters <- load_dataset("rate_parameters")
+    categories      <- load_dataset("categories")
+  }, error = function(e) {
+    stop("Error loading datasets with load_dataset(). Original error: ", e$message)
+  })
 
-  # Convertimos el texto a NÚMERO
-  pop_k18 <- as.numeric(pop_k18_char)
-  pop_k23 <- as.numeric(pop_k23_char)
-  pop_k24 <- as.numeric(pop_k24_char)
+  # --- 2. The Dispatcher ---
+  message("Splitting census by animal_type...")
 
+  # Dividir el censo por animal_type
+  census_split <- split(census_base, census_base$animal_type)
 
-  # --- 2. Validar inputs ---
-  # Valida los NÚMEROS que el usuario acaba de escribir
-  if (any(is.na(c(pop_k18, pop_k23, pop_k24)))) {
-    stop("Error: Las poblaciones (k18, k23, k24) deben ser números válidos.")
+  results_list <- list() # Un lugar para guardar los resultados
+
+  # --- 3. Calcular Vacuno (Cattle) ---
+  if ("cattle" %in% names(census_split)) {
+    results_list$cattle <- calculate_population_cattle(
+      census_cattle = census_split$cattle,
+      rate_parameters = rate_parameters,
+      categories = categories # (Solo 'cattle' usa 'categories' para 'zone=NA')
+    )
   }
 
-  # ¡NUEVO! Validar que los datos del paquete (.rda) existen.
-  # (Esto da un error útil si 'data/rate_parameters.rda' no se cargó)
-  if (!exists("rate_parameters") || !exists("categories")) {
-    stop("Error: Faltan los datos 'rate_parameters' o 'categories'. ",
-         "Asegúrate de que el paquete esté cargado correctamente.")
+  # --- 4. Calcular Ovejas (Sheep) ---
+  if ("sheep" %in% names(census_split)) {
+    results_list$sheep <- calculate_population_sheep(
+      census_sheep = census_split$sheep,
+      rate_parameters = rate_parameters
+    )
   }
 
-  message("🟢 Inputs validados.")
-  message("📊 Extrayendo tasas...")
-
-  # --- 3. Extraer tasas ---
-
-  # ¡MODIFICADO!
-  # Esta función anidada ahora usa 'rate_parameters' (el objeto .rda
-  # de tu paquete) directamente. Ya no necesita un argumento 'df'.
-  get_rate <- function(param, subtype, sex_val = NA) {
-
-    # 'rate_parameters' se refiere al objeto .rda cargado con el paquete
-    filtered_df <- rate_parameters %>%
-      dplyr::filter(parameter == param, animal_subtype == subtype)
-
-    if (!is.na(sex_val)) {
-      filtered_df <- filtered_df %>% dplyr::filter(sex == sex_val)
-    }
-
-    value <- filtered_df %>% dplyr::pull(value)
-
-    if (length(value) == 0) {
-      warning(paste("Tasa no encontrada para:", param, subtype, sex_val))
-      return(NA_real_)
-    }
-    return(value[1])
+  # --- 5. Calcular Cabras (Goat) ---
+  if ("goat" %in% names(census_split)) {
+    results_list$goat <- calculate_population_goat(
+      census_goat = census_split$goat,
+      rate_parameters = rate_parameters
+    )
   }
 
-  # ¡MODIFICADO!
-  # Ya no pasamos 'rate_parameters_df' a la función get_rate.
-  rate_dairy_calving <- get_rate("calving_rate", "dairy")
-  rate_beef_calving <- get_rate("calving_rate", "beef")
-  rate_beef_male_repl <- get_rate("replacement_rate", "beef", "male")
-  rate_beef_female_repl <- get_rate("replacement_rate", "beef", "female")
-  rate_dairy_female_repl <- get_rate("replacement_rate", "dairy", "female")
+  # --- 6. Unir todos los resultados ---
+  message("Combining all results...")
+  final_result <- dplyr::bind_rows(results_list)
 
-  all_rates <- c(rate_dairy_calving, rate_beef_calving, rate_beef_male_repl,
-                 rate_beef_female_repl, rate_dairy_female_repl)
-  if (any(is.na(all_rates))) {
-    stop("Error: Faltan una o más tasas. Revisa 'rate_parameters' del paquete.")
-  }
-
-  message("🧮 Calculating new populations...")
-
-  # --- 4. Calcular nuevas poblaciones ---
-  # (Esta sección no cambia)
-  pop_k7 <- pop_k18 * rate_beef_male_repl
-  pop_k8 <- pop_k24 * rate_beef_female_repl
-  pop_k9 <- pop_k23 * rate_dairy_female_repl
-  total_dairy_births_per_sex <- pop_k23 * rate_dairy_calving / 2
-  total_beef_births_per_sex <- pop_k24 * rate_beef_calving / 2
-  pop_k1 <- total_dairy_births_per_sex
-  pop_k2 <- total_dairy_births_per_sex - pop_k9
-  pop_k3 <- total_beef_births_per_sex - pop_k7
-  pop_k5 <- total_beef_births_per_sex - pop_k8
-
-  message("🧩 Assembling final dataframe...")
-
-  # --- 5. Ensamblar 'tibble' de resultados ---
-  # (Esta sección no cambia)
-  new_populations <- tibble::tribble(
-    ~code, ~population,
-    "k1",  pop_k1,
-    "k2",  pop_k2,
-    "k3",  pop_k3,
-    "k5",  pop_k5,
-    "k7",  pop_k7,
-    "k8",  pop_k8,
-    "k9",  pop_k9,
-    "k10", pop_k7,
-    "k14", pop_k8,
-    "k16", pop_k9,
-    "k22", pop_k8
-  )
-  base_populations <- tibble::tribble(
-    ~code, ~population,
-    "k18", pop_k18,
-    "k23", pop_k23,
-    "k24", pop_k24
-  )
-  all_populations <- dplyr::bind_rows(base_populations, new_populations)
-
-  # --- 6. Unir con descripciones ---
-
-  # ¡MODIFICADO!
-  # Usamos 'categories' (el objeto .rda de tu paquete) directamente.
-  result <- all_populations %>%
-    dplyr::left_join(categories, by = "code") %>%
+  # --- 7. Join with categories (Paso final) ---
+  message("Attaching metadata (animal_type, subtype)...")
+  result_with_metadata <- final_result %>%
+    dplyr::left_join(
+      # Seleccionamos las claves de 'categories'
+      dplyr::select(categories, identification, animal_type, animal_subtype),
+      by = "identification",
+      na_matches = "na"
+    ) %>%
+    # Asegurarnos de que las columnas están en el orden correcto
     dplyr::select(
-      code,
-      population,
-      category,
-      sex,
-      destination,
-      housing_type,
-      animal_type,
-      animal_subtype
+      group, zone, identification, animal_type, animal_subtype, population
     )
 
-  # --- 7. Guardar y devolver ---
-  # (Esta sección no cambia)
-  if (saveoutput) {
+  # --- 8. Save output ---
+  if (isTRUE(saveoutput)) {
     dir.create("output", showWarnings = FALSE)
-    write.csv(result, "output/population_result.csv", row.names = FALSE)
-    message("💾 Saved output to output/population_result.csv")
+    readr::write_csv(result_with_metadata, "output/population_result.csv")
+    message("💾 Saved to output/population_result.csv")
   }
 
-  return(result)
+  return(result_with_metadata)
 }

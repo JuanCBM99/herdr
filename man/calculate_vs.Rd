@@ -4,28 +4,17 @@
 \alias{calculate_vs}
 \title{Calculate Volatile Solids (VS) for Animals}
 \usage{
-calculate_vs(
-  animal = NULL,
-  type = NULL,
-  zone = NULL,
-  urinary_energy = 0.04,
-  saveoutput = TRUE
-)
+calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (optional). Filter by animal type. Default NULL.}
-
-\item{type}{Character string (optional). Only applies if `animal = "Cattle"`. Default NULL.}
-
-\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
-
 \item{urinary_energy}{Numeric. Fraction of energy lost in urine. Default 0.04.}
 
 \item{saveoutput}{Logical. If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
-Tibble with code, animal_type, animal_subtype, zone, ge, de, ash, urinary_energy, vs.
+Tibble with VS for all animal categories, groups, and zones.
 }
 \description{
-Computes volatile solids (VS) based on GE, DE, ash, and urinary energy fraction.
+Computes volatile solids (VS) for all animals based on GE, DE, ash,
+and urinary energy fraction.
 }

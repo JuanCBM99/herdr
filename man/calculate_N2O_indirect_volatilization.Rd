@@ -4,30 +4,15 @@
 \alias{calculate_N2O_indirect_volatilization}
 \title{Calculate indirect N₂O emissions from volatilization}
 \usage{
-calculate_N2O_indirect_volatilization(
-  animal = NULL,
-  type = NULL,
-  zone = NULL,
-  saveoutput = TRUE,
-  population_df = NULL
-)
+calculate_N2O_indirect_volatilization(saveoutput = TRUE)
 }
 \arguments{
-\item{animal}{Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.}
-
-\item{type}{Character string (optional). Subtype only for Cattle. Default NULL.}
-
-\item{zone}{Character vector (optional). Filter by zone. Default NULL.}
-
 \item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_volatilization.csv". Default TRUE.}
-
-\item{population_df}{(Opcional) Un dataframe de población ya calculado.
-Si es NULL (por defecto), la función llamará a `calculate_population()`
-interactivamente.}
 }
 \value{
 Tibble with indirect N₂O emissions per category
 }
 \description{
-Computes indirect N₂O emissions derived from volatilization of excreted nitrogen.
+Computes indirect N₂O emissions derived from volatilization of excreted nitrogen
+for all animal categories, groups, and zones.
 }

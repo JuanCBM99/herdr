@@ -1,92 +1,62 @@
 #' Calculate direct N₂O emissions from manure
 #'
 #' Computes direct N₂O emissions based on nitrogen excretion, emission factors,
-#' management system, and climate.
+#' management system, and climate for all animals.
 #'
-#' @param animal Character string (optional). Animal type ("Cattle", "Sheep", "Goat"). Default NULL.
-#' @param type Character string (optional). Only for "Cattle" subtype. Default NULL.
-#' @param zone Character vector (optional). Filter by zone. Default NULL.
 #' @param saveoutput Logical. If TRUE, saves output as CSV. Default TRUE.
-#' @param population_df (Opcional) Un dataframe de población ya calculado.
-#'   Si es NULL (por defecto), la función llamará a `calculate_population()`
-#'   interactivamente.
 #' @return A tibble with N₂O emissions per category
 #' @export
-calculate_N2O_direct_manure <- function(animal = NULL, type = NULL, zone = NULL, saveoutput = TRUE,
-                                        population_df = NULL) { # <-- CAMBIO 1
+calculate_N2O_direct_manure <- function(saveoutput = TRUE) {
 
   message("🟢 Calculating direct N₂O emissions from manure...")
 
-  # --- 1️⃣ Cargar datasets base ---
+  # --- 1️⃣ Cargar datasets de configuración (universales) ---
   categories_df <- load_dataset("categories") %>%
-    dplyr::select(code, animal_type, animal_subtype, milk_yield, fat_content)
-
-  # --- CAMBIO 3: Lógica de población modificada ---
-  message("🟢 Calculating population data...")
-
-  # Variable para guardar la población que usaremos
-  pop_data_to_use <- NULL
-
-  if (!is.null(population_df)) {
-    # Opción 1: Usamos la población que nos han "pasado"
-    message("♻️ Usando datos de población proporcionados.")
-    pop_data_to_use <- population_df
-
-  } else {
-    # Opción 2: Nadie nos pasó los datos. Llamamos a la función interactiva
-    message("-> No se proporcionaron datos de población. Calculando...")
-    pop_data_to_use <- calculate_population(saveoutput = FALSE)
-  }
-
-  # Seleccionamos las columnas que necesitamos de la población
-  pop_df <- pop_data_to_use %>%
-    dplyr::select(code, animal_type, animal_subtype, population)
-  # --- Fin del Cambio 3 ---
-
+    dplyr::select(identification, animal_type, animal_subtype, milk_yield, fat_content)
 
   weights_df <- load_dataset("weights") %>%
-    dplyr::select(code, animal_type, animal_subtype, weight_gain)
+    dplyr::select(identification, animal_type, animal_subtype, weight_gain)
 
-  direct_df <- load_dataset("n2o_direct")
+  direct_df <- load_dataset("n2o_direct") # Tiene management_system, climate, etc.
 
   ef_tab <- load_dataset("emission_factors_direct") %>%
     dplyr::select(management_system, climate, value)
 
-  # --- 2️⃣ Filtrar por animal/type ---
-  if (!is.null(animal)) {
-    categories_df <- categories_df %>% dplyr::filter(animal_type == animal)
-    pop_df <- pop_df %>% dplyr::filter(animal_type == animal) # <-- MODIFICACIÓN
-  }
-  if (!is.null(type)) {
-    categories_df <- categories_df %>% dplyr::filter(animal_subtype == type)
-    pop_df <- pop_df %>% dplyr::filter(animal_subtype == type) # <-- MODIFICACIÓN
-  }
+  # --- 2️⃣ Cargar datos calculados (específicos de group/zone) ---
+  message("  -> Calculando GE, CP, NEg y Población...")
 
-  codes_validos <- categories_df$code
+  ge <- calculate_ge(saveoutput = FALSE) %>%
+    dplyr::select(group, zone, identification, animal_type, animal_subtype, ge)
 
-  # --- 3️⃣ Filtrar otras tablas por códigos válidos ---
-  ge <- calculate_ge(animal = animal, type = type, zone = zone, saveoutput = FALSE) %>%
-    dplyr::filter(code %in% codes_validos) %>%
-    dplyr::select(code, animal_type, animal_subtype, zone, ge)
+  cp <- calculate_weighted_variable(saveoutput = FALSE) %>%
+    dplyr::select(group, zone, identification, animal_type, animal_subtype, cp)
 
-  cp <- calculate_weighted_variable(animal = animal, type = type, zones = zone, saveoutput = FALSE) %>%
-    dplyr::filter(code %in% codes_validos) %>%
-    dplyr::select(code, animal_type, animal_subtype, zone, cp)
+  NEg <- calculate_NEg(saveoutput = FALSE) %>%
+    dplyr::select(identification, animal_type, animal_subtype, NEg) # NEg es universal
 
-  NEg <- calculate_NEg(animal = animal, type = type, saveoutput = FALSE) %>%
-    dplyr::filter(code %in% codes_validos) %>%
-    dplyr::select(code, animal_type, animal_subtype, NEg)
+  pop_df <- calculate_population(saveoutput = FALSE) %>%
+    dplyr::select(group, zone, identification, animal_type, animal_subtype, population)
 
-  direct_df <- direct_df %>% dplyr::filter(code %in% codes_validos)
+  # --- 3️⃣ Unir datasets y calcular emisiones ---
 
-  # --- 4️⃣ Calcular emisiones ---
+  # Claves de unión
+  join_keys_specific <- c("group", "zone", "identification", "animal_type", "animal_subtype")
+  join_keys_universal <- c("identification", "animal_type", "animal_subtype")
+
   df <- ge %>%
-    dplyr::inner_join(cp, by = c("code", "animal_type", "animal_subtype", "zone")) %>%
-    dplyr::left_join(categories_df, by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(pop_df, by = c("code", "animal_type", "animal_subtype")) %>% # <-- MODIFICACIÓN: usa pop_df
-    dplyr::left_join(weights_df, by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::left_join(NEg, by = c("code", "animal_type", "animal_subtype")) %>%
-    dplyr::inner_join(direct_df, by = c("code", "animal_type", "animal_subtype")) %>%
+    # Unir CP (específico)
+    dplyr::left_join(cp, by = join_keys_specific, na_matches = "na") %>%
+    # Unir Población (específico)
+    dplyr::left_join(pop_df, by = join_keys_specific, na_matches = "na") %>%
+    # Unir Categorías (universal)
+    dplyr::left_join(categories_df, by = join_keys_universal) %>%
+    # Unir Pesos (universal)
+    dplyr::left_join(weights_df, by = join_keys_universal) %>%
+    # Unir NEg (universal)
+    dplyr::left_join(NEg, by = join_keys_universal) %>%
+    # Unir sistemas de manejo (universal)
+    dplyr::left_join(direct_df, by = join_keys_universal) %>%
+    # Unir factores de emisión
     dplyr::left_join(ef_tab, by = c("management_system", "climate")) %>%
     dplyr::mutate(
       milk_protein = 1.9 + 0.4 * fat_content,
@@ -103,10 +73,11 @@ calculate_N2O_direct_manure <- function(animal = NULL, type = NULL, zone = NULL,
                           (N_intake * (1 - N_retention)) * 365,
                           (N_intake - N_retention) * 365),
       awms = management_duration / 12,
+      population = tidyr::replace_na(population, 0),
       Emisiones_N2O = population * N_excreted * awms * value * (44 / 28)
     )
 
-  # --- 5️⃣ Guardar salida ---
+  # --- 4️⃣ Guardar salida ---
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
     readr::write_csv(df, "output/N2O_direct_manure.csv")

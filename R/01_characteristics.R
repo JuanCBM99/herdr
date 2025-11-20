@@ -1,95 +1,119 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables based on animal diets.
-#' Allows using user-provided datasets in 'user_data/' or defaults from the package.
+#' Computes weighted averages of nutritional variables based on animal diets,
+#' using the 'diet_tag' architecture.
 #'
-#' @param animal Animal type to filter by (optional)
-#' @param type Animal subtype (only for Cattle, optional)
-#' @param zones Geographical zones to include (optional)
-#' @param saveoutput Save results to CSV? Default TRUE
+#' @param saveoutput Logical. Save results to CSV? Default TRUE
 #'
-#' @return A data frame with weighted nutritional values by animal category and zone
-#'
-#' @examples
-#' \dontrun{
-#' calculate_weighted_variable(animal = "Cattle", type = "Dairy")
-#' }
+#' @return A data frame with weighted nutritional values by all key properties.
 #' @export
-calculate_weighted_variable <- function(animal = NULL, type = NULL, zones = NULL, saveoutput = TRUE) {
+calculate_weighted_variable <- function(saveoutput = TRUE) {
 
-  message("🟢 Loading input data...")
+  message("🟢 Loading input data (diet, ingredients, characteristics, categories)...")
 
-  # --- Cargar datasets ---
+  # --- 1. Cargar datasets ---
   diet <- load_dataset("diet")
   ingredients <- load_dataset("ingredients")
   characteristics <- load_dataset("characteristics")
+  categories <- load_dataset("categories") # El "Traductor"
 
-  # --- Validaciones ---
-  if (!is.null(animal)) {
-    animales_validos <- unique(diet$animal_type)
-    assertthat::assert_that(animal %in% animales_validos,
-                            msg = paste0("El animal debe estar en los datos. Opciones: ",
-                                         paste(animales_validos, collapse = ", ")))
+  # --- 2. Validaciones ---
+  # Comprobamos que existan las columnas clave.
+  # Nota: No exigimos animal_type/subtype en diet/ingredients, el diet_tag es suficiente.
+
+  if (!all(c("group", "zone", "diet_tag", "forage_share", "feed_share") %in% names(diet))) {
+    stop("Error: 'diet.csv' columnas incorrectas.")
+  }
+  if (!all(c("group", "zone", "diet_tag", "ingredient", "ingredient_share") %in% names(ingredients))) {
+    stop("Error: 'ingredients.csv' columnas incorrectas.")
+  }
+  # En categories sí necesitamos identification y diet_tag
+  if (!all(c("identification", "diet_tag", "animal_type", "animal_subtype") %in% names(categories))) {
+    stop("Error: 'categories.csv' columnas incorrectas.")
   }
 
-  if (!is.null(type) && !is.null(animal) && animal == "cattle") {
-    tipos_validos <- unique(diet$animal_subtype)
-    assertthat::assert_that(type %in% tipos_validos,
-                            msg = paste0("type debe estar en: ",
-                                         paste(tipos_validos, collapse = ", ")))
-  } else if (!is.null(type)) {
-    warning("El parámetro `type` solo aplica para `cattle`. Se ignorará para otros animales.")
-  }
+  # --- 3. Joins y Cálculo ---
 
-  if (!is.null(zones)) {
-    zonas_validas <- unique(diet$zone)
-    assertthat::assert_that(all(zones %in% zonas_validas),
-                            msg = paste("Alguna zona no existe. Opciones: ",
-                                        paste(zonas_validas, collapse = ", ")))
-  }
+  # Claves de unión (SIMPLIFICADAS)
+  # Solo usamos lo necesario para identificar la dieta
+  join_keys_diet <- c("group", "zone", "diet_tag")
+  join_keys_char <- c("ingredient", "ingredient_type")
 
-  # --- Filtrado de diet ---
-  diet_sub <- diet
-  if (!is.null(animal)) {
-    diet_sub <- dplyr::filter(diet_sub, animal_type == animal)
-    if (!is.null(type))  diet_sub <- dplyr::filter(diet_sub, animal_subtype %in% type)
-    if (!is.null(zones)) diet_sub <- dplyr::filter(diet_sub, zone %in% zones)
-  }
+  # --- PASO A: Calcular el valor nutricional de cada 'diet_tag' ---
 
-  # --- Joins ---
-  joined <- dplyr::inner_join(ingredients, characteristics,
-                              by = c("ingredient", "animal_type", "animal_subtype", "ingredient_type")) %>%
-    dplyr::inner_join(diet_sub,
-                      by = c("code", "animal_type", "animal_subtype", "zone"))
+  # 1. Unir 'diet' e 'ingredients'
+  diet_full <- diet %>%
+    dplyr::left_join(ingredients, by = join_keys_diet, na_matches = "na")
 
-  # --- Variables a calcular ---
-  vars <- intersect(c("cp", "de", "ash", "ndf"), names(joined))
-  req <- c("ingredient_share", "feed_share", "forage_share", "milk_share","milk_replacer_share")
-  miss <- setdiff(req, names(joined))
-  if (length(miss) > 0) stop("Faltan columnas: ", paste(miss, collapse = ", "))
+  # 2. Unir 'characteristics' (valores nutricionales)
+  diet_with_char <- diet_full %>%
+    dplyr::left_join(characteristics, by = join_keys_char, na_matches = "na")
 
-  # --- Cálculo ponderado ---
-  variables <- joined %>%
+  # 3. Variables a calcular
+  vars_to_calc <- intersect(c("cp", "de", "ash", "ndf"), names(diet_with_char))
+
+  # 4. Cálculo ponderado
+  calculated_diets <- diet_with_char %>%
     dplyr::mutate(weight = dplyr::case_when(
-      ingredient_type == "feed"   ~ feed_share,
-      ingredient_type == "forage" ~ forage_share,
-      ingredient_type == "milk"   ~ milk_share,
+      ingredient_type == "feed"        ~ feed_share,
+      ingredient_type == "forage"      ~ forage_share,
+      ingredient_type == "milk"        ~ milk_share,
       ingredient_type == "milk_replacer" ~ milk_replacer_share,
       TRUE ~ 0
     )) %>%
-    dplyr::mutate(dplyr::across(all_of(vars),
-                                ~ . * ingredient_share * weight / 10000,
-                                .names = "{.col}")) %>%
-    dplyr::group_by(animal_type, animal_subtype, zone, code) %>%
-    dplyr::summarise(dplyr::across(all_of(vars), sum, na.rm = TRUE), .groups = "drop") %>%
-    dplyr::arrange(code, zone, animal_type, animal_subtype)
+    # Reemplazar NAs por 0
+    dplyr::mutate(
+      dplyr::across(
+        c(dplyr::all_of(vars_to_calc), "ingredient_share", "weight"),
+        ~ tidyr::replace_na(., 0)
+      )
+    ) %>%
+    # Aplicar la fórmula de ponderación
+    dplyr::mutate(
+      de_weighted  = de  * ingredient_share/100,
+      cp_weighted  = cp  * ingredient_share/100,
+      ndf_weighted = ndf * ingredient_share/100,
+      ash_weighted = ash * ingredient_share/100,
+    ) %>%
 
-  # --- Guardar salida ---
+    # 5. Agrupar por 'diet_tag' (NO por animal_type, eso viene luego)
+    dplyr::group_by(
+      group, zone, diet_tag
+    ) %>%
+    dplyr::summarise(
+      de  = sum(de_weighted * weight/100, na.rm = TRUE),
+      cp  = sum(cp_weighted * weight/100, na.rm = TRUE),
+      ndf = sum(ndf_weighted * weight/100, na.rm = TRUE),
+      ash = sum(ash_weighted * weight/100, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  # --- PASO B: Unir el "Traductor" (categories) ---
+  # Aquí es donde asignamos la dieta a cada animal específico
+
+  variables <- categories %>%
+    # Seleccionar columnas necesarias de categories
+    dplyr::select(identification, diet_tag, animal_type, animal_subtype) %>%
+
+    # Unir los valores calculados SOLO por 'diet_tag'
+    # (categories provee el animal_type, calculated_diets provee los nutrientes)
+    dplyr::left_join(calculated_diets, by = "diet_tag", na_matches = "na") %>%
+
+    # Seleccionar y reordenar
+    dplyr::select(
+      group, zone, identification, animal_type, animal_subtype, diet_tag,
+      dplyr::all_of(vars_to_calc)
+    ) %>%
+    # Filtrar filas que no hayan cruzado bien (opcional, por limpieza)
+    dplyr::filter(!is.na(group)) %>%
+    dplyr::arrange(group, zone, identification)
+
+  # --- 6. Guardar salida ---
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
-    write.csv(variables, "output/variables.csv", row.names = FALSE)
+    readr::write_csv(variables, "output/variables.csv")
     message("💾 Saved output to output/variables.csv")
   }
 
-  variables
+  return(variables)
 }

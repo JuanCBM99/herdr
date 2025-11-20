@@ -2,25 +2,17 @@
 % Please edit documentation in R/00_population.R
 \name{calculate_population}
 \alias{calculate_population}
-\title{Calcula la población animal (Versión Paquete)}
+\title{Calculate total animal population (non-interactive version)}
 \usage{
 calculate_population(saveoutput = TRUE)
 }
 \arguments{
-\item{saveoutput}{Logical (opcional). Si es TRUE, guarda el resultado
-como CSV. Por defecto es TRUE.}
+\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
 }
 \value{
-Un tibble con la población completa (base + calculada) incluyendo
-  columnas descriptivas del dataframe de categorías.
+A tibble with the full population, including columns 'group' and 'zone'.
 }
 \description{
-Carga los datos internos del paquete (categories, rate_parameters),
-pide al usuario la población base (k18, k23, k24) de forma interactiva
-y calcula la población restante.
-}
-\details{
-Esta función asume que los dataframes 'rate_parameters' y
-  'categories' están disponibles en el entorno del paquete (cargados
-  desde los archivos .rda en la carpeta 'data' del paquete).
+Loads base population data (census.csv) and calculates the full
+population structure for all animal types (cattle, sheep, etc.).
 }
