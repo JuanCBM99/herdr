@@ -2,17 +2,10 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEm}
 \alias{calculate_NEm}
-\title{Calculate Net Energy for Maintenance (NEm)}
+\title{Calculate Net Energy for Maintenance (NEm) (Refactored)}
 \usage{
 calculate_NEm(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. Save CSV? Default TRUE}
-}
-\value{
-Tibble with NEm for all animal categories.
-}
 \description{
-Computes NEm for all livestock animals based on average weight and
-CFI coefficients found in the input files.
+Computes NEm based on average weight and CFI coefficients using a relational join approach.
 }

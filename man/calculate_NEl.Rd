@@ -2,16 +2,11 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEl}
 \alias{calculate_NEl}
-\title{Calculate Net Energy for Lactation (NEl)}
+\title{Calculate Net Energy for Lactation (NEl) (Refactored)}
 \usage{
 calculate_NEl(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with NEl for all relevant animal categories.
-}
 \description{
-Computes NEl based on milk yield and fat content for all animals.
+Computes NEl based on milk yield and fat content.
+Assigns 0 energy for non-lactating animals instead of dropping them.
 }

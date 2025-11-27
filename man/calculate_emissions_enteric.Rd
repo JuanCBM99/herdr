@@ -2,17 +2,11 @@
 % Please edit documentation in R/04_emissions_enteric.R
 \name{calculate_emissions_enteric}
 \alias{calculate_emissions_enteric}
-\title{Calculate methane emissions from enteric fermentation}
+\title{Calculate methane emissions from enteric fermentation (Refactored)}
 \usage{
 calculate_emissions_enteric(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with enteric fermentation emissions.
-}
 \description{
-Computes enteric methane emissions for all animal categories, groups,
-and zones by loading the census data internally.
+Computes enteric methane emissions based on Gross Energy (GE),
+Digestible Energy (DE), NDF, and Ym factor.
 }

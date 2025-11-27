@@ -1,5 +1,5 @@
 #' Calculates the full goat population structure (Internal Helper)
-#' @noRd # <-- ¡Importante! No se exporta
+#' @export
 calculate_population_goat <- function(census_goat, rate_parameters) {
 
   message("🧮 Calculating populations for GOAT...")

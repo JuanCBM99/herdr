@@ -1,424 +1,479 @@
-#' Calculate Net Energy for Maintenance (NEm)
+#' Calculate Net Energy for Maintenance (NEm) (Refactored)
 #'
-#' Computes NEm for all livestock animals based on average weight and
-#' CFI coefficients found in the input files.
-#'
-#' @param saveoutput Logical. Save CSV? Default TRUE
-#' @return Tibble with NEm for all animal categories.
+#' Computes NEm based on average weight and CFI coefficients using a relational join approach.
 #' @export
 calculate_NEm <- function(saveoutput = TRUE) {
 
-  message("🟢 Loading input data (weights, categories, coefficients)...")
-  weights <- load_dataset("weights")
-  categories <- load_dataset("categories")
+  message("🟢 Calculating Net Energy for Maintenance (NEm)...")
+
+  # --- 1. Carga de Datos ---
+  weights      <- load_dataset("weights")
+  categories   <- load_dataset("categories")
   coefficients <- load_dataset("coefficients")
 
-  # --- Validaciones de Columnas Esenciales ---
-  req_cols_weights <- c("identification", "animal_type", "animal_subtype", "average_weight")
-  if (!all(req_cols_weights %in% names(weights))) {
-    stop(paste("Error: 'weights.csv' debe contener:", paste(req_cols_weights, collapse = ", ")))
-  }
+  # Validaciones (concisas y efectivas)
+  stopifnot(
+    all(c("identification", "average_weight") %in% names(weights)),
+    all(c("identification", "cfi") %in% names(categories))
+  )
 
-  req_cols_cat <- c("identification", "animal_type", "animal_subtype", "cfi")
-  if (!all(req_cols_cat %in% names(categories))) {
-    stop(paste("Error: 'categories.csv' debe contener:", paste(req_cols_cat, collapse = ", ")))
-  }
-
-  # --- Preparar tabla CFI ---
-  cfi_tbl <- coefficients %>%
-    dplyr::filter(tolower(coefficient) == "cfi") %>%
-    dplyr::select(description, value) %>%
-    tibble::deframe()
-
-  # --- Cálculo ---
-
-  categories_cfi <- categories %>%
-    dplyr::select(identification, animal_type, animal_subtype, cfi)
-
-  nem_result <- weights %>%
-    dplyr::left_join(categories_cfi, by = c("identification", "animal_type", "animal_subtype")) %>%
-    dplyr::mutate(
-      cfi_value = cfi_tbl[cfi],
-      NEm = cfi_value * (average_weight^0.75)
+  # --- 2. Pipeline de Cálculo ---
+  results <- weights %>%
+    # 2.1 Unir con Categorías para obtener la etiqueta 'cfi' (ej. "lactating_cow")
+    dplyr::left_join(
+      categories %>%
+        dplyr::select(identification, animal_type, animal_subtype, cfi_tag = cfi),
+      by = c("identification", "animal_type", "animal_subtype")
     ) %>%
+
+    # 2.2 Unir con Coeficientes para obtener el valor numérico
+    # Esto reemplaza al vector de búsqueda manual y es más robusto
+    dplyr::left_join(
+      coefficients %>%
+        dplyr::filter(tolower(coefficient) == "cfi") %>%
+        dplyr::select(cfi_tag = description, cfi_value = value),
+      by = "cfi_tag"
+    ) %>%
+
+    # 2.3 Cálculo y Limpieza
+    dplyr::mutate(
+      # Seguridad numérica
+      across(c(average_weight, cfi_value), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+
+      # Fórmula: Coeficiente * (Peso ^ 0.75)
+      NEm = cfi_value * (average_weight ^ 0.75)
+    ) %>%
+
+    # 2.4 Selección flexible (mantiene group/zone solo si existen)
     dplyr::select(
-      dplyr::any_of(c("group", "zone")), # <--- any_of() aquí en select() está BIEN
+      dplyr::any_of(c("group", "zone")),
       identification, animal_type, animal_subtype,
       average_weight, cfi_value, NEm
     ) %>%
 
-    # --- ¡LÍNEA CORREGIDA! ---
-    # Envolvemos any_of() dentro de across() para arrange()
+    # Ordenar priorizando group/zone si existen, luego identificación
     dplyr::arrange(dplyr::across(dplyr::any_of(c("group", "zone"))), identification)
 
-  # --- Guardar ---
-  if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(nem_result, "output/NEm_result.csv")
+  # --- 3. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NEm_result.csv")
     message("💾 Saved output to output/NEm_result.csv")
   }
 
-  return(nem_result)
+  return(results)
 }
 
-
-#' Calculate Net Energy for Activity (NEa)
+#' Calculate Net Energy for Activity (NEa) (Refactored)
 #'
-#' Computes NEa for all animals using NEm and housing/activity coefficients.
-#'
-#' @param saveoutput Logical. Save results to CSV? Default TRUE
-#' @return A tibble with NEa for all animal categories.
+#' Computes NEa based on NEm and housing/activity coefficients (Ca),
+#' applying weighted averages for mixed systems (grazing/stall) in cattle.
 #' @export
-calculate_NEa <- function(saveoutput = TRUE) { # <-- Filtros eliminados
+calculate_NEa <- function(saveoutput = TRUE) {
 
-  message("🟢 Loading input data (categories, coefficients)...")
+  message("🟢 Calculating Net Energy for Activity (NEa)...")
 
-  # --- Cargar datasets ---
-  categories <- load_dataset("categories")
+  # --- 1. Carga de Datos ---
+  categories   <- load_dataset("categories")
   coefficients <- load_dataset("coefficients")
 
-  # --- Calcular NEm (versión sin filtros) ---
-  NEm <- calculate_NEm(saveoutput = FALSE)
+  # Traemos NEm (aseguramos tipos numéricos aquí por si acaso)
+  nem_df <- calculate_NEm(saveoutput = FALSE)
 
-  # --- Preparar categorías ---
-  # (Ya no se filtra, solo se seleccionan columnas)
-  categories_sub <- categories %>%
-    dplyr::select(identification, animal_type, animal_subtype, ca, grazing_months) %>%
-    dplyr::mutate(grazing_months = ifelse(is.na(grazing_months), 0, grazing_months))
+  # --- 2. Preparación de Constantes y Factores ---
 
-  # --- Preparar coeficientes ca ---
-  ca_coeff <- coefficients %>%
+  # Extraemos la tabla de coeficientes 'ca'
+  ca_table <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "ca") %>%
-    dplyr::select(description, value) %>%
-    tibble::deframe()
+    dplyr::select(ca_tag = description, ca_value = value)
 
-  # --- Cálculo de NEa ---
-  NEa_result <- NEm %>%
-    dplyr::inner_join(categories_sub, by = c("identification", "animal_type", "animal_subtype")) %>%
-    dplyr::mutate(
-      ca_val = ca_coeff[ca],
-      ca_val = ifelse(is.na(ca_val), 0, ca_val),
-      second_ca_val = ca_coeff[ifelse(ca == "stall", "pasture",
-                                      ifelse(ca == "pasture", "stall", ca))],
-      second_ca_val = ifelse(is.na(second_ca_val), 0, second_ca_val),
-      ca = dplyr::case_when(
-        animal_type == "cattle" & ca %in% c("stall", "pasture") ~ (grazing_months/12)*ca_val + ((12-grazing_months)/12)*second_ca_val,
-        animal_type == "cattle" & ca == "grazing large areas" ~ ca_val,
-        TRUE ~ ca_val
-      ),
-      NEa = ca * NEm
+  # Extraemos valores específicos para la fórmula de vacuno (Pasture vs Stall)
+  # Esto evita la lógica compleja de "si es A, dame B" dentro del mutate
+  val_stall   <- ca_table$ca_value[ca_table$ca_tag == "stall"][1]
+  val_pasture <- ca_table$ca_value[ca_table$ca_tag == "pasture"][1]
+
+  # Validamos que existan (por seguridad)
+  val_stall   <- if (is.na(val_stall)) 0 else val_stall
+  val_pasture <- if (is.na(val_pasture)) 0 else val_pasture
+
+  # --- 3. Pipeline de Cálculo ---
+  results <- nem_df %>%
+    # 3.1 Unir datos de categorización (Tag de actividad y Meses de pastoreo)
+    dplyr::left_join(
+      categories %>%
+        dplyr::select(identification, animal_type, animal_subtype, ca_tag = ca, grazing_months),
+      by = c("identification", "animal_type", "animal_subtype")
     ) %>%
-    dplyr::select(
-      dplyr::any_of(c("group", "zone")), # Mantiene group/zone si existen
-      identification, animal_type, animal_subtype, cfi_value, NEm, ca, NEa
-    )
 
-  # --- Guardar salida ---
-  if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(NEa_result, "output/NEa_result.csv")
+    # 3.2 Unir el valor base del coeficiente (Lookup simple)
+    dplyr::left_join(ca_table, by = "ca_tag") %>%
+
+    # 3.3 Cálculos
+    dplyr::mutate(
+      # Seguridad numérica
+      across(c(grazing_months, ca_value, NEm), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+
+      # Lógica del Coeficiente de Actividad (Ca)
+      Ca_final = dplyr::case_when(
+        # CASO 1: Vacuno en sistema mixto (Stall/Pasture)
+        # Se calcula el promedio ponderado basado en los meses de pastoreo
+        animal_type == "cattle" & ca_tag %in% c("stall", "pasture") ~
+          (val_pasture * (grazing_months / 12)) + (val_stall * ((12 - grazing_months) / 12)),
+
+        # CASO 2: Vacuno en grandes áreas (Grazing large areas)
+        # Usa su propio coeficiente directo
+        animal_type == "cattle" & ca_tag == "grazing large areas" ~ ca_value,
+
+        # CASO 3: Resto de animales o sistemas
+        TRUE ~ ca_value
+      ),
+
+      # Cálculo final de Energía Neta para Actividad
+      NEa = Ca_final * NEm
+    ) %>%
+
+    # 3.4 Selección y Limpieza
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")), # Mantiene group/zone si vienen de NEm
+      identification, animal_type, animal_subtype,
+      NEm, ca_tag, grazing_months, Ca_coefficient = Ca_final, NEa
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NEa_result.csv")
     message("💾 Saved output to output/NEa_result.csv")
   }
 
-  return(NEa_result)
+  return(results)
 }
 
 
-  #' Calculate Net Energy for Growth (NEg)
-  #'
-  #' Computes NEg for all animals.
-  #'
-  #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-  #' @return A tibble with NEg for all animal categories.
-  #' @export
+#' Calculate Net Energy for Growth (NEg) (Refactored)
+#'
+#' Computes NEg for all animals using vectorized operations.
+#' Replaces rowwise lookups with efficient joins.
+#' @export
+calculate_NEg <- function(saveoutput = TRUE) {
 
-  calculate_NEg <- function(saveoutput = TRUE) { # <-- Filtros eliminados
+  message("🟢 Calculating Net Energy for Growth (NEg)...")
 
-    message("🟢 Loading input data (weights, categories, coefficients)...")
+  # --- 1. Carga de Datos ---
+  weights      <- load_dataset("weights")
+  categories   <- load_dataset("categories")
+  coefficients <- load_dataset("coefficients")
 
-    # --- Cargar datasets ---
-    weights <- load_dataset("weights")
-    categories <- load_dataset("categories")
-    coefficients <- load_dataset("coefficients")
+  # Preparamos una tabla de búsqueda limpia para los coeficientes
+  # Solo necesitamos 'description' (la clave) y 'value' (el número)
+  coeff_lookup <- coefficients %>%
+    dplyr::select(description, value) %>%
+    dplyr::distinct(description, .keep_all = TRUE) # Seguridad contra duplicados
 
-    # --- Bloque de filtrado eliminado ---
+  # --- 2. Pipeline de Construcción de Datos ---
+  # En lugar de buscar coeficientes fila por fila, los unimos todos de golpe
 
-    # --- Preparar df para cálculo ---
-    # (Se usan los dataframes completos)
-    df <- weights %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")),
-        identification, animal_type, animal_subtype, weight_gain, average_weight, adult_weight
-      ) %>%
-      dplyr::left_join(
-        categories %>% dplyr::select(identification, animal_type, animal_subtype, c, a, b),
-        by = c("identification","animal_type","animal_subtype")
+  df_joined <- weights %>%
+    # 2.1 Unir categorías para obtener los tags de los coeficientes (c, a, b)
+    dplyr::left_join(
+      categories %>% dplyr::select(identification, animal_type, animal_subtype, c, a, b),
+      by = c("identification", "animal_type", "animal_subtype")
+    ) %>%
+
+    # 2.2 Traer valor C (usado para Cattle)
+    dplyr::left_join(coeff_lookup, by = c("c" = "description")) %>%
+    dplyr::rename(C_val = value) %>%
+
+    # 2.3 Traer valor A (usado para Sheep/Goat)
+    dplyr::left_join(coeff_lookup, by = c("a" = "description")) %>%
+    dplyr::rename(A_val = value) %>%
+
+    # 2.4 Traer valor B (usado para Sheep/Goat)
+    dplyr::left_join(coeff_lookup, by = c("b" = "description")) %>%
+    dplyr::rename(B_val = value)
+
+  # --- 3. Cálculo Vectorizado ---
+  results <- df_joined %>%
+    dplyr::mutate(
+      # Limpieza de tipos y NAs antes de calcular
+      across(
+        c(average_weight, adult_weight, weight_gain, C_val, A_val, B_val),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      # Lógica NEg
+      NEg = dplyr::case_when(
+        # Lógica Vacuno (Cattle)
+        # Fórmula: 22.02 * (Peso / (C * PesoAdulto))^0.75 * Ganancia^1.097
+        tolower(animal_type) == "cattle" ~ dplyr::if_else(
+          adult_weight > 0 & C_val > 0,
+          22.02 * ((average_weight / (C_val * adult_weight))^0.75) * (weight_gain^1.097),
+          0
+        ),
+
+        # Lógica Ovinos/Caprinos (Sheep/Goat)
+        # Fórmula: (A + 0.5 * B) * Ganancia
+        tolower(animal_type) %in% c("sheep", "goat") ~ (A_val + 0.5 * B_val) * weight_gain,
+
+        # Otros
+        TRUE ~ 0
       )
+    ) %>%
 
-    coeff_vector <- coefficients %>% dplyr::select(animal_type, description, value)
+    # --- 4. Limpieza Final ---
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")),
+      identification, animal_type, animal_subtype,
+      c_tag = c, a_tag = a, b_tag = b, # Mantenemos los nombres originales como tags
+      average_weight, adult_weight, weight_gain,
+      NEg
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
-    # --- Cálculo NEg ---
-    df <- df %>%
-      dplyr::rowwise() %>%
-      dplyr::mutate(
-        NEg = dplyr::case_when(
-          animal_type == "cattle" ~ {
-            C_val <- coeff_vector$value[
-              coeff_vector$animal_type == "cattle" &
-                coeff_vector$description == c
-            ]
-            C_val <- if (length(C_val) == 0 || all(is.na(C_val))) 0 else C_val[1]
-
-            ifelse(
-              is.na(C_val) | is.na(average_weight) | is.na(adult_weight) | is.na(weight_gain),
-              0,
-              22.02 * ((average_weight / (C_val * adult_weight))^0.75) * (weight_gain^1.097)
-            )
-          },
-
-          animal_type %in% c("Sheep", "Goat") ~ {
-            a_val <- coeff_vector$value[
-              coeff_vector$animal_type == animal_type &
-                coeff_vector$description == a
-            ]
-            b_val <- coeff_vector$value[
-              coeff_vector$animal_type == animal_type &
-                coeff_vector$description == b
-            ]
-            a_val <- if (length(a_val) == 0 || all(is.na(a_val))) 0 else a_val[1]
-            b_val <- if (length(b_val) == 0 || all(is.na(b_val))) 0 else b_val[1]
-
-            ifelse(
-              is.na(a_val) | is.na(b_val) | is.na(weight_gain),
-              0,
-              (a_val + 0.5 * b_val) * weight_gain
-            )
-          },
-
-          TRUE ~ 0
-        )
-      ) %>%
-      dplyr::ungroup()
-
-    # --- Guardar salida ---
-    if (saveoutput) {
-      dir.create("output", showWarnings = FALSE)
-      readr::write_csv(df, "output/NEg_result.csv")
-      message("💾 Saved output to output/NEg_result.csv")
-    }
-
-    # Seleccionamos las columnas finales
-    df %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")),
-        identification, animal_type, animal_subtype, c, a, b,
-        average_weight, adult_weight, weight_gain, NEg
-      )
+  # --- 5. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NEg_result.csv")
+    message("💾 Saved output to output/NEg_result.csv")
   }
 
+  return(results)
+}
 
-  #' Calculate Net Energy for Lactation (NEl)
-  #'
-  #' Computes NEl based on milk yield and fat content for all animals.
-  #'
-  #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-  #' @return A tibble with NEl for all relevant animal categories.
-  #' @export
-  calculate_NEl <- function(saveoutput = TRUE) { # <-- Filtros eliminados
 
-    message("🟢 Loading input data (categories)...")
+#' Calculate Net Energy for Lactation (NEl) (Refactored)
+#'
+#' Computes NEl based on milk yield and fat content.
+#' Assigns 0 energy for non-lactating animals instead of dropping them.
+#' @export
+calculate_NEl <- function(saveoutput = TRUE) {
 
-    # --- Cargar dataset categories ---
-    categories <- load_dataset("categories")
+  message("🟢 Calculating Net Energy for Lactation (NEl)...")
 
-    # --- Filtrado por datos válidos ---
-    result <- categories %>%
-      dplyr::filter(!is.na(milk_yield), !is.na(fat_content), !is.na(identification)) %>%
-      dplyr::mutate(
-        Milk_yield_kg_day_head = milk_yield / 365,
-        NEl = dplyr::case_when(
-          animal_type == "cattle" ~ Milk_yield_kg_day_head * (1.47 + 0.4 * fat_content),
-          animal_type %in% c("sheep", "goat") ~ Milk_yield_kg_day_head * 4.6,
-          TRUE ~ NA_real_
-        )
-      ) %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")),
-        identification, animal_type, animal_subtype,
-        Milk_yield_kg_day_head, fat_content, NEl
+  # --- 1. Carga de Datos ---
+  categories <- load_dataset("categories")
+
+  # --- 2. Pipeline de Cálculo ---
+  results <- categories %>%
+    dplyr::mutate(
+      # Limpieza de tipos y manejo de NAs (NAs se convierten en 0)
+      across(
+        c(milk_yield, fat_content),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      # Cálculo de producción diaria (asumiendo milk_yield anual)
+      Milk_yield_kg_day = milk_yield / 365,
+
+      # Cálculo de Energía (NEl)
+      NEl = dplyr::case_when(
+        # Si no hay producción, la energía es 0 (ahorra cálculo)
+        Milk_yield_kg_day <= 0 ~ 0,
+
+        # Fórmula Vacuno: Producción * (1.47 + 0.4 * Grasa)
+        tolower(animal_type) == "cattle" ~ Milk_yield_kg_day * (1.47 + 0.4 * fat_content),
+
+        # Fórmula Pequeños Rumiantes: Producción * Factor Fijo (4.6 MJ/kg aprox)
+        tolower(animal_type) %in% c("sheep", "goat") ~ Milk_yield_kg_day * 4.6,
+
+        # Resto (ej. cerdos, aves no lactantes en este contexto)
+        TRUE ~ 0
       )
+    ) %>%
 
-    # --- Bloque de filtrado por animal / tipo eliminado ---
+    # --- 3. Limpieza Final ---
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")), # Mantiene columnas si existen
+      identification, animal_type, animal_subtype,
+      Milk_yield_kg_day, fat_content, NEl
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
-    # --- Guardar salida ---
-    if (saveoutput) {
-      dir.create("output", showWarnings = FALSE)
-      readr::write_csv(result, "output/NEl_result.csv")
-      message("💾 Saved output to output/NEl_result.csv")
-    }
-
-    result
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NEl_result.csv")
+    message("💾 Saved output to output/NEl_result.csv")
   }
 
+  return(results)
+}
 
-  #' Calculate Net Working Energy (NE_work)
-  #'
-  #' NE_work = NEm * hours of activity.
-  #'
-  #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-  #' @return A tibble with NE_work for all relevant animal categories.
-  #' @export
-  calculate_NE_work <- function(saveoutput = TRUE) { # <-- Filtros eliminados
 
-    message("🟢 Loading input data (categories)...")
+#' Calculate Net Working Energy (NE_work) (Refactored)
+#'
+#' Computes NE_work based on NEm and hours of activity.
+#' Keeps all animals in the dataset (assigns 0 to non-working animals).
+#' @export
+calculate_NE_work <- function(saveoutput = TRUE) {
 
-    # --- Cargar dataset categories ---
-    categories <- load_dataset("categories")
+  message("🟢 Calculating Net Energy for Work (NE_work)...")
 
-    # --- Calcular NEm (versión sin filtros) ---
-    NEm <- calculate_NEm(saveoutput = FALSE)
+  # --- 1. Carga de Datos ---
+  categories <- load_dataset("categories")
 
-    # --- Bloque de filtrado por animal / tipo eliminado ---
+  # Traemos NEm (base del cálculo)
+  nem_df <- calculate_NEm(saveoutput = FALSE)
 
-    # --- Cálculo NE_work ---
-    # (Se usa el dataframe 'categories' completo)
-    result <- categories %>%
-      dplyr::filter(!is.na(hours) & hours > 0) %>% # Filtramos solo los que trabajan
-      dplyr::inner_join(NEm, by = c("identification","animal_type","animal_subtype")) %>%
-      dplyr::mutate(NE_work = hours * NEm) %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")),
-        identification, animal_type, animal_subtype, hours, NEm, NE_work
-      )
+  # --- 2. Pipeline de Cálculo ---
+  results <- nem_df %>%
+    # 2.1 Unimos la variable 'hours' desde categories
+    dplyr::left_join(
+      categories %>% dplyr::select(identification, animal_type, animal_subtype, hours),
+      by = c("identification", "animal_type", "animal_subtype")
+    ) %>%
 
-    # --- Guardar salida ---
-    if (saveoutput) {
-      dir.create("output", showWarnings = FALSE)
-      readr::write_csv(result, "output/NE_work_result.csv")
-      message("💾 Saved output to output/NE_work_result.csv")
-    }
+    # 2.2 Cálculos y Limpieza
+    dplyr::mutate(
+      # Aseguramos que 'hours' y 'NEm' sean numéricos.
+      # Si hours es NA (no hay dato), se convierte en 0.
+      across(
+        c(hours, NEm),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
 
-    result
+      # Fórmula: NEm * Horas (Asignará 0 si hours es 0)
+      NE_work = hours * NEm
+    ) %>%
+
+    # --- 3. Limpieza Final ---
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")), # Mantiene group/zone si vienen de NEm
+      identification, animal_type, animal_subtype,
+      hours, NEm, NE_work
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NE_work_result.csv")
+    message("💾 Saved output to output/NE_work_result.csv")
   }
 
+  return(results)
+}
 
-  #' Calculate Net Energy for Wool Production (NE_wool)
-  #'
-  #' NE_wool = (wool_yield * 24) / 365
-  #'
-  #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-  #' @return Tibble with NE_wool for all relevant animal categories.
-  #' @export
-  calculate_NE_wool <- function(saveoutput = TRUE) { # <-- Filtros eliminados
 
-    message("🟢 Loading input data (categories)...")
+#' Calculate Net Energy for Wool Production (NE_wool) (Refactored)
+#'
+#' Computes NE_wool based on wool yield.
+#' Assigns 0 energy for non-wool producing animals instead of dropping them.
+#' @export
+calculate_NE_wool <- function(saveoutput = TRUE) {
 
-    # --- Cargar dataset categories ---
-    categories <- load_dataset("categories")
+  message("🟢 Calculating Net Energy for Wool (NE_wool)...")
 
-    # --- Filtrado y cálculo NE_wool ---
-    result <- categories %>%
-      dplyr::filter(!is.na(wool_yield) & wool_yield > 0) %>% # Filtramos solo los que producen lana
-      dplyr::mutate(NE_wool = (wool_yield * 24) / 365) %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")),
-        identification, animal_type, animal_subtype, wool_yield, NE_wool
-      )
+  # --- 1. Carga de Datos ---
+  categories <- load_dataset("categories")
 
-    # --- Bloque de filtrado por animal / tipo eliminado ---
+  # --- 2. Pipeline de Cálculo ---
+  results <- categories %>%
+    dplyr::mutate(
+      # Seguridad numérica: Convertimos texto a número y NA a 0
+      wool_yield = tidyr::replace_na(suppressWarnings(as.numeric(wool_yield)), 0),
 
-    # --- Guardar salida ---
-    if (saveoutput) {
-      dir.create("output", showWarnings = FALSE)
-      readr::write_csv(result, "output/NE_wool_result.csv")
-      message("💾 Saved output to output/NE_wool_result.csv")
-    }
+      # Cálculo directo (Vectorizado)
+      # La fórmula aplica a todos. Si wool_yield es 0 (ej. vacas), NE_wool será 0.
+      NE_wool = (wool_yield * 24) / 365
+    ) %>%
 
-    result
+    # --- 3. Selección y Limpieza ---
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")), # Mantiene columnas si existen
+      identification, animal_type, animal_subtype,
+      wool_yield, NE_wool
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NE_wool_result.csv")
+    message("💾 Saved output to output/NE_wool_result.csv")
   }
 
+  return(results)
+}
 
-  #' Calculate Net Energy for Pregnancy (NE_pregnancy)
-  #'
-  #' Computes NE_pregnancy with species-specific rules for all animals.
-  #'
-  #' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-  #' @return Tibble with NE_pregnancy for all relevant animal categories.
-  #' @export
-  calculate_NE_pregnancy <- function(saveoutput = TRUE) { # <-- Filtros eliminados
 
-    message("🟢 Loading input data (categories, coefficients)...")
+#' Calculate Net Energy for Pregnancy (NE_pregnancy) (Refactored)
+#'
+#' Computes NE_pregnancy based on species-specific coefficients (C_pregnancy or PR).
+#' Keeps all animals (assigns 0 to non-pregnant), ensuring data consistency.
+#' @export
+calculate_NE_pregnancy <- function(saveoutput = TRUE) {
 
-    # --- Cargar datasets ---
-    categories <- load_dataset("categories")
-    coefficients <- load_dataset("coefficients")
+  message("🟢 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
-    # --- Calcular NEm (versión sin filtros) ---
-    NEm <- calculate_NEm(saveoutput = FALSE) # <-- Esta llamada ahora funciona
+  # --- 1. Carga de Datos ---
+  categories   <- load_dataset("categories")
+  coefficients <- load_dataset("coefficients")
 
-    # --- Preparar dataframe categories ---
-    cat_df <- categories %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")), # <-- any_of() en select() está bien
-        identification, animal_type, animal_subtype, c_pregnancy, pr
-      )
+  # Traemos NEm (Define la población base: group, zone, id...)
+  nem_df <- calculate_NEm(saveoutput = FALSE)
 
-    # --- Tabla de coeficientes c_pregnancy ---
-    c_preg_tbl <- coefficients %>%
-      dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
-      dplyr::select(description, value) %>%
-      dplyr::mutate(description = tolower(trimws(description))) %>%
-      tibble::deframe()
+  # Preparar tabla de coeficientes para Cattle (C_pregnancy)
+  # Esto sustituye la creación manual del diccionario/vector
+  coeff_lookup <- coefficients %>%
+    dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
+    dplyr::select(c_pregnancy_tag = description, c_value = value) %>%
+    dplyr::distinct(c_pregnancy_tag, .keep_all = TRUE)
 
-    # --- ¡BLOQUE CORREGIDO! ---
-    # Construimos las claves de unión dinámicamente
+  # --- 2. Pipeline de Cálculo ---
+  results <- nem_df %>%
+    # 2.1 Unir datos de categorías (tags y tasas de preñez)
+    # Usamos las claves universales. NEm ya trae group/zone, categories aporta los parámetros.
+    dplyr::left_join(
+      categories %>%
+        dplyr::select(identification, animal_type, animal_subtype, c_pregnancy, pr),
+      by = c("identification", "animal_type", "animal_subtype")
+    ) %>%
 
-    # Claves base
-    join_keys <- c("identification", "animal_type", "animal_subtype")
+    # 2.2 Unir el valor del coeficiente para Cattle
+    dplyr::left_join(coeff_lookup, by = c("c_pregnancy" = "c_pregnancy_tag")) %>%
 
-    # Añadimos 'group' y 'zone' a las claves SI existen en AMBOS dataframes
-    if ("group" %in% names(NEm) && "group" %in% names(cat_df)) {
-      join_keys <- c("group", join_keys)
-    }
-    if ("zone" %in% names(NEm) && "zone" %in% names(cat_df)) {
-      join_keys <- c("zone", join_keys)
-    }
+    # 2.3 Cálculos
+    dplyr::mutate(
+      # Seguridad numérica
+      across(c(pr, c_value, NEm), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
-    # --- Cálculo NE_pregnancy ---
-    result <- NEm %>%
-      # Usamos las 'join_keys' seguras
-      dplyr::left_join(cat_df, by = join_keys) %>%
-      dplyr::mutate(
-        c_pregnancy_value = dplyr::case_when(
-          animal_type=="cattle" ~ {
-            lookup_key <- tolower(trimws(as.character(c_pregnancy)))
-            c_preg_tbl[lookup_key]
-          },
-          animal_type %in% c("sheep","goat") & pr==0 ~ 0,
-          animal_type %in% c("sheep","goat") & pr>0 ~ {
-            double_birth <- pmax(pr-1,0)
-            single_birth <- 1-double_birth
-            0.126*double_birth + 0.077*single_birth
-          },
-          TRUE ~ 0
-        )
-        , # Esta coma SÍ es correcta (separa 'c_pregnancy_value' de la siguiente línea)
-        c_pregnancy_value = ifelse(is.na(c_pregnancy_value), 0, c_pregnancy_value),
-        NE_pregnancy = c_pregnancy_value * NEm
-      ) %>%
-      # Filtramos para quedarnos solo con los que tienen valor
-      dplyr::filter(NE_pregnancy > 0) %>%
-      dplyr::select(
-        dplyr::any_of(c("group", "zone")), # <-- any_of() en select() está bien
-        identification, animal_type, animal_subtype, c_pregnancy = c_pregnancy_value, NEm, NE_pregnancy
-      )
+      # Cálculo del Factor de Gestación (C_preg)
+      C_preg_factor = dplyr::case_when(
+        # CASO 1: Vacuno (Usa coeficiente tabular Cb)
+        tolower(animal_type) == "cattle" ~ c_value,
 
-    # --- Guardar salida ---
-    if (saveoutput) {
-      dir.create("output", showWarnings = FALSE)
-      readr::write_csv(result, "output/NE_pregnancy_result.csv")
-      message("💾 Saved output to output/NE_pregnancy_result.csv")
-    }
+        # CASO 2: Ovinos y Caprinos (Usa tasa PR)
+        # Lógica: Desglose en partos simples vs dobles basado en si PR > 1
+        tolower(animal_type) %in% c("sheep", "goat") & pr > 0 ~ {
+          double_birth <- pmax(pr - 1, 0) # Si PR es 1.2, double es 0.2
+          single_birth <- 1 - double_birth # y single es 0.8
+          (0.126 * double_birth) + (0.077 * single_birth)
+        },
 
-    return(result)
+        # CASO 3: Resto
+        TRUE ~ 0
+      ),
+
+      # Cálculo final: Factor * NEm
+      NE_pregnancy = C_preg_factor * NEm
+    ) %>%
+
+    # --- 3. Limpieza Final ---
+    dplyr::select(
+      dplyr::any_of(c("group", "zone")), # Mantiene columnas si existen en NEm
+      identification, animal_type, animal_subtype,
+      c_pregnancy_tag = c_pregnancy, C_preg_factor, NE_pregnancy
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/NE_pregnancy_result.csv")
+    message("💾 Saved output to output/NE_pregnancy_result.csv")
   }
+
+  return(results)
+}

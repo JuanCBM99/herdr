@@ -2,17 +2,10 @@
 % Please edit documentation in R/10_land_use.R
 \name{calculate_land_use}
 \alias{calculate_land_use}
-\title{Calculate land use}
+\title{Calculate land use (Refactored & Fixed)}
 \usage{
 calculate_land_use(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. If TRUE, saves the result to "output/Land_use.csv". Default TRUE.}
-}
-\value{
-Tibble with **total land use per animal**.
-}
 \description{
-Computes total land use (m²) for all animal categories, groups, and zones
-based on the 'diet_tag' architecture.
+Computes total land use (m²) per animal based on diet and yields.
 }

@@ -2,17 +2,11 @@
 % Please edit documentation in R/06_emissions_manure_CH4.R
 \name{calculate_CH4_manure}
 \alias{calculate_CH4_manure}
-\title{Calculate CH₄ Emissions from Manure Management}
+\title{Calculate CH₄ Emissions from Manure Management (Refactored)}
 \usage{
 calculate_CH4_manure(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-Tibble with CH₄ emissions per animal category.
-}
 \description{
-Computes CH₄ emissions from manure for all animal categories, groups,
-and zones.
+Computes CH₄ emissions from manure based on Volatile Solids (VS),
+population, and management factors.
 }

@@ -1,83 +1,85 @@
-#' Calculate total animal population (non-interactive version)
+#' Calculate total animal population (Refactored)
 #'
-#' Loads base population data (census.csv) and calculates the full
-#' population structure for all animal types (cattle, sheep, etc.).
-#'
-#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-#'
-#' @return A tibble with the full population, including columns 'group' and 'zone'.
+#' Orchestrates the population calculation by loading census data and dispatching
+#' sub-calculations for each animal type (cattle, sheep, goat).
 #' @export
-#'
 calculate_population <- function(saveoutput = TRUE) {
 
-  message("🟢 Loading census, rates, and categories...")
+  message("🟢 Calculating Total Population...")
 
-  # --- 1. Load datasets safely ---
-  tryCatch({
-    census_base     <- load_dataset("census")
-    rate_parameters <- load_dataset("rate_parameters")
-    categories      <- load_dataset("categories")
-  }, error = function(e) {
-    stop("Error loading datasets with load_dataset(). Original error: ", e$message)
-  })
+  # --- 1. Carga de Datos ---
+  census_base     <- load_dataset("census")
+  rate_parameters <- load_dataset("rate_parameters")
+  categories      <- load_dataset("categories")
 
-  # --- 2. The Dispatcher ---
-  message("Splitting census by animal_type...")
+  # Validación mínima para evitar errores en cascada
+  stopifnot("animal_type" %in% names(census_base))
 
-  # Dividir el censo por animal_type
-  census_split <- split(census_base, census_base$animal_type)
+  # --- 2. Dispatcher (Gestor de Tráfico) ---
+  # Creamos una lista para almacenar los resultados parciales
+  results_list <- list()
 
-  results_list <- list() # Un lugar para guardar los resultados
-
-  # --- 3. Calcular Vacuno (Cattle) ---
-  if ("cattle" %in% names(census_split)) {
+  # A) VACUNO (Cattle)
+  # Requiere lógica especial (pasa 'categories' para gestionar zonas vacías/NA)
+  df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
+  if (nrow(df_cattle) > 0) {
+    message("  -> Processing Cattle...")
     results_list$cattle <- calculate_population_cattle(
-      census_cattle = census_split$cattle,
+      census_cattle = df_cattle,
       rate_parameters = rate_parameters,
-      categories = categories # (Solo 'cattle' usa 'categories' para 'zone=NA')
+      categories = categories
     )
   }
 
-  # --- 4. Calcular Ovejas (Sheep) ---
-  if ("sheep" %in% names(census_split)) {
+  # B) OVEJAS (Sheep)
+  df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
+  if (nrow(df_sheep) > 0) {
+    message("  -> Processing Sheep...")
     results_list$sheep <- calculate_population_sheep(
-      census_sheep = census_split$sheep,
+      census_sheep = df_sheep,
       rate_parameters = rate_parameters
     )
   }
 
-  # --- 5. Calcular Cabras (Goat) ---
-  if ("goat" %in% names(census_split)) {
+  # C) CABRAS (Goat)
+  df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
+  if (nrow(df_goat) > 0) {
+    message("  -> Processing Goats...")
     results_list$goat <- calculate_population_goat(
-      census_goat = census_split$goat,
+      census_goat = df_goat,
       rate_parameters = rate_parameters
     )
   }
 
-  # --- 6. Unir todos los resultados ---
-  message("Combining all results...")
-  final_result <- dplyr::bind_rows(results_list)
+  # --- 3. Unificación y Metadatos ---
+  message("  -> Combining and attaching metadata...")
 
-  # --- 7. Join with categories (Paso final) ---
-  message("Attaching metadata (animal_type, subtype)...")
-  result_with_metadata <- final_result %>%
+  if (length(results_list) == 0) {
+    warning("⚠️ No data found for any known animal type.")
+    return(tibble::tibble())
+  }
+
+  final_result <- dplyr::bind_rows(results_list) %>%
+    # Unimos con categories para recuperar info descriptiva (subtype, etc.)
+    # Usamos la columna 'identification' como clave única
     dplyr::left_join(
-      # Seleccionamos las claves de 'categories'
-      dplyr::select(categories, identification, animal_type, animal_subtype),
-      by = "identification",
-      na_matches = "na"
+      categories %>% dplyr::select(identification, animal_type, animal_subtype),
+      by = "identification"
     ) %>%
-    # Asegurarnos de que las columnas están en el orden correcto
+    # Orden y selección final de columnas
     dplyr::select(
       group, zone, identification, animal_type, animal_subtype, population
-    )
+    ) %>%
+    # Limpieza final: aseguramos que población sea numérico y ordenamos
+    dplyr::mutate(population = as.numeric(population)) %>%
+    dplyr::arrange(group, zone, identification)
 
-  # --- 8. Save output ---
+  # --- 4. Guardado ---
   if (isTRUE(saveoutput)) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(result_with_metadata, "output/population_result.csv")
-    message("💾 Saved to output/population_result.csv")
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(final_result, "output/population_result.csv")
+    message("💾 Saved output to output/population_result.csv")
   }
 
-  return(result_with_metadata)
+  return(final_result)
 }

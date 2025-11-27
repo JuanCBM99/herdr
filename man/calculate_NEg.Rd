@@ -2,16 +2,11 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEg}
 \alias{calculate_NEg}
-\title{Calculate Net Energy for Growth (NEg)}
+\title{Calculate Net Energy for Growth (NEg) (Refactored)}
 \usage{
 calculate_NEg(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with NEg for all animal categories.
-}
 \description{
-Computes NEg for all animals.
+Computes NEg for all animals using vectorized operations.
+Replaces rowwise lookups with efficient joins.
 }

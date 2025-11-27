@@ -1,5 +1,5 @@
 #' Calculates the full sheep population structure (Internal Helper)
-#' @noRd # <-- ¡Importante! No se exporta
+#' @export
 calculate_population_sheep <- function(census_sheep, rate_parameters) {
 
   message("🧮 Calculating populations for SHEEP...")

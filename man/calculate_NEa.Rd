@@ -2,16 +2,11 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEa}
 \alias{calculate_NEa}
-\title{Calculate Net Energy for Activity (NEa)}
+\title{Calculate Net Energy for Activity (NEa) (Refactored)}
 \usage{
 calculate_NEa(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. Save results to CSV? Default TRUE}
-}
-\value{
-A tibble with NEa for all animal categories.
-}
 \description{
-Computes NEa for all animals using NEm and housing/activity coefficients.
+Computes NEa based on NEm and housing/activity coefficients (Ca),
+applying weighted averages for mixed systems (grazing/stall) in cattle.
 }

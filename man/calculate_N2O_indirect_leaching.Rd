@@ -2,17 +2,10 @@
 % Please edit documentation in R/09_N2O_indirect_leaching.R
 \name{calculate_N2O_indirect_leaching}
 \alias{calculate_N2O_indirect_leaching}
-\title{Calculate indirect N₂O emissions from leaching}
+\title{Calculate indirect N₂O emissions from leaching (Refactored)}
 \usage{
 calculate_N2O_indirect_leaching(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_leaching.csv". Default TRUE.}
-}
-\value{
-Tibble with N₂O emissions per category from leaching
-}
 \description{
-Computes indirect N₂O emissions from nitrogen leaching for all animal
-categories, groups, and zones.
+Computes indirect N₂O emissions from nitrogen leaching.
 }

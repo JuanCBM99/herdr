@@ -1,78 +1,78 @@
-#' Calculate CH₄ Emissions from Manure Management
+#' Calculate CH₄ Emissions from Manure Management (Refactored)
 #'
-#' Computes CH₄ emissions from manure for all animal categories, groups,
-#' and zones.
-#'
-#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-#' @return Tibble with CH₄ emissions per animal category.
+#' Computes CH₄ emissions from manure based on Volatile Solids (VS),
+#' population, and management factors.
 #' @export
 calculate_CH4_manure <- function(saveoutput = TRUE) {
 
   message("🟢 Calculating CH₄ emissions from manure management...")
 
-  # --- 1️⃣ Calcular Volatile Solids (versión sin filtros) ---
-  # 'vs_df' tiene group, zone, identification, animal_type, animal_subtype, vs
-  vs_df <- calculate_vs(saveoutput = FALSE) %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype, vs)
+  # --- 1. Procesamiento y Cálculo ---
+  # Base: Sólidos Volátiles (VS) calculados por Grupo/Zona
+  results <- calculate_vs(saveoutput = FALSE) %>%
+    dplyr::select(group, zone, identification, animal_type, animal_subtype, vs) %>%
 
-  # --- 2️⃣ Cargar datasets de configuración ---
-  # 'ch4_data' NO tiene group ni zone
-  ch4_data <- load_dataset("ch4_mm") %>%
-    dplyr::select(identification, animal_category, animal_type, animal_subtype,
-                  management_system, system_climate, management_duration)
+    # 1.1 Unir Población (Dato específico)
+    dplyr::left_join(
+      calculate_population(saveoutput = FALSE) %>%
+        dplyr::select(group, zone, identification, animal_type, animal_subtype, population),
+      by = c("group", "zone", "identification", "animal_type", "animal_subtype")
+    ) %>%
 
-  coefficients_df <- load_dataset("coefficients") %>%
-    dplyr::filter(coefficient == "b_0") %>%
-    dplyr::select(animal_category = description, B0 = value)
+    # 1.2 Unir Configuración de Manejo (Dato universal)
+    dplyr::left_join(
+      load_dataset("ch4_mm") %>%
+        dplyr::select(identification, animal_category, animal_type, animal_subtype,
+                      management_system, system_climate, management_duration),
+      by = c("identification", "animal_type", "animal_subtype")
+    ) %>%
 
-  MCF_data <- load_dataset("mcf") %>%
-    dplyr::select(management_system, system_climate, mcf)
+    # 1.3 Unir Coeficiente B0
+    dplyr::left_join(
+      load_dataset("coefficients") %>%
+        dplyr::filter(coefficient == "b_0") %>%
+        dplyr::select(animal_category = description, B0 = value),
+      by = "animal_category"
+    ) %>%
 
-  # --- 3️⃣ Cargar Población ---
-  message("🟢 Calculating population data...")
-  message("  -> Cargando 'census.csv'...")
-  pop_data_to_use <- calculate_population(saveoutput = FALSE)
+    # 1.4 Unir Factores MCF
+    dplyr::left_join(
+      load_dataset("mcf") %>% dplyr::select(management_system, system_climate, mcf),
+      by = c("management_system", "system_climate")
+    ) %>%
 
-  pop_df <- pop_data_to_use %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype, population)
-
-  # --- 4️⃣ Unir datasets y calcular EF ---
-
-  # Claves para unir VS (específico) con ch4_data (general)
-  join_keys_universal <- c("identification", "animal_type", "animal_subtype")
-
-  # ¡MODIFICADO! Empezamos con 'vs_df' (que tiene group/zone)
-  joined <- vs_df %>%
-    # Unimos los datos de manejo (ch4_data) usando solo las claves universales
-    dplyr::left_join(ch4_data, by = join_keys_universal) %>%
-    dplyr::left_join(coefficients_df, by = "animal_category") %>%
-    dplyr::left_join(MCF_data, by = c("management_system", "system_climate")) %>%
+    # 2. Cálculos y Limpieza
     dplyr::mutate(
+      # Limpieza de tipos (Seguridad numérica)
+      across(
+        c(vs, population, management_duration, B0, mcf),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      # Lógica Matemática
       awms = management_duration / 12,
-      EF_CH4_kg_year = (vs * 365) * (B0 * 0.67 * mcf * awms)
-    )
 
-  # --- 5️⃣ Unir población y calcular emisiones totales ---
-  # Claves para unir con la población (estas SÍ tienen group/zone)
-  pop_join_keys <- c("group", "zone", "identification", "animal_type", "animal_subtype")
+      # Factor de Emisión (kg CH4 / animal / año)
+      EF_CH4_kg_year = (vs * 365) * (B0 * 0.67 * mcf * awms),
 
-  final <- joined %>%
-    # Usamos na_matches = "na" para k1 y k2
-    dplyr::left_join(pop_df, by = pop_join_keys, na_matches = "na") %>%
-    dplyr::mutate(
-      population = tidyr::replace_na(population, 0), # Si no hay población, es 0
+      # Emisiones Totales (Mg CH4 / año) -> dividimos por 1.000.000 para pasar de kg a Mg (toneladas)
       Emissions_CH4_Mg_year = EF_CH4_kg_year * population / 1e6
     ) %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype,
-                  management_system, vs, B0, mcf, awms,
-                  EF_CH4_kg_year, population, Emissions_CH4_Mg_year)
 
-  # --- 6️⃣ Guardar CSV ---
-  if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(final, "output/CH4_manure.csv")
+    # 3. Selección y Redondeo
+    dplyr::select(
+      group, zone, identification, animal_type, animal_subtype,
+      management_system, vs, B0, mcf, awms,
+      EF_CH4_kg_year, population, Emissions_CH4_Mg_year
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+
+  # --- 4. Guardado ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/CH4_manure.csv")
     message("💾 Saved output to output/CH4_manure.csv")
   }
 
-  return(final)
+  return(results)
 }

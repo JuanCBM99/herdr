@@ -2,18 +2,10 @@
 % Please edit documentation in R/03_calculate_GE.R
 \name{calculate_ge}
 \alias{calculate_ge}
-\title{Calculate Gross Energy (GE)}
+\title{Calculate Gross Energy (GE) (Fixed & Robust)}
 \usage{
 calculate_ge(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with gross energy (GE) and its components for all
-animal categories, groups, and zones.
-}
 \description{
-Computes gross energy requirements for all animals by summing all
-net energy components and adjusting by digestible energy (DE).
+Computes gross energy requirements by aggregating Net Energy (NE) components.
 }

@@ -2,17 +2,10 @@
 % Please edit documentation in R/08_N2O_indirect_volatilization.R
 \name{calculate_N2O_indirect_volatilization}
 \alias{calculate_N2O_indirect_volatilization}
-\title{Calculate indirect N₂O emissions from volatilization}
+\title{Calculate indirect N₂O emissions from volatilization (Refactored)}
 \usage{
 calculate_N2O_indirect_volatilization(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. If TRUE, saves output to "output/N2O_indirect_volatilization.csv". Default TRUE.}
-}
-\value{
-Tibble with indirect N₂O emissions per category
-}
 \description{
-Computes indirect N₂O emissions derived from volatilization of excreted nitrogen
-for all animal categories, groups, and zones.
+Computes indirect N₂O emissions derived from volatilization of excreted nitrogen.
 }

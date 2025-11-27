@@ -2,17 +2,11 @@
 % Please edit documentation in R/01_characteristics.R
 \name{calculate_weighted_variable}
 \alias{calculate_weighted_variable}
-\title{Calculate Weighted Nutritional Variables}
+\title{Calculate Weighted Nutritional Variables (Refactored)}
 \usage{
 calculate_weighted_variable(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. Save results to CSV? Default TRUE}
-}
-\value{
-A data frame with weighted nutritional values by all key properties.
-}
 \description{
-Computes weighted averages of nutritional variables based on animal diets,
-using the 'diet_tag' architecture.
+Computes weighted averages of nutritional variables (DE, CP, NDF, Ash)
+by mapping ingredients to diets, and diets to animals.
 }

@@ -1,92 +1,79 @@
-#' Calculate Gross Energy (GE)
+#' Calculate Gross Energy (GE) (Fixed & Robust)
 #'
-#' Computes gross energy requirements for all animals by summing all
-#' net energy components and adjusting by digestible energy (DE).
-#'
-#' @param saveoutput Logical (optional). If TRUE, saves the result as CSV. Default TRUE.
-#'
-#' @return A tibble with gross energy (GE) and its components for all
-#' animal categories, groups, and zones.
+#' Computes gross energy requirements by aggregating Net Energy (NE) components.
 #' @export
 calculate_ge <- function(saveoutput = TRUE) {
 
   message("🟢 Calculating Gross Energy (GE)...")
 
-  # --- 1. Calcular todos los componentes de NE (sin filtros) ---
-  message("  -> 1/3: Calculating all Net Energy components...")
-  # (Estas funciones devuelven 'identification', 'animal_type', 'animal_subtype'
-  # y el valor NE. NO tienen 'group' ni 'zone' para categorías
-  # universales como k1)
-  NEm <- calculate_NEm(saveoutput = FALSE)
-  NEa <- calculate_NEa(saveoutput = FALSE)
-  NEg <- calculate_NEg(saveoutput = FALSE)
-  NE_work <- calculate_NE_work(saveoutput = FALSE)
-  NE_pregnancy <- calculate_NE_pregnancy(saveoutput = FALSE)
-  NEl <- calculate_NEl(saveoutput = FALSE)
-  NE_wool <- calculate_NE_wool(saveoutput = FALSE)
+  # 1. Datos Base (DE por Group/Zone)
+  de_df <- calculate_weighted_variable(saveoutput = FALSE) %>%
+    dplyr::select(group, zone, identification, animal_type, animal_subtype, de)
 
-  # --- 2. Combinar todos los componentes de NE ---
-  message("  -> 2/3: Combining Net Energy components...")
+  join_keys_univ <- c("identification", "animal_type", "animal_subtype")
 
-  # Claves de unión universales
-  join_keys_universal <- c("identification", "animal_type", "animal_subtype")
+  # 2. Cargar Componentes de Energía (Seleccionando ESTRICTAMENTE lo necesario)
+  # Esto evita que columnas 'basura' de funciones viejas rompan el join
 
-  ne_list <- list(
-    NEm,
-    NEa %>% dplyr::select(all_of(join_keys_universal), NEa),
-    NEg %>% dplyr::select(all_of(join_keys_universal), NEg),
-    NE_work %>% dplyr::select(all_of(join_keys_universal), NE_work),
-    NE_pregnancy %>% dplyr::select(all_of(join_keys_universal), NE_pregnancy),
-    NEl %>% dplyr::select(all_of(join_keys_universal), NEl),
-    NE_wool %>% dplyr::select(all_of(join_keys_universal), NE_wool)
-  )
+  message("  -> Fetching NE components...")
 
-  # NE_all contiene las propiedades "universales"
-  NE_all <- ne_list %>%
-    purrr::reduce(dplyr::left_join, by = join_keys_universal)
+  # Helper para limpiar la salida de cada funcion auxiliar
+  get_ne <- function(func, col_name) {
+    suppressMessages(func(saveoutput = FALSE)) %>%
+      dplyr::select(all_of(join_keys_univ), all_of(col_name))
+  }
 
-  # --- 3. Calcular DE (sin filtros) ---
-  message("  -> 3/3: Calculating weighted diet variables (DE)...")
-  # de_df contiene las propiedades "específicas" (por group y zone)
-  de_df <- calculate_weighted_variable(saveoutput = FALSE)
+  NEm_df          <- get_ne(calculate_NEm, "NEm")
+  NEa_df          <- get_ne(calculate_NEa, "NEa")
+  NEg_df          <- get_ne(calculate_NEg, "NEg")
+  NEl_df          <- get_ne(calculate_NEl, "NEl")
+  NE_work_df      <- get_ne(calculate_NE_work, "NE_work")
+  NE_pregnancy_df <- get_ne(calculate_NE_pregnancy, "NE_pregnancy")
+  NE_wool_df      <- get_ne(calculate_NE_wool, "NE_wool")
 
-  # --- 4. Combinar NE con DE y calcular GE ---
-  message("  -> 4/4: Calculating final Gross Energy (GE)...")
+  # 3. Unión en cadena (Pipeline seguro)
+  results <- de_df %>%
+    dplyr::left_join(NEm_df,          by = join_keys_univ) %>%
+    dplyr::left_join(NEa_df,          by = join_keys_univ) %>%
+    dplyr::left_join(NEg_df,          by = join_keys_univ) %>%
+    dplyr::left_join(NEl_df,          by = join_keys_univ) %>%
+    dplyr::left_join(NE_work_df,      by = join_keys_univ) %>%
+    dplyr::left_join(NE_pregnancy_df, by = join_keys_univ) %>%
+    dplyr::left_join(NE_wool_df,      by = join_keys_univ) %>%
 
-  # --- ¡ESTE ES EL CAMBIO CLAVE! ---
-  # Unimos las propiedades 'universales' (NE_all) a las 'específicas' (de_df)
-  # usando *solo* las claves universales.
-  # Esto "difunde" el NEm de k1 (universal) a las filas de k1 en Zona A y Zona B.
-
-  final <- de_df %>% # <-- Empezamos con 'de_df' (que tiene group/zone)
-    dplyr::inner_join(NE_all, by = join_keys_universal) %>%
-
+    # 4. Cálculos y Limpieza
     dplyr::mutate(
-      dplyr::across(
-        c(NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool, de),
-        ~ tidyr::replace_na(., 0)
-      )
+      across(
+        c(de, NEm, NEa, NEg, NEl, NE_work, NE_pregnancy, NE_wool),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      de_safe = dplyr::if_else(de == 0, 60, de),
+      de_percent = de_safe / 100,
+
+      # Fórmulas REM y REG
+      rem = 1.123 - (4.092e-3 * de_safe) + (1.126e-5 * de_safe^2) - (25.4 / de_safe),
+      reg = 1.164 - (5.16e-3 * de_safe) + (1.308e-5 * de_safe^2) - (37.4 / de_safe),
+
+      rem = dplyr::if_else(rem == 0, 1, rem),
+      reg = dplyr::if_else(reg == 0, 1, reg),
+
+      ge = ((NEm + NEa + NEl + NE_work + NE_pregnancy) / rem + (NEg + NE_wool) / reg) / de_percent
     ) %>%
-    dplyr::mutate(
-      de_percent = ifelse(de == 0, 0.60, de / 100),
-      reg = 1.164 - (5.16e-3 * de) + (1.308e-5 * de^2) - (37.4 / ifelse(de == 0, 60, de)),
-      rem = 1.123 - (4.092e-3 * de) + (1.126e-5 * de^2) - (25.4 / ifelse(de == 0, 60, de)),
-      ge = ((NEm + NEa + NEl + NE_work + NE_pregnancy) / ifelse(rem == 0, 1, rem) +
-              (NEg + NE_wool) / ifelse(reg == 0, 1, reg)) / de_percent
-    ) %>%
-    # Reordenamos las columnas para que se vea bien
+
     dplyr::select(
       group, zone, identification, animal_type, animal_subtype,
       NEm, NEa, NEg, NE_work, NE_pregnancy, NEl, NE_wool,
       de, rem, reg, ge
-    )
+    ) %>%
+    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
-  # --- Guardar salida ---
-  if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(final, "output/ge_result.csv")
+  # Guardado
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/ge_result.csv")
     message("💾 Saved output to output/ge_result.csv")
   }
 
-  return(final)
+  return(results)
 }

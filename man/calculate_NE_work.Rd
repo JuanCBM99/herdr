@@ -2,16 +2,11 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NE_work}
 \alias{calculate_NE_work}
-\title{Calculate Net Working Energy (NE_work)}
+\title{Calculate Net Working Energy (NE_work) (Refactored)}
 \usage{
 calculate_NE_work(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with NE_work for all relevant animal categories.
-}
 \description{
-NE_work = NEm * hours of activity.
+Computes NE_work based on NEm and hours of activity.
+Keeps all animals in the dataset (assigns 0 to non-working animals).
 }

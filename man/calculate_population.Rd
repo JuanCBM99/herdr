@@ -2,17 +2,11 @@
 % Please edit documentation in R/00_population.R
 \name{calculate_population}
 \alias{calculate_population}
-\title{Calculate total animal population (non-interactive version)}
+\title{Calculate total animal population (Refactored)}
 \usage{
 calculate_population(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-A tibble with the full population, including columns 'group' and 'zone'.
-}
 \description{
-Loads base population data (census.csv) and calculates the full
-population structure for all animal types (cattle, sheep, etc.).
+Orchestrates the population calculation by loading census data and dispatching
+sub-calculations for each animal type (cattle, sheep, goat).
 }

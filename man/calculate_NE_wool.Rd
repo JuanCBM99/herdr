@@ -2,16 +2,11 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NE_wool}
 \alias{calculate_NE_wool}
-\title{Calculate Net Energy for Wool Production (NE_wool)}
+\title{Calculate Net Energy for Wool Production (NE_wool) (Refactored)}
 \usage{
 calculate_NE_wool(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical (optional). If TRUE, saves the result as CSV. Default TRUE.}
-}
-\value{
-Tibble with NE_wool for all relevant animal categories.
-}
 \description{
-NE_wool = (wool_yield * 24) / 365
+Computes NE_wool based on wool yield.
+Assigns 0 energy for non-wool producing animals instead of dropping them.
 }

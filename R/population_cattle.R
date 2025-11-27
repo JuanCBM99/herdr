@@ -1,5 +1,5 @@
 #' Calculates the full cattle population structure (Internal Helper)
-#' @noRd
+#' @export
 calculate_population_cattle <- function(census_cattle, rate_parameters, categories) {
 
   message("🧮 Calculating populations for CATTLE...")

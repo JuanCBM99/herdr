@@ -2,17 +2,11 @@
 % Please edit documentation in R/07_N2O_direct_manure.R
 \name{calculate_N2O_direct_manure}
 \alias{calculate_N2O_direct_manure}
-\title{Calculate direct N₂O emissions from manure}
+\title{Calculate direct N₂O emissions from manure (Refactored)}
 \usage{
 calculate_N2O_direct_manure(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{Logical. If TRUE, saves output as CSV. Default TRUE.}
-}
-\value{
-A tibble with N₂O emissions per category
-}
 \description{
-Computes direct N₂O emissions based on nitrogen excretion, emission factors,
-management system, and climate for all animals.
+Computes direct N₂O emissions based on nitrogen excretion logic,
+emission factors, management system, and climate.
 }
