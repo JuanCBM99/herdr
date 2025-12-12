@@ -1,0 +1,24 @@
+﻿management_system,frac_gas_ms,frac_leach_ms
+uncovered anaerobic lagoon,0.35,0
+liquid_slurry_with_natural_trust_cover,0.3,0
+liquid_slurry_without_natural_trust_cover,0.48,0
+liquid_slurry_with_cover,0.1,0
+pit_storage_below_animal_confinements,0.28,0
+daily spread,0.07,0
+solid storage_covered_compacted,0.14,0
+solid storage_bulking_agent_addition,0.38,0.02
+solid storage_additives,0.11,0.02
+solid_storage,0.3,0.02
+dry_lot,0.3,0.035
+anaerobic_digester,0.275,0
+burned_for_fuel_or_as_waste,,
+cattle_swine_deep_bedding,0.25,0.035
+composting_in_vessel,0.45,0
+composting_static_pile,0.5,0.06
+composting_intensive_windrow,0.5,0.06
+composting_passive_windrow,0.45,0.04
+pasture_range_paddock,0.21,0.24
+poultry_manure_with_litter,,
+poultry_manure_without_litter,,
+aerobic_treatment_natural_aeration,,0
+aerobic_treatment_forced_aeration,0.85,0

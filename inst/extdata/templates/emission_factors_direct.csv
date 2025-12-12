@@ -1,0 +1,25 @@
+﻿management_system,climate,value
+pasture_range_paddock,wet,0.014
+pasture_range_paddock,dry,0.005
+daily_spread,,0
+solid_storage,,0.01
+solid storage_covered_compacted,,0.01
+solid storage_bulking_agent_addition,,0.005
+solid storage_additives,,0.005
+dry_lot,,0.02
+liquid_slurry_with_natural_trust_cover,,0.005
+liquid_slurry_without_natural_trust_cover,,0
+liquid_slurry_with_cover,,0.005
+uncovered anaerobic lagoon,,0
+pit_storage_below_animal_confinements,,0.002
+anaerobic digester,,0.0006
+cattle_swine_deep_bedding_no_mixing,,0.01
+cattle_swine_deep_bedding_mixing,,0.07
+composting_in_vessel,,0.006
+composting_static_pile,,0.01
+composting_intensive_windrow,,0.005
+composting_passive_windrow,,0.005
+poultry_manure_with_litter,,0.001
+poultry_manure_without_litter,,0.001
+aerobic_treatment_natural_aeration,,0.01
+aerobic_treatment_forced_aeration,,0.005

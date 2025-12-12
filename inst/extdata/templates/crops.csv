@@ -1,126 +1,78 @@
-﻿ingredient_type,animal_type,ingredient,fedna description,moisture,harvested_yield_rainfed,harvested_yield_irrigated,harvested_area_rainfed,harvested_area_irrigated,dry_matter_yield,origin
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
-,,,,,,,,,,
+﻿ingredient_type,ingredient,description,land_use_category,moisture,harvested_yield_rainfed,harvested_yield_irrigated,harvested_area_rainfed,harvested_area_irrigated,dry_matter_yield,origin
+feed,oats,Whole oat grain,Main Crop (100%),0.13,885,2865,353616,46400,969.76,spain
+feed,wheat_middlings_25_starch,Wheat middlings,Co-product (~15% Allocation),0.12,,,,,4084.96,ukraine
+feed,corn_national,Whole corn (maize) grain,Main Crop (100%),0.15,6260,12253,15722,223365,10080.07,spain
+feed,wheat_soft_national_12_9_cp,Soft wheat grain (whole),Main Crop (100%),0.12,4642,4642,1,1,4084.96,ukraine
+feed,corn_heat_processed_national,Heat-processed corn flakes,Main Crop (100%),0.15,6260,12253,15722,223365,10080.07,spain
+feed,wheat_bran_20_starch,Wheat bran,Co-product (~15% Allocation),0.12,,,,,4084.96,ukraine
+forage,straw_cereals_wheat_and_barley,Cereal straw,Residue (Low allocation),,,,,,,
+feed,brewers_grains,Brewers' spent grains,Co-product (Low allocation),,,,,,,
+feed,corn_gluten_feed_19_cp,Corn gluten feed,Co-product (Allocation needed),0.15,6260,12253,15722,223365,10080.07,spain
+feed,corn_gluten_feed_20_5_cp,Corn gluten feed,Co-product (Allocation needed),0.15,6260,12253,15722,223365,10080.07,spain
+feed,sodium_bicarbonate,Sodium Bicarbonate,NO LAND USE (Chem),,,,,,0.00,
+feed,potassium_carbonate,Potassium Carbonate,NO LAND USE (Mining/Chem),,,,,,0.00,
+feed,molasses_sugarcane,Sugarcane molasses,Co-product (Sugar is main),0,0,45476,0,21,45476.00,spain
+feed,molasses_beet,Sugar beet molasses,Co-product (Sugar is main),0,37878,85617,1677,33016,83309.38,spain
+feed,cotton_seed_whole,Whole cottonseed,Co-product (Fiber is main),0,995,1072,5287,46437,1064.13,spain
+feed,lupin_australian,Whole lupin seeds,Main Crop (100%),,,,,,1847.50,australia
+feed,rapeseed_meal_00_33_cp,Rapeseed meal (Canola meal),Co-product (Oil is main),0.09,1154,2829,75416,29298,1476.61,spain
+feed,sunflower_seed,Whole sunflower seeds,Main Crop (100%),0.09,930,2299,666102,96083,1003.35,spain
+feed,sunflower_meal_28_cp,Sunflower meal,Co-product (Oil is main),0.09,930,2299,666102,96083,1003.35,spain
+feed,sunflower_meal_32_cp,Sunflower meal (high),Co-product (Oil is main),0.09,930,2299,666102,96083,1003.35,spain
+feed,sunflower_meal_expeller_34_cp,Sunflower expeller meal,Co-product (Oil is main),0.09,930,2299,666102,96083,1003.35,spain
+feed,field_pea_heat_processed,Field peas (processed),Main Crop (100%),0.12,466,1856,168913,37581,632.70,spain
+feed,horse_bean_white_flower_variety,Fava beans (Horse beans),Main Crop (100%),0.13,841,1409,20557,6204,846.23,spain
+feed,soybean_meal_44_cp,Soybean meal (solvent extracted),Co-product (High value allocation),0.14,,,,,2943.78,brasil
+feed,soybean_meal_47_cp,Soybean meal (high protein),Co-product (High value allocation),0.14,,,,,2943.78,brasil
+feed,brewery_yeast,Brewer's yeast,Co-product,0,0,0,0,0,0.00,
+feed,forage_meal_mix_12_5_cp,Mixed forage meal,Main Crop (100% Biomass yield),0.79,9911,48184,56439,126007,7632.32,spain
+feed,out_hulls,Oat hulls,Co-product (Low allocation),0.13,885,2865,353616,46400,969.76,spain
+feed,soybean_hulls_12_cp,Soybean hulls,Co-product (Low allocation),0.14,,,,,2943.78,brasil
+feed,corn_ddgs_12_5_ee_3_5_starch,Corn DDGS (Distillers Grains),Co-product (Allocation needed),0.15,6260,12253,15722,223365,10080.07,spain
+forage,cereals_silage_wheat_barley_oat_triticale,Mixed cereal silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+feed,citrus_pulp_orange_tangerine,Dried citrus pulp,Co-product (Juice is main),#N/D,#N/D,#N/D,#N/D,#N/D,#N/D,
+feed,beet_pulp_4_ash,Sugar beet pulp,Co-product (Sugar is main),0,0,89000,0,917,89000.00,
+feed,meat_meal_52_14_25,Meat and bone meal,Indirect (Animal),,,,,,0.00,
+feed,skimmed_milk,Skimmed milk powder,Indirect (Animal),,,,,,0.00,
+feed,wheypowder_acid,Acid whey powder,Indirect (Animal),,,,,,0.00,
+feed,wheypowder_sweet_cattle,Sweet whey powder,Indirect (Animal),,,,,,0.00,
+feed,butterfat,Butterfat / Milk fat,Indirect (Animal),,,,,,0.00,
+feed,soybean_oil,Soybean oil,Co-product (Meal is co-product),0.14,,,,,2943.78,brasil
+feed,palm_oil,Palm oil,Main Product (Kernel is co-product),0,0,0,0,0,0.00,
+feed,mixed_calcium_soaps,Calcium soaps of fatty acids,Co-product (Fat by-product),,,,,,,
+feed,carob_bean,Carob pods/bean,Main Crop (usually),0.14,314,1303,1603,39,290.24,spain
+feed,dicalcium_phosphate_dihydrated,Dicalcium Phosphate,NO LAND USE (Mining/Chem),,,,,,0.00,
+feed,mg_oxide_calcined_magnesite,Magnesium Oxide,NO LAND USE (Mining),,,,,,0.00,
+feed,sodium_chloride_mine_92,Sodium Chloride (Salt),NO LAND USE (Mining),,,,,,0.00,
+feed,calcium_carbonate,Calcium Carbonate / Limestone,NO LAND USE (Mining),,,,,,0.00,
+feed,sodium_sulfate,Sodium Sulfate,NO LAND USE (Chem),,,,,,0.00,
+feed,urea,Urea,NO LAND USE (Synthetic),,,,,,0.00,
+feed,ammonium_chloride,Ammonium Chloride,NO LAND USE (Synthetic),,,,,,0.00,
+feed,sodium_butyrate,Sodium Butyrate,NO LAND USE (Synthetic),,,,,,0.00,
+forage,alfalfa_hay_first,Alfalfa hay (1st cut),Main Crop (100% Biomass yield),0.79,9911,48184,56439,126007,7632.32,spain
+forage,ryegrass_hay_second,Ryegrass hay (2nd cut),Main Crop (100% Biomass yield),,,,,,8000.00,
+forage,ryegrass_hay_third,Ryegrass hay (3rd cut),Main Crop (100% Biomass yield),,,,,,8000.00,
+forage,ryegrass_hay_fourth,Ryegrass hay (4th cut),Main Crop (100% Biomass yield),,,,,,8000.00,
+forage,vetch_hay_third,Vetch hay,Main Crop (100% Biomass yield),0.78,5156,18140,147268,17525,1438.09,spain
+forage,corn_silage_25_30,Whole plant corn silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+forage,sorghum_silage_25_30,Whole plant sorghum silage,Main Crop (100% Biomass yield),0.67,6732,28342,6487,5154,5378.91,spain
+forage,oat_silage_25_30,Whole plant oat silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+forage,barley_silage_25_30,Whole plant barley silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+forage,wheat_silage_25_30,Whole plant wheat silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+forage,triticale_silage_25_30,Whole plant triticale silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
+forage,ryegrass_fresh_first,Fresh ryegrass forage (grazing),Main Crop (100% Biomass yield),,,,,,8000.00,
+forage,ryegrass_fresh_second,Fresh ryegrass forage,Main Crop (100% Biomass yield),0.703,,,,,8000.00,
+forage,ryegrass_fresh_third,Fresh ryegrass forage,Main Crop (100% Biomass yield),0.703,,,,,8000.00,
+forage,ryegrass_fresh_fourth,Fresh ryegrass forage,Main Crop (100% Biomass yield),0.703,,,,,8000.00,
+forage,ryegrass_silage_second,Ryegrass silage,Main Crop (100% Biomass yield),0.68,,,,,8000.00,
+forage,grass_silage_third,Grass silage,Main Crop (100% Biomass yield),,,,,,8000.00,
+feed,mycotoxin_adsorbent,Mycotoxin binder (Clay/Yeast),NO LAND USE (usually),,,,,,0.00,
+feed,barley_ddgs,Barley Distillers Dried Grains with Solubles,Co-product (Allocation needed),0.13,1276,4226,1599683,312820,1529.91,spain
+forage,alfalfa_silage,Alfalfa silage,Main Crop (100% Biomass yield),0.79,9911,48184,56439,126007,7632.32,spain
+milk,cow_breast_milk,Cow milk (fresh),Indirect (Animal),,,,,,0.00,
+milk,sheep_breast_milk,Sheep milk (fresh),Indirect (Animal),,,,,,0.00,
+milk,goat_breast_milk,Goat milk (fresh),Indirect (Animal),,,,,,0.00,
+milk_replacer,milk_replacer,Milk replacer (blend),Indirect (Check ingredients),,,,,,0.00,
+feed,barley_2_rows_national_11_3_cp,Two-row barley grain,Main Crop (100%),0.13,1276,4226,1599683,312820,1529.91,spain
+feed,Vitamin/mineral_supplement,Vitamin and Mineral Premix,NO LAND USE (Negligible),,,,,,0.00,
+feed,aroma,Flavoring / Aroma,NO LAND USE (Negligible),,,,,,0.00,

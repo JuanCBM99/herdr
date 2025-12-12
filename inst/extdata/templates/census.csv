@@ -1,0 +1,17 @@
+﻿identification,animal_type,animal_subtype,sex,group,zone,population
+mature_beef_bull,cattle,beef,male,spain,montaña,127057.50
+mature_beef_bull,cattle,beef,male,spain,dehesa,10000.00
+mature_beef_bull,cattle,beef,male,spain,españa húmeda,50000.00
+mature_dairy_cattle,cattle,dairy,female,spain,a,848676.50
+mature_dairy_cattle,cattle,dairy,female,spain,b,90000.00
+mature_beef_cattle,cattle,beef,female,spain,montaña,1871690.00
+mature_beef_cattle,cattle,beef,female,spain,dehesa,15000.00
+mature_beef_cattle,cattle,beef,female,spain,españa húmeda,100000.00
+mature_sheep_male_dairy,sheep,dairy,male,spain,,70456.00
+mature_sheep_male_meat,sheep,meat,male,spain,,281204.00
+mature_sheep_female_dairy,sheep,dairy,female,spain,,1855492.00
+mature_sheep_female_meat,sheep,meat,female,spain,,7405698.00
+mature_goat_male_dairy,goat,dairy,male,spain,,63006.00
+mature_goat_male_meat,goat,meat,male,spain,,23058.00
+mature_goat_female_dairy,goat,dairy,female,spain,,1140202.00
+mature_goat_female_meat,goat,meat,female,spain,,417282.00

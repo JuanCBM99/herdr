@@ -1,0 +1,116 @@
+﻿management_system,system_climate,mcf
+uncovered_anaerobic_lagoon,cool temp. moist,0.6000
+uncovered_anaerobic_lagoon,cool temp. dry,0.6700
+uncovered_anaerobic_lagoon,boreal moist,0.5000
+uncovered_anaerobic_lagoon,boreal dry,0.4900
+uncovered_anaerobic_lagoon,warm temp. moist,0.7300
+uncovered_anaerobic_lagoon,warm temp. dry,0.7600
+uncovered_anaerobic_lagoon,tropical montane,0.7600
+uncovered_anaerobic_lagoon,tropical wet,0.8000
+uncovered_anaerobic_lagoon,tropical moist,0.8000
+uncovered_anaerobic_lagoon,tropical dry,0.8000
+liquid_slurry_below_confinements_1,cool temp. moist,0.0600
+liquid_slurry_below_confinements_1,cool temp. dry,0.0800
+liquid_slurry_below_confinements_1,boreal moist,0.0400
+liquid_slurry_below_confinements_1,boreal dry,0.0400
+liquid_slurry_below_confinements_1,warm temp. moist,0.1300
+liquid_slurry_below_confinements_1,warm temp. dry,0.1500
+liquid_slurry_below_confinements_1,tropical montane,0.2500
+liquid_slurry_below_confinements_1,tropical wet,0.3800
+liquid_slurry_below_confinements_1,tropical moist,0.3600
+liquid_slurry_below_confinements_1,tropical dry,0.4200
+liquid_slurry_below_confinements_3,cool temp. moist,0.1200
+liquid_slurry_below_confinements_3,cool temp. dry,0.1600
+liquid_slurry_below_confinements_3,boreal moist,0.0800
+liquid_slurry_below_confinements_3,boreal dry,0.0800
+liquid_slurry_below_confinements_3,warm temp. moist,0.2400
+liquid_slurry_below_confinements_3,warm temp. dry,0.2800
+liquid_slurry_below_confinements_3,tropical montane,0.4300
+liquid_slurry_below_confinements_3,tropical wet,0.6100
+liquid_slurry_below_confinements_3,tropical moist,0.5700
+liquid_slurry_below_confinements_3,tropical dry,0.6200
+liquid_slurry_below_confinements_4,cool temp. moist,0.1500
+liquid_slurry_below_confinements_4,cool temp. dry,0.1900
+liquid_slurry_below_confinements_4,boreal moist,0.0900
+liquid_slurry_below_confinements_4,boreal dry,0.0900
+liquid_slurry_below_confinements_4,warm temp. moist,0.2900
+liquid_slurry_below_confinements_4,warm temp. dry,0.3200
+liquid_slurry_below_confinements_4,tropical montane,0.5000
+liquid_slurry_below_confinements_4,tropical wet,0.6700
+liquid_slurry_below_confinements_4,tropical moist,0.6400
+liquid_slurry_below_confinements_4,tropical dry,0.6800
+liquid_slurry_below_confinements_6,cool temp. moist,0.2100
+liquid_slurry_below_confinements_6,cool temp. dry,0.2600
+liquid_slurry_below_confinements_6,boreal moist,0.1400
+liquid_slurry_below_confinements_6,boreal dry,0.1400
+liquid_slurry_below_confinements_6,warm temp. moist,0.3700
+liquid_slurry_below_confinements_6,warm temp. dry,0.4100
+liquid_slurry_below_confinements_6,tropical montane,0.5900
+liquid_slurry_below_confinements_6,tropical wet,0.7600
+liquid_slurry_below_confinements_6,tropical moist,0.7300
+liquid_slurry_below_confinements_6,tropical dry,0.7400
+liquid_slurry_below_confinements_12,cool temp. moist,0.3100
+liquid_slurry_below_confinements_12,cool temp. dry,0.4200
+liquid_slurry_below_confinements_12,boreal moist,0.2100
+liquid_slurry_below_confinements_12,boreal dry,0.2000
+liquid_slurry_below_confinements_12,warm temp. moist,0.5500
+liquid_slurry_below_confinements_12,warm temp. dry,0.6400
+liquid_slurry_below_confinements_12,tropical montane,0.7300
+liquid_slurry_below_confinements_12,tropical wet,0.8000
+liquid_slurry_below_confinements_12,tropical moist,0.8000
+liquid_slurry_below_confinements_12,tropical dry,0.8000
+cattle_and_swine_deep_bedding_more_1,cool temp. moist,0.2100
+cattle_and_swine_deep_bedding_more_1,cool temp. dry,0.2600
+cattle_and_swine_deep_bedding_more_1,boreal moist,0.1400
+cattle_and_swine_deep_bedding_more_1,boreal dry,0.1400
+cattle_and_swine_deep_bedding_more_1,warm temp. moist,0.3700
+cattle_and_swine_deep_bedding_more_1,warm temp. dry,0.4100
+cattle_and_swine_deep_bedding_more_1,tropical montane,0.5900
+cattle_and_swine_deep_bedding_more_1,tropical wet,0.7600
+cattle_and_swine_deep_bedding_more_1,tropical moist,0.7300
+cattle_and_swine_deep_bedding_more_1,tropical dry,0.7400
+cattle_and_swine_deep_bedding_less_1,cool,0.0275
+cattle_and_swine_deep_bedding_less_1,temperate,0.0650
+cattle_and_swine_deep_bedding_less_1,warm,0.1800
+solid_storage,cool,0.0200
+solid_storage,temperate,0.0400
+solid_storage,warm,0.0500
+solid_storage_covered_compacted,cool,0.0200
+solid_storage_covered_compacted,temperate,0.0400
+solid_storage_covered_compacted,warm,0.0500
+solid_storage_bulking_agent_addition,cool,0.0050
+solid_storage_bulking_agent_addition,temperate,0.0100
+solid_storage_bulking_agent_addition,warm,0.0150
+solid_storage_additives,cool,0.0100
+solid_storage_additives,temperate,0.0200
+solid_storage_additives,warm,0.0250
+dry_lot,cool,0.0100
+dry_lot,temperate,0.0150
+dry_lot,warm,0.0200
+daily_spread,cool,0.0010
+daily_spread,temperate,0.0050
+daily_spread,warm,0.0100
+composting_in_vessel,na,0.0050
+composting_static_pile,cool,0.0100
+composting_static_pile,temperate,0.0200
+composting_static_pile,warm,0.0250
+composting_intensive_windrow,cool,0.0050
+composting_intensive_windrow,temperate,0.0100
+composting_intensive_windrow,warm,0.0150
+composting_passive_windrow,cool,0.0100
+composting_passive_windrow,temperate,0.0200
+composting_passive_windrow,warm,0.0250
+pasture_range_paddock,na,0.0047
+poultry_manure_with_and_without_litter,na,0.0150
+aerobic_treatment,na,0.0000
+burned_for_fuel,na,0.1000
+"anaerobic_digester,_low_leakage,_best_complete_industrial_tech,_high-quality_gastight_storage",na,0.0100
+"anaerobic_digester,_low_leakage,_high-quality_industrial_tech,_low-quality_gastight_storage",na,0.0141
+"anaerobic_digester,_low_leakage,_high-quality_industrial_tech,_open_storage",cool,0.0355
+"anaerobic_digester,_low_leakage,_high-quality_industrial_tech,_open_storage",temperate,0.0438
+"anaerobic_digester,_low_leakage,_high-quality_industrial_tech,_open_storage",warm,0.0459
+"anaerobic_digester,_high_leakage,_low-quality_tech,_high-quality_gastight_storage",na,0.0959
+"anaerobic_digester,_high_leakage,_low-quality_tech,_low-quality_gastight_storage",na,0.1000
+"anaerobic_digester,_high_leakage,_low-quality_tech,_open_storage",cool,0.1214
+"anaerobic_digester,_high_leakage,_low-quality_tech,_open_storage",temperate,0.1297
+"anaerobic_digester,_high_leakage,_low-quality_tech,_open_storage",warm,0.1317
