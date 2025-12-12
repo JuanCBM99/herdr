@@ -7,5 +7,5 @@
 calculate_N2O_indirect_volatilization(saveoutput = TRUE)
 }
 \description{
-Computes indirect N₂O emissions derived from volatilization of excreted nitrogen.
+Computes indirect N₂O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
 }

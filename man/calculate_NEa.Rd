@@ -7,6 +7,6 @@
 calculate_NEa(saveoutput = TRUE)
 }
 \description{
-Computes NEa based on NEm and housing/activity coefficients (Ca),
-applying weighted averages for mixed systems (grazing/stall) in cattle.
+Computes NEa based on NEm and activity coefficients (Ca).
+Uses a simplified direct lookup based on the assigned Ca tag.
 }

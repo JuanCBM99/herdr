@@ -4,35 +4,35 @@
 #' @return Data frame
 #' @export
 load_dataset <- function(name) {
-  # Carpeta donde el usuario puede poner sus CSV personalizados
+  # Folder where the user can place custom CSV files
   user_path <- file.path(getwd(), "user_data")
   csv_path <- file.path(user_path, paste0(name, ".csv"))
 
   if (file.exists(csv_path)) {
-    # Mensaje de éxito claro
-    message("    → ¡Éxito! Usando archivo de usuario: user_data/", name, ".csv")
+    # Success message for using user file
+    message("    → Success! Using user file: user_data/", name, ".csv")
 
-    # --- ¡ARREGLO! ---
-    # na.strings = "NA" (por defecto) + "" (para celdas en blanco)
-    # Esto convierte las celdas vacías "" en NA
+    # FIX: na.strings = "NA" (default) + "" (for blank cells)
+    # This converts empty cells "" to NA
     df <- read.csv(csv_path, stringsAsFactors = FALSE, na.strings = c("NA", ""))
 
   } else {
-    # (El resto de la función no cambia)
+    # Fallback to package default dataset
+
     if (dir.exists(user_path)) {
-      message("    → AVISO: La carpeta 'user_data' existe, pero no se encontró '", name, ".csv'.")
-      message("    → Asegúrate de que el nombre del archivo es correcto.")
-      message("    → Usando dataset por defecto del paquete: ", name)
+      message("    → WARNING: The 'user_data' folder exists, but '", name, ".csv' was not found.")
+      message("    → Ensure the file name is correct.")
+      message("    → Using package default dataset: ", name)
     } else {
-      message("    → Usando dataset por defecto del paquete: ", name)
+      message("    → Using package default dataset: ", name)
     }
 
-    # Cargar dataset por defecto del paquete (.rda en data/)
-    # ¡MODIFICACIÓN! Aplicamos la misma lógica de NA a los .rda
+    # Load package default dataset (.rda in data/)
+    # MODIFICATION: Apply the same NA logic to .rda files
     df_raw <- get(name, envir = asNamespace("AnimalGEILU"))
 
     if (is.data.frame(df_raw)) {
-      # Reemplaza "" por NA en todas las columnas de texto
+      # Replace "" with NA in all character columns
       df <- df_raw %>%
         dplyr::mutate(dplyr::across(where(is.character), ~ na_if(., "")))
     } else {

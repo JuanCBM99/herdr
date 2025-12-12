@@ -4,7 +4,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
 
   message("🧮 Calculating populations for SHEEP...")
 
-  # (Asumimos que estos son los 'identification' base para ovejas)
+  # (Assume these are the base 'identification' for sheep)
   req_identifications <- c("mature_sheep_male_dairy", "mature_sheep_male_meat",
                            "mature_sheep_female_dairy", "mature_sheep_female_meat")
   if (!all(req_identifications %in% census_sheep$identification)) {
@@ -14,7 +14,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
   # --- Helper to get rates safely ---
   get_rate <- function(param, subtype, sex_val = NA) {
     df <- rate_parameters %>%
-      dplyr::filter(animal_type == "sheep", # <-- Filtrar por sheep
+      dplyr::filter(animal_type == "sheep", # Filter by sheep
                     parameter == param,
                     animal_subtype == subtype)
     if (!is.na(sex_val)) df <- df %>% dplyr::filter(sex == sex_val)
@@ -26,7 +26,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
     val[1]
   }
 
-  # --- Tasas de Ovejas ---
+  # --- Sheep Rates ---
   rate_dairy_lambing <- get_rate("lambing_rate", "dairy", sex_val = NA)
   rate_meat_lambing  <- get_rate("lambing_rate", "meat", sex_val = NA)
   rate_dairy_male_repl   <- get_rate("replacement_rate", "dairy", "male")
@@ -34,7 +34,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
   rate_meat_male_repl    <- get_rate("replacement_rate", "meat", "male")
   rate_meat_female_repl  <- get_rate("replacement_rate", "meat", "female")
 
-  # --- Cálculo de Ovejas ---
+  # --- Sheep Calculation ---
   base_pops_agg <- census_sheep %>%
     dplyr::filter(identification %in% req_identifications) %>%
     dplyr::group_by(group, zone, identification) %>%
@@ -50,24 +50,24 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
   calculated_pops <- base_pops_wide %>%
     dplyr::group_by(group, zone) %>%
     dplyr::mutate(
-      # Reemplazos
+      # Replacements
       pop_lamb_female_dairy_replacement = mature_sheep_female_dairy * rate_dairy_female_repl,
       pop_lamb_male_dairy_replacement = mature_sheep_male_dairy * rate_dairy_male_repl,
       pop_lamb_female_meat_replacement = mature_sheep_female_meat * rate_meat_female_repl,
       pop_lamb_male_meat_replacement = mature_sheep_male_meat * rate_meat_male_repl,
 
-      # Nacimientos
+      # Births
       total_dairy_births = mature_sheep_female_dairy * rate_dairy_lambing,
       total_meat_births  = mature_sheep_female_meat * rate_meat_lambing
     ) %>%
     dplyr::mutate(
-      # Sacrificio (Nacidos - Reemplazos)
+      # Slaughter (Born - Replacements)
       pop_lamb_dairy_slaughter = total_dairy_births - pop_lamb_female_dairy_replacement - pop_lamb_male_dairy_replacement,
       pop_lamb_meat_slaughter = total_meat_births - pop_lamb_female_meat_replacement - pop_lamb_male_meat_replacement
     ) %>%
     dplyr::ungroup()
 
-  # --- Ensamblado de Ovejas ---
+  # --- Sheep Assembly ---
   all_populations_long <- calculated_pops %>%
     dplyr::select(
       group, zone,

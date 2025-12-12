@@ -1,39 +1,36 @@
-#' Descarga los archivos de template desde GitHub
+#' Download Template Files from GitHub
 #'
-#' Descarga los archivos de ejemplo (census, categories, rate_parameters)
-#' desde el repositorio de GitHub y los guarda en una carpeta local.
+#' Downloads example data files (templates) from the GitHub repository and
+#' saves them to a local folder.
 #'
-#' @param dest_folder El nombre de la carpeta donde se guardarán los
-#'   templates. Por defecto es "user_data".
+#' @param dest_folder The name of the folder where the templates will be saved.
+#'   Defaults to "user_data".
 #'
-#' @return El path absoluto a la carpeta `dest_folder` donde se
-#'   guardaron los archivos.
+#' @return The absolute path to the `dest_folder` where the files were saved.
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#'   # Llama a la función para descargar los archivos
-#'   ruta_datos <- download_templates()
+#'  # Call the function to download the files
+#'  data_path <- download_templates()
 #'
-#'   # Ver los archivos descargados
-#'   list.files(ruta_datos)
+#'  # View the downloaded files
+#'  list.files(data_path)
 #'
-#'   # Leer uno de los archivos
-#'   read.csv(file.path(ruta_datos, "census_c_s.csv"))
+#'  # Read one of the files
+#'  read.csv(file.path(data_path, "categories.csv"))
 #' }
 #'
 download_templates <- function(dest_folder = "user_data") {
 
-  message("Iniciando la descarga de templates...")
+  message("Starting template download...")
 
-  # --- 1. Definir los archivos y la URL base ---
+  # --- 1. Define Files and Base URL ---
 
-  # ¡CORREGIDO! Esta es la URL "raw" para descargar directamente el contenido.
-  # Nota que ahora termina con una barra diagonal (/)
+  # Base URL for direct content download from GitHub (raw content)
   base_url <- "https://raw.githubusercontent.com/JuanCBM99/Animal_GEI_LU/dev/inst/extdata/templates/"
 
-  # ¡CORREGIDO! Actualizados los nombres de archivo
-  # y añadido rate_parameters.csv (que aparecía en tus errores).
+  # List of all required template files for the package
   template_files <- c(
     "categories.csv",
     "ch4_mm.csv",
@@ -46,39 +43,38 @@ download_templates <- function(dest_folder = "user_data") {
     "weights.csv"
   )
 
-  # --- 2. Crear el directorio de destino ---
+  # --- 2. Create Destination Directory ---
   dir.create(dest_folder, showWarnings = FALSE, recursive = TRUE)
   download_path <- normalizePath(dest_folder)
 
-  message(paste("Archivos se guardarán en:", download_path))
+  message(paste("Files will be saved to:", download_path))
 
 
-  # --- 3. Bucle de descarga ---
+  # --- 3. Download Loop ---
 
   for (file_name in template_files) {
 
-    # Construir la URL completa (ej: .../templates/census_c_s.csv)
-    # Como base_url ahora termina en "/", paste0 funciona correctamente
+    # Construct the full source URL
     source_url <- paste0(base_url, file_name)
 
-    # Construir la ruta de destino (ej: user_data/census_c_s.csv)
+    # Construct the destination file path
     dest_file_path <- file.path(download_path, file_name)
 
-    message(paste(" -> Descargando", file_name, "..."))
+    message(paste(" -> Downloading", file_name, "..."))
 
     tryCatch({
-      # Usamos 'quiet = FALSE' para ver el progreso, o 'quiet = TRUE' para ocultarlo
+      # Download file (mode 'wb' for binary write)
       download.file(url = source_url, destfile = dest_file_path, mode = "wb", quiet = FALSE)
 
     }, error = function(e) {
-      # Advertir si un archivo falla, pero no detener la función
-      warning(paste("Error al descargar", file_name, ":", e$message))
-      warning(paste("URL intentada:", source_url)) # Añadido para mejor depuración
+      # Warn if a file fails, but do not stop the function
+      warning(paste("Error downloading", file_name, ":", e$message))
+      warning(paste("URL attempted:", source_url))
     })
   }
-  message(paste("Los archivos están en:", download_path))
-  message("✅ Descarga completada.")
+  message(paste("Files are located at:", download_path))
+  message("✅ Download completed.")
 
-  # --- 4. Devolver el path ---
+  # --- 4. Return Path ---
   return(download_path)
 }

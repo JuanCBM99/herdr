@@ -7,5 +7,5 @@
 calculate_N2O_indirect_leaching(saveoutput = TRUE)
 }
 \description{
-Computes indirect N₂O emissions from nitrogen leaching.
+Computes indirect N₂O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
 }

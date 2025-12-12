@@ -8,5 +8,5 @@ calculate_CH4_manure(saveoutput = TRUE)
 }
 \description{
 Computes CH₄ emissions from manure based on Volatile Solids (VS),
-population, and management factors.
+population, and management factors (B0, MCF, AWMS). (IPCC Eq 10.23).
 }

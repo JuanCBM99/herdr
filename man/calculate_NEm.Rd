@@ -2,10 +2,12 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEm}
 \alias{calculate_NEm}
-\title{Calculate Net Energy for Maintenance (NEm) (Refactored)}
+\title{Calculate Net Energy for Maintenance (NEm)
+Computes NEm based on average weight and CFI coefficients using a relational join approach.}
 \usage{
 calculate_NEm(saveoutput = TRUE)
 }
 \description{
+Calculate Net Energy for Maintenance (NEm)
 Computes NEm based on average weight and CFI coefficients using a relational join approach.
 }

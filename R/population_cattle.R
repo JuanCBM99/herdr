@@ -80,12 +80,12 @@ calculate_population_cattle <- function(census_cattle, rate_parameters, categori
       values_to = "population"
     )
 
-  # --- 7. Reassign zones for feedlot animals (¡ARREGLADO!) ---
+  # --- 7. Reassign zones for feedlot animals (FIXED!) ---
   all_populations_agg <- all_populations_long %>%
-    # Ya no necesitamos el 'left_join' a 'categories' aquí
+    # We no longer need the 'left_join' to 'categories' here
     dplyr::mutate(
       zone = dplyr::if_else(
-        # Usamos la lógica de 'identification'
+        # Use 'identification' logic
         identification %in% c("feedlot_calves_male", "feedlot_calves_female"),
         NA_character_,
         zone_parent

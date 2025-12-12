@@ -4,7 +4,7 @@ calculate_population_goat <- function(census_goat, rate_parameters) {
 
   message("🧮 Calculating populations for GOAT...")
 
-  # (Asumimos que estos son los 'identification' base para cabras)
+  # (Assume these are the base 'identification' for goats)
   req_identifications <- c("mature_goat_male_dairy", "mature_goat_male_meat",
                            "mature_goat_female_dairy", "mature_goat_female_meat")
   if (!all(req_identifications %in% census_goat$identification)) {
@@ -14,7 +14,7 @@ calculate_population_goat <- function(census_goat, rate_parameters) {
   # --- Helper to get rates safely ---
   get_rate <- function(param, subtype, sex_val = NA) {
     df <- rate_parameters %>%
-      dplyr::filter(animal_type == "goat", # <-- Filtrar por goat
+      dplyr::filter(animal_type == "goat", # Filter by goat
                     parameter == param,
                     animal_subtype == subtype)
     if (!is.na(sex_val)) df <- df %>% dplyr::filter(sex == sex_val)
@@ -26,8 +26,8 @@ calculate_population_goat <- function(census_goat, rate_parameters) {
     val[1]
   }
 
-  # --- Tasas de Cabras ---
-  # (Asegúrate de que 'kidding_rate' existe en tu 'rate_parameters.csv')
+  # --- Goat Rates ---
+  # (Ensure 'kidding_rate' exists in your 'rate_parameters.csv')
   rate_dairy_kidding <- get_rate("kidding_rate", "dairy", sex_val = NA)
   rate_meat_kidding  <- get_rate("kidding_rate", "meat", sex_val = NA)
   rate_dairy_male_repl   <- get_rate("replacement_rate", "dairy", "male")
@@ -35,7 +35,7 @@ calculate_population_goat <- function(census_goat, rate_parameters) {
   rate_meat_male_repl    <- get_rate("replacement_rate", "meat", "male")
   rate_meat_female_repl  <- get_rate("replacement_rate", "meat", "female")
 
-  # --- Cálculo de Cabras ---
+  # --- Goat Calculation ---
   base_pops_agg <- census_goat %>%
     dplyr::filter(identification %in% req_identifications) %>%
     dplyr::group_by(group, zone, identification) %>%
@@ -51,24 +51,24 @@ calculate_population_goat <- function(census_goat, rate_parameters) {
   calculated_pops <- base_pops_wide %>%
     dplyr::group_by(group, zone) %>%
     dplyr::mutate(
-      # Reemplazos (¡ÚNICOS HIJOS CALCULADOS!)
+      # Replacements (ONLY calculated offspring)
       pop_kid_goat_female_dairy_replacement = mature_goat_female_dairy * rate_dairy_female_repl,
       pop_kid_goat_male_dairy_replacement = mature_goat_male_dairy * rate_dairy_male_repl,
       pop_kid_goat_female_meat_replacement = mature_goat_female_meat * rate_meat_female_repl,
       pop_kid_goat_male_meat_replacement = mature_goat_male_meat * rate_meat_male_repl
 
-      # (No hay 'total_births' ni 'slaughter' según tu lógica)
+      # (No 'total_births' or 'slaughter')
     ) %>%
     dplyr::ungroup()
 
-  # --- Ensamblado de Cabras ---
+  # --- Goat Assembly ---
   all_populations_long <- calculated_pops %>%
     dplyr::select(
       group, zone,
-      # Padres
+      # Parents
       mature_goat_male_dairy, mature_goat_male_meat,
       mature_goat_female_dairy, mature_goat_female_meat,
-      # Hijos (Solo Reemplazo)
+      # Offspring (Replacement Only)
       kid_goat_female_dairy_replacement = pop_kid_goat_female_dairy_replacement,
       kid_goat_male_dairy_replacement = pop_kid_goat_male_dairy_replacement,
       kid_goat_female_meat_replacement = pop_kid_goat_female_meat_replacement,

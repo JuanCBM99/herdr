@@ -2,32 +2,31 @@
 % Please edit documentation in R/download_user_data.R
 \name{download_templates}
 \alias{download_templates}
-\title{Descarga los archivos de template desde GitHub}
+\title{Download Template Files from GitHub}
 \usage{
 download_templates(dest_folder = "user_data")
 }
 \arguments{
-\item{dest_folder}{El nombre de la carpeta donde se guardarán los
-templates. Por defecto es "user_data".}
+\item{dest_folder}{The name of the folder where the templates will be saved.
+Defaults to "user_data".}
 }
 \value{
-El path absoluto a la carpeta `dest_folder` donde se
-  guardaron los archivos.
+The absolute path to the `dest_folder` where the files were saved.
 }
 \description{
-Descarga los archivos de ejemplo (census, categories, rate_parameters)
-desde el repositorio de GitHub y los guarda en una carpeta local.
+Downloads example data files (templates) from the GitHub repository and
+saves them to a local folder.
 }
 \examples{
 \dontrun{
-  # Llama a la función para descargar los archivos
-  ruta_datos <- download_templates()
+ # Call the function to download the files
+ data_path <- download_templates()
 
-  # Ver los archivos descargados
-  list.files(ruta_datos)
+ # View the downloaded files
+ list.files(data_path)
 
-  # Leer uno de los archivos
-  read.csv(file.path(ruta_datos, "census_c_s.csv"))
+ # Read one of the files
+ read.csv(file.path(data_path, "categories.csv"))
 }
 
 }

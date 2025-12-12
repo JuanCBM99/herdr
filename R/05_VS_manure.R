@@ -11,43 +11,44 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
 
   message("🟢 Calculating Volatile Solids (VS)...")
 
-  # Claves de unión completas
   join_keys <- c("group", "zone", "identification", "animal_type", "animal_subtype")
 
-  # --- 1. Procesamiento y Cálculo ---
+  # --- 1. Data Merging and Pre-processing ---
+
+  # Fetch GE and DE (from Energy Module)
   results <- calculate_ge(saveoutput = FALSE) %>%
     dplyr::select(all_of(join_keys), ge, de) %>%
 
-    # Unir datos de dieta (Ash)
+    # Join Ash content (from Diet Characteristics)
     dplyr::left_join(
       calculate_weighted_variable(saveoutput = FALSE) %>%
         dplyr::select(all_of(join_keys), ash),
       by = join_keys
     ) %>%
 
+    # --- 2. VS Calculation (IPCC Eq 10.24) ---
     dplyr::mutate(
-      # Limpieza de tipos (Seguridad numérica)
+      # Numeric Safety: NA replacement and type casting
       across(
         c(ge, de, ash),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Añadimos el parámetro como columna por transparencia
+      # Define Urinary Energy Factor
       ue_factor = as.numeric(urinary_energy),
 
-      # Cálculo de VS
-      # Fórmula: [ Energía ingerida y no digerida + Energía urinaria ] / Contenido energético de materia orgánica
+      # Final VS calculation based on non-digested energy (GE, DE) and Ash
       vs = ((ge * (1 - de/100)) + (ue_factor * ge)) * ((1 - ash/100) / 18.45)
     ) %>%
 
-    # Selección y redondeo
+    # --- 3. Final Output and Cleanup ---
     dplyr::select(
       all_of(join_keys),
       ge, de, ash, urinary_energy = ue_factor, vs
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
-  # --- 2. Guardado ---
+  # --- 4. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/VS.csv")

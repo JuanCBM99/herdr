@@ -7,5 +7,6 @@
 calculate_ge(saveoutput = TRUE)
 }
 \description{
-Computes gross energy requirements by aggregating Net Energy (NE) components.
+Computes gross energy requirements by aggregating all necessary Net Energy (NE) components (NEm, NEa, NEg, NEl, NEwork, NEp, NEwool)
+and adjusting for feed digestibility (DE) and conversion ratios (REM, REG).
 }
