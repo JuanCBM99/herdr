@@ -1,10 +1,10 @@
 # Título de la web
-title: "AnimalGEILU"
+title: "AnimalGEILU: GHG & LU Calculator 🌎📊"
 
 # Tema moderno
 template:
   bootstrap: 5
-  bootswatch: flatly
+  bootswatch: yeti
 
 # Navbar
 navbar:
@@ -12,15 +12,19 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
-    - text: "Vignettes"
+    - text: "Guides"
       icon: fas fa-book
       menu:
         - text: "Introduction"
-          href: articles/newVignetteName1.html
-        - text: "Data exploration"
-          href: articles/newVignetteName2.html
-        - text: "Practical cases"
-          href: articles/newVignetteName3.html
+          href: articles/Introduction.html
+        - text: "Data dictionary"
+          href: articles/Data_dictionary.html
+        - text: "Package Function Reference"
+          href: articles/Functions.html
+        - text: "Workflow Guide: Step-by-Step"
+          href: articles/Workflow.html
+        - text: "Theoretical Basis: IPCC Tier 2 Methodology"
+          href: articles/Theoretical_basis.html
     - icon: fa-file-code-o
       text: "Reference"
       href: reference/index.html
@@ -33,10 +37,10 @@ navbar:
 
 # Table of contents
 toc:
-  depth: 2
+  depth: 3
 
 # Logo y meta
 logo: man_logo.png
 favicon: favicon.ico
 meta:
-  description: "AnimalGEILU: cálculo de emisiones de CH4 y N2O y uso de tierra para ganado."
+  description: "AnimalGEILU: calculation of CH4 and N2O emissions and land use for livestock."
