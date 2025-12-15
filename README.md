@@ -1,34 +1,61 @@
----
-title: "AnimalGEILU"
-output:
-  rmarkdown::html_document:
-    toc: true        # Enable table of contents
-    toc_depth: 3     # Include subsections up to ###
+# 🌟 AnimalGEILU: GHG & LU Calculator 🌎📊
+
+An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (LU) in livestock systems, based on the IPCC Tier 2 methodology.
+
 ---
 
-# Welcome to AnimalGEILU: GHG & LU Calculator 🌎📊
+## 🚀 Installation
 
-**AnimalGEILU** is an R package designed to calculate **Greenhouse Gas (GHG) emissions** and **Land Use (LU)** associated with different livestock systems based on **IPCC Tier 2** methodologies.
+AnimalGEILU is a development package and can be installed directly from GitHub using `remotes`:
 
-## 📚 Guides and Examples 
+```r
+# Install the remotes package if needed
+if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
-Below are the main guides and examples for using the package:
+# Install AnimalGEILU (dev branch)
+remotes::install_github("JuanCBM99/Animal_GEI_LU", ref = "dev")
+```
 
-### 1. Introduction
-Learn what AnimalGEILU does, which animals are supported, and how to install the package.  
-[Go to Introduction →](articles/Introduction.html)
+## ✨✨ Key Features
 
-### 2. Data Dictionary
-Explore the included datasets like diets and emission factors, and see how to load and inspect them.  
-[Go to Data Dictionary: Internal CSV Files →](articles/Data_dictionary.html)
+IPCC Tier 2 Methodology: Robust calculations for enteric emissions, manure management, and indirect N₂O emissions.
 
-### 3. Function Dictionary
-Explore the included functions and the information that is inside of each one.
-[Go to Package Function Reference →](articles/Functions.html)
+Modular and Flexible: Allows detailed input of population, diets, and management systems at farm/zone level.
 
-### 3. Workflow
-Step-by-step examples of calculations for CH₄, N₂O, and land use for different livestock systems.  
-[Go to Workflow Guide: Step-by-Step →](articles/Workflow.html)
+Consolidated Output: Generates a single report summarizing impacts (CH₄, N₂O, and LU).
 
 
+## 📋 Workflow (Quick Start)
+
+1. Download Templates
+
+```r
+library(AnimalGEILU)
+
+# Download templates into the 'user_data/' folder of your working directory
+data_path <- download_templates()
+
+# View downloaded files
+list.files(data_path)
+```
+
+2. Generate Impact Assessment
+
+```r
+# Generate summary of all emissions and land use (m²/year)
+impact_assessment <- generate_impact_assessment()
+
+# Results
+head(impact_assessment)
+```
+
+## 📚 Documentation & Reference
+
+[Package Documentation Website]: Workflow guides, function references, and theoretical basis (IPCC Tier 2).
+
+[Introduction Guide Link]: Step-by-step tutorial on preparing your data.
+
+## 🤝 Contributions
+
+Contributions are welcome! If you find a bug or have suggestions for improvement, please open an issue or submit a pull request.
 
