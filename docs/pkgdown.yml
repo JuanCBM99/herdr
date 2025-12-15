@@ -1,0 +1,10 @@
+pandoc: 3.6.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  Data_dictionary: Data_dictionary.html
+  Functions: Functions.html
+  Introduction: Introduction.html
+  Theoretical_basis: Theoretical_basis.html
+  Workflow: Workflow.html
+last_built: 2025-12-15T11:45Z
