@@ -1,5 +1,5 @@
 # Título de la web
-title: "AnimalGEILU: GHG & LU Calculator 🌎📊"
+title: "herdr: GHG & LU Calculator 🌎📊"
 
 # Tema moderno
 template:
@@ -12,17 +12,18 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
+    - text: "Introduction"
+      icon: fas fa-book
+      href: articles/Introduction.html
     - text: "Guides"
       icon: fas fa-book
       menu:
-        - text: "Introduction"
-          href: articles/Introduction.html
+        - text: "Workflow Guide: Step-by-Step"
+          href: articles/Workflow.html
         - text: "Data dictionary"
           href: articles/Data_dictionary.html
         - text: "Package Function Reference"
           href: articles/Functions.html
-        - text: "Workflow Guide: Step-by-Step"
-          href: articles/Workflow.html
         - text: "Theoretical Basis: IPCC Tier 2 Methodology"
           href: articles/Theoretical_basis.html
     - icon: fa-file-code-o
@@ -30,10 +31,10 @@ navbar:
       href: reference/index.html
     - icon: fa-download
       text: "Download"
-      href: https://github.com/JuanCBM99/Animal_GEI_LU
+      href: https://github.com/JuanCBM99/herdr
     - icon: fa-github
       text: "GitHub"
-      href: https://github.com/JuanCBM99/Animal_GEI_LU
+      href: https://github.com/JuanCBM99/herdr
 
 # Table of contents
 toc:
@@ -43,4 +44,4 @@ toc:
 logo: man_logo.png
 favicon: favicon.ico
 meta:
-  description: "AnimalGEILU: calculation of CH4 and N2O emissions and land use for livestock."
+  description: "herdr: calculation of CH4 and N2O emissions and land use for livestock."

@@ -28,7 +28,7 @@ download_templates <- function(dest_folder = "user_data") {
   # --- 1. Define Files and Base URL ---
 
   # Base URL for direct content download from GitHub (raw content)
-  base_url <- "https://raw.githubusercontent.com/JuanCBM99/Animal_GEI_LU/dev/inst/extdata/templates/"
+  base_url <- "https://raw.githubusercontent.com/JuanCBM99/herdr/dev/inst/extdata/templates/"
 
   # List of all required template files for the package
   template_files <- c(

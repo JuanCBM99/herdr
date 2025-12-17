@@ -1,4 +1,4 @@
-#' Animal_GEI_LU: Package for Animal Greenhouse Gas Emissions and Land Use
+#' herdr: Package for Animal Greenhouse Gas Emissions and Land Use
 #'
 #' @description
 #' This package provides tools for calculating and analyzing greenhouse gas
@@ -7,7 +7,7 @@
 #' @details
 #' For more information, see:
 #' \itemize{
-#' \item GitHub: \url{https://github.com/JuanCBM99/Animal_GEI_LU}
+#' \item GitHub: \url{https://github.com/JuanCBM99/herdr}
 #' }
 #'
 #' @keywords internal

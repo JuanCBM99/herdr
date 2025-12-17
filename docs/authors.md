@@ -8,15 +8,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/JuanCBM99/Animal_GEI_LU/blob/HEAD/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/JuanCBM99/herdr/blob/HEAD/DESCRIPTION)
 
-Baez J (2025). *AnimalGEILU: AnimalGEILU*. R package version 0.1.0,
-<https://github.com/JuanCBM99/Animal_GEI_LU>.
+Baez J (2025). *herdr: herdr*. R package version 0.1.0,
+<https://github.com/JuanCBM99/herdr>.
 
     @Manual{,
-      title = {AnimalGEILU: AnimalGEILU},
+      title = {herdr: herdr},
       author = {Juan Carlos Baez},
       year = {2025},
       note = {R package version 0.1.0},
-      url = {https://github.com/JuanCBM99/Animal_GEI_LU},
+      url = {https://github.com/JuanCBM99/herdr},
     }

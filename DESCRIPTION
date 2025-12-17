@@ -1,10 +1,10 @@
-Package: AnimalGEILU
-Title: AnimalGEILU
+Package: herdr
+Title: herdr
 Version: 0.1.0
 Authors@R: c(person("Juan Carlos", "Baez", email = "juancarlos.baez@bc3research.org", role = c("aut", "cre"),
 		   comment = c(ORCID ="0000-0002-7067-265X")))
 Description: R package for calculating emissions and land use connected to different animals
-URL: https://github.com/JuanCBM99/Animal_GEI_LU
+URL: https://github.com/JuanCBM99/herdr
 Depends: 
     R (>= 4.1.0)
 License: MIT + file LICENSE
@@ -22,8 +22,9 @@ Imports:
     markdown,
     magrittr
 Suggests: 
-     rmarkdown,
-     testthat,
-     pkgdown
+    rmarkdown,
+    testthat (>= 3.0.0),
+    pkgdown
 VignetteBuilder: 
      knitr
+Config/testthat/edition: 3

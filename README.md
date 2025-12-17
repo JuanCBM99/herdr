@@ -1,4 +1,4 @@
-# 🌟 AnimalGEILU: GHG & LU Calculator 🌎📊
+# 🌟 herdr: GHG & LU Calculator 🌎📊
 
 An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (LU) in livestock systems, based on the IPCC Tier 2 methodology.
 
@@ -22,14 +22,14 @@ If you do not have R and RStudio installed, follow these steps:
 
 ## 🚀 Installation
 
-AnimalGEILU is a development package and can be installed directly from GitHub using `remotes`:
+herdr is a development package and can be installed directly from GitHub using `remotes`:
 
 ```r
 # Install the remotes package if needed
 if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
 
-# Install AnimalGEILU (dev branch)
-remotes::install_github("JuanCBM99/Animal_GEI_LU", ref = "dev")
+# Install herdr (dev branch)
+remotes::install_github("JuanCBM99/herdr", ref = "dev")
 ```
 
 ## ✨✨ Key Features
@@ -48,7 +48,7 @@ Consolidated Output: Generates a single report summarizing impacts (CH₄, N₂O
 If you wish to change the default data:
 
 ```r
-library(AnimalGEILU)
+library(herdr)
 
 # Download templates into the 'user_data/' folder of your working directory
 download_templates()

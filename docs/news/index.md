@@ -1,6 +1,6 @@
 # Changelog
 
-## AnimalGEILU 0.1.0 (Under development)
+## herdr 0.1.0 (Under development)
 
 ### New features
 

@@ -1,0 +1,40 @@
+﻿identification,management_system,system_climate,management_duration,animal_category,animal_type,animal_subtype
+feedlot_calves_male,solid_storage,cool,12.00,non dairy cattle,cattle,feedlot
+beef_yearlings_male_replacement,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_yearlings_male_replacement,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+beef_yearlings_female_replacement,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_yearlings_female_replacement,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+dairy_yearlings_female_replacement,solid_storage,cool,12.00,non dairy cattle,cattle,dairy
+mature_beef_bull,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+mature_beef_bull,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+feedlot_calves_female,solid_storage,cool,12.00,non dairy cattle,cattle,feedlot
+mature_dairy_cattle,liquid_slurry_below_confinements_12,cool temp. moist,12.00,dairy cattle,cattle,dairy
+mature_beef_cattle,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+mature_beef_cattle,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+beef_calves_male,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_calves_male,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+beef_calves_female,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_calves_female,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+beef_calves_male_replacement,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_calves_male_replacement,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+beef_calves_female_replacement,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
+beef_calves_female_replacement,solid_storage,cool,3.00,non dairy cattle,cattle,beef
+dairy_calves_female_replacement,solid_storage,cool,12.00,non dairy cattle,cattle,dairy
+lamb_dairy_slaughter,solid_storage,cool,12.00,sheep,sheep,dairy
+lamb_meat_slaughter,solid_storage,cool,12.00,sheep,sheep,meat
+lamb_male_dairy_replacement,pasture_range_paddock,na,12.00,sheep,sheep,dairy
+lamb_male_meat_replacement,pasture_range_paddock,na,12.00,sheep,sheep,meat
+mature_sheep_male_dairy,pasture_range_paddock,na,12.00,sheep,sheep,dairy
+mature_sheep_male_meat,pasture_range_paddock,na,12.00,sheep,sheep,meat
+lamb_female_dairy_replacement,pasture_range_paddock,na,12.00,sheep,sheep,dairy
+lamb_female_meat_replacement,pasture_range_paddock,na,12.00,sheep,sheep,meat
+mature_sheep_female_dairy,pasture_range_paddock,na,12.00,sheep,sheep,dairy
+mature_sheep_female_meat,pasture_range_paddock,na,12.00,sheep,sheep,meat
+kid_goat_male_dairy_replacement,pasture_range_paddock,na,12.00,goat,goat,dairy
+kid_goat_male_meat_replacement,pasture_range_paddock,na,12.00,goat,goat,meat
+mature_goat_male_dairy,pasture_range_paddock,na,12.00,goat,goat,dairy
+mature_goat_male_meat,pasture_range_paddock,na,12.00,goat,goat,meat
+kid_goat_female_dairy_replacement,pasture_range_paddock,na,12.00,goat,goat,dairy
+kid_goat_female_meat_replacement,pasture_range_paddock,na,12.00,goat,goat,meat
+mature_goat_female_dairy,pasture_range_paddock,na,12.00,goat,goat,dairy
+mature_goat_female_meat,pasture_range_paddock,na,12.00,goat,goat,meat

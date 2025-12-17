@@ -29,7 +29,7 @@ load_dataset <- function(name) {
 
     # Load package default dataset (.rda in data/)
     # MODIFICATION: Apply the same NA logic to .rda files
-    df_raw <- get(name, envir = asNamespace("AnimalGEILU"))
+    df_raw <- get(name, envir = asNamespace("herdr"))
 
     if (is.data.frame(df_raw)) {
       # Replace "" with NA in all character columns
