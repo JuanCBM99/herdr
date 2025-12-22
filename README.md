@@ -1,10 +1,10 @@
 # AnimalGEILU <img src="man/figures/logo.png" align="right" height="139" />
 
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
-[![R-CMD-check](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/build.yaml/badge.svg)](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/build.yaml)
-[![docs](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/docs.yaml/badge.svg)](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/docs.yaml)
-[![codecov](https://codecov.io/gh/JuanCBM99/Animal_GEI_LU/graph/badge.svg?token=[TU_TOKEN_AQUI])](https://codecov.io/gh/JuanCBM99/Animal_GEI_LU)
-[![test-coverage](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/JuanCBM99/Animal_GEI_LU/actions/workflows/test-coverage.yml)
+[![R-CMD-check](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml)
+[![docs](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml)
+[![codecov](https://codecov.io/gh/JuanCBM99/herdr/graph/badge.svg?token=[TU_TOKEN_AQUI])](https://codecov.io/gh/JuanCBM99/herdr)
+[![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yml)
 ---
 
 # 🌟 herdr: GHG & LU Calculator 🌎📊

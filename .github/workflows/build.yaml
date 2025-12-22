@@ -1,9 +1,11 @@
 on:
   push:
-    branches: [main, dev]
+    branches:
+      - main
+      - dev
   pull_request:
 
-name: R-CMD-check.yaml
+name: build.yaml
 
 permissions: read-all
 
@@ -46,5 +48,5 @@ jobs:
       - uses: r-lib/actions/check-r-package@v2
         with:
           upload-snapshots: true
-          error-on: '"error"'  # <--- AÑADE ESTA LÍNEA AQUÍ
+          error-on: '"error"'  #Flexibility
           build_args: 'c("--no-manual","--compact-vignettes=gs+qpdf")'
