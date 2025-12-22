@@ -1,9 +1,9 @@
 # Package Function Reference
 
-## AnimalGEILU Function Reference
+## herdr Function Reference
 
 This manual provides a detailed technical reference for every public
-function within the **AnimalGEILU** package.
+function within the **herdr** package.
 
 ------------------------------------------------------------------------
 

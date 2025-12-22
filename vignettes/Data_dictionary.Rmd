@@ -11,7 +11,7 @@ vignette: >
 
 # Data Dictionary: Internal CSV Files
 
-**AnimalGEILU** operates on a data-driven approach. While the calculations are universal (IPCC Tier 2), the package comes pre-loaded with **default datasets representing Spanish national averages** for livestock performance, diets, and emission factors.
+**herdr** operates on a data-driven approach. While the calculations are universal (IPCC Tier 2), the package comes pre-loaded with **default datasets representing Spanish national averages** for livestock performance, diets, and emission factors.
 
 This document serves as the **Technical Reference** for all these internal CSV files.
 

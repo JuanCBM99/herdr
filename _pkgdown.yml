@@ -13,10 +13,10 @@ navbar:
     - icon: fa-home
       href: index.html
     - text: "Introduction"
-      icon: fas fa-book
+      icon: fas fa-book-open
       href: articles/Introduction.html
     - text: "Guides"
-      icon: fas fa-book
+      icon: fas fa-map-signs
       menu:
         - text: "Workflow Guide: Step-by-Step"
           href: articles/Workflow.html
@@ -31,7 +31,7 @@ navbar:
       href: reference/index.html
     - icon: fa-download
       text: "Download"
-      href: https://github.com/JuanCBM99/herdr
+      href: https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip
     - icon: fa-github
       text: "GitHub"
       href: https://github.com/JuanCBM99/herdr

@@ -16,3 +16,6 @@ exampleRepoCheatsheet.pdf
 ^\.github$
 ^_config.yml$
 ^articles$
+^index\.md$
+^output$
+^user_data$

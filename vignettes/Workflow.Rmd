@@ -9,7 +9,7 @@ vignette: >
 
 # Workflow Guide: Step-by-Step
 
-This guide explains the workflow for using the `AnimalGEILU` model, from exploring the default reference datasets to introducing and analysing your own Tier 2 custom scenarios.
+This guide explains the workflow for using the `herdr` model, from exploring the default reference datasets to introducing and analysing your own Tier 2 custom scenarios.
 
 <img src="images/workflow.png" alt="" style="width:100%; height:auto;">
 
@@ -17,7 +17,7 @@ This guide explains the workflow for using the `AnimalGEILU` model, from explori
 
 ## 1. Preliminary Analysis: Default National Data
 
-**AnimalGEILU** includes default datasets based on national averages and emission factors for **Spain**. These allow you to run the model immediately and obtain a **baseline environmental footprint**.
+**herdr** includes default datasets based on national averages and emission factors for **Spain**. These allow you to run the model immediately and obtain a **baseline environmental footprint**.
 
 ### Step 1: Run a Quick Analysis
 
@@ -25,7 +25,7 @@ To view the results computed from the internal reference data, simply load the p
 
 ```{r run-default-model, eval=FALSE}
 # Load the package
-library(AnimalGEILU)
+library(herdr)
 
 # Run the complete calculation using only internal package data
 reporte_base <- generate_impact_assessment(

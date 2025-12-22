@@ -7,9 +7,9 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# AnimalGEILU Function Reference
+# herdr Function Reference
 
-This manual provides a detailed technical reference for every public function within the **AnimalGEILU** package.
+This manual provides a detailed technical reference for every public function within the **herdr** package.
 
 ---
 

@@ -1,4 +1,4 @@
-# Animal_GEI_LU: Package for Animal Greenhouse Gas Emissions and Land Use
+# herdr: Package for Animal Greenhouse Gas Emissions and Land Use
 
 This package provides tools for calculating and analyzing greenhouse gas
 emissions and land use metrics for animal systems.
@@ -7,13 +7,13 @@ emissions and land use metrics for animal systems.
 
 For more information, see:
 
-- GitHub: <https://github.com/JuanCBM99/Animal_GEI_LU>
+- GitHub: <https://github.com/JuanCBM99/herdr>
 
 ## See also
 
 Useful links:
 
-- <https://github.com/JuanCBM99/Animal_GEI_LU>
+- <https://github.com/JuanCBM99/herdr>
 
 ## Author
 

@@ -1,16 +1,16 @@
 ---
-title: "Introduction to AnimalGEILU"
+title: "Introduction to herdr"
 output:
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Introduction to AnimalGEILU}
+  %\VignetteIndexEntry{Introduction to herdr}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
-# Introduction to AnimalGEILU
+# Introduction to herdr
 
-**AnimalGEILU** is an R package designed to calculate **greenhouse gas (GHG) emissions** and **land use** (LU) associated with livestock production.  
+**herdr** is an R package designed to calculate **greenhouse gas (GHG) emissions** and **land use** (LU) associated with livestock production.  
 
 Currently supported animals:
 - **Cattle**
@@ -41,7 +41,7 @@ The package offers specific functions to model the primary sources of environmen
 
 ## 🎯 Calculation Methodology (IPCC 2019)
 
-All emission calculations within AnimalGEILU adhere to the Tier 2 methods established by the Intergovernmental Panel on Climate Change (IPCC).
+All emission calculations within herdr adhere to the Tier 2 methods established by the Intergovernmental Panel on Climate Change (IPCC).
 
 Specifically, we use the guidelines from the 2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories:
 
@@ -54,7 +54,7 @@ Specifically, we use the guidelines from the 2019 Refinement to the 2006 IPCC Gu
 Diet composition is the primary driver of the results. The functions use nutritional data (Energy, Protein, NDF) to determine key parameters like the Methane Conversion Factor ($Y_m$) and Nitrogen Excretion ($N_{ex}$).
 
 **Automatic Validation:**
-Before calculating, `AnimalGEILU` automatically checks consistency between your census (population) and diet files, ensuring every animal defined has a corresponding nutritional profile.
+Before calculating, `herdr` automatically checks consistency between your census (population) and diet files, ensuring every animal defined has a corresponding nutritional profile.
 
 ---
 
@@ -62,19 +62,19 @@ Before calculating, `AnimalGEILU` automatically checks consistency between your 
 
 - Install the package directly from GitHub using **remotes**:
 
-```{r install_AnimalGEILU, eval=FALSE}
+```{r install_herdr, eval=FALSE}
 # Instalar 'remotes' si es necesario
 if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
 }
-# Instalar el paquete AnimalGEILU
+# Instalar el paquete herdr
 remotes::install_github("JuanCBM99/Animal_GEI_LU")
 ```
 
 - Load the package and explore the default datasets:
 
-```{r load_AnimalGEILU}
-library(AnimalGEILU)
+```{r load_herdr}
+library(herdr)
 ```
 ---
 

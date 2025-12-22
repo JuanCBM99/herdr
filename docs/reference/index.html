@@ -16,16 +16,16 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book"></span> Guides</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides"><li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
     <li><a class="dropdown-item" href="../articles/Data_dictionary.html">Data dictionary</a></li>
     <li><a class="dropdown-item" href="../articles/Functions.html">Package Function Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
   </ul></li>
 <li class="active nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-download"></span> Download</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -53,115 +53,17 @@
 
       <dl><dt>
 
-          <code><a href="calculate_CH4_manure.html">calculate_CH4_manure()</a></code>
+          <code><a href="load_dataset.html">load_dataset()</a></code>
 
         </dt>
-        <dd>Calculate CH₄ Emissions from Manure Management (Refactored)</dd>
+        <dd>Load dataset from user_data or package default</dd>
 
         <dt>
 
-          <code><a href="calculate_emissions_enteric.html">calculate_emissions_enteric()</a></code>
+          <code><a href="download_templates.html">download_templates()</a></code>
 
         </dt>
-        <dd>Calculate methane emissions from enteric fermentation (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_ge.html">calculate_ge()</a></code>
-
-        </dt>
-        <dd>Calculate Gross Energy (GE) (Fixed &amp; Robust)</dd>
-
-        <dt>
-
-          <code><a href="calculate_land_use.html">calculate_land_use()</a></code>
-
-        </dt>
-        <dd>Calculate land use (Refactored &amp; Fixed)</dd>
-
-        <dt>
-
-          <code><a href="calculate_N2O_direct_manure.html">calculate_N2O_direct_manure()</a></code>
-
-        </dt>
-        <dd>Calculate direct N₂O emissions from manure (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_N2O_indirect_leaching.html">calculate_N2O_indirect_leaching()</a></code>
-
-        </dt>
-        <dd>Calculate indirect N₂O emissions from leaching (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_N2O_indirect_volatilization.html">calculate_N2O_indirect_volatilization()</a></code>
-
-        </dt>
-        <dd>Calculate indirect N₂O emissions from volatilization (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NEa.html">calculate_NEa()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Activity (NEa) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NEg.html">calculate_NEg()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Growth (NEg) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NEl.html">calculate_NEl()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Lactation (NEl) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NEm.html">calculate_NEm()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Maintenance (NEm) Computes NEm based on average weight and CFI coefficients using a relational join approach.</dd>
-
-        <dt>
-
-          <code><a href="calculate_NE_pregnancy.html">calculate_NE_pregnancy()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Pregnancy (NE_pregnancy) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NE_wool.html">calculate_NE_wool()</a></code>
-
-        </dt>
-        <dd>Calculate Net Energy for Wool Production (NE_wool) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_NE_work.html">calculate_NE_work()</a></code>
-
-        </dt>
-        <dd>Calculate Net Working Energy (NE_work) (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_population.html">calculate_population()</a></code>
-
-        </dt>
-        <dd>Calculate total animal population (Refactored)</dd>
-
-        <dt>
-
-          <code><a href="calculate_population_cattle.html">calculate_population_cattle()</a></code>
-
-        </dt>
-        <dd>Calculates the full cattle population structure (Internal Helper)</dd>
+        <dd>Download Template Files from GitHub</dd>
 
         <dt>
 
@@ -179,10 +81,59 @@
 
         <dt>
 
+          <code><a href="calculate_land_use.html">calculate_land_use()</a></code>
+
+        </dt>
+        <dd>Calculate land use (Refactored &amp; Fixed)</dd>
+
+        <dt>
+
+          <code><a href="calculate_N2O_indirect_leaching.html">calculate_N2O_indirect_leaching()</a></code>
+
+        </dt>
+        <dd>Calculate indirect N₂O emissions from leaching (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_N2O_indirect_volatilization.html">calculate_N2O_indirect_volatilization()</a></code>
+
+        </dt>
+        <dd>Calculate indirect N₂O emissions from volatilization (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_CH4_manure.html">calculate_CH4_manure()</a></code>
+
+        </dt>
+        <dd>Calculate CH₄ Emissions from Manure Management (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_N2O_direct_manure.html">calculate_N2O_direct_manure()</a></code>
+
+        </dt>
+        <dd>Calculate direct N₂O emissions from manure (Refactored)</dd>
+
+        <dt>
+
           <code><a href="calculate_vs.html">calculate_vs()</a></code>
 
         </dt>
         <dd>Calculate Volatile Solids (VS) for Animals (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_emissions_enteric.html">calculate_emissions_enteric()</a></code>
+
+        </dt>
+        <dd>Calculate methane emissions from enteric fermentation (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_ge.html">calculate_ge()</a></code>
+
+        </dt>
+        <dd>Calculate Gross Energy (GE) (Fixed &amp; Robust)</dd>
 
         <dt>
 
@@ -193,10 +144,66 @@
 
         <dt>
 
-          <code><a href="download_templates.html">download_templates()</a></code>
+          <code><a href="calculate_population_cattle.html">calculate_population_cattle()</a></code>
 
         </dt>
-        <dd>Download Template Files from GitHub</dd>
+        <dd>Calculates the full cattle population structure (Internal Helper)</dd>
+
+        <dt>
+
+          <code><a href="calculate_population.html">calculate_population()</a></code>
+
+        </dt>
+        <dd>Calculate total animal population (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NE_work.html">calculate_NE_work()</a></code>
+
+        </dt>
+        <dd>Calculate Net Working Energy (NE_work) (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NE_pregnancy.html">calculate_NE_pregnancy()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Pregnancy (NE_pregnancy) (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NEm.html">calculate_NEm()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Maintenance (NEm) Computes NEm based on average weight and CFI coefficients using a relational join approach.</dd>
+
+        <dt>
+
+          <code><a href="calculate_NEl.html">calculate_NEl()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Lactation (NEl) (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NEg.html">calculate_NEg()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Growth (NEg) (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NEa.html">calculate_NEa()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Activity (NEa) (Refactored)</dd>
+
+        <dt>
+
+          <code><a href="calculate_NE_wool.html">calculate_NE_wool()</a></code>
+
+        </dt>
+        <dd>Calculate Net Energy for Wool Production (NE_wool) (Refactored)</dd>
 
         <dt>
 
@@ -204,13 +211,6 @@
 
         </dt>
         <dd>Summarize CH₄, N₂O Emissions, and Land Use</dd>
-
-        <dt>
-
-          <code><a href="load_dataset.html">load_dataset()</a></code>
-
-        </dt>
-        <dd>Load dataset from user_data or package default</dd>
       </dl></div>
   </main></div>
 

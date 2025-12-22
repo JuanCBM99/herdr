@@ -1,10 +1,9 @@
-# Introduction to AnimalGEILU
+# Introduction to herdr
 
-## Introduction to AnimalGEILU
+## Introduction to herdr
 
-**AnimalGEILU** is an R package designed to calculate **greenhouse gas
-(GHG) emissions** and **land use** (LU) associated with livestock
-production.
+**herdr** is an R package designed to calculate **greenhouse gas (GHG)
+emissions** and **land use** (LU) associated with livestock production.
 
 Currently supported animals: - **Cattle** - **Goat** - **Sheep**
 
@@ -47,9 +46,8 @@ growth, lactation, pregnancy, work, and wool production.
 
 ### 🎯 Calculation Methodology (IPCC 2019)
 
-All emission calculations within AnimalGEILU adhere to the Tier 2
-methods established by the Intergovernmental Panel on Climate Change
-(IPCC).
+All emission calculations within herdr adhere to the Tier 2 methods
+established by the Intergovernmental Panel on Climate Change (IPCC).
 
 Specifically, we use the guidelines from the 2019 Refinement to the 2006
 IPCC Guidelines for National Greenhouse Gas Inventories:
@@ -66,10 +64,9 @@ nutritional data (Energy, Protein, NDF) to determine key parameters like
 the Methane Conversion Factor ($`Y_m`$) and Nitrogen Excretion
 ($`N_{ex}`$).
 
-**Automatic Validation:** Before calculating, `AnimalGEILU`
-automatically checks consistency between your census (population) and
-diet files, ensuring every animal defined has a corresponding
-nutritional profile.
+**Automatic Validation:** Before calculating, `herdr` automatically
+checks consistency between your census (population) and diet files,
+ensuring every animal defined has a corresponding nutritional profile.
 
 ------------------------------------------------------------------------
 
@@ -82,14 +79,14 @@ nutritional profile.
 if (!requireNamespace("remotes", quietly = TRUE)) {
     install.packages("remotes")
 }
-# Instalar el paquete AnimalGEILU
+# Instalar el paquete herdr
 remotes::install_github("JuanCBM99/Animal_GEI_LU")
 ```
 
 - Load the package and explore the default datasets:
 
 ``` r
-library(AnimalGEILU)
+library(herdr)
 ```
 
 ------------------------------------------------------------------------

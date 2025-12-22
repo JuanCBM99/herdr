@@ -30,9 +30,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book"></span> Guides</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
     <li><a class="dropdown-item" href="../articles/Data_dictionary.html">Data dictionary</a></li>
@@ -41,7 +41,7 @@
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-download"></span> Download</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -74,18 +74,17 @@
 <div class="section level2">
 <h2 id="workflow-guide-step-by-step">Workflow Guide: Step-by-Step<a class="anchor" aria-label="anchor" href="#workflow-guide-step-by-step"></a>
 </h2>
-<p>This guide explains the workflow for using the
-<code>AnimalGEILU</code> model, from exploring the default reference
-datasets to introducing and analysing your own Tier 2 custom
-scenarios.</p>
+<p>This guide explains the workflow for using the <code>herdr</code>
+model, from exploring the default reference datasets to introducing and
+analysing your own Tier 2 custom scenarios.</p>
 <p><img src="images/workflow.png" alt="" style="width:100%; height:auto;"></p>
 <hr>
 <div class="section level3">
 <h3 id="preliminary-analysis-default-national-data">1. Preliminary Analysis: Default National Data<a class="anchor" aria-label="anchor" href="#preliminary-analysis-default-national-data"></a>
 </h3>
-<p><strong>AnimalGEILU</strong> includes default datasets based on
-national averages and emission factors for <strong>Spain</strong>. These
-allow you to run the model immediately and obtain a <strong>baseline
+<p><strong>herdr</strong> includes default datasets based on national
+averages and emission factors for <strong>Spain</strong>. These allow
+you to run the model immediately and obtain a <strong>baseline
 environmental footprint</strong>.</p>
 <div class="section level4">
 <h4 id="step-1-run-a-quick-analysis">Step 1: Run a Quick Analysis<a class="anchor" aria-label="anchor" href="#step-1-run-a-quick-analysis"></a>
@@ -95,7 +94,7 @@ load the package and run the main function
 <code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Load the package</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JuanCBM99/Animal_GEI_LU" class="external-link">AnimalGEILU</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JuanCBM99/herdr" class="external-link">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run the complete calculation using only internal package data</span></span>
 <span><span class="va">reporte_base</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
