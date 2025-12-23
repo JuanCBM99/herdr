@@ -4,7 +4,7 @@
 [![R-CMD-check](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml)
 [![docs](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml)
 [![codecov](https://codecov.io/github/JuanCBM99/herdr/graph/badge.svg?token=GMIP6FM869)](https://codecov.io/github/JuanCBM99/herdr)
-[![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yml)
+[![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml)
 ---
 
 # 🌟 herdr: GHG & LU Calculator 🌎📊
