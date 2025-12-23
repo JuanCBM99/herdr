@@ -47,6 +47,7 @@ jobs:
           plugins: noop
           disable_search: true
           token: ${{ secrets.CODECOV_TOKEN }}
+          slug: JuanCBM99/herdr
 
       - name: Show testthat output
         if: always()
