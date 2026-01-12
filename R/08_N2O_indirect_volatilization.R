@@ -1,10 +1,11 @@
 #' Calculate indirect N₂O emissions from volatilization (Refactored)
 #'
 #' Computes indirect N₂O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_N2O_indirect_volatilization <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating indirect N₂O emissions (volatilization)...")
+  message("\U0001f4be Calculating indirect N2O emissions (volatilization)...")
 
   # --- 1. Data Processing and Joins ---
 
@@ -65,7 +66,7 @@ calculate_N2O_indirect_volatilization <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_indirect_volatilization.csv")
-    message("💾 Saved output to output/N2O_indirect_volatilization.csv")
+    message("\U0001f4be Saved output to output/N2O_indirect_volatilization.csv")
   }
 
   return(results)

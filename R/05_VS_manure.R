@@ -4,12 +4,12 @@
 #' and Ash content.
 #'
 #' @param urinary_energy Numeric. Fraction of energy lost in urine. Default 0.04.
-#' @param saveoutput Logical. If TRUE, saves the result as CSV. Default TRUE.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @return Tibble with VS for all animal categories.
 #' @export
 calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
 
-  message("🟢 Calculating Volatile Solids (VS)...")
+  message("\U0001f7e2 Calculating Volatile Solids (VS)...")
 
   join_keys <- c("group", "zone", "identification", "animal_type", "animal_subtype")
 
@@ -52,7 +52,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/VS.csv")
-    message("💾 Saved output to output/VS.csv")
+    message("\U0001f4be Saved output to output/VS.csv")
   }
 
   return(results)

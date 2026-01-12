@@ -1,11 +1,12 @@
-#' Calculate CH₄ Emissions from Manure Management (Refactored)
+#' Calculate CH4 Emissions from Manure Management (Refactored)
 #'
-#' Computes CH₄ emissions from manure based on Volatile Solids (VS),
+#' Computes CH4 emissions from manure based on Volatile Solids (VS),
 #' population, and management factors (B0, MCF, AWMS). (IPCC Eq 10.23).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_CH4_manure <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating CH₄ emissions from manure management...")
+  message("\U0001f4be Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Processing and Joins ---
 
@@ -73,7 +74,7 @@ calculate_CH4_manure <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/CH4_manure.csv")
-    message("💾 Saved output to output/CH4_manure.csv")
+    message("\U0001f4be Saved output to output/CH4_manure.csv")
   }
 
   return(results)

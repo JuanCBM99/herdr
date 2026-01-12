@@ -6,6 +6,9 @@
 \usage{
 calculate_NEl(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NEl based on milk yield and fat content.
 Assigns 0 energy for non-lactating animals instead of dropping them.

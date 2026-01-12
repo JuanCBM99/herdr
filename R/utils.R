@@ -10,7 +10,7 @@ load_dataset <- function(name) {
 
   if (file.exists(csv_path)) {
     # Success message for using user file
-    message("    → Success! Using user file: user_data/", name, ".csv")
+    message("    \u2192 Success! Using user file: user_data/", name, ".csv")
 
     # FIX: na.strings = "NA" (default) + "" (for blank cells)
     # This converts empty cells "" to NA
@@ -20,11 +20,11 @@ load_dataset <- function(name) {
     # Fallback to package default dataset
 
     if (dir.exists(user_path)) {
-      message("    → WARNING: The 'user_data' folder exists, but '", name, ".csv' was not found.")
-      message("    → Ensure the file name is correct.")
-      message("    → Using package default dataset: ", name)
+      message("    \u2192 WARNING: The 'user_data' folder exists, but '", name, ".csv' was not found.")
+      message("    \u2192 Ensure the file name is correct.")
+      message("    \u2192 Using package default dataset: ", name)
     } else {
-      message("    → Using package default dataset: ", name)
+      message("    \u2192 Using package default dataset: ", name)
     }
 
     # Load package default dataset (.rda in data/)

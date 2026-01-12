@@ -6,6 +6,9 @@
 \usage{
 calculate_emissions_enteric(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),
 Digestible Energy (DE), NDF, and Ym factor.

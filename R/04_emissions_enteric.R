@@ -2,10 +2,11 @@
 #'
 #' Computes enteric methane emissions based on Gross Energy (GE),
 #' Digestible Energy (DE), NDF, and Ym factor.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_emissions_enteric <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating enteric fermentation emissions...")
+  message("\U0001f7e2 Calculating enteric fermentation emissions...")
 
   # --- 1. Data Preparation and Loading ---
 
@@ -15,7 +16,7 @@ calculate_emissions_enteric <- function(saveoutput = TRUE) {
 
   # Early exit if no diet data is found
   if (nrow(diet_vars) == 0) {
-    message("⚠️ No diet data found. Returning empty structure.")
+    message("\u26a0 No diet data found. Returning empty structure.")
     return(dplyr::tibble(
       group = character(), zone = character(), identification = character(),
       animal_type = character(), animal_subtype = character(),
@@ -103,7 +104,7 @@ calculate_emissions_enteric <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput) && nrow(results) > 0) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/enteric_emissions.csv")
-    message("💾 Saved output to output/enteric_emissions.csv")
+    message("\U0001f4be Saved output to output/enteric_emissions.csv")
   }
 
   return(results)

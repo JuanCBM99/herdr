@@ -6,6 +6,9 @@
 \usage{
 calculate_NE_pregnancy(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NE_pregnancy based on species-specific coefficients (C_pregnancy or PR).
 Keeps all animals (assigns 0 to non-pregnant), ensuring data consistency.

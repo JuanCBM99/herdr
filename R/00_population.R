@@ -2,10 +2,11 @@
 #'
 #' Orchestrates the population calculation by loading census data and dispatching
 #' sub-calculations for each animal type (cattle, sheep, goat).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_population <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Total Population...")
+  message("\U0001f7e2 Calculating Total Population...")
 
   # --- 1. Data Loading ---
   census_base <- load_dataset("census")
@@ -52,10 +53,10 @@ calculate_population <- function(saveoutput = TRUE) {
   }
 
   # --- 3. Unification and Metadata ---
-  message("  -> Combining and attaching metadata...")
+  message(" -> Combining and attaching metadata...")
 
   if (length(results_list) == 0) {
-    warning("⚠️ No data found for any known animal type.")
+    warning("\u26a0 No data found for any known animal type.")
     return(tibble::tibble())
   }
 
@@ -78,7 +79,7 @@ calculate_population <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(final_result, "output/population_result.csv")
-    message("💾 Saved output to output/population_result.csv")
+    message("\U1F4BE Saved output to output/population_result.csv")
   }
 
   return(final_result)

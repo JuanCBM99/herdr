@@ -1,8 +1,10 @@
 #' Calculates the full sheep population structure (Internal Helper)
+#' @param census_sheep Edit in csv
+#' @param rate_parameters Edit in csv
 #' @export
 calculate_population_sheep <- function(census_sheep, rate_parameters) {
 
-  message("🧮 Calculating populations for SHEEP...")
+  message("\U0001F9EE Calculating populations for SHEEP...")
 
   # (Assume these are the base 'identification' for sheep)
   req_identifications <- c("mature_sheep_male_dairy", "mature_sheep_male_meat",

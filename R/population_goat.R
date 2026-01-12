@@ -1,8 +1,10 @@
 #' Calculates the full goat population structure (Internal Helper)
+#' @param census_goat Edit in csv
+#' @param rate_parameters Edit in csv
 #' @export
 calculate_population_goat <- function(census_goat, rate_parameters) {
 
-  message("🧮 Calculating populations for GOAT...")
+  message("\U0001F9EE Calculating populations for GOAT...")
 
   # (Assume these are the base 'identification' for goats)
   req_identifications <- c("mature_goat_male_dairy", "mature_goat_male_meat",

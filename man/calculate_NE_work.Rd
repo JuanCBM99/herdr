@@ -6,6 +6,9 @@
 \usage{
 calculate_NE_work(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NE_work based on NEm and hours of activity.
 Keeps all animals in the dataset (assigns 0 to non-working animals).

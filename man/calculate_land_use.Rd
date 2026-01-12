@@ -6,6 +6,9 @@
 \usage{
 calculate_land_use(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes total land use (m²) per animal based on diet and yields.
 }

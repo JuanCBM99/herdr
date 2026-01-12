@@ -6,6 +6,9 @@
 \usage{
 calculate_NEg(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NEg for all animals using vectorized operations.
 Replaces rowwise lookups with efficient joins.

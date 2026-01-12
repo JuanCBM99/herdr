@@ -6,6 +6,9 @@
 \usage{
 calculate_population(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Orchestrates the population calculation by loading census data and dispatching
 sub-calculations for each animal type (cattle, sheep, goat).

@@ -6,6 +6,9 @@
 \usage{
 calculate_ge(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes gross energy requirements by aggregating all necessary Net Energy (NE) components (NEm, NEa, NEg, NEl, NEwork, NEp, NEwool)
 and adjusting for feed digestibility (DE) and conversion ratios (REM, REG).

@@ -6,6 +6,13 @@
 \usage{
 calculate_population_cattle(census_cattle, rate_parameters, categories)
 }
+\arguments{
+\item{census_cattle}{Edit in csv}
+
+\item{rate_parameters}{Edit in csv}
+
+\item{categories}{Edit in csv}
+}
 \description{
 Calculates the full cattle population structure (Internal Helper)
 }

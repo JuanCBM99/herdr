@@ -163,7 +163,7 @@ Gross Energy (GE) is the total daily energy intake required to cover all Net Ene
 | B0       | Maximum methane potential | `coefficients.csv` |
 | AWMS     | Fraction of manure managed | `ch4_mm.csv` |
 | MCF      | Methane conversion factor | `mcf.csv` |
-| 0.67     | Conversion m³ CH₄ → kg CH₄ | Constant |
+| 0.67     | Conversion m³ CH₄ \u2192 kg CH₄ | Constant |
 
 ---
 

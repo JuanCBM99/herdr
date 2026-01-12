@@ -6,6 +6,11 @@
 \usage{
 calculate_population_sheep(census_sheep, rate_parameters)
 }
+\arguments{
+\item{census_sheep}{Edit in csv}
+
+\item{rate_parameters}{Edit in csv}
+}
 \description{
 Calculates the full sheep population structure (Internal Helper)
 }

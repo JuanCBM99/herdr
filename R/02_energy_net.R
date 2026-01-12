@@ -1,9 +1,10 @@
 #' Calculate Net Energy for Maintenance (NEm)
 #' Computes NEm based on average weight and CFI coefficients using a relational join approach.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEm <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Maintenance (NEm)...")
+  message("\U0001f7e2 Calculating Net Energy for Maintenance (NEm)...")
 
   # --- 1. Data Loading ---
   weights       <- load_dataset("weights")
@@ -57,7 +58,7 @@ calculate_NEm <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NEm_result.csv")
-    message("💾 Saved output to output/NEm_result.csv")
+    message("\U0001f4be Saved output to output/NEm_result.csv")
   }
 
   return(results)
@@ -68,10 +69,11 @@ calculate_NEm <- function(saveoutput = TRUE) {
 #'
 #' Computes NEa based on NEm and activity coefficients (Ca).
 #' Uses a simplified direct lookup based on the assigned Ca tag.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEa <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Activity (NEa) via direct C_a lookup (Simplified)...")
+  message("\U0001f7e2 Calculating Net Energy for Activity (NEa) via direct C_a lookup (Simplified)...")
 
   # --- 1. Data Loading ---
   categories   <- load_dataset("categories")
@@ -125,7 +127,7 @@ calculate_NEa <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NEa_result.csv")
-    message("💾 Saved output to output/NEa_result.csv")
+    message("\U0001f4be Saved output to output/NEa_result.csv")
   }
 
   return(results)
@@ -136,10 +138,11 @@ calculate_NEa <- function(saveoutput = TRUE) {
 #'
 #' Computes NEg for all animals using vectorized operations.
 #' Replaces rowwise lookups with efficient joins.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEg <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Growth (NEg)...")
+  message("\U0001f7e2 Calculating Net Energy for Growth (NEg)...")
 
   # --- 1. Data Loading ---
   weights      <- load_dataset("weights")
@@ -216,7 +219,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NEg_result.csv")
-    message("💾 Saved output to output/NEg_result.csv")
+    message("\U0001f4be Saved output to output/NEg_result.csv")
   }
 
   return(results)
@@ -227,10 +230,11 @@ calculate_NEg <- function(saveoutput = TRUE) {
 #'
 #' Computes NEl based on milk yield and fat content.
 #' Assigns 0 energy for non-lactating animals instead of dropping them.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEl <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Lactation (NEl)...")
+  message("\U0001f7e2 Calculating Net Energy for Lactation (NEl)...")
 
   # --- 1. Data Loading ---
   categories <- load_dataset("categories")
@@ -275,7 +279,7 @@ calculate_NEl <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NEl_result.csv")
-    message("💾 Saved output to output/NEl_result.csv")
+    message("\U0001f4be Saved output to output/NEl_result.csv")
   }
 
   return(results)
@@ -286,10 +290,11 @@ calculate_NEl <- function(saveoutput = TRUE) {
 #'
 #' Computes NE_work based on NEm and hours of activity.
 #' Keeps all animals in the dataset (assigns 0 to non-working animals).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NE_work <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Work (NE_work)...")
+  message("\U0001f7e2 Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading ---
   categories <- load_dataset("categories")
@@ -330,7 +335,7 @@ calculate_NE_work <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NE_work_result.csv")
-    message("💾 Saved output to output/NE_work_result.csv")
+    message("\U0001f4be Saved output to output/NE_work_result.csv")
   }
 
   return(results)
@@ -341,10 +346,11 @@ calculate_NE_work <- function(saveoutput = TRUE) {
 #'
 #' Computes NE_wool based on wool yield.
 #' Assigns 0 energy for non-wool producing animals instead of dropping them.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NE_wool <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Wool (NE_wool)...")
+  message("\U0001f7e2 Calculating Net Energy for Wool (NE_wool)...")
 
   # --- 1. Data Loading ---
   categories <- load_dataset("categories")
@@ -372,7 +378,7 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NE_wool_result.csv")
-    message("💾 Saved output to output/NE_wool_result.csv")
+    message("\U0001f4be Saved output to output/NE_wool_result.csv")
   }
 
   return(results)
@@ -383,10 +389,11 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
 #'
 #' Computes NE_pregnancy based on species-specific coefficients (C_pregnancy or PR).
 #' Keeps all animals (assigns 0 to non-pregnant), ensuring data consistency.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NE_pregnancy <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
+  message("\U0001f7e2 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
   # --- 1. Data Loading ---
   categories   <- load_dataset("categories")
@@ -453,7 +460,7 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NE_pregnancy_result.csv")
-    message("💾 Saved output to output/NE_pregnancy_result.csv")
+    message("\U0001f4be Saved output to output/NE_pregnancy_result.csv")
   }
 
   return(results)

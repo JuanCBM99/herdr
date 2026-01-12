@@ -1,8 +1,11 @@
 #' Calculates the full cattle population structure (Internal Helper)
+#' @param categories Edit in csv
+#' @param rate_parameters Edit in csv
+#' @param census_cattle Edit in csv
 #' @export
 calculate_population_cattle <- function(census_cattle, rate_parameters, categories) {
 
-  message("🧮 Calculating populations for CATTLE...")
+  message("\U0001F9EE Calculating populations for CATTLE...")
 
   req_identifications <- c("mature_beef_bull", "mature_dairy_cattle", "mature_beef_cattle")
   if (!all(req_identifications %in% census_cattle$identification)) {

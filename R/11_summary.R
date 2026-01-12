@@ -8,14 +8,14 @@
 #' @param zone Character vector (optional). Zones to filter. Default `NULL`.
 #' @param animal Character string (optional). Livestock type (`animal_type`). Default `NULL`.
 #' @param type Character string (optional). Livestock subtype (`animal_subtype`). Default `NULL`.
-#' @param saveoutput Logical. If `TRUE`, saves the result to `"output/generate_impact_assessment.csv"`. Default `TRUE`.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param group_by_identification Logical. If `TRUE`, returns results at the `identification` level. If `FALSE`, aggregates all `identification`s.
 #' @return A `tibble` with columns for each emission type and land use.
 #' @export
 generate_impact_assessment <- function(group = NULL, zone = NULL, animal = NULL, type = NULL,
                                        saveoutput = TRUE, group_by_identification = TRUE) {
 
-  message("🟢 Starting impact assessment summary...")
+  message("\U0001f4be Starting impact assessment summary...")
 
   # --- 1. Data Validation Step ---
   message(" -> 1/3: Validating data consistency (census vs. diet)...")
@@ -120,9 +120,9 @@ generate_impact_assessment <- function(group = NULL, zone = NULL, animal = NULL,
   if (saveoutput) {
     dir.create("output", showWarnings = FALSE)
     readr::write_csv(final_summary, "output/generate_impact_assessment.csv")
-    message("💾 Saved output to output/generate_impact_assessment.csv")
+    message("\U0001f4be Saved output to output/generate_impact_assessment.csv")
   }
 
-  message("✅ Summary completed.")
+  message("\u2705Summary completed.")
   return(final_summary)
 }

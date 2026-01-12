@@ -6,6 +6,9 @@
 \usage{
 calculate_NE_wool(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NE_wool based on wool yield.
 Assigns 0 energy for non-wool producing animals instead of dropping them.

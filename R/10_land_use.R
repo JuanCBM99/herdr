@@ -1,10 +1,11 @@
 #' Calculate land use (Refactored & Fixed)
 #'
 #' Computes total land use (m²) per animal based on diet and yields.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_land_use <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating land use...")
+  message("\U0001f4be Calculating land use...")
 
   # --- 1. Data Loading ---
   categories  <- load_dataset("categories")
@@ -77,7 +78,7 @@ calculate_land_use <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/Land_use.csv")
-    message("💾 Saved output to output/Land_use.csv")
+    message("\U0001f4be Saved output to output/Land_use.csv")
   }
 
   return(results)

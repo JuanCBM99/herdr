@@ -9,7 +9,7 @@ calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 \arguments{
 \item{urinary_energy}{Numeric. Fraction of energy lost in urine. Default 0.04.}
 
-\item{saveoutput}{Logical. If TRUE, saves the result as CSV. Default TRUE.}
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \value{
 Tibble with VS for all animal categories.

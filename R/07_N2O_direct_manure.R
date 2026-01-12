@@ -2,10 +2,11 @@
 #'
 #' Computes direct N₂O emissions based on nitrogen excretion logic,
 #' emission factors, management system, and climate (IPCC Eq 10.25).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_N2O_direct_manure <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating direct N₂O emissions from manure...")
+  message("\U0001f4be Calculating direct N2O emissions from manure...")
 
   # --- 1. Master Dataset Construction (Data Merging) ---
 
@@ -92,7 +93,7 @@ calculate_N2O_direct_manure <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_direct_manure.csv")
-    message("💾 Saved output to output/N2O_direct_manure.csv")
+    message("\U0001f4be Saved output to output/N2O_direct_manure.csv")
   }
 
   return(results)

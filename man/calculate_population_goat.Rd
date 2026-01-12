@@ -6,6 +6,11 @@
 \usage{
 calculate_population_goat(census_goat, rate_parameters)
 }
+\arguments{
+\item{census_goat}{Edit in csv}
+
+\item{rate_parameters}{Edit in csv}
+}
 \description{
 Calculates the full goat population structure (Internal Helper)
 }

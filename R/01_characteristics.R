@@ -2,10 +2,11 @@
 #'
 #' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash)
 #' by mapping ingredients to diets, and diets to animals.
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_weighted_variable <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Weighted Nutritional Variables...")
+  message("\U0001f7e2 Calculating Weighted Nutritional Variables...")
 
   # --- 1. Data Loading ---
   diet            <- load_dataset("diet")
@@ -83,7 +84,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/variables.csv")
-    message("💾 Saved output to output/variables.csv")
+    message("\U0001f4be Saved output to output/variables.csv")
   }
 
   return(results)

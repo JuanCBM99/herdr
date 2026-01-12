@@ -2,10 +2,11 @@
 #'
 #' Computes gross energy requirements by aggregating all necessary Net Energy (NE) components (NEm, NEa, NEg, NEl, NEwork, NEp, NEwool)
 #' and adjusting for feed digestibility (DE) and conversion ratios (REM, REG).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_ge <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating Gross Energy (GE)...")
+  message("\U0001f7e2 Calculating Gross Energy (GE)...")
 
   # --- 1. Data Preparation and Setup ---
 
@@ -87,7 +88,7 @@ calculate_ge <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/ge_result.csv")
-    message("💾 Saved output to output/ge_result.csv")
+    message("\U0001f4be Saved output to output/ge_result.csv")
   }
 
   return(results)

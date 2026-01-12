@@ -73,7 +73,7 @@ download_templates <- function(dest_folder = "user_data") {
     })
   }
   message(paste("Files are located at:", download_path))
-  message("✅ Download completed.")
+  message("\u2705Download completed.")
 
   # --- 4. Return Path ---
   return(download_path)

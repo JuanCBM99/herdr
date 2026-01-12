@@ -6,6 +6,9 @@
 \usage{
 calculate_NEa(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Computes NEa based on NEm and activity coefficients (Ca).
 Uses a simplified direct lookup based on the assigned Ca tag.

@@ -2,11 +2,14 @@
 % Please edit documentation in R/06_emissions_manure_CH4.R
 \name{calculate_CH4_manure}
 \alias{calculate_CH4_manure}
-\title{Calculate CH₄ Emissions from Manure Management (Refactored)}
+\title{Calculate CH4 Emissions from Manure Management (Refactored)}
 \usage{
 calculate_CH4_manure(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
-Computes CH₄ emissions from manure based on Volatile Solids (VS),
+Computes CH4 emissions from manure based on Volatile Solids (VS),
 population, and management factors (B0, MCF, AWMS). (IPCC Eq 10.23).
 }

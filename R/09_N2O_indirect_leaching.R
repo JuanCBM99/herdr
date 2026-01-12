@@ -1,10 +1,11 @@
 #' Calculate indirect N₂O emissions from leaching (Refactored)
 #'
 #' Computes indirect N₂O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_N2O_indirect_leaching <- function(saveoutput = TRUE) {
 
-  message("🟢 Calculating indirect N₂O emissions (leaching)...")
+  message("\U0001f4be Calculating indirect N2O emissions (leaching)...")
 
   # --- 1. Load and Configure Factors ---
 
@@ -71,7 +72,7 @@ calculate_N2O_indirect_leaching <- function(saveoutput = TRUE) {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_indirect_leaching.csv")
-    message("💾 Saved output to output/N2O_indirect_leaching.csv")
+    message("\U0001f4be Saved output to output/N2O_indirect_leaching.csv")
   }
 
   return(results)

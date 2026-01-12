@@ -22,7 +22,7 @@ generate_impact_assessment(
 
 \item{type}{Character string (optional). Livestock subtype (`animal_subtype`). Default `NULL`.}
 
-\item{saveoutput}{Logical. If `TRUE`, saves the result to `"output/generate_impact_assessment.csv"`. Default `TRUE`.}
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{group_by_identification}{Logical. If `TRUE`, returns results at the `identification` level. If `FALSE`, aggregates all `identification`s.}
 }
