@@ -154,13 +154,13 @@ depend on population and **diet-specific emission factor**:
 
 `EF_CH4_manure = (VS * B0 * 365 / 100) * 0.67 * Σ(AWMS * MCF) (kg CH₄/year)`
 
-| Variable | Description                | Source in the Package |
-|----------|----------------------------|-----------------------|
-| VS       | Volatile solids excreted   | Calculated            |
-| B0       | Maximum methane potential  | `coefficients.csv`    |
-| AWMS     | Fraction of manure managed | `ch4_mm.csv`          |
-| MCF      | Methane conversion factor  | `mcf.csv`             |
-| 0.67     | Conversion m³ CH₄ → kg CH₄ | Constant              |
+| Variable | Description                  | Source in the Package |
+|----------|------------------------------|-----------------------|
+| VS       | Volatile solids excreted     | Calculated            |
+| B0       | Maximum methane potential    | `coefficients.csv`    |
+| AWMS     | Fraction of manure managed   | `ch4_mm.csv`          |
+| MCF      | Methane conversion factor    | `mcf.csv`             |
+| 0.67     | Conversion m³ CH₄ 192 kg CH₄ | Constant              |
 
 ------------------------------------------------------------------------
 

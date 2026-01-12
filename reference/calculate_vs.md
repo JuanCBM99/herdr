@@ -17,7 +17,7 @@ calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 
 - saveoutput:
 
-  Logical. If TRUE, saves the result as CSV. Default TRUE.
+  If TRUE (default) the results are saved in the output folder.
 
 ## Value
 

@@ -8,3 +8,9 @@ Digestible Energy (DE), NDF, and Ym factor.
 ``` r
 calculate_emissions_enteric(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

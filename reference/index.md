@@ -2,7 +2,7 @@
 
 ## All functions
 
-- [`calculate_CH4_manure()`](calculate_CH4_manure.md) : Calculate CH₄
+- [`calculate_CH4_manure()`](calculate_CH4_manure.md) : Calculate CH4
   Emissions from Manure Management (Refactored)
 - [`calculate_N2O_direct_manure()`](calculate_N2O_direct_manure.md) :
   Calculate direct N₂O emissions from manure (Refactored)
@@ -43,9 +43,28 @@
   for Animals (Refactored)
 - [`calculate_weighted_variable()`](calculate_weighted_variable.md) :
   Calculate Weighted Nutritional Variables (Refactored)
+- [`categories`](categories.md) : Datos de categorías
+- [`census`](census.md) : Datos del censo
+- [`ch4_mm`](ch4_mm.md) : Mediciones de CH4 (Metano)
+- [`characteristics`](characteristics.md) : Características del sistema
+- [`coefficients`](coefficients.md) : Coeficientes de cálculo
+- [`crops`](crops.md) : Datos de cultivos (crops)
+- [`diet`](diet.md) : Datos de dieta
 - [`download_templates()`](download_templates.md) : Download Template
   Files from GitHub
+- [`emission_factors_direct`](emission_factors_direct.md) : Factores de
+  emisión directa
+- [`emission_factors_indirect`](emission_factors_indirect.md) : Factores
+  de emisión indirecta
+- [`fractions`](fractions.md) : Fracciones de conversión
 - [`generate_impact_assessment()`](generate_impact_assessment.md) :
   Summarize CH₄, N₂O Emissions, and Land Use
+- [`ingredients`](ingredients.md) : Ingredientes
 - [`load_dataset()`](load_dataset.md) : Load dataset from user_data or
   package default
+- [`mcf`](mcf.md) : Factores de Conversión de Metano (MCF)
+- [`n2o_direct`](n2o_direct.md) : Emisiones de N2O directas
+- [`n2o_indirect`](n2o_indirect.md) : Emisiones de N2O indirectas
+- [`rate_parameters`](rate_parameters.md) : Parámetros de tasa (Rate
+  parameters)
+- [`weights`](weights.md) : Pesos (Weights)

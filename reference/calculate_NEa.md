@@ -8,3 +8,9 @@ simplified direct lookup based on the assigned Ca tag.
 ``` r
 calculate_NEa(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

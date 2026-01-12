@@ -9,3 +9,9 @@ adjusting for feed digestibility (DE) and conversion ratios (REM, REG).
 ``` r
 calculate_ge(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

@@ -40,8 +40,7 @@ generate_impact_assessment(
 
 - saveoutput:
 
-  Logical. If \`TRUE\`, saves the result to
-  \`"output/generate_impact_assessment.csv"\`. Default \`TRUE\`.
+  If TRUE (default) the results are saved in the output folder.
 
 - group_by_identification:
 

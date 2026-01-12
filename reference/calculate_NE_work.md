@@ -8,3 +8,9 @@ in the dataset (assigns 0 to non-working animals).
 ``` r
 calculate_NE_work(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

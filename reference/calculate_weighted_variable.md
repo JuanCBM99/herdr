@@ -8,3 +8,9 @@ by mapping ingredients to diets, and diets to animals.
 ``` r
 calculate_weighted_variable(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

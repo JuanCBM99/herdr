@@ -8,3 +8,9 @@ nitrogen (IPCC Eq 10.26 and 10.28).
 ``` r
 calculate_N2O_indirect_volatilization(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

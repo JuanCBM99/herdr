@@ -1,6 +1,6 @@
-# Calculate CH₄ Emissions from Manure Management (Refactored)
+# Calculate CH4 Emissions from Manure Management (Refactored)
 
-Computes CH₄ emissions from manure based on Volatile Solids (VS),
+Computes CH4 emissions from manure based on Volatile Solids (VS),
 population, and management factors (B0, MCF, AWMS). (IPCC Eq 10.23).
 
 ## Usage
@@ -8,3 +8,9 @@ population, and management factors (B0, MCF, AWMS). (IPCC Eq 10.23).
 ``` r
 calculate_CH4_manure(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

@@ -8,3 +8,9 @@ non-lactating animals instead of dropping them.
 ``` r
 calculate_NEl(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

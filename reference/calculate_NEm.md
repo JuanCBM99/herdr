@@ -8,3 +8,9 @@ weight and CFI coefficients using a relational join approach.
 ``` r
 calculate_NEm(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.
