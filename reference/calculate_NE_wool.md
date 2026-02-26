@@ -1,16 +1,9 @@
-# Calculate Net Energy for Wool Production (NE_wool) (Refactored)
+# Calculate Net Energy for Wool (NE_wool)
 
-Computes NE_wool based on wool yield. Assigns 0 energy for non-wool
-producing animals instead of dropping them.
+Calculate Net Energy for Wool (NE_wool)
 
 ## Usage
 
 ``` r
 calculate_NE_wool(saveoutput = TRUE)
 ```
-
-## Arguments
-
-- saveoutput:
-
-  If TRUE (default) the results are saved in the output folder.

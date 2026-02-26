@@ -1,16 +1,9 @@
-# Calculate Net Energy for Activity (NEa) (Refactored)
+# Calculate Net Energy for Activity (NEa)
 
-Computes NEa based on NEm and activity coefficients (Ca). Uses a
-simplified direct lookup based on the assigned Ca tag.
+Calculate Net Energy for Activity (NEa)
 
 ## Usage
 
 ``` r
 calculate_NEa(saveoutput = TRUE)
 ```
-
-## Arguments
-
-- saveoutput:
-
-  If TRUE (default) the results are saved in the output folder.

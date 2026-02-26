@@ -1,17 +1,17 @@
-# Summarize CH₄, N₂O Emissions, and Land Use
+# Summarize CH4, N2O Emissions, and Land Use
 
-Calculates a summary of CH₄ and N₂O emissions (direct and indirect) and
-land use, grouped by code, animal type, subtype, and zone. Optionally
-allows for aggregation to a more general level.
+Summarize CH4, N2O Emissions, and Land Use
 
 ## Usage
 
 ``` r
 generate_impact_assessment(
-  group = NULL,
-  zone = NULL,
+  automatic_cycle = FALSE,
+  region = NULL,
+  subregion = NULL,
   animal = NULL,
   type = NULL,
+  class_flex = NULL,
   saveoutput = TRUE,
   group_by_identification = TRUE
 )
@@ -19,34 +19,35 @@ generate_impact_assessment(
 
 ## Arguments
 
-- group:
+- automatic_cycle:
 
-  Character/Numeric vector (optional). Groups to filter. Default
-  \`NULL\`.
+  Logical. TRUE for built-in model, FALSE for manual
+  livestock_census.csv.
 
-- zone:
+- region:
 
-  Character vector (optional). Zones to filter. Default \`NULL\`.
+  Character/Numeric vector to filter.
+
+- subregion:
+
+  Character vector to filter.
 
 - animal:
 
-  Character string (optional). Livestock type (\`animal_type\`). Default
-  \`NULL\`.
+  Livestock type (animal_type).
 
 - type:
 
-  Character string (optional). Livestock subtype (\`animal_subtype\`).
-  Default \`NULL\`.
+  Livestock subtype (animal_subtype).
+
+- class_flex:
+
+  Management class (e.g., 'grazing', 'stall').
 
 - saveoutput:
 
-  If TRUE (default) the results are saved in the output folder.
+  If TRUE saves to output folder.
 
 - group_by_identification:
 
-  Logical. If \`TRUE\`, returns results at the \`identification\` level.
-  If \`FALSE\`, aggregates all \`identification\`s.
-
-## Value
-
-A \`tibble\` with columns for each emission type and land use.
+  If TRUE returns by animal_tag.

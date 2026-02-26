@@ -1,16 +1,20 @@
-# Calculate total animal population (Refactored)
+# Calculate Total Animal Population
 
-Orchestrates the population calculation by loading census data and
-dispatching sub-calculations for each animal type (cattle, sheep, goat).
+Orchestrates the population calculation. Choose between manual census or
+automatic farm cycle models based on mature animal counts.
 
 ## Usage
 
 ``` r
-calculate_population(saveoutput = TRUE)
+calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 ```
 
 ## Arguments
 
+- automatic_cycle:
+
+  Logical. If TRUE, uses species-specific birth models.
+
 - saveoutput:
 
-  If TRUE (default) the results are saved in the output folder.
+  If TRUE, saves results to the output folder.

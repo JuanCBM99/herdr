@@ -2,8 +2,9 @@
 
 ### All vignettes
 
-- [Data Dictionary: Internal CSV Files](Data_dictionary.md):
-- [Package Function Reference](Functions.md):
+- [Dairy Cattle Environmental Impact](dairy_cattle_assessment.md):
 - [Introduction to herdr](Introduction.md):
+- [Manure System Guide 💩](Manure.md):
+- [Technical Reference: Files & Parameters](Technical_reference.md):
 - [Theoretical Basis: IPCC Tier 2 Methodology](Theoretical_basis.md):
-- [Workflow Guide: Step-by-Step](Workflow.md):
+- [General Workflow: Step-by-Step Guide](Workflow.md):

@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Theoretical Basis: IPCC Tier 2 Methodology • herdr: GHG &amp; LU Calculator 🌎📊</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -30,16 +35,17 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
-    <li><a class="dropdown-item" href="../articles/Data_dictionary.html">Data dictionary</a></li>
-    <li><a class="dropdown-item" href="../articles/Functions.html">Package Function Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Reference: Files &amp; Parameters</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
     <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../articles/dairy_cattle_assessment.html"><span class="fa fa-tools"></span> Practical Cases</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
@@ -71,234 +77,316 @@
     
     
 <div class="section level2">
-<h2 id="i--net-energy-for-maintenance-nem">I. Net Energy for Maintenance (NEm)<a class="anchor" aria-label="anchor" href="#i--net-energy-for-maintenance-nem"></a>
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p><strong>Net Energy for Maintenance (NEm)</strong> is the energy
-required to maintain the animal’s energy balance.</p>
-<p><strong>Formula:</strong><br><code>NEm = Cfi * Weight^0.75  (MJ/day)</code></p>
-<table class="table">
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>NEm</td>
-<td>Net energy for maintenance (MJ/day)</td>
-<td>Calculated</td>
-</tr>
-<tr class="even">
-<td>Cfi</td>
-<td>Maintenance coefficient (MJ/day/kg)</td>
-<td><code>coefficients.csv</code></td>
-</tr>
-<tr class="odd">
-<td>Weight</td>
-<td>Live weight of the animal (kg)</td>
-<td><code>weights.csv</code></td>
-</tr>
-</tbody>
-</table>
+<p>The <strong>herdr</strong> package performs environmental impact
+assessments based on the <strong>2019 Refinement to the 2006 IPCC
+Guidelines</strong>. The core of the model is the <strong>Energy
+Balance</strong>, where Gross Energy (GE) intake is derived from the
+animal’s physiological requirements.</p>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="ii--net-energy-for-activity-nea">II. Net Energy for Activity (NEa)<a class="anchor" aria-label="anchor" href="#ii--net-energy-for-activity-nea"></a>
+<h2 id="i--net-energy-for-maintenance-ne_m-eq--10-3">I. Net Energy for Maintenance
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math>)
+(Eq. 10.3)<a class="anchor" aria-label="anchor" href="#i--net-energy-for-maintenance-ne_m-eq--10-3"></a>
 </h2>
-<p><strong>Net Energy for Activity (NEa)</strong> represents energy used
-for grazing, walking, or other animal activities.</p>
-<ul>
-<li><strong>Cattle and Buffalo</strong></li>
-</ul>
-<p><code>NEa = Ca * NEm  (MJ/day)</code></p>
-<ul>
-<li><strong>Sheep and Goats</strong></li>
-</ul>
-<p><code>NEa = Ca * Weight  (MJ/day)</code></p>
-<table class="table">
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>NEa</td>
-<td>Net energy for activity (MJ/day)</td>
-<td>Calculated</td>
-</tr>
-<tr class="even">
-<td>Ca</td>
-<td>Activity coefficient</td>
-<td><code>coefficients.csv</code></td>
-</tr>
-<tr class="odd">
-<td>NEm / Weight</td>
-<td>Base energy or body weight</td>
-<td><code>weights.csv</code></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="iii--net-energy-for-growth-neg">III. Net Energy for Growth (NEg)<a class="anchor" aria-label="anchor" href="#iii--net-energy-for-growth-neg"></a>
-</h2>
-<p><strong>Net Energy for Growth (NEg)</strong> is energy for tissue
-deposition.</p>
-<ul>
-<li><strong>Cattle and Buffalo</strong></li>
-</ul>
-<p><code>NEg = BW^0.75 * (1.097 / 22.02) * (WG / (C * MW))^2  (MJ/day)</code></p>
-<ul>
-<li><strong>Sheep and Goats</strong></li>
-</ul>
-<p><code>NEg = (WGlamb / 365) * (a + b * ((BWi + BWf)/2))  (MJ/day)</code></p>
-<table class="table">
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td>NEg</td>
-<td>Net energy for growth</td>
-<td>Calculated</td>
-</tr>
-<tr class="even">
-<td>BW / BWi/BWf</td>
-<td>Body weight</td>
-<td><code>weights.csv</code></td>
-</tr>
-<tr class="odd">
-<td>WG / WGlamb</td>
-<td>Weight gain</td>
-<td><code>weights.csv</code></td>
-</tr>
-<tr class="even">
-<td>C, a, b</td>
-<td>Species/sex constants</td>
-<td><code>coefficients.csv</code></td>
-</tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="iv--net-energy-for-lactation-nel">IV. Net Energy for Lactation (NEl)<a class="anchor" aria-label="anchor" href="#iv--net-energy-for-lactation-nel"></a>
-</h2>
-<p>Energy required for milk production:</p>
-<ul>
-<li><strong>Cattle and Buffalo</strong></li>
-</ul>
-<p><code>NEl = Milk * (1.47 + 0.40 * Fat)  (MJ/day)</code></p>
-<ul>
-<li><strong>Sheep and Goats</strong></li>
-</ul>
-<p><code>NEl = Milk * EV_milk  (MJ/day)</code></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math>
+is the energy required to maintain the animal’s energy balance without
+gain or loss of weight.</p>
+<p><strong>Formula:</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub><mo>=</mo><mi>C</mi><msub><mi>f</mi><mi>i</mi></msub><mo>⋅</mo><msup><mtext mathvariant="normal">Weight</mtext><mn>0.75</mn></msup></mrow><annotation encoding="application/x-tex">NE_m = Cf_i \cdot \text{Weight}^{0.75}</annotation></semantics></math></p>
 <table class="table">
 <colgroup>
-<col width="22%">
+<col width="23%">
 <col width="29%">
-<col width="47%">
+<col width="46%">
 </colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>NEl</td>
-<td>Net energy for lactation</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math></td>
+<td align="left">Net energy for maintenance (MJ/day)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>Milk</td>
-<td>Daily milk production (kg/day)</td>
-<td><code>categories.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>f</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Cf_i</annotation></semantics></math></td>
+<td align="left">Maintenance coefficient based on animal
+species/status</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
 </tr>
 <tr class="odd">
-<td>Fat / EV_milk</td>
-<td>Milk fat or energy value per kg milk</td>
-<td>
-<code>categories.csv</code> / <code>coefficients.csv</code>
-</td>
+<td align="left">Weight</td>
+<td align="left">Live weight of the individual animal (kg)</td>
+<td align="left"><code>weights.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="v--net-energy-for-work-and-wool-production">V. Net Energy for Work and Wool Production<a class="anchor" aria-label="anchor" href="#v--net-energy-for-work-and-wool-production"></a>
+<h2 id="ii--net-energy-for-activity-ne_a">II. Net Energy for Activity
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">NE_a</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#ii--net-energy-for-activity-ne_a"></a>
 </h2>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">NE_a</annotation></semantics></math>
+represents energy used for grazing, walking, or other activities.</p>
 <ul>
-<li><strong>Work (NEwork) for draft animals</strong></li>
+<li>
+<strong>Cattle:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub><mo>=</mo><msub><mi>C</mi><mi>a</mi></msub><mo>⋅</mo><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_a = C_a \cdot NE_m</annotation></semantics></math>
+(Eq. 10.4)</li>
+<li>
+<strong>Sheep and Goats:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub><mo>=</mo><msub><mi>C</mi><mi>a</mi></msub><mo>⋅</mo><mtext mathvariant="normal">Weight</mtext></mrow><annotation encoding="application/x-tex">NE_a = C_a \cdot \text{Weight}</annotation></semantics></math>
+(Eq. 10.5)</li>
 </ul>
-<p><code>NEwork = 0.10 * NEm * Hours (MJ/day)</code></p>
-<ul>
-<li><strong>Wool (NEwool) for sheep/goats</strong></li>
-</ul>
-<p><code>NEwool = Pr_wool * EV_wool / 365  (MJ/day)</code></p>
 <table class="table">
 <colgroup>
-<col width="22%">
+<col width="23%">
 <col width="29%">
-<col width="47%">
+<col width="46%">
 </colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>NEwork / NEwool</td>
-<td>Energy for work or wool</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub></mrow><annotation encoding="application/x-tex">NE_a</annotation></semantics></math></td>
+<td align="left">Net energy for activity (MJ/day)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>Hours / Pr_wool</td>
-<td>Work hours per day or annual wool production</td>
-<td><code>categories.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math></td>
+<td align="left">Activity coefficient (varies by feeding situation)</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
 </tr>
 <tr class="odd">
-<td>EV_wool</td>
-<td>Energy per kg of wool</td>
-<td><code>coefficients.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math></td>
+<td align="left">Maintenance energy</td>
+<td align="left">Result of Eq. 10.3</td>
+</tr>
+<tr class="even">
+<td align="left">Weight</td>
+<td align="left">Live weight of the animal (kg)</td>
+<td align="left"><code>weights.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="vi--net-energy-for-pregnancy-nep">VI. Net Energy for Pregnancy (NEp)<a class="anchor" aria-label="anchor" href="#vi--net-energy-for-pregnancy-nep"></a>
+<h2 id="iii--net-energy-for-growth-ne_g">III. Net Energy for Growth
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">NE_g</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#iii--net-energy-for-growth-ne_g"></a>
 </h2>
-<p>Energy required for gestation:</p>
-<p><code>NEp = C_pregnancy * NEm  (MJ/day)</code></p>
+<p>Energy required for tissue deposition (weight gain).</p>
+<ul>
+<li><p><strong>Cattle and Buffalo:</strong> (Eq. 10.6)
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>=</mo><mn>22.02</mn><mo>⋅</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>B</mi><mi>W</mi></mrow><mrow><mi>C</mi><mo>⋅</mo><mi>M</mi><mi>W</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>0.75</mn></msup><mo>⋅</mo><mi>W</mi><msup><mi>G</mi><mn>1.097</mn></msup></mrow><annotation encoding="application/x-tex">NE_{g} = 22.02 \cdot \left( \frac{BW}{C \cdot MW} \right)^{0.75} \cdot WG^{1.097}</annotation></semantics></math></p></li>
+<li><p><strong>Sheep and Goats:</strong> (Eq. 10.7)
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>=</mo><mfrac><mrow><mi>W</mi><msub><mi>G</mi><mrow><mi>l</mi><mi>a</mi><mi>m</mi><mi>b</mi><mi>/</mi><mi>k</mi><mi>i</mi><mi>d</mi></mrow></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>a</mi><mo>+</mo><mn>0.5</mn><mi>b</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mi>i</mi></msub><mo>+</mo><mi>B</mi><msub><mi>W</mi><mi>f</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{365}</annotation></semantics></math></p></li>
+</ul>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>NEp</td>
-<td>Energy for pregnancy</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">BW</annotation></semantics></math></td>
+<td align="left">Average live body weight of the animal (kg)</td>
+<td align="left"><code>weights.csv</code></td>
 </tr>
 <tr class="even">
-<td>C_pregnancy</td>
-<td>Pregnancy coefficient</td>
-<td><code>coefficients.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>W</mi></mrow><annotation encoding="application/x-tex">MW</annotation></semantics></math></td>
+<td align="left">Mature body weight of an adult female (kg)</td>
+<td align="left"><code>weights.csv</code></td>
 </tr>
 <tr class="odd">
-<td>NEm</td>
-<td>Maintenance energy</td>
-<td>Result of <code><a href="../reference/calculate_NEm.html">calculate_NEm()</a></code>
-</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">WG</annotation></semantics></math></td>
+<td align="left">Daily weight gain (kg/day)</td>
+<td align="left"><code>weights.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mo>,</mo><mi>a</mi><mo>,</mo><mi>b</mi></mrow><annotation encoding="application/x-tex">C, a, b</annotation></semantics></math></td>
+<td align="left">IPCC species-specific growth constants</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><msub><mi>W</mi><mi>i</mi></msub><mi>/</mi><mi>B</mi><msub><mi>W</mi><mi>f</mi></msub></mrow><annotation encoding="application/x-tex">BW_i / BW_f</annotation></semantics></math></td>
+<td align="left">Initial and final weight for the period (kg)</td>
+<td align="left"><code>weights.csv</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="iv--net-energy-for-lactation-ne_l">IV. Net Energy for Lactation
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">NE_l</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#iv--net-energy-for-lactation-ne_l"></a>
+</h2>
+<p>Energy required for milk production based on volume and fat
+content.</p>
+<ul>
+<li>
+<strong>Cattle:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>l</mi></msub><mo>=</mo><mtext mathvariant="normal">Milk</mtext><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1.47</mn><mo>+</mo><mn>0.40</mn><mo>⋅</mo><mtext mathvariant="normal">Fat</mtext><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">NE_l = \text{Milk} \cdot (1.47 + 0.40 \cdot \text{Fat})</annotation></semantics></math>
+(Eq. 10.8)</li>
+<li>
+<strong>Sheep and Goats:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>l</mi></msub><mo>=</mo><mtext mathvariant="normal">Milk</mtext><mo>⋅</mo><mi>E</mi><msub><mi>V</mi><mrow><mi>m</mi><mi>i</mi><mi>l</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">NE_l = \text{Milk} \cdot EV_{milk}</annotation></semantics></math>
+(Eq. 10.9)</li>
+</ul>
+<table class="table">
+<colgroup>
+<col width="23%">
+<col width="29%">
+<col width="46%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>l</mi></msub></mrow><annotation encoding="application/x-tex">NE_l</annotation></semantics></math></td>
+<td align="left">Net energy for lactation (MJ/day)</td>
+<td align="left">Calculated</td>
+</tr>
+<tr class="even">
+<td align="left">Milk</td>
+<td align="left">Average daily milk yield (kg/day)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left">Fat</td>
+<td align="left">Milk fat content percentage (%)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>V</mi><mrow><mi>m</mi><mi>i</mi><mi>l</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EV_{milk}</annotation></semantics></math></td>
+<td align="left">Energy required to produce 1 kg of milk (MJ/kg)</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="v--net-energy-for-work-wool-and-pregnancy">V. Net Energy for Work, Wool, and Pregnancy<a class="anchor" aria-label="anchor" href="#v--net-energy-for-work-wool-and-pregnancy"></a>
+</h2>
+<ul>
+<li>
+<strong>Work
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>r</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">NE_{work}</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>r</mi><mi>k</mi></mrow></msub><mo>=</mo><mn>0.10</mn><mo>⋅</mo><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub><mo>⋅</mo><mtext mathvariant="normal">Hours</mtext></mrow><annotation encoding="application/x-tex">NE_{work} = 0.10 \cdot NE_m \cdot \text{Hours}</annotation></semantics></math>
+</li>
+<li>
+<strong>Wool
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">NE_{wool}</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Pr</mtext><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub><mo>⋅</mo><mi>E</mi><msub><mi>V</mi><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">NE_{wool} = \frac{\text{Pr}_{wool} \cdot EV_{wool}}{365}</annotation></semantics></math>
+</li>
+<li>
+<strong>Pregnancy
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">NE_p</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub><mo>=</mo><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><mo>⋅</mo><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_p = C_{pregnancy} \cdot NE_m</annotation></semantics></math>
+</li>
+</ul>
+<table class="table">
+<colgroup>
+<col width="23%">
+<col width="29%">
+<col width="46%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">Hours</td>
+<td align="left">Number of hours worked per day (draft animals)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Pr</mtext><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub><annotation encoding="application/x-tex">\text{Pr}_{wool}</annotation></semantics></math></td>
+<td align="left">Annual wool production (kg/year)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>V</mi><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EV_{wool}</annotation></semantics></math></td>
+<td align="left">Energy per kg of wool (IPCC default 24 MJ/kg)</td>
+<td align="left">Constant</td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><annotation encoding="application/x-tex">C_{pregnancy}</annotation></semantics></math></td>
+<td align="left">Pregnancy energy coefficient</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="vi--efficiency-ratios-rem-and-reg">VI. Efficiency Ratios
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">REM</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">REG</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#vi--efficiency-ratios-rem-and-reg"></a>
+</h2>
+<p>Based on IPCC Equations 10.14 and 10.15, derived from feed
+digestibility
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">DE</annotation></semantics></math>):</p>
+<ul>
+<li>
+<strong>For Maintenance
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">REM</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>M</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>1.123</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>4.092</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup><mo>⋅</mo><mi>D</mi><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1.126</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><mo>⋅</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>D</mi><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>25.4</mn><mrow><mi>D</mi><mi>E</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">REM = \left[ 1.123 - (4.092 \cdot 10^{-3} \cdot DE) + (1.126 \cdot 10^{-5} \cdot (DE)^2) - \left( \frac{25.4}{DE} \right) \right]</annotation></semantics></math>
+</li>
+<li>
+<strong>For Growth
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">REG</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>G</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>1.164</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>5.16</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>3</mn></mrow></msup><mo>⋅</mo><mi>D</mi><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1.308</mn><mo>⋅</mo><msup><mn>10</mn><mrow><mo>−</mo><mn>5</mn></mrow></msup><mo>⋅</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mi>D</mi><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mn>2</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>37.4</mn><mrow><mi>D</mi><mi>E</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">REG = \left[ 1.164 - (5.16 \cdot 10^{-3} \cdot DE) + (1.308 \cdot 10^{-5} \cdot (DE)^2) - \left( \frac{37.4}{DE} \right) \right]</annotation></semantics></math>
+</li>
+</ul>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">REM</annotation></semantics></math></td>
+<td align="left">Efficiency of digestible energy for maintenance</td>
+<td align="left">Calculated</td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">REG</annotation></semantics></math></td>
+<td align="left">Efficiency of digestible energy for growth</td>
+<td align="left">Calculated</td>
+</tr>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">DE</annotation></semantics></math></td>
+<td align="left">Digestibility of feed as % of gross energy</td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 </tbody>
 </table>
@@ -307,242 +395,360 @@ deposition.</p>
 <div class="section level2">
 <h2 id="vii--gross-energy-ge">VII. Gross Energy (GE)<a class="anchor" aria-label="anchor" href="#vii--gross-energy-ge"></a>
 </h2>
-<p>Gross Energy (GE) is the total daily energy intake required to cover
-all Net Energy needs:</p>
-<p><code>GE = [(NE_m + NE_a + NE_l + NEwork + NEp)/R_EM + (NEg + NEwool)/R_EG] / DE  (MJ/day)</code></p>
+<p><strong>Gross Energy (GE)</strong> is the total daily energy intake
+required to sustain all physiological functions.</p>
+<p><strong>Formula:</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mo>=</mo><mfrac><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub><mo>+</mo><mi>N</mi><msub><mi>E</mi><mi>a</mi></msub><mo>+</mo><mi>N</mi><msub><mi>E</mi><mi>l</mi></msub><mo>+</mo><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>r</mi><mi>k</mi></mrow></msub><mo>+</mo><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub></mrow><mrow><mi>R</mi><mi>E</mi><mi>M</mi></mrow></mfrac><mo>+</mo><mfrac><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>+</mo><mi>N</mi><msub><mi>E</mi><mrow><mi>w</mi><mi>o</mi><mi>o</mi><mi>l</mi></mrow></msub></mrow><mrow><mi>R</mi><mi>E</mi><mi>G</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mrow><mi>D</mi><mi>E</mi><mi>/</mi><mn>100</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">GE = \frac{\left( \frac{NE_m + NE_a + NE_l + NE_{work} + NE_p}{REM} + \frac{NE_g + NE_{wool}}{REG} \right)}{DE/100}</annotation></semantics></math></p>
 <table class="table">
+<colgroup>
+<col width="23%">
+<col width="29%">
+<col width="46%">
+</colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in the Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>GE</td>
-<td>Gross energy intake</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">GE</annotation></semantics></math></td>
+<td align="left">Total daily gross energy requirement (MJ/day)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>NE_*</td>
-<td>All Net Energy components</td>
-<td>Results of calculations</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">NE_x</annotation></semantics></math></td>
+<td align="left">Various net energy requirements calculated above</td>
+<td align="left">Calculated Results</td>
 </tr>
 <tr class="odd">
-<td>R_EM / R_EG</td>
-<td>NE to DE conversion ratios</td>
-<td><code>coefficients.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>E</mi><mi>M</mi><mi>/</mi><mi>R</mi><mi>E</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">REM/REG</annotation></semantics></math></td>
+<td align="left">Efficiency ratios</td>
+<td align="left">Results of Eq. 10.14/10.15</td>
 </tr>
 <tr class="even">
-<td>DE</td>
-<td>Digestibility of feed</td>
-<td><code>characteristics.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">DE</annotation></semantics></math></td>
+<td align="left">Feed digestibility (%)</td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="viii--methane-module-enteric-emissions-ch₄">VIII. Methane Module: Enteric Emissions (CH₄)<a class="anchor" aria-label="anchor" href="#viii--methane-module-enteric-emissions-ch%E2%82%84"></a>
+<h2 id="viii--methane-module-enteric-fermentation-ch_4">VIII. Methane Module: Enteric Fermentation
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#viii--methane-module-enteric-fermentation-ch_4"></a>
 </h2>
-<p><strong>Tier 1 Structure with Tier 2 EF calculation</strong>: methane
-emissions depend on population and <strong>diet-specific emission
-factor</strong>:</p>
-<p><code>E_CH4 = Σ (N_animals * EF)  (Gg CH₄/year)</code></p>
-<p><code>EF = (GE * Ym / 100 * 365) / 55.65  (kg CH₄/head/year)</code></p>
+<div class="section level4">
+<h4 id="methane-emission-factor-ef-eq--10-21">Methane Emission Factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">EF</annotation></semantics></math>)
+(Eq. 10.21)<a class="anchor" aria-label="anchor" href="#methane-emission-factor-ef-eq--10-21"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi><mo>=</mo><mfrac><mrow><mi>G</mi><mi>E</mi><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><msub><mi>Y</mi><mi>m</mi></msub><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mn>365</mn></mrow><mn>55.65</mn></mfrac></mrow><annotation encoding="application/x-tex">EF = \frac{GE \cdot \left( \frac{Y_m}{100} \right) \cdot 365}{55.65}</annotation></semantics></math></p>
 <table class="table">
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>EF</td>
-<td>Methane emission factor</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">EF</annotation></semantics></math></td>
+<td align="left">Methane emission factor (kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>/head/year)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>GE</td>
-<td>Gross energy intake</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">GE</annotation></semantics></math></td>
+<td align="left">Daily gross energy intake (MJ/day)</td>
+<td align="left">Result of Section VII</td>
 </tr>
 <tr class="odd">
-<td>Ym</td>
-<td>Methane conversion factor</td>
-<td><code>characteristics.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math></td>
+<td align="left">Methane conversion factor (%)</td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 <tr class="even">
-<td>55.65</td>
-<td>Energy content of methane</td>
-<td>Constant</td>
+<td align="left">55.65</td>
+<td align="left">Energy content of methane (MJ/kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>)</td>
+<td align="left">Constant</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="total-enteric-emissions-e_t-eq--10-19">Total Enteric Emissions
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>T</mi></msub><annotation encoding="application/x-tex">E_T</annotation></semantics></math>)
+(Eq. 10.19)<a class="anchor" aria-label="anchor" href="#total-enteric-emissions-e_t-eq--10-19"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>E</mi><mi>T</mi></msub><mo>=</mo><munder><mo>∑</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow></munder><mi>E</mi><msub><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><msub><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><msup><mn>10</mn><mn>6</mn></msup></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)</annotation></semantics></math></p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>E</mi><mi>T</mi></msub><annotation encoding="application/x-tex">E_T</annotation></semantics></math></td>
+<td align="left">Total emissions from category
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+(Gg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>/year)</td>
+<td align="left">Calculated</td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><annotation encoding="application/x-tex">N_{(T,P)}</annotation></semantics></math></td>
+<td align="left">Number of animals in category
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>T</mi><annotation encoding="application/x-tex">T</annotation></semantics></math>
+</td>
+<td align="left"><code>livestock_census.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
+</div>
 <div class="section level2">
-<h2 id="ix--methane-module-manure-management-ch₄-mm">IX. Methane Module: Manure Management (CH₄-MM)<a class="anchor" aria-label="anchor" href="#ix--methane-module-manure-management-ch%E2%82%84-mm"></a>
+<h2 id="ix--methane-module-manure-management-ch_4mm">IX. Methane Module: Manure Management
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mrow><mn>4</mn><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub></mrow><annotation encoding="application/x-tex">CH_{4(mm)}</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#ix--methane-module-manure-management-ch_4mm"></a>
 </h2>
-<p><strong>Volatile Solids (VS)</strong> excretion:</p>
-<p><code>VS = (GE / 18.45) * [(1 - DE/100) + (UE * GE / GE)] * (1 - ASH)  (kg/day)</code></p>
-<p><strong>Manure CH₄ Emission Factor:</strong></p>
-<p><code>EF_CH4_manure = (VS * B0 * 365 / 100) * 0.67 * Σ(AWMS * MCF)  (kg CH₄/year)</code></p>
+<div class="section level4">
+<h4 id="volatile-solid-excretion-rates-vs-eq--10-24">Volatile Solid Excretion Rates
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">VS</annotation></semantics></math>)
+(Eq. 10.24)<a class="anchor" aria-label="anchor" href="#volatile-solid-excretion-rates-vs-eq--10-24"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>S</mi><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mi>G</mi><mi>E</mi><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mfrac><mrow><mi>D</mi><mi>E</mi></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>U</mi><mi>E</mi><mo>⋅</mo><mi>G</mi><mi>E</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">]</mo></mrow><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><mn>1</mn><mo>−</mo><mi>A</mi><mi>S</mi><mi>H</mi></mrow><mn>18.45</mn></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">VS = \left[ GE \cdot \left( 1 - \frac{DE}{100} \right) + (UE \cdot GE) \right] \cdot \left[ \frac{1 - ASH}{18.45} \right]</annotation></semantics></math></p>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>VS</td>
-<td>Volatile solids excreted</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">VS</annotation></semantics></math></td>
+<td align="left">Daily volatile solid excretion (kg VS/day)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>B0</td>
-<td>Maximum methane potential</td>
-<td><code>coefficients.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>U</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">UE</annotation></semantics></math></td>
+<td align="left">Urinary energy excretion fraction (default 0.04)</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
 </tr>
 <tr class="odd">
-<td>AWMS</td>
-<td>Fraction of manure managed</td>
-<td><code>ch4_mm.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>S</mi><mi>H</mi></mrow><annotation encoding="application/x-tex">ASH</annotation></semantics></math></td>
+<td align="left">Ash content of the feed (fraction)</td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 <tr class="even">
-<td>MCF</td>
-<td>Methane conversion factor</td>
-<td><code>mcf.csv</code></td>
+<td align="left">18.45</td>
+<td align="left">Energy content of dietary dry matter (MJ/kg)</td>
+<td align="left">Constant</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="manure-emission-factor-ef-eq--10-23">Manure Emission Factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">EF</annotation></semantics></math>)
+(Eq. 10.23)<a class="anchor" aria-label="anchor" href="#manure-emission-factor-ef-eq--10-23"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>V</mi><msub><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><mo>⋅</mo><mn>365</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">[</mo><msub><mi>B</mi><mrow><mn>0</mn><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>⋅</mo><mn>0.67</mn><mo>⋅</mo><munder><mo>∑</mo><mrow><mi>S</mi><mo>,</mo><mi>k</mi></mrow></munder><mfrac><mrow><mi>M</mi><mi>C</mi><msub><mi>F</mi><mrow><mi>S</mi><mo>,</mo><mi>k</mi></mrow></msub></mrow><mn>100</mn></mfrac><mo>⋅</mo><mi>A</mi><mi>W</mi><mi>M</mi><msub><mi>S</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>S</mi><mo>,</mo><mi>k</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">EF_{(T)} = (VS_{(T)} \cdot 365) \cdot \left[ B_{0(T)} \cdot 0.67 \cdot \sum_{S,k} \frac{MCF_{S,k}}{100} \cdot AWMS_{(T,S,k)} \right]</annotation></semantics></math></p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mrow><mn>0</mn><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><annotation encoding="application/x-tex">B_{0(T)}</annotation></semantics></math></td>
+<td align="left">Maximum methane producing capacity
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mi>/</mi><mi>k</mi><mi>g</mi><mi>V</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">m^3/kg VS</annotation></semantics></math>)</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>C</mi><msub><mi>F</mi><mrow><mi>S</mi><mo>,</mo><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">MCF_{S,k}</annotation></semantics></math></td>
+<td align="left">Methane conversion factor for system
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+(%)</td>
+<td align="left"><code>ipcc_mm.csv</code></td>
 </tr>
 <tr class="odd">
-<td>0.67</td>
-<td>Conversion m³ CH₄ 192 kg CH₄</td>
-<td>Constant</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>W</mi><mi>M</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">AWMS</annotation></semantics></math></td>
+<td align="left">Fraction of manure handled in system
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>S</mi><annotation encoding="application/x-tex">S</annotation></semantics></math>
+</td>
+<td align="left"><code>manure_management.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left">0.67</td>
+<td align="left">Conversion factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">m^3 CH_4</annotation></semantics></math>
+to kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>)</td>
+<td align="left">Constant</td>
 </tr>
 </tbody>
 </table>
 <hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="x--n₂o-module-nitrogen-based-emissions">X. N₂O Module: Nitrogen-Based Emissions<a class="anchor" aria-label="anchor" href="#x--n%E2%82%82o-module-nitrogen-based-emissions"></a>
 </h2>
 <div class="section level3">
-<h3 id="i--annual-nitrogen-excretion-nex">I. Annual Nitrogen Excretion (Nex)<a class="anchor" aria-label="anchor" href="#i--annual-nitrogen-excretion-nex"></a>
+<h3 id="i--nitrogen-balance-excretion">I. Nitrogen Balance &amp; Excretion<a class="anchor" aria-label="anchor" href="#i--nitrogen-balance-excretion"></a>
 </h3>
-<p><code>Nintake = GE / 18.45 * (6.25 / 100) * CP%  (kg N/day)</code></p>
-<p><strong>Nitrogen retention:</strong></p>
-<ul>
-<li><strong>Cattle/Buffalo:</strong></li>
-</ul>
-<p><code>Nretention = [(NEg + Milk * PR) * 7.03 / (1000 * 6.38)] - [Milk * PR * 6.25 / 100]  (g N/day)</code></p>
-<ul>
-<li><strong>Sheep/Goats:</strong></li>
-</ul>
-<p><code>Nretention_frac = 0.1 (fraction)</code><br><code>Nex = Nintake * (1 - Nretention_frac) * 365  (kg N/year)</code></p>
+<div class="section level4">
+<h4 id="nitrogen-intake-n_intake-eq--10-3110-32">1. Nitrogen Intake
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">N_{intake}</annotation></semantics></math>)
+(Eq. 10.31/10.32)<a class="anchor" aria-label="anchor" href="#nitrogen-intake-n_intake-eq--10-3110-32"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>G</mi><mi>E</mi></mrow><mn>18.45</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>C</mi><mi>P</mi><mi>/</mi><mn>100</mn></mrow><mn>6.25</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N_{intake} = \left( \frac{GE}{18.45} \right) \cdot \left( \frac{CP/100}{6.25} \right)</annotation></semantics></math></p>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>Nintake</td>
-<td>Nitrogen ingested per day</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">N_{intake}</annotation></semantics></math></td>
+<td align="left">Total nitrogen ingested (kg N/day)</td>
+<td align="left">Calculated</td>
 </tr>
 <tr class="even">
-<td>NEg</td>
-<td>Net energy for growth</td>
-<td><code><a href="../reference/calculate_NEg.html">calculate_NEg()</a></code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">CP</annotation></semantics></math></td>
+<td align="left">Crude Protein content of the diet (%)</td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 <tr class="odd">
-<td>Milk</td>
-<td>Daily milk yield</td>
-<td><code>categories.csv</code></td>
-</tr>
-<tr class="even">
-<td>PR</td>
-<td>Milk protein content</td>
-<td><code>categories.csv</code></td>
-</tr>
-<tr class="odd">
-<td>Nretention_frac</td>
-<td>Fraction of N retained</td>
-<td><code>coefficients.csv</code></td>
+<td align="left">6.25</td>
+<td align="left">Conversion factor from N to Protein</td>
+<td align="left">Constant</td>
 </tr>
 </tbody>
 </table>
-<hr>
 </div>
-<div class="section level3">
-<h3 id="ii--direct-n₂o-emissions">II. Direct N₂O Emissions<a class="anchor" aria-label="anchor" href="#ii--direct-n%E2%82%82o-emissions"></a>
-</h3>
-<p><code>N2O_direct = 44/28 * Σ [N_animals * Nex * AWMS * EF3]  (kg N2O/year)</code></p>
+<div class="section level4">
+<h4 id="nitrogen-retention-n_retention">2. Nitrogen Retention
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">N_{retention}</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#nitrogen-retention-n_retention"></a>
+</h4>
+<p>Reflects the logic used in the <code>herdr</code> codebase: *
+<strong>Cattle:</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>i</mi><mi>l</mi><msub><mi>k</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>t</mi><mi>e</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mn>1.9</mn><mo>+</mo><mn>0.4</mn><mo>⋅</mo><mi>F</mi><mi>a</mi><msub><mi>t</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Milk_{protein} = 1.9 + 0.4 \cdot Fat_{content}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><mi>M</mi><mi>i</mi><mi>l</mi><mi>k</mi><mo>⋅</mo><mi>M</mi><mi>i</mi><mi>l</mi><msub><mi>k</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>t</mi><mi>e</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><mn>6.38</mn></mfrac><mo stretchy="true" form="postfix">]</mo></mrow><mo>+</mo><mrow><mo stretchy="true" form="prefix">[</mo><mfrac><mrow><mi>W</mi><mi>G</mi><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>268</mn><mo>−</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>7.03</mn><mo>⋅</mo><mfrac><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub></mrow><mrow><mi>W</mi><mi>G</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mn>1000</mn></mrow><mn>6.25</mn></mfrac><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">N_{retention} = \left[ \frac{Milk \cdot Milk_{protein}}{6.38} \right] + \left[ \frac{WG \cdot (268 - (7.03 \cdot \frac{NE_g}{WG})) / 1000}{6.25} \right]</annotation></semantics></math></p>
 <table class="table">
 <colgroup>
-<col width="22%">
-<col width="29%">
-<col width="47%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>AWMS</td>
-<td>Fraction of N managed in system</td>
-<td><code>ch4_mm.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>a</mi><msub><mi>t</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Fat_{content}</annotation></semantics></math></td>
+<td align="left">Milk fat percentage (%)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
 </tr>
 <tr class="even">
-<td>EF3</td>
-<td>Direct N₂O emission factor</td>
-<td><code>emission_factors_direct.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>i</mi><mi>l</mi><mi>k</mi></mrow><annotation encoding="application/x-tex">Milk</annotation></semantics></math></td>
+<td align="left">Daily milk yield (kg/day)</td>
+<td align="left"><code>livestock_definitions.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">WG</annotation></semantics></math></td>
+<td align="left">Daily weight gain (kg/day)</td>
+<td align="left"><code>weights.csv</code></td>
+</tr>
+<tr class="even">
+<td align="left">6.38 / 6.25</td>
+<td align="left">Specific N-to-Protein conversion factors</td>
+<td align="left">Constants</td>
 </tr>
 </tbody>
 </table>
-<hr>
+</div>
+<div class="section level4">
+<h4 id="annual-excretion-n_excreted">3. Annual Excretion
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><annotation encoding="application/x-tex">N_{excreted}</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#annual-excretion-n_excreted"></a>
+</h4>
+<ul>
+<li>
+<strong>Sheep/Goats:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mn>1</mn><mo>−</mo><mn>0.1</mn><mo stretchy="true" form="postfix">)</mo></mrow><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mn>365</mn></mrow><annotation encoding="application/x-tex">N_{excreted} = (N_{intake} \cdot (1 - 0.1)) \cdot 365</annotation></semantics></math>
+</li>
+<li>
+<strong>Cattle:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><mo>−</mo><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mn>365</mn></mrow><annotation encoding="application/x-tex">N_{excreted} = (N_{intake} - N_{retention}) \cdot 365</annotation></semantics></math>
+</li>
+</ul>
+</div>
 </div>
 <div class="section level3">
-<h3 id="iii--indirect-n₂o-emissions">III. Indirect N₂O Emissions<a class="anchor" aria-label="anchor" href="#iii--indirect-n%E2%82%82o-emissions"></a>
+<h3 id="ii--direct-n_2o-emissions-eq--10-25">II. Direct
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+Emissions (Eq. 10.25)<a class="anchor" aria-label="anchor" href="#ii--direct-n_2o-emissions-eq--10-25"></a>
 </h3>
-<p><strong>Volatilization:</strong></p>
-<p><code>N_volatilization = Σ [ (N_animals * Nex + N_codigestate) * fraction_managed * frac_gas ]</code><br><code>N2O_volatilization = 44/28 * N_volatilization * EF4</code></p>
-<p><strong>Leaching / Runoff:</strong></p>
-<p><code>N_leaching = Σ [ (N_animals * Nex + N_codigestate) * fraction_managed * frac_leach ]</code><br><code>N2O_leaching = 44/28 * N_leaching * EF5</code></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><msub><mi>O</mi><mrow><mi>d</mi><mi>i</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>t</mi></mrow></msub><mo>=</mo><msub><mi>N</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>T</mi><mo>,</mo><mi>P</mi><mo stretchy="true" form="postfix">)</mo></mrow></msub><mo>⋅</mo><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>⋅</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mn>3</mn></msub><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>44</mn><mn>28</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">N_2O_{direct} = N_{(T,P)} \cdot N_{excreted} \cdot Allocation \cdot EF_3 \cdot \left( \frac{44}{28} \right)</annotation></semantics></math></p>
 <table class="table">
 <colgroup>
-<col width="22%">
-<col width="29%">
-<col width="47%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td>N_codigestate</td>
-<td>Nitrogen from co-digestates</td>
-<td>User input / CSV</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Allocation</annotation></semantics></math></td>
+<td align="left">Fraction of N managed in a specific system</td>
+<td align="left"><code>manure_management.csv</code></td>
 </tr>
 <tr class="even">
-<td>fraction_managed</td>
-<td>Fraction of N managed in system</td>
-<td><code>ch4_mm.csv</code></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">EF_3</annotation></semantics></math></td>
+<td align="left">Direct
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+emission factor for the system</td>
+<td align="left"><code>ipcc_mm.csv</code></td>
 </tr>
 <tr class="odd">
-<td>frac_gas / frac_leach</td>
-<td>Fraction lost as gas or leached</td>
-<td><code>fractions.csv</code></td>
-</tr>
-<tr class="even">
-<td>EF4 / EF5</td>
-<td>Emission factors for indirect N₂O</td>
-<td><code>emission_factors_indirect.csv</code></td>
+<td align="left">44/28</td>
+<td align="left">Stoichiometric ratio of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mn>2</mn></msub><annotation encoding="application/x-tex">N_2</annotation></semantics></math>
+</td>
+<td align="left">Constant</td>
 </tr>
 </tbody>
 </table>
@@ -550,184 +756,103 @@ factor</strong>:</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="xi--land-use-module">XI. Land Use Module<a class="anchor" aria-label="anchor" href="#xi--land-use-module"></a>
+<h2 id="xi--n₂o-module-indirect-emissions">XI. N₂O Module: Indirect Emissions<a class="anchor" aria-label="anchor" href="#xi--n%E2%82%82o-module-indirect-emissions"></a>
 </h2>
-<p>The <strong>Land Use Module</strong> calculates the agricultural land
-required to support each animal category based on their diet composition
-and crop yields. It provides <strong>land use per animal</strong> and
-<strong>total land use for the population</strong>.</p>
-<hr>
 <div class="section level3">
-<h3 id="i--data-inputs">I. Data Inputs<a class="anchor" aria-label="anchor" href="#i--data-inputs"></a>
+<h3 id="i--nitrogen-losses-from-manure">I. Nitrogen Losses from Manure<a class="anchor" aria-label="anchor" href="#i--nitrogen-losses-from-manure"></a>
 </h3>
-<p>The calculation requires the following datasets:</p>
+<div class="section level4">
+<h4 id="volatilization-n_volatilization-mms-eq--10-26">1. Volatilization
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>v</mi><mi>o</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>l</mi><mi>i</mi><mi>z</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><annotation encoding="application/x-tex">N_{volatilization-MMS}</annotation></semantics></math>)
+(Eq. 10.26)<a class="anchor" aria-label="anchor" href="#volatilization-n_volatilization-mms-eq--10-26"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>v</mi><mi>o</mi><mi>l</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>=</mo><mo>∑</mo><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>⋅</mo><mi>N</mi><mi>e</mi><mi>x</mi><mo>⋅</mo><mi>A</mi><mi>W</mi><mi>M</mi><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>G</mi><mi>a</mi><mi>s</mi><mi>M</mi><mi>S</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">N_{vol-MMS} = \sum \left[ (N \cdot Nex \cdot AWMS) \cdot Frac_{GasMS} \right]</annotation></semantics></math></p>
+</div>
+<div class="section level4">
+<h4 id="leaching-and-runoff-n_leaching-mms-eq--10-27">2. Leaching and Runoff
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>i</mi><mi>n</mi><mi>g</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><annotation encoding="application/x-tex">N_{leaching-MMS}</annotation></semantics></math>)
+(Eq. 10.27)<a class="anchor" aria-label="anchor" href="#leaching-and-runoff-n_leaching-mms-eq--10-27"></a>
+</h4>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>=</mo><mo>∑</mo><mrow><mo stretchy="true" form="prefix">[</mo><mrow><mo stretchy="true" form="prefix">(</mo><mi>N</mi><mo>⋅</mo><mi>N</mi><mi>e</mi><mi>x</mi><mo>⋅</mo><mi>A</mi><mi>W</mi><mi>M</mi><mi>S</mi><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>L</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>M</mi><mi>S</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">N_{leach-MMS} = \sum \left[ (N \cdot Nex \cdot AWMS) \cdot Frac_{LeachMS} \right]</annotation></semantics></math></p>
 <table class="table">
 <colgroup>
-<col width="20%">
-<col width="29%">
-<col width="50%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Dataset</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code>categories.csv</code></td>
-<td>Animal characteristics, including total dry matter intake
-(<code>dm_ingested_total</code>)</td>
-<td>categories.csv</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>G</mi><mi>a</mi><mi>s</mi><mi>M</mi><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Frac_{GasMS}</annotation></semantics></math></td>
+<td align="left">Fraction of N lost as volatilized gas
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>H</mi><mn>3</mn></msub><mo>+</mo><mi>N</mi><msub><mi>O</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">NH_3 + NO_x</annotation></semantics></math>)</td>
+<td align="left"><code>ipcc_mm.csv</code></td>
 </tr>
 <tr class="even">
-<td><code>ingredients.csv</code></td>
-<td>Different ingredients share that compose the defined diets</td>
-<td>diet.csv</td>
-</tr>
-<tr class="odd">
-<td><code>diet.csv</code></td>
-<td>Diet composition including feed, forage, milk, and milk replacer
-shares</td>
-<td>diet.csv</td>
-</tr>
-<tr class="even">
-<td><code>crops.csv</code></td>
-<td>Crop yield data (<code>dry_matter_yield</code> in kg/ha) from
-Spain</td>
-<td>crops.csv</td>
-</tr>
-<tr class="odd">
-<td>Population</td>
-<td>Number of animals per category</td>
-<td>Calculated via <code><a href="../reference/calculate_population.html">calculate_population()</a></code>
-</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>L</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>M</mi><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Frac_{LeachMS}</annotation></semantics></math></td>
+<td align="left">Fraction of N lost via leaching into water</td>
+<td align="left"><code>ipcc_mm.csv</code></td>
 </tr>
 </tbody>
 </table>
-<hr>
+</div>
 </div>
 <div class="section level3">
-<h3 id="ii--land-use-per-ingredient">II. Land Use per Ingredient<a class="anchor" aria-label="anchor" href="#ii--land-use-per-ingredient"></a>
+<h3 id="ii--indirect-n_2o-calculation-eq--10-2810-29">II. Indirect
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+Calculation (Eq. 10.28/10.29)<a class="anchor" aria-label="anchor" href="#ii--indirect-n_2o-calculation-eq--10-2810-29"></a>
 </h3>
-<p>For each ingredient in the diet, the <strong>weighted
-consumption</strong> is calculated:</p>
-<p><code>consumption_kg = dm_ingested_total * ingredient_share * share_weight / 10000 (kg)</code></p>
+<ul>
+<li>
+<strong>From Volatilization:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><msub><mi>O</mi><mrow><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>v</mi><mi>o</mi><mi>l</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mn>4</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mfrac><mn>44</mn><mn>28</mn></mfrac></mrow><annotation encoding="application/x-tex">N_2O_{G(mm)} = (N_{vol-MMS} \cdot EF_4) \cdot \frac{44}{28}</annotation></semantics></math>
+</li>
+<li>
+<strong>From Leaching:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><msub><mi>O</mi><mrow><mi>L</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>m</mi><mi>m</mi><mo stretchy="true" form="postfix">)</mo></mrow></mrow></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mn>5</mn></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mfrac><mn>44</mn><mn>28</mn></mfrac></mrow><annotation encoding="application/x-tex">N_2O_{L(mm)} = (N_{leach-MMS} \cdot EF_5) \cdot \frac{44}{28}</annotation></semantics></math>
+</li>
+</ul>
 <table class="table">
 <colgroup>
-<col width="22%">
-<col width="28%">
-<col width="48%">
+<col width="33%">
+<col width="33%">
+<col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
+<th align="left">Variable</th>
+<th align="left">Description</th>
+<th align="left">Source in Package</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td><code>dm_ingested_total</code></td>
-<td>Total dry matter ingested by the animal (kg/year)</td>
-<td>categories.csv</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">EF_4</annotation></semantics></math></td>
+<td align="left">Indirect
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+factor for volatilization</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
 </tr>
 <tr class="even">
-<td><code>ingredient_share</code></td>
-<td>Fraction of the diet contributed by the ingredient</td>
-<td>ingredients.csv</td>
-</tr>
-<tr class="odd">
-<td><code>share_weight</code></td>
-<td>Weighting factor depending on ingredient type
-(<code>feed_share</code>, <code>forage_share</code>,
-<code>milk_share</code>, <code>milk_replacer_share</code>)</td>
-<td>diet.csv</td>
-</tr>
-</tbody>
-</table>
-<p>The <strong>land use per ingredient</strong> is then calculated using
-crop yields:</p>
-<p><code>land_use_m2_per_unit = ifelse(dry_matter_yield &gt; 0, (consumption_kg / dry_matter_yield) * 10000, 0) (m²/animal)</code></p>
-<table class="table">
-<colgroup>
-<col width="22%">
-<col width="28%">
-<col width="48%">
-</colgroup>
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>dry_matter_yield</code></td>
-<td>Crop yield in kg DM/ha</td>
-<td>crops.csv</td>
-</tr>
-<tr class="even">
-<td><code>land_use_m2_per_unit</code></td>
-<td>Land area required per ingredient for one animal (m²)</td>
-<td>Calculated</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>5</mn></msub></mrow><annotation encoding="application/x-tex">EF_5</annotation></semantics></math></td>
+<td align="left">Indirect
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
+factor for leaching</td>
+<td align="left"><code>ipcc_coefficients.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
+<div class="section level4">
+<h4 id="references">📚 References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h4>
+<ul>
+<li>IPCC (2019). <em>Refinement to the 2006 IPCC Guidelines for National
+Greenhouse Gas Inventories</em>. Volume 4: AFOLU, Chapter 10.</li>
+</ul>
 </div>
-<div class="section level3">
-<h3 id="iii--total-land-use-per-animal">III. Total Land Use per Animal<a class="anchor" aria-label="anchor" href="#iii--total-land-use-per-animal"></a>
-</h3>
-<p>The <strong>total land use per animal</strong> is obtained by summing
-the land required for all ingredients:</p>
-<p><code>Land_use_per_animal = sum(land_use_m2_per_unit) (m²/animal)</code></p>
-<table class="table">
-<colgroup>
-<col width="22%">
-<col width="28%">
-<col width="48%">
-</colgroup>
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody><tr class="odd">
-<td><code>Land_use_per_animal</code></td>
-<td>Total land required per individual animal (m²)</td>
-<td>Calculated</td>
-</tr></tbody>
-</table>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="iv--total-land-use-for-the-population">IV. Total Land Use for the Population<a class="anchor" aria-label="anchor" href="#iv--total-land-use-for-the-population"></a>
-</h3>
-<p>The total land required for a livestock category is:</p>
-<p><code>Land_use_total = Land_use_per_animal * population (m²)</code></p>
-<table class="table">
-<colgroup>
-<col width="22%">
-<col width="28%">
-<col width="48%">
-</colgroup>
-<thead><tr class="header">
-<th>Variable</th>
-<th>Description</th>
-<th>Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td><code>population</code></td>
-<td>Number of animals in the category</td>
-<td>Calculated via <code><a href="../reference/calculate_population.html">calculate_population()</a></code>
-</td>
-</tr>
-<tr class="even">
-<td><code>Land_use_total</code></td>
-<td>Total land area required for the population (m²)</td>
-<td>Calculated</td>
-</tr>
-</tbody>
-</table>
-<hr>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

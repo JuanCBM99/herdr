@@ -1,297 +1,263 @@
 # Theoretical Basis: IPCC Tier 2 Methodology
 
-## I. Net Energy for Maintenance (NEm)
+## Introduction
 
-**Net Energy for Maintenance (NEm)** is the energy required to maintain
-the animal’s energy balance.
-
-**Formula:**  
-`NEm = Cfi * Weight^0.75 (MJ/day)`
-
-| Variable | Description                         | Source in the Package |
-|----------|-------------------------------------|-----------------------|
-| NEm      | Net energy for maintenance (MJ/day) | Calculated            |
-| Cfi      | Maintenance coefficient (MJ/day/kg) | `coefficients.csv`    |
-| Weight   | Live weight of the animal (kg)      | `weights.csv`         |
+The **herdr** package performs environmental impact assessments based on
+the **2019 Refinement to the 2006 IPCC Guidelines**. The core of the
+model is the **Energy Balance**, where Gross Energy (GE) intake is
+derived from the animal’s physiological requirements.
 
 ------------------------------------------------------------------------
 
-## II. Net Energy for Activity (NEa)
+## I. Net Energy for Maintenance ($NE_{m}$) (Eq. 10.3)
 
-**Net Energy for Activity (NEa)** represents energy used for grazing,
-walking, or other animal activities.
+$NE_{m}$ is the energy required to maintain the animal’s energy balance
+without gain or loss of weight.
 
-- **Cattle and Buffalo**
+**Formula:** $$NE_{m} = Cf_{i} \cdot \text{Weight}^{0.75}$$
 
-`NEa = Ca * NEm (MJ/day)`
-
-- **Sheep and Goats**
-
-`NEa = Ca * Weight (MJ/day)`
-
-| Variable     | Description                      | Source in the Package |
-|--------------|----------------------------------|-----------------------|
-| NEa          | Net energy for activity (MJ/day) | Calculated            |
-| Ca           | Activity coefficient             | `coefficients.csv`    |
-| NEm / Weight | Base energy or body weight       | `weights.csv`         |
+| Variable | Description                                            | Source in the Package   |
+|:---------|:-------------------------------------------------------|:------------------------|
+| $NE_{m}$ | Net energy for maintenance (MJ/day)                    | Calculated              |
+| $Cf_{i}$ | Maintenance coefficient based on animal species/status | `ipcc_coefficients.csv` |
+| Weight   | Live weight of the individual animal (kg)              | `weights.csv`           |
 
 ------------------------------------------------------------------------
 
-## III. Net Energy for Growth (NEg)
+## II. Net Energy for Activity ($NE_{a}$)
 
-**Net Energy for Growth (NEg)** is energy for tissue deposition.
+$NE_{a}$ represents energy used for grazing, walking, or other
+activities.
 
-- **Cattle and Buffalo**
+- **Cattle:** $NE_{a} = C_{a} \cdot NE_{m}$ (Eq. 10.4)
+- **Sheep and Goats:** $NE_{a} = C_{a} \cdot \text{Weight}$ (Eq. 10.5)
 
-`NEg = BW^0.75 * (1.097 / 22.02) * (WG / (C * MW))^2 (MJ/day)`
-
-- **Sheep and Goats**
-
-`NEg = (WGlamb / 365) * (a + b * ((BWi + BWf)/2)) (MJ/day)`
-
-| Variable     | Description           | Source in the Package |
-|--------------|-----------------------|-----------------------|
-| NEg          | Net energy for growth | Calculated            |
-| BW / BWi/BWf | Body weight           | `weights.csv`         |
-| WG / WGlamb  | Weight gain           | `weights.csv`         |
-| C, a, b      | Species/sex constants | `coefficients.csv`    |
+| Variable | Description                                        | Source in the Package   |
+|:---------|:---------------------------------------------------|:------------------------|
+| $NE_{a}$ | Net energy for activity (MJ/day)                   | Calculated              |
+| $C_{a}$  | Activity coefficient (varies by feeding situation) | `ipcc_coefficients.csv` |
+| $NE_{m}$ | Maintenance energy                                 | Result of Eq. 10.3      |
+| Weight   | Live weight of the animal (kg)                     | `weights.csv`           |
 
 ------------------------------------------------------------------------
 
-## IV. Net Energy for Lactation (NEl)
+## III. Net Energy for Growth ($NE_{g}$)
 
-Energy required for milk production:
+Energy required for tissue deposition (weight gain).
 
-- **Cattle and Buffalo**
+- **Cattle and Buffalo:** (Eq. 10.6)
+  $$NE_{g} = 22.02 \cdot \left( \frac{BW}{C \cdot MW} \right)^{0.75} \cdot WG^{1.097}$$
 
-`NEl = Milk * (1.47 + 0.40 * Fat) (MJ/day)`
+- **Sheep and Goats:** (Eq. 10.7)
+  $$NE_{g} = \frac{WG_{lamb/kid} \cdot \left( a + 0.5b\left( BW_{i} + BW_{f} \right) \right)}{365}$$
 
-- **Sheep and Goats**
-
-`NEl = Milk * EV_milk (MJ/day)`
-
-| Variable      | Description                          | Source in the Package                 |
-|---------------|--------------------------------------|---------------------------------------|
-| NEl           | Net energy for lactation             | Calculated                            |
-| Milk          | Daily milk production (kg/day)       | `categories.csv`                      |
-| Fat / EV_milk | Milk fat or energy value per kg milk | `categories.csv` / `coefficients.csv` |
-
-------------------------------------------------------------------------
-
-## V. Net Energy for Work and Wool Production
-
-- **Work (NEwork) for draft animals**
-
-`NEwork = 0.10 * NEm * Hours (MJ/day)`
-
-- **Wool (NEwool) for sheep/goats**
-
-`NEwool = Pr_wool * EV_wool / 365 (MJ/day)`
-
-| Variable        | Description                                  | Source in the Package |
-|-----------------|----------------------------------------------|-----------------------|
-| NEwork / NEwool | Energy for work or wool                      | Calculated            |
-| Hours / Pr_wool | Work hours per day or annual wool production | `categories.csv`      |
-| EV_wool         | Energy per kg of wool                        | `coefficients.csv`    |
+| Variable        | Description                                  | Source in the Package   |
+|:----------------|:---------------------------------------------|:------------------------|
+| $BW$            | Average live body weight of the animal (kg)  | `weights.csv`           |
+| $MW$            | Mature body weight of an adult female (kg)   | `weights.csv`           |
+| $WG$            | Daily weight gain (kg/day)                   | `weights.csv`           |
+| $C,a,b$         | IPCC species-specific growth constants       | `ipcc_coefficients.csv` |
+| $BW_{i}/BW_{f}$ | Initial and final weight for the period (kg) | `weights.csv`           |
 
 ------------------------------------------------------------------------
 
-## VI. Net Energy for Pregnancy (NEp)
+## IV. Net Energy for Lactation ($NE_{l}$)
 
-Energy required for gestation:
+Energy required for milk production based on volume and fat content.
 
-`NEp = C_pregnancy * NEm (MJ/day)`
+- **Cattle:**
+  $NE_{l} = \text{Milk} \cdot \left( 1.47 + 0.40 \cdot \text{Fat} \right)$
+  (Eq. 10.8)
+- **Sheep and Goats:** $NE_{l} = \text{Milk} \cdot EV_{milk}$ (Eq. 10.9)
 
-| Variable    | Description           | Source in the Package                                        |
-|-------------|-----------------------|--------------------------------------------------------------|
-| NEp         | Energy for pregnancy  | Calculated                                                   |
-| C_pregnancy | Pregnancy coefficient | `coefficients.csv`                                           |
-| NEm         | Maintenance energy    | Result of [`calculate_NEm()`](../reference/calculate_NEm.md) |
+| Variable    | Description                                     | Source in the Package       |
+|:------------|:------------------------------------------------|:----------------------------|
+| $NE_{l}$    | Net energy for lactation (MJ/day)               | Calculated                  |
+| Milk        | Average daily milk yield (kg/day)               | `livestock_definitions.csv` |
+| Fat         | Milk fat content percentage (%)                 | `livestock_definitions.csv` |
+| $EV_{milk}$ | Energy required to produce 1 kg of milk (MJ/kg) | `ipcc_coefficients.csv`     |
+
+------------------------------------------------------------------------
+
+## V. Net Energy for Work, Wool, and Pregnancy
+
+- **Work ($NE_{work}$):**
+  $$NE_{work} = 0.10 \cdot NE_{m} \cdot \text{Hours}$$
+- **Wool ($NE_{wool}$):**
+  $$NE_{wool} = \frac{\text{Pr}_{wool} \cdot EV_{wool}}{365}$$
+- **Pregnancy ($NE_{p}$):** $$NE_{p} = C_{pregnancy} \cdot NE_{m}$$
+
+| Variable           | Description                                    | Source in the Package       |
+|:-------------------|:-----------------------------------------------|:----------------------------|
+| Hours              | Number of hours worked per day (draft animals) | `livestock_definitions.csv` |
+| $\text{Pr}_{wool}$ | Annual wool production (kg/year)               | `livestock_definitions.csv` |
+| $EV_{wool}$        | Energy per kg of wool (IPCC default 24 MJ/kg)  | Constant                    |
+| $C_{pregnancy}$    | Pregnancy energy coefficient                   | `ipcc_coefficients.csv`     |
+
+------------------------------------------------------------------------
+
+## VI. Efficiency Ratios ($REM$ and $REG$)
+
+Based on IPCC Equations 10.14 and 10.15, derived from feed digestibility
+($DE$):
+
+- **For Maintenance ($REM$):**
+  $$REM = \left\lbrack 1.123 - \left( 4.092 \cdot 10^{- 3} \cdot DE \right) + \left( 1.126 \cdot 10^{- 5} \cdot (DE)^{2} \right) - \left( \frac{25.4}{DE} \right) \right\rbrack$$
+- **For Growth ($REG$):**
+  $$REG = \left\lbrack 1.164 - \left( 5.16 \cdot 10^{- 3} \cdot DE \right) + \left( 1.308 \cdot 10^{- 5} \cdot (DE)^{2} \right) - \left( \frac{37.4}{DE} \right) \right\rbrack$$
+
+| Variable | Description                                     | Source in the Package      |
+|:---------|:------------------------------------------------|:---------------------------|
+| $REM$    | Efficiency of digestible energy for maintenance | Calculated                 |
+| $REG$    | Efficiency of digestible energy for growth      | Calculated                 |
+| $DE$     | Digestibility of feed as % of gross energy      | `feed_characteristics.csv` |
 
 ------------------------------------------------------------------------
 
 ## VII. Gross Energy (GE)
 
-Gross Energy (GE) is the total daily energy intake required to cover all
-Net Energy needs:
+**Gross Energy (GE)** is the total daily energy intake required to
+sustain all physiological functions.
 
-`GE = [(NE_m + NE_a + NE_l + NEwork + NEp)/R_EM + (NEg + NEwool)/R_EG] / DE (MJ/day)`
+**Formula:**
+$$GE = \frac{\left( \frac{NE_{m} + NE_{a} + NE_{l} + NE_{work} + NE_{p}}{REM} + \frac{NE_{g} + NE_{wool}}{REG} \right)}{DE/100}$$
 
-| Variable    | Description                | Source in the Package   |
-|-------------|----------------------------|-------------------------|
-| GE          | Gross energy intake        | Calculated              |
-| NE\_\*      | All Net Energy components  | Results of calculations |
-| R_EM / R_EG | NE to DE conversion ratios | `coefficients.csv`      |
-| DE          | Digestibility of feed      | `characteristics.csv`   |
-
-------------------------------------------------------------------------
-
-## VIII. Methane Module: Enteric Emissions (CH₄)
-
-**Tier 1 Structure with Tier 2 EF calculation**: methane emissions
-depend on population and **diet-specific emission factor**:
-
-`E_CH4 = Σ (N_animals * EF) (Gg CH₄/year)`
-
-`EF = (GE * Ym / 100 * 365) / 55.65 (kg CH₄/head/year)`
-
-| Variable | Description               | Source in the Package |
-|----------|---------------------------|-----------------------|
-| EF       | Methane emission factor   | Calculated            |
-| GE       | Gross energy intake       | Calculated            |
-| Ym       | Methane conversion factor | `characteristics.csv` |
-| 55.65    | Energy content of methane | Constant              |
+| Variable  | Description                                      | Source in the Package      |
+|:----------|:-------------------------------------------------|:---------------------------|
+| $GE$      | Total daily gross energy requirement (MJ/day)    | Calculated                 |
+| $NE_{x}$  | Various net energy requirements calculated above | Calculated Results         |
+| $REM/REG$ | Efficiency ratios                                | Results of Eq. 10.14/10.15 |
+| $DE$      | Feed digestibility (%)                           | `feed_characteristics.csv` |
 
 ------------------------------------------------------------------------
 
-## IX. Methane Module: Manure Management (CH₄-MM)
+## VIII. Methane Module: Enteric Fermentation ($CH_{4}$)
 
-**Volatile Solids (VS)** excretion:
+#### Methane Emission Factor ($EF$) (Eq. 10.21)
 
-`VS = (GE / 18.45) * [(1 - DE/100) + (UE * GE / GE)] * (1 - ASH) (kg/day)`
+$$EF = \frac{GE \cdot \left( \frac{Y_{m}}{100} \right) \cdot 365}{55.65}$$
 
-**Manure CH₄ Emission Factor:**
+| Variable | Description                                     | Source in Package          |
+|:---------|:------------------------------------------------|:---------------------------|
+| $EF$     | Methane emission factor (kg $CH_{4}$/head/year) | Calculated                 |
+| $GE$     | Daily gross energy intake (MJ/day)              | Result of Section VII      |
+| $Y_{m}$  | Methane conversion factor (%)                   | `feed_characteristics.csv` |
+| 55.65    | Energy content of methane (MJ/kg $CH_{4}$)      | Constant                   |
 
-`EF_CH4_manure = (VS * B0 * 365 / 100) * 0.67 * Σ(AWMS * MCF) (kg CH₄/year)`
+#### Total Enteric Emissions ($E_{T}$) (Eq. 10.19)
 
-| Variable | Description                  | Source in the Package |
-|----------|------------------------------|-----------------------|
-| VS       | Volatile solids excreted     | Calculated            |
-| B0       | Maximum methane potential    | `coefficients.csv`    |
-| AWMS     | Fraction of manure managed   | `ch4_mm.csv`          |
-| MCF      | Methane conversion factor    | `mcf.csv`             |
-| 0.67     | Conversion m³ CH₄ 192 kg CH₄ | Constant              |
+$$E_{T} = \sum\limits_{(P)}EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^{6}} \right)$$
+
+| Variable    | Description                                          | Source in Package      |
+|:------------|:-----------------------------------------------------|:-----------------------|
+| $E_{T}$     | Total emissions from category $T$ (Gg $CH_{4}$/year) | Calculated             |
+| $N_{(T,P)}$ | Number of animals in category $T$                    | `livestock_census.csv` |
+
+------------------------------------------------------------------------
+
+## IX. Methane Module: Manure Management ($CH_{4{(mm)}}$)
+
+#### Volatile Solid Excretion Rates ($VS$) (Eq. 10.24)
+
+$$VS = \left\lbrack GE \cdot \left( 1 - \frac{DE}{100} \right) + (UE \cdot GE) \right\rbrack \cdot \left\lbrack \frac{1 - ASH}{18.45} \right\rbrack$$
+
+| Variable | Description                                      | Source in Package          |
+|:---------|:-------------------------------------------------|:---------------------------|
+| $VS$     | Daily volatile solid excretion (kg VS/day)       | Calculated                 |
+| $UE$     | Urinary energy excretion fraction (default 0.04) | `ipcc_coefficients.csv`    |
+| $ASH$    | Ash content of the feed (fraction)               | `feed_characteristics.csv` |
+| 18.45    | Energy content of dietary dry matter (MJ/kg)     | Constant                   |
+
+#### Manure Emission Factor ($EF$) (Eq. 10.23)
+
+$$EF_{(T)} = \left( VS_{(T)} \cdot 365 \right) \cdot \left\lbrack B_{0{(T)}} \cdot 0.67 \cdot \sum\limits_{S,k}\frac{MCF_{S,k}}{100} \cdot AWMS_{(T,S,k)} \right\rbrack$$
+
+| Variable     | Description                                       | Source in Package       |
+|:-------------|:--------------------------------------------------|:------------------------|
+| $B_{0{(T)}}$ | Maximum methane producing capacity ($m^{3}/kgVS$) | `ipcc_coefficients.csv` |
+| $MCF_{S,k}$  | Methane conversion factor for system $S$ (%)      | `ipcc_mm.csv`           |
+| $AWMS$       | Fraction of manure handled in system $S$          | `manure_management.csv` |
+| 0.67         | Conversion factor ($m^{3}CH_{4}$ to kg $CH_{4}$)  | Constant                |
 
 ------------------------------------------------------------------------
 
 ## X. N₂O Module: Nitrogen-Based Emissions
 
-### I. Annual Nitrogen Excretion (Nex)
+### I. Nitrogen Balance & Excretion
 
-`Nintake = GE / 18.45 * (6.25 / 100) * CP% (kg N/day)`
+#### 1. Nitrogen Intake ($N_{intake}$) (Eq. 10.31/10.32)
 
-**Nitrogen retention:**
+$$N_{intake} = \left( \frac{GE}{18.45} \right) \cdot \left( \frac{CP/100}{6.25} \right)$$
 
-- **Cattle/Buffalo:**
+| Variable     | Description                           | Source in Package          |
+|:-------------|:--------------------------------------|:---------------------------|
+| $N_{intake}$ | Total nitrogen ingested (kg N/day)    | Calculated                 |
+| $CP$         | Crude Protein content of the diet (%) | `feed_characteristics.csv` |
+| 6.25         | Conversion factor from N to Protein   | Constant                   |
 
-`Nretention = [(NEg + Milk * PR) * 7.03 / (1000 * 6.38)] - [Milk * PR * 6.25 / 100] (g N/day)`
+#### 2. Nitrogen Retention ($N_{retention}$)
+
+Reflects the logic used in the `herdr` codebase: \* **Cattle:**
+$$Milk_{protein} = 1.9 + 0.4 \cdot Fat_{content}$$$$N_{retention} = \left\lbrack \frac{Milk \cdot Milk_{protein}}{6.38} \right\rbrack + \left\lbrack \frac{WG \cdot \left( 268 - \left( 7.03 \cdot \frac{NE_{g}}{WG} \right) \right)/1000}{6.25} \right\rbrack$$
+
+| Variable        | Description                              | Source in Package           |
+|:----------------|:-----------------------------------------|:----------------------------|
+| $Fat_{content}$ | Milk fat percentage (%)                  | `livestock_definitions.csv` |
+| $Milk$          | Daily milk yield (kg/day)                | `livestock_definitions.csv` |
+| $WG$            | Daily weight gain (kg/day)               | `weights.csv`               |
+| 6.38 / 6.25     | Specific N-to-Protein conversion factors | Constants                   |
+
+#### 3. Annual Excretion ($N_{excreted}$)
 
 - **Sheep/Goats:**
+  $N_{excreted} = \left( N_{intake} \cdot (1 - 0.1) \right) \cdot 365$
+- **Cattle:**
+  $N_{excreted} = \left( N_{intake} - N_{retention} \right) \cdot 365$
 
-`Nretention_frac = 0.1 (fraction)`  
-`Nex = Nintake * (1 - Nretention_frac) * 365 (kg N/year)`
+### II. Direct $N_{2}O$ Emissions (Eq. 10.25)
 
-| Variable        | Description               | Source in the Package                              |
-|-----------------|---------------------------|----------------------------------------------------|
-| Nintake         | Nitrogen ingested per day | Calculated                                         |
-| NEg             | Net energy for growth     | [`calculate_NEg()`](../reference/calculate_NEg.md) |
-| Milk            | Daily milk yield          | `categories.csv`                                   |
-| PR              | Milk protein content      | `categories.csv`                                   |
-| Nretention_frac | Fraction of N retained    | `coefficients.csv`                                 |
+$$N_{2}O_{direct} = N_{(T,P)} \cdot N_{excreted} \cdot Allocation \cdot EF_{3} \cdot \left( \frac{44}{28} \right)$$
 
-------------------------------------------------------------------------
-
-### II. Direct N₂O Emissions
-
-`N2O_direct = 44/28 * Σ [N_animals * Nex * AWMS * EF3] (kg N2O/year)`
-
-| Variable | Description                     | Source in the Package         |
-|----------|---------------------------------|-------------------------------|
-| AWMS     | Fraction of N managed in system | `ch4_mm.csv`                  |
-| EF3      | Direct N₂O emission factor      | `emission_factors_direct.csv` |
+| Variable     | Description                                    | Source in Package       |
+|:-------------|:-----------------------------------------------|:------------------------|
+| $Allocation$ | Fraction of N managed in a specific system     | `manure_management.csv` |
+| $EF_{3}$     | Direct $N_{2}O$ emission factor for the system | `ipcc_mm.csv`           |
+| 44/28        | Stoichiometric ratio of $N_{2}O$ to $N_{2}$    | Constant                |
 
 ------------------------------------------------------------------------
 
-### III. Indirect N₂O Emissions
+## XI. N₂O Module: Indirect Emissions
 
-**Volatilization:**
+### I. Nitrogen Losses from Manure
 
-`N_volatilization = Σ [ (N_animals * Nex + N_codigestate) * fraction_managed * frac_gas ]`  
-`N2O_volatilization = 44/28 * N_volatilization * EF4`
+#### 1. Volatilization ($N_{volatilization - MMS}$) (Eq. 10.26)
 
-**Leaching / Runoff:**
+$$N_{vol - MMS} = \sum\left\lbrack (N \cdot Nex \cdot AWMS) \cdot Frac_{GasMS} \right\rbrack$$
 
-`N_leaching = Σ [ (N_animals * Nex + N_codigestate) * fraction_managed * frac_leach ]`  
-`N2O_leaching = 44/28 * N_leaching * EF5`
+#### 2. Leaching and Runoff ($N_{leaching - MMS}$) (Eq. 10.27)
 
-| Variable              | Description                       | Source in the Package           |
-|-----------------------|-----------------------------------|---------------------------------|
-| N_codigestate         | Nitrogen from co-digestates       | User input / CSV                |
-| fraction_managed      | Fraction of N managed in system   | `ch4_mm.csv`                    |
-| frac_gas / frac_leach | Fraction lost as gas or leached   | `fractions.csv`                 |
-| EF4 / EF5             | Emission factors for indirect N₂O | `emission_factors_indirect.csv` |
+$$N_{leach - MMS} = \sum\left\lbrack (N \cdot Nex \cdot AWMS) \cdot Frac_{LeachMS} \right\rbrack$$
 
-------------------------------------------------------------------------
+| Variable         | Description                                               | Source in Package |
+|:-----------------|:----------------------------------------------------------|:------------------|
+| $Frac_{GasMS}$   | Fraction of N lost as volatilized gas ($NH_{3} + NO_{x}$) | `ipcc_mm.csv`     |
+| $Frac_{LeachMS}$ | Fraction of N lost via leaching into water                | `ipcc_mm.csv`     |
 
-## XI. Land Use Module
+### II. Indirect $N_{2}O$ Calculation (Eq. 10.28/10.29)
 
-The **Land Use Module** calculates the agricultural land required to
-support each animal category based on their diet composition and crop
-yields. It provides **land use per animal** and **total land use for the
-population**.
+- **From Volatilization:**
+  $N_{2}O_{G{(mm)}} = \left( N_{vol - MMS} \cdot EF_{4} \right) \cdot \frac{44}{28}$
+- **From Leaching:**
+  $N_{2}O_{L{(mm)}} = \left( N_{leach - MMS} \cdot EF_{5} \right) \cdot \frac{44}{28}$
 
-------------------------------------------------------------------------
-
-### I. Data Inputs
-
-The calculation requires the following datasets:
-
-| Dataset           | Description                                                                     | Source in the Package                                                           |
-|-------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------|
-| `categories.csv`  | Animal characteristics, including total dry matter intake (`dm_ingested_total`) | categories.csv                                                                  |
-| `ingredients.csv` | Different ingredients share that compose the defined diets                      | diet.csv                                                                        |
-| `diet.csv`        | Diet composition including feed, forage, milk, and milk replacer shares         | diet.csv                                                                        |
-| `crops.csv`       | Crop yield data (`dry_matter_yield` in kg/ha) from Spain                        | crops.csv                                                                       |
-| Population        | Number of animals per category                                                  | Calculated via [`calculate_population()`](../reference/calculate_population.md) |
+| Variable | Description                                 | Source in Package       |
+|:---------|:--------------------------------------------|:------------------------|
+| $EF_{4}$ | Indirect $N_{2}O$ factor for volatilization | `ipcc_coefficients.csv` |
+| $EF_{5}$ | Indirect $N_{2}O$ factor for leaching       | `ipcc_coefficients.csv` |
 
 ------------------------------------------------------------------------
 
-### II. Land Use per Ingredient
+#### 📚 References
 
-For each ingredient in the diet, the **weighted consumption** is
-calculated:
-
-`consumption_kg = dm_ingested_total * ingredient_share * share_weight / 10000 (kg)`
-
-| Variable            | Description                                                                                                       | Source in the Package |
-|---------------------|-------------------------------------------------------------------------------------------------------------------|-----------------------|
-| `dm_ingested_total` | Total dry matter ingested by the animal (kg/year)                                                                 | categories.csv        |
-| `ingredient_share`  | Fraction of the diet contributed by the ingredient                                                                | ingredients.csv       |
-| `share_weight`      | Weighting factor depending on ingredient type (`feed_share`, `forage_share`, `milk_share`, `milk_replacer_share`) | diet.csv              |
-
-The **land use per ingredient** is then calculated using crop yields:
-
-`land_use_m2_per_unit = ifelse(dry_matter_yield > 0, (consumption_kg / dry_matter_yield) * 10000, 0) (m²/animal)`
-
-| Variable               | Description                                           | Source in the Package |
-|------------------------|-------------------------------------------------------|-----------------------|
-| `dry_matter_yield`     | Crop yield in kg DM/ha                                | crops.csv             |
-| `land_use_m2_per_unit` | Land area required per ingredient for one animal (m²) | Calculated            |
-
-------------------------------------------------------------------------
-
-### III. Total Land Use per Animal
-
-The **total land use per animal** is obtained by summing the land
-required for all ingredients:
-
-`Land_use_per_animal = sum(land_use_m2_per_unit) (m²/animal)`
-
-| Variable              | Description                                    | Source in the Package |
-|-----------------------|------------------------------------------------|-----------------------|
-| `Land_use_per_animal` | Total land required per individual animal (m²) | Calculated            |
-
-------------------------------------------------------------------------
-
-### IV. Total Land Use for the Population
-
-The total land required for a livestock category is:
-
-`Land_use_total = Land_use_per_animal * population (m²)`
-
-| Variable         | Description                                      | Source in the Package                                                           |
-|------------------|--------------------------------------------------|---------------------------------------------------------------------------------|
-| `population`     | Number of animals in the category                | Calculated via [`calculate_population()`](../reference/calculate_population.md) |
-| `Land_use_total` | Total land area required for the population (m²) | Calculated                                                                      |
-
-------------------------------------------------------------------------
+- IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National
+  Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.

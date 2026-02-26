@@ -2,9 +2,10 @@ pandoc: 3.1.11
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
-  Data_dictionary: Data_dictionary.html
-  Functions: Functions.html
+  dairy_cattle_assessment: dairy_cattle_assessment.html
   Introduction: Introduction.html
+  Manure: Manure.html
+  Technical_reference: Technical_reference.html
   Theoretical_basis: Theoretical_basis.html
   Workflow: Workflow.html
-last_built: 2026-01-12T11:01Z
+last_built: 2026-02-26T09:19Z

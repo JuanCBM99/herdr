@@ -1,15 +1,20 @@
-# Calculate direct N₂O emissions from manure (Refactored)
+# Calculate direct N2O emissions from manure
 
-Computes direct N₂O emissions based on nitrogen excretion logic,
+Computes direct N2O emissions based on nitrogen excretion logic,
 emission factors, management system, and climate (IPCC Eq 10.25).
 
 ## Usage
 
 ``` r
-calculate_N2O_direct_manure(saveoutput = TRUE)
+calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = TRUE)
 ```
 
 ## Arguments
+
+- automatic_cycle:
+
+  Logical. If TRUE, uses the built-in model for automatic farm cycle
+  calculation. Default is FALSE.
 
 - saveoutput:
 

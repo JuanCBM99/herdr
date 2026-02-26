@@ -1,7 +1,7 @@
-# Calculate Volatile Solids (VS) for Animals (Refactored)
+# Calculate Volatile Solids (VS) for Animals
 
 Computes volatile solids (VS) based on Gross Energy (GE), Digestible
-Energy (DE), and Ash content.
+Energy (DE), and Ash content using IPCC Tier 2 methodology.
 
 ## Usage
 
