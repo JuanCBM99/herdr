@@ -1,4 +1,4 @@
-﻿identification,management_system,duration,climate,animal_type,animal_subtype
+﻿animal_tag,management_system,duration,climate,animal_type,animal_subtype
 feedlot_calves_male,solid_storage,12,wet,cattle,feedlot
 feedlot_calves_female,solid_storage,12,wet,cattle,feedlot
 beef_calves_male,pasture_range_paddock,9,wet,cattle,beef

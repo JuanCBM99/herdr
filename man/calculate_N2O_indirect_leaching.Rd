@@ -2,13 +2,15 @@
 % Please edit documentation in R/09_N2O_indirect_leaching.R
 \name{calculate_N2O_indirect_leaching}
 \alias{calculate_N2O_indirect_leaching}
-\title{Calculate indirect N₂O emissions from leaching (Refactored)}
+\title{Calculate indirect N2O emissions from leaching}
 \usage{
-calculate_N2O_indirect_leaching(saveoutput = TRUE)
+calculate_N2O_indirect_leaching(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes indirect N₂O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
+Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
 }

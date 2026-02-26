@@ -2,14 +2,16 @@
 % Please edit documentation in R/04_emissions_enteric.R
 \name{calculate_emissions_enteric}
 \alias{calculate_emissions_enteric}
-\title{Calculate methane emissions from enteric fermentation (Refactored)}
+\title{Calculate methane emissions from enteric fermentation}
 \usage{
-calculate_emissions_enteric(saveoutput = TRUE)
+calculate_emissions_enteric(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),
-Digestible Energy (DE), NDF, and Ym factor.
+Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic.
 }

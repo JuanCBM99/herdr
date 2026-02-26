@@ -1,90 +1,79 @@
-#' Calculate Weighted Nutritional Variables (Refactored)
+#' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash)
-#' by mapping ingredients to diets, and diets to animals.
+#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, EB)
+#' by mapping ingredients to diets and diets to animals.
+#'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_weighted_variable <- function(saveoutput = TRUE) {
 
   message("\U0001f7e2 Calculating Weighted Nutritional Variables...")
 
-  # --- 1. Data Loading ---
-  diet            <- load_dataset("diet")
-  ingredients     <- load_dataset("ingredients")
-  characteristics <- load_dataset("characteristics")
-  categories      <- load_dataset("categories") # The mapping table
+  # --- 1. Load Data ---
+  diets           <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
+  ingredients     <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE)
+  characteristics <- readr::read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
+  definitions     <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
 
-  # Quick validations
-  stopifnot(
-    all(c("group", "zone", "diet_tag", "forage_share", "feed_share") %in% names(diet)),
-    all(c("diet_tag", "ingredient", "ingredient_share") %in% names(ingredients)),
-    all(c("identification", "diet_tag") %in% names(categories))
-  )
+  # --- 2. Data Integrity Assertions ---
 
-  # --- 2. Phase A: Calculate Nutritional Profile by Diet Tag ---
-  # Goal: Obtain one row per diet with its weighted average values (DE, CP, etc.)
+  # A. Check Diet Profiles sum to 100%
+  diet_sum_check <- diets %>%
+    dplyr::mutate(total_diet = forage_share + concentrate_share + milk_share + milk_replacer_share) %>%
+    dplyr::filter(abs(total_diet - 100) > 0.1)
 
-  diet_profiles <- diet %>%
-    # Join ingredients and their nutritional characteristics
-    dplyr::left_join(ingredients, by = c("group", "zone", "diet_tag")) %>%
+  assertthat::assert_that(nrow(diet_sum_check) == 0,
+                          msg = paste("Diet Profile Error: Shares do not sum to 100% in 'diet_profiles.csv' for:",
+                                      paste(diet_sum_check$diet_tag, collapse = ", ")))
+
+  # B. Check Ingredient Shares within each category sum to 100%
+  ing_sum_check <- ingredients %>%
+    dplyr::group_by(diet_tag, region, subregion, class_flex, ingredient_type) %>%
+    dplyr::summarise(total_ing = sum(ingredient_share, na.rm = TRUE), .groups = "drop") %>%
+    dplyr::filter(abs(total_ing - 100) > 0.1)
+
+  assertthat::assert_that(nrow(ing_sum_check) == 0,
+                          msg = paste("Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for:",
+                                      paste(unique(ing_sum_check$diet_tag), collapse = ", ")))
+
+  # --- 3. Build Diet Nutritional Profiles ---
+
+  diet_profiles <- diets %>%
+    dplyr::left_join(ingredients, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
-
     dplyr::mutate(
-      # Determine the percentage of the total diet this category represents
-      category_share = dplyr::case_when(
-        ingredient_type == "feed"          ~ feed_share,
-        ingredient_type == "forage"        ~ forage_share,
-        ingredient_type == "milk"          ~ milk_share,
-        ingredient_type == "milk_replacer" ~ milk_replacer_share,
-        TRUE                               ~ 0
-      ),
-
-      # Numeric cleanup (Convert to numeric and NAs to 0)
-      across(
-        c(de, cp, ash, ndf, ingredient_share, category_share),
-        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
-      ),
-
-      # Final Weighting Factor
-      # (Ingredient Share % * Category Share %) / 10000
-      weight_factor = (ingredient_share * category_share) / 10000
+      # Weighting factor calculation:
+      # (Ingredient % in category) * (Category % in Diet) / 10000
+      weight_factor = (ingredient_share * dplyr::case_when(
+        ingredient_type == "forage"      ~ forage_share,
+        ingredient_type == "concentrate" ~ concentrate_share,
+        ingredient_type == "milk"        ~ milk_share,
+        ingredient_type == "replacer"    ~ milk_replacer_share,
+        TRUE ~ 0
+      )) / 10000
     ) %>%
-
-    # Group by DIET (group, zone, diet_tag) to sum contributions
-    dplyr::group_by(group, zone, diet_tag) %>%
+    dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
-      de  = sum(de * weight_factor,  na.rm = TRUE),
-      cp  = sum(cp * weight_factor,  na.rm = TRUE),
-      ndf = sum(ndf * weight_factor, na.rm = TRUE),
-      ash = sum(ash * weight_factor, na.rm = TRUE),
+      dplyr::across(c(de, cp, ndf, ash, eb), ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
-  # --- 3. Phase B: Assign Diets to Animals ---
-  # Goal: Expand the calculated profiles to each specific animal identification
-
-  results <- categories %>%
-    dplyr::select(identification, diet_tag, animal_type, animal_subtype) %>%
-
-    # Join the calculated profiles
-    dplyr::left_join(diet_profiles, by = "diet_tag") %>%
-
-    # Filter out junk rows (if the join failed because group/zone was missing)
-    dplyr::filter(!is.na(group)) %>%
-
-    # Final Selection and Cleanup
+  # --- 4. Map Diets to Animals ---
+  results <- definitions %>%
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag) %>%
+    dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
+    dplyr::filter(!is.na(region)) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
-      group, zone, identification, animal_type, animal_subtype, diet_tag,
-      de, cp, ndf, ash
-    ) %>%
-    dplyr::arrange(group, zone, identification) %>%
-    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+      region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
+      de, cp, ndf, ash, eb
+    )
 
-  # --- 4. Save Output ---
+  # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
-    readr::write_csv(results, "output/variables.csv")
-    message("\U0001f4be Saved output to output/variables.csv")
+    readr::write_csv(results, "output/weighted_nutritional_variables.csv")
+    message("\U0001f4be Saved nutritional variables to output/weighted_nutritional_variables.csv")
   }
 
   return(results)

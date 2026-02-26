@@ -1,11 +1,16 @@
-# Calculate Gross Energy (GE) (Fixed & Robust)
+# Calculate Gross Energy (GE)
 
-Computes gross energy requirements by aggregating all necessary Net
-Energy (NE) components (NEm, NEa, NEg, NEl, NEwork, NEp, NEwool) and
-adjusting for feed digestibility (DE) and conversion ratios (REM, REG).
+Computes gross energy requirements by aggregating Net Energy (NE)
+components.
 
 ## Usage
 
 ``` r
 calculate_ge(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

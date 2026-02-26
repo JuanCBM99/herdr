@@ -1,78 +1,99 @@
-#' Calculate indirect N₂O emissions from leaching (Refactored)
+#' Calculate indirect N2O emissions from leaching
 #'
-#' Computes indirect N₂O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
+#' Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
+#' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_indirect_leaching <- function(saveoutput = TRUE) {
+calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   message("\U0001f4be Calculating indirect N2O emissions (leaching)...")
 
-  # --- 1. Load and Configure Factors ---
+  # --- 1. Data Loading ---
+  user_manure <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
+  ipcc_master <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
 
-  # Load and safely extract EF5 value
-  ef_factors <- load_dataset("emission_factors_indirect")
-  ef5_value  <- ef_factors$value[ef_factors$description == "EF5"][1]
+  # Calling internal modules
+  # We fetch N_excreted from the direct N2O function (which already handles N balance)
+  direct_n2o_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
-  if (is.na(ef5_value) || length(ef5_value) == 0) {
-    stop("Error: 'EF5' factor not found in 'emission_factors_indirect'.")
-  }
+  # --- 2. Allocation Assertion (using assertthat) ---
+  # We group by the unique identity of the animal/system and verify the sum
+  allocation_sums <- user_manure %>%
+    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::summarise(total_alloc = sum(allocation, na.rm = TRUE), .groups = "drop")
 
-  # --- 2. Processing and Calculation Pipeline ---
+  assertthat::assert_that(all(allocation_sums$total_alloc <= 1.001),
+                          msg = paste("Data Error: Manure allocation exceeds 1.0 (100%) for animals in:",
+                                      paste(unique(allocation_sums$animal_tag[allocation_sums$total_alloc > 1.001]), collapse = ", ")))
 
-  # Base Data: Fetch N Excreted (N_excreted) from the direct N2O calculation
-  results <- calculate_N2O_direct_manure(saveoutput = FALSE) %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype, N_excreted) %>%
+  # Mandatory identity keys
+  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+
+  # --- 2. Master Dataset Construction & Joins ---
+
+  results <- direct_n2o_df %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted) %>%
     dplyr::distinct() %>%
 
-    # Join Population Data
+    # 2.1 Join Population Data
     dplyr::left_join(
-      calculate_population(saveoutput = FALSE) %>%
-        dplyr::select(group, zone, identification, animal_type, animal_subtype, population),
-      by = c("group", "zone", "identification", "animal_type", "animal_subtype")
+      pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
+      by = join_keys
     ) %>%
 
-    # Join System Parameters (n2o_indirect)
+    # 2.2 Join Management Configuration (User Data)
     dplyr::left_join(
-      load_dataset("n2o_indirect"),
-      by = c("identification", "animal_type", "animal_subtype")
+      user_manure %>%
+        dplyr::select(region, subregion, animal_tag, class_flex,
+                      system_base, management_months, system_climate,
+                      system_subclimate, climate_zone, system_variant,
+                      climate_moisture, animal_type, animal_subtype, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
     ) %>%
 
-    # Join Leaching Fractions (frac_leach_ms)
+    # 2.3 Join Leaching Fraction (frac_leach) and Factor (EF5) from Master Table
     dplyr::left_join(
-      load_dataset("fractions") %>% dplyr::select(management_system, frac_leach_ms),
-      by = "management_system"
+      ipcc_master %>%
+        dplyr::select(system_base, management_months, system_climate,
+                      system_subclimate, climate_zone, system_variant,
+                      climate_moisture, animal_type, animal_subtype, frac_leach, EF5),
+      by = c("system_base", "management_months", "system_climate",
+             "system_subclimate", "climate_zone", "system_variant",
+             "climate_moisture", "animal_type", "animal_subtype")
     ) %>%
 
-    # Calculations
+    # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
-      # Numeric Safety: NA replacement
-      across(
-        c(population, N_excreted, duration, frac_leach_ms),
+      # Numeric Safety
+      dplyr::across(
+        c(population, N_excreted, allocation, frac_leach, EF5),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Calculate AWMS (Annualized Duration)
-      awms = duration / 12,
-
       # Calculate N Loss due to Leaching (N_leaching-MMS, Eq 10.27)
-      N_leaching = population * N_excreted * awms * frac_leach_ms,
+      # N_leach = Population * N_excreted * Allocation * Frac_Leach
+      n_leaching_kg_year = population * N_excreted * allocation * frac_leach,
 
-      # Define EF5 value (used in the final N2O conversion)
-      EF5 = as.numeric(ef5_value),
-
-      # Calculate Indirect N2O Emissions (N2O_L,mm, Eq 10.29)
-      # N2O_L = EF5 * N_leaching * (44/28)
-      N2O_L = EF5 * N_leaching * (44 / 28)
+      # Calculate Indirect N2O Emissions (Eq 10.29)
+      # Factor 44/28 converts N2O-N to N2O
+      n2o_l = EF5 * n_leaching_kg_year * (44 / 28)
     ) %>%
 
-    # Final Rounding
-    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+    # --- 4. Final Selection and Cleanup ---
+    dplyr::select(
+      dplyr::all_of(join_keys),
+      system_base, system_variant,
+      N_excreted, frac_leach, EF5,
+      n_leaching_kg_year, n2o_l
+    ) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 
-  # --- 3. Save Output ---
+  # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_indirect_leaching.csv")
-    message("\U0001f4be Saved output to output/N2O_indirect_leaching.csv")
+    message("\U1F4BE Saved output to output/N2O_indirect_leaching.csv")
   }
 
   return(results)

@@ -1,7 +1,7 @@
-# Calculate Volatile Solids (VS) for Animals (Refactored)
+# Calculate Volatile Solids (VS) for Animals
 
 Computes volatile solids (VS) based on Gross Energy (GE), Digestible
-Energy (DE), and Ash content.
+Energy (DE), and Ash content using IPCC Tier 2 methodology.
 
 ## Usage
 
@@ -17,7 +17,7 @@ calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 
 - saveoutput:
 
-  Logical. If TRUE, saves the result as CSV. Default TRUE.
+  If TRUE (default) the results are saved in the output folder.
 
 ## Value
 

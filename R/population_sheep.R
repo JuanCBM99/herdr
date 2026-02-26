@@ -6,51 +6,41 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
 
   message("\U0001F9EE Calculating populations for SHEEP...")
 
-  # (Assume these are the base 'identification' for sheep)
+  # (Assume these are the base 'animal_tag' for sheep)
   req_identifications <- c("mature_sheep_male_dairy", "mature_sheep_male_meat",
                            "mature_sheep_female_dairy", "mature_sheep_female_meat")
-  if (!all(req_identifications %in% census_sheep$identification)) {
-    stop("Error: 'census.csv' (sheep) must contain all 4 base identifications.")
-  }
 
   # --- Helper to get rates safely ---
-  get_rate <- function(param, subtype, sex_val = NA) {
-    df <- rate_parameters %>%
-      dplyr::filter(animal_type == "sheep", # Filter by sheep
-                    parameter == param,
-                    animal_subtype == subtype)
-    if (!is.na(sex_val)) df <- df %>% dplyr::filter(sex == sex_val)
-    val <- df %>% dplyr::pull(value)
-    if (length(val) == 0) {
-      warning(paste("Rate not found for (sheep):", param, subtype, sex_val))
-      return(NA_real_)
-    }
-    val[1]
+  get_rate <- function(param, tag) {
+    rate_parameters %>%
+      dplyr::filter(parameter == param, animal_tag == tag) %>%
+      dplyr::pull(value) %>%
+      .[1] # Coge el primer valor que encuentre
   }
 
   # --- Sheep Rates ---
-  rate_dairy_lambing <- get_rate("lambing_rate", "dairy", sex_val = NA)
-  rate_meat_lambing  <- get_rate("lambing_rate", "meat", sex_val = NA)
-  rate_dairy_male_repl   <- get_rate("replacement_rate", "dairy", "male")
-  rate_dairy_female_repl <- get_rate("replacement_rate", "dairy", "female")
-  rate_meat_male_repl    <- get_rate("replacement_rate", "meat", "male")
-  rate_meat_female_repl  <- get_rate("replacement_rate", "meat", "female")
+  rate_dairy_lambing     <- get_rate("lambing_rate", "mature_sheep_female_dairy")
+  rate_meat_lambing      <- get_rate("lambing_rate", "mature_sheep_female_meat")
+  rate_dairy_male_repl   <- get_rate("replacement_rate", "mature_sheep_male_dairy")
+  rate_dairy_female_repl <- get_rate("replacement_rate", "mature_sheep_female_dairy")
+  rate_meat_male_repl    <- get_rate("replacement_rate", "mature_sheep_male_meat")
+  rate_meat_female_repl  <- get_rate("replacement_rate", "mature_sheep_female_meat")
 
   # --- Sheep Calculation ---
   base_pops_agg <- census_sheep %>%
-    dplyr::filter(identification %in% req_identifications) %>%
-    dplyr::group_by(group, zone, identification) %>%
+    dplyr::filter(animal_tag %in% req_identifications) %>%
+    dplyr::group_by(region, subregion, class_flex, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop")
 
   base_pops_wide <- base_pops_agg %>%
     tidyr::pivot_wider(
-      names_from = identification,
+      names_from = animal_tag,
       values_from = population,
       values_fill = 0
     )
 
   calculated_pops <- base_pops_wide %>%
-    dplyr::group_by(group, zone) %>%
+    dplyr::group_by(region, subregion, class_flex) %>%
     dplyr::mutate(
       # Replacements
       pop_lamb_female_dairy_replacement = mature_sheep_female_dairy * rate_dairy_female_repl,
@@ -72,7 +62,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
   # --- Sheep Assembly ---
   all_populations_long <- calculated_pops %>%
     dplyr::select(
-      group, zone,
+      region, subregion, class_flex,
       mature_sheep_male_dairy, mature_sheep_male_meat,
       mature_sheep_female_dairy, mature_sheep_female_meat,
       lamb_female_dairy_replacement = pop_lamb_female_dairy_replacement,
@@ -83,8 +73,8 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
       lamb_meat_slaughter = pop_lamb_meat_slaughter
     ) %>%
     tidyr::pivot_longer(
-      cols = -c(group, zone),
-      names_to = "identification",
+      cols = -c(region, subregion, class_flex),
+      names_to = "animal_tag",
       values_to = "population"
     ) %>%
     dplyr::filter(round(population, 5) > 0)

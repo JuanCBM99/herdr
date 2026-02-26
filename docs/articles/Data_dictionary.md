@@ -2,10 +2,10 @@
 
 ## Data Dictionary: Internal CSV Files
 
-**herdr** operates on a data-driven approach. While the
-calculations are universal (IPCC Tier 2), the package comes pre-loaded
-with **default datasets representing Spanish national averages** for
-livestock performance, diets, and emission factors.
+**herdr** operates on a data-driven approach. While the calculations are
+universal (IPCC Tier 2), the package comes pre-loaded with **default
+datasets representing Spanish national averages** for livestock
+performance, diets, and emission factors.
 
 This document serves as the **Technical Reference** for all these
 internal CSV files.
@@ -21,19 +21,19 @@ biological requirements for energy calculation.
 
 | Column | Description / Notes |
 |:---|:---|
-| `identification` | Unique identifier for each animal (must match `categories.csv`). |
+| `animal_tag` | Unique identifier for each animal (must match `categories.csv`). |
 | `animal_type` | General animal class (e.g., `Cattle`, `Sheep`). |
 | `animal_subtype` | Specific production type. |
 | `sex` | Sex of the animals (`male` / `female`). |
-| `group` | Grouping variable (e.g., Farm ID, country, region). |
+| `region` | Grouping variable (e.g., Farm ID, country, region). |
 | `zone` | Geographic or management zone. |
-| `population` | Number of animals in this category/group/zone. |
+| `population` | Number of animals in this category/region/zone. |
 
 #### 🥩 📁 `categories.csv` — Production and Energy Parameters
 
 | Column | Description / Notes |
 |:---|:---|
-| `identification` | Unique identifier for each animal. |
+| `animal_tag` | Unique identifier for each animal. |
 | `animal_type` | General animal class. |
 | `animal_subtype` | Specific production type. |
 | `diet_tag` | Links to `diet.csv` / `ingredients.csv`. |
@@ -54,7 +54,7 @@ biological requirements for energy calculation.
 
 | Column              | Description / Notes                                 |
 |:--------------------|:----------------------------------------------------|
-| `identification`    | Unique identifier for each animal.                  |
+| `animal_tag`        | Unique identifier for each animal.                  |
 | `adult_weight`      | Adult weight of the animal (kg).                    |
 | `birth_weight`      | Birth weight of the animal (kg).                    |
 | `initial_weight`    | Weight at the start of the observation period (kg). |
@@ -95,7 +95,7 @@ excretion calculations.
 | `feed_share`          | Fraction of the diet composed of concentrate feed. |
 | `milk_share`          | Fraction of the diet composed of milk.             |
 | `milk_replacer_share` | Fraction of the diet composed of milk replacer.    |
-| `group`               | Grouping variable.                                 |
+| `region`              | Grouping variable.                                 |
 | `animal_type`         | General animal class.                              |
 | `animal_subtype`      | Specific production type.                          |
 
@@ -108,7 +108,7 @@ excretion calculations.
 | `ingredient`       | Name of the ingredient (e.g., maize, soybean meal).  |
 | `ingredient_share` | Fraction of the diet represented by this ingredient. |
 | `ingredient_type`  | Type of ingredient (e.g., feed, forage, milk).       |
-| `group`            | Grouping variable.                                   |
+| `region`           | Grouping variable.                                   |
 | `animal_type`      | General animal class.                                |
 | `animal_subtype`   | Specific production type.                            |
 
@@ -142,7 +142,7 @@ excretion calculations.
 
 | Column | Description / Notes |
 |:---|:---|
-| `identification` | Unique animal identifier. |
+| `animal_tag` | Unique animal identifier. |
 | `management_system` | Manure management system currently used. |
 | `system_climate` | Climate category of the system. |
 | `management_duration` | Duration of the manure management system (days or months). |

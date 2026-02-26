@@ -1,4 +1,4 @@
-﻿identification,animal_type,animal_subtype,diet_tag,cfi,ca,c,a,b,dm_ingested_total,milk_yield,fat_content,wool_yield,hours,pr,single birth fraction,double birth fraction,c_pregnancy
+﻿animal_tag,animal_type,animal_subtype,diet_tag,cfi,ca,c,a,b,dm_ingested_total,milk_yield,fat_content,wool_yield,hours,pr,single birth fraction,double birth fraction,c_pregnancy
 feedlot_calves_male,cattle,feedlot,diet_feedlot_calves,cattle/buffalo,stall,bulls,,,1757.2,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
 feedlot_calves_female,cattle,feedlot,diet_feedlot_calves,cattle/buffalo,stall,females,,,1607.8,0.00,0.00,0.00,0.00,0.00,0.00,0.00,
 beef_calves_male,cattle,beef,diet_beef_calves_slaughter,cattle/buffalo,pasture,bulls,,,877.4,0.00,0.00,0.00,0.00,0.00,0.00,0.00,

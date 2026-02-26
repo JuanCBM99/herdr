@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Package Function Reference • herdr: GHG &amp; LU Calculator 🌎📊</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -30,9 +35,9 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
 <li class="active nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book"></span> Guides</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
     <li><a class="dropdown-item" href="../articles/Data_dictionary.html">Data dictionary</a></li>
@@ -40,8 +45,9 @@
     <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../articles/dairy_cattle_assessment.html"><span class="fa fa-tools"></span> Practical Cases</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-download"></span> Download</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -61,8 +67,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Package Function Reference</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Package Function Reference</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/JuanCBM99/herdr/blob/HEAD/vignettes/Functions.Rmd" class="external-link"><code>vignettes/Functions.Rmd</code></a></small>
@@ -72,83 +77,250 @@
     
     
 <div class="section level2">
-<h2 id="herdr-function-reference">herdr Function Reference<a class="anchor" aria-label="anchor" href="#herdr-function-reference"></a>
+<h2 id="configuration-reference-guide">🛠️ Configuration Reference Guide<a class="anchor" aria-label="anchor" href="#configuration-reference-guide"></a>
 </h2>
-<p>This manual provides a detailed technical reference for every public
-function within the <strong>herdr</strong> package.</p>
-<hr>
+<p>This guide defines the valid <strong>Paths</strong> for your
+<code>manure_management.csv</code>. For the model to function, your
+entries must match the IPCC database logic exactly.</p>
 <div class="section level3">
-<h3 id="i--core-workflow-and-data-utilities">I. Core Workflow and Data Utilities<a class="anchor" aria-label="anchor" href="#i--core-workflow-and-data-utilities"></a>
+<h3 id="high-detail-systems-storage-duration-dependent">1. High-Detail Systems (Storage Duration Dependent)<a class="anchor" aria-label="anchor" href="#high-detail-systems-storage-duration-dependent"></a>
 </h3>
+<p>These systems require specific <strong>Management Months</strong>,
+<strong>Sub-climates</strong>, and <strong>Climate Zones</strong>.</p>
 <div class="section level4">
-<h4 id="generate_impact_assessment">⚙️ <code>generate_impact_assessment</code><a class="anchor" aria-label="anchor" href="#generate_impact_assessment"></a>
+<h4 id="a--liquid-slurry-pit-storage">A. Liquid Slurry &amp; Pit Storage<a class="anchor" aria-label="anchor" href="#a--liquid-slurry-pit-storage"></a>
 </h4>
-<p>Orchestrates the entire calculation pipeline (Demographics, Energy,
-Emissions, Land Use) and aggregates all results into a single,
-filterable summary table.</p>
-<table class="table">
+<p>Factors for these systems change based on exactly how many months the
+manure is stored.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="25%">
-<col width="74%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
+<th align="left">System Base</th>
+<th align="left">System Variant</th>
+<th align="left">Months</th>
+<th align="left">Climate</th>
+<th align="left">Sub-climate</th>
+<th align="left">Climate Zone</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><strong>liquid_slurry</strong></td>
 <td align="left">
-<code>group</code>, <code>zone</code>,
-<code>animal</code>
+<code>with_natural_crust_cover</code>,
+<code>without_natural_crust_cover</code>, <code>with_cover</code>
 </td>
-<td align="left">Filters the summary by specific attributes.</td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>cool</code></td>
+<td align="left">
+<code>boreal</code>, <code>temperate</code>
+</td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><code>saveoutput</code></td>
-<td align="left">Logical. If <code>TRUE</code>, saves the final summary
-to CSV.</td>
+<td align="left"><strong>liquid_slurry</strong></td>
+<td align="left">
+<code>with_natural_crust_cover</code>,
+<code>without_natural_crust_cover</code>, <code>with_cover</code>
+</td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>group_by_identification</code></td>
-<td align="left">Logical. If <code>FALSE</code>, aggregates results
-above the <code>identification</code> level.</td>
+<td align="left"><strong>liquid_slurry</strong></td>
+<td align="left">
+<code>with_natural_crust_cover</code>,
+<code>without_natural_crust_cover</code>, <code>with_cover</code>
+</td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>tropical</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>,
+<code>zone_montane</code>, <code>zone_moist</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A tibble containing aggregated emissions
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>)
-and land use
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>).</td>
+<td align="left"><strong>pit_storage</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>cool</code></td>
+<td align="left">
+<code>boreal</code>, <code>temperate</code>
+</td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>pit_storage</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>pit_storage</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><strong>1, 3, 4, 6, 12</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>tropical</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>,
+<code>zone_montane</code>, <code>zone_moist</code>
+</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level4">
-<h4 id="load_dataset">⚙️ <code>load_dataset</code><a class="anchor" aria-label="anchor" href="#load_dataset"></a>
+<h4 id="b--anaerobic-lagoon">B. Anaerobic Lagoon<a class="anchor" aria-label="anchor" href="#b--anaerobic-lagoon"></a>
 </h4>
-<p>Internal utility function. Loads datasets (<code>census</code>,
-<code>diet</code>, <code>coefficients</code>, etc.) by prioritizing user
-files found in the <code>user_data/</code> directory over internal
-package defaults.</p>
-<table class="table">
+<p>Lagoon factors are based on climate/moisture rather than specific
+months.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="12%">
-<col width="87%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
+<th align="left">System Base</th>
+<th align="left">System Variant</th>
+<th align="left">Months</th>
+<th align="left">Climate</th>
+<th align="left">Sub-climate</th>
+<th align="left">Climate Zone</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>name</code></td>
-<td align="left">Name of the dataset without the extension (e.g.,
-<code>"census"</code>).</td>
+<td align="left"><strong>anaerobic_lagoon</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left"><code>cool</code></td>
+<td align="left">
+<code>boreal</code>, <code>temperate</code>
+</td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A data frame or tibble with the requested data.</td>
+<td align="left"><strong>anaerobic_lagoon</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>anaerobic_lagoon</strong></td>
+<td align="left"><code>below_animal_confinements</code></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>tropical</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>,
+<code>zone_montane</code>, <code>zone_moist</code>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="c--deep-bedding">C. Deep Bedding<a class="anchor" aria-label="anchor" href="#c--deep-bedding"></a>
+</h4>
+<p>The logic here focuses on mixing and whether the storage cycle is
+longer or shorter than one month.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">System Base</th>
+<th align="left">System Variant</th>
+<th align="left">Months</th>
+<th align="left">Climate</th>
+<th align="left">Sub-climate</th>
+<th align="left">Climate Zone</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>deep_bedding</strong></td>
+<td align="left">
+<code>active_mixing</code>,<code>no_mixing</code>
+</td>
+<td align="left"><strong>&gt;1</strong></td>
+<td align="left"><code>cool</code></td>
+<td align="left">
+<code>boreal</code>, <code>temperate</code>
+</td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>deep_bedding</strong></td>
+<td align="left">
+<code>active_mixing</code>,<code>no_mixing</code>
+</td>
+<td align="left"><strong>&gt;1</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>deep_bedding</strong></td>
+<td align="left">
+<code>active_mixing</code>,<code>no_mixing</code>
+</td>
+<td align="left"><strong>&gt;1</strong></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>tropical</code></td>
+<td align="left">
+<code>zone_dry</code>, <code>zone_wet</code>,
+<code>zone_montane</code>, <code>zone_moist</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>deep_bedding</strong></td>
+<td align="left">
+<code>active_mixing</code>,<code>no_mixing</code>
+</td>
+<td align="left"><strong>&lt;1</strong></td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left"><em>(leave empty)</em></td>
 </tr>
 </tbody>
 </table>
@@ -156,99 +328,10 @@ package defaults.</p>
 </div>
 </div>
 <div class="section level3">
-<h3 id="ii--demographics-and-population-structure">II. Demographics and Population Structure<a class="anchor" aria-label="anchor" href="#ii--demographics-and-population-structure"></a>
+<h3 id="standard-systems-climate-only">2. Standard Systems (Climate-Only)<a class="anchor" aria-label="anchor" href="#standard-systems-climate-only"></a>
 </h3>
-<div class="section level4">
-<h4 id="calculate_population">🐄 <code>calculate_population</code><a class="anchor" aria-label="anchor" href="#calculate_population"></a>
-</h4>
-<p>The main population orchestrator. Loads census data, validates it,
-and dispatches specialized calculations for each animal type (cattle,
-sheep, goat), unifying the partial results.</p>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="83%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>saveoutput</code></td>
-<td align="left">Logical. If <code>TRUE</code>, saves the raw population
-result to CSV.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A tibble containing the calculated population for all
-animal types.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="calculate_population_cattle">🐄 <code>calculate_population_cattle</code><a class="anchor" aria-label="anchor" href="#calculate_population_cattle"></a>
-</h4>
-<p>Calculates the complex demographic structure for
-<strong>Cattle</strong> (including calves, yearlings, replacement
-animals, and feedlot/slaughter animals) based on census data and
-rates.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_population_sheep">🐑 <code>calculate_population_sheep</code><a class="anchor" aria-label="anchor" href="#calculate_population_sheep"></a>
-</h4>
-<p>Calculates the demographic structure for <strong>Sheep</strong>,
-including total births and separating animals required for replacement
-from those designated for slaughter.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_population_goat">🐐 <code>calculate_population_goat</code><a class="anchor" aria-label="anchor" href="#calculate_population_goat"></a>
-</h4>
-<p>Calculates the demographic structure for <strong>Goats</strong>,
-primarily focused on ensuring replacement populations based on specific
-rates.</p>
-<hr>
-</div>
-</div>
-<div class="section level3">
-<h3 id="iii--metabolism-and-energy-intake">III. Metabolism and Energy Intake<a class="anchor" aria-label="anchor" href="#iii--metabolism-and-energy-intake"></a>
-</h3>
-<div class="section level4">
-<h4 id="calculate_weighted_variable">🌱 <code>calculate_weighted_variable</code><a class="anchor" aria-label="anchor" href="#calculate_weighted_variable"></a>
-</h4>
-<p>Calculates the weighted average nutritional profile (DE, CP, NDF,
-Ash) for each animal’s diet by linking ingredients, characteristics, and
-diet shares.</p>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="83%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>saveoutput</code></td>
-<td align="left">Logical. If <code>TRUE</code>, saves the calculated
-nutritional profiles to CSV.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A tibble with the final weighted nutritional variables
-per animal ID.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="net-energy-component-functions">🔋 Net Energy Component Functions<a class="anchor" aria-label="anchor" href="#net-energy-component-functions"></a>
-</h4>
-<p>These functions calculate the energy required for specific biological
-processes, primarily depending on weights and performance data. All use
-the same input/output structure.</p>
+<p>For these systems, sub-climates and zones are not required. Leave
+those columns blank in your CSV.</p>
 <table class="table">
 <colgroup>
 <col width="33%">
@@ -256,191 +339,140 @@ the same input/output structure.</p>
 <col width="33%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">Function</th>
-<th align="left">Biological Process / Calculation</th>
-<th align="left">Formula Basis</th>
+<th align="left">System Base</th>
+<th align="left">Valid Variants</th>
+<th align="left">System Climate</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>calculate_NEm</code></td>
-<td align="left">Net Energy for <strong>Maintenance</strong> (Base
-survival).</td>
-<td align="left">Coefficient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>×</mi><mrow><mo stretchy="true" form="prefix">(</mo><mi>W</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><msup><mi>t</mi><mn>0.75</mn></msup><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\times (Weight^{0.75})</annotation></semantics></math>.</td>
+<td align="left"><strong>solid_storage</strong></td>
+<td align="left">
+<code>additives</code>,
+<code>bulking_agent_addition</code>, <code>covered_compacted</code> OR
+<em>(leave empty)</em>
+</td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><code>calculate_NEa</code></td>
-<td align="left">Net Energy for <strong>Activity</strong>
-(Walking/Grazing).</td>
-<td align="left">Depends on NEm and specific coefficient (e.g.,
-<code>pasture</code> vs <code>stall</code>).</td>
+<td align="left"><strong>composting</strong></td>
+<td align="left">
+<code>intensive_windrow</code>,
+<code>passive_windrow</code>, <code>static_pile</code> OR
+<code>vessel</code>
+</td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>calculate_NEg</code></td>
-<td align="left">Net Energy for <strong>Growth</strong> (Weight
-gain).</td>
-<td align="left">Complex formulas specific to Cattle vs. Small
-Ruminants.</td>
+<td align="left"><strong>anaerobic_digester</strong></td>
+<td align="left">
+<code>low_leak_high_gastight</code>,
+<code>low_leakage_open_storage</code>,
+<code>low_leak_low_gastight</code>,
+<code>high_leakage_open_storage</code>,
+<code>high_leakage_high_gastight</code> OR
+<code>high_leakage_low_gastight</code>
+</td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><code>calculate_NEl</code></td>
-<td align="left">Net Energy for <strong>Lactation</strong> (Milk
-production).</td>
-<td align="left">Depends on milk yield and fat content.</td>
+<td align="left"><strong>aerobic_treatment</strong></td>
+<td align="left">
+<code>forced_aeration</code> OR
+<code>natural_aeration</code>
+</td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>calculate_NE_work</code></td>
-<td align="left">Net Energy for <strong>Work</strong> (Draught
-animals).</td>
-<td align="left">Depends on NEm and hours of work.</td>
+<td align="left"><strong>pasture_range_paddock</strong></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><code>calculate_NE_wool</code></td>
-<td align="left">Net Energy for <strong>Wool Production</strong>.</td>
-<td align="left">Depends on wool yield (for sheep).</td>
+<td align="left"><strong>burned_for_fuel</strong></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>calculate_NE_pregnancy</code></td>
-<td align="left">Net Energy for <strong>Pregnancy</strong>
-(Gestation).</td>
-<td align="left">Depends on NEm and species-specific gestation
-factors.</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="calculate_ge">⛽ <code>calculate_ge</code><a class="anchor" aria-label="anchor" href="#calculate_ge"></a>
-</h4>
-<p>The crucial function that converts Net Energy Requirements (NEm, NEg,
-etc.) into <strong>Gross Energy (GE)</strong> intake, adjusting for
-metabolic efficiency (REM/REG) based on the diet’s digestibility. This
-is the <strong>estimated total food mass</strong> the animal must
-consume.</p>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="83%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>saveoutput</code></td>
-<td align="left">Logical. If <code>TRUE</code>, saves GE and efficiency
-coefficients to CSV.</td>
+<td align="left"><strong>dry_lot</strong></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A tibble with the total required Gross Energy
-(<code>ge</code>).</td>
+<td align="left"><strong>daily_spread</strong></td>
+<td align="left"><em>(leave empty)</em></td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>poultry_manure</strong></td>
+<td align="left">
+<code>with_litter</code> OR
+<code>without_litter</code>
+</td>
+<td align="left">
+<code>cool</code>, <code>temperate</code> OR
+<code>warm</code>
+</td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
-</div>
 <div class="section level3">
-<h3 id="iv--emissions-and-waste-modeling">IV. Emissions and Waste Modeling<a class="anchor" aria-label="anchor" href="#iv--emissions-and-waste-modeling"></a>
+<h3 id="quick-logic-rules">💡 Quick Logic Rules<a class="anchor" aria-label="anchor" href="#quick-logic-rules"></a>
 </h3>
 <div class="section level4">
-<h4 id="calculate_vs">💩 <code>calculate_vs</code><a class="anchor" aria-label="anchor" href="#calculate_vs"></a>
+<h4 id="the-warm-rule">The “Warm” Rule<a class="anchor" aria-label="anchor" href="#the-warm-rule"></a>
 </h4>
-<p>Calculates <strong>Volatile Solids (VS)</strong> excretion, which is
-the organic matter component of the manure. VS forms the substrate for
-methane production in manure management.</p>
+<ul>
+<li>
+<strong>Warm + Temperate:</strong> Only supports
+<code>zone_dry</code> and <code>zone_wet</code>.</li>
+<li>
+<strong>Warm + Tropical:</strong> Unlocks all zones:
+<code>zone_dry</code>, <code>zone_wet</code>, <code>zone_moist</code>,
+and <code>zone_montane</code>.</li>
+</ul>
 </div>
 <div class="section level4">
-<h4 id="calculate_emissions_enteric">💨 <code>calculate_emissions_enteric</code><a class="anchor" aria-label="anchor" href="#calculate_emissions_enteric"></a>
+<h4 id="data-entry-tips">Data Entry Tips<a class="anchor" aria-label="anchor" href="#data-entry-tips"></a>
 </h4>
-<p>Calculates <strong>Methane
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>)
-emissions from Enteric Fermentation</strong> using the IPCC Tier 2
-methodology. The calculation depends heavily on the animal’s Gross
-Energy (GE) intake and the Methane Conversion Factor
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math>),
-which varies by diet quality.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_ch4_manure">🛢️ <code>calculate_CH4_manure</code><a class="anchor" aria-label="anchor" href="#calculate_ch4_manure"></a>
-</h4>
-<p>Calculates <strong>Methane
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>)
-emissions from Manure Management</strong> systems. Uses the VS value
-along with management system factors
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>C</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">MCF</annotation></semantics></math>)
-to estimate total
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>
-output.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_n2o_direct_manure">💧 <code>calculate_N2O_direct_manure</code><a class="anchor" aria-label="anchor" href="#calculate_n2o_direct_manure"></a>
-</h4>
-<p>Calculates <strong>Nitrogen
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>N</mi><annotation encoding="application/x-tex">N</annotation></semantics></math>)
-Excretion</strong> based on Nitrogen intake (derived from Crude Protein,
-CP) minus Nitrogen retention (growth/milk). Then estimates
-<strong>Direct Nitrous Oxide
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>)</strong>
-emissions from that excreted nitrogen.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_n2o_indirect_volatilization">🌬️ <code>calculate_N2O_indirect_volatilization</code><a class="anchor" aria-label="anchor" href="#calculate_n2o_indirect_volatilization"></a>
-</h4>
-<p>Calculates <strong>Indirect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
-emissions</strong> resulting from the volatilization of Nitrogen
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>H</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">NH_3</annotation></semantics></math>/<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>O</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">NO_x</annotation></semantics></math>)
-from the manure management system into the atmosphere.</p>
-</div>
-<div class="section level4">
-<h4 id="calculate_n2o_indirect_leaching">🌧️ <code>calculate_N2O_indirect_leaching</code><a class="anchor" aria-label="anchor" href="#calculate_n2o_indirect_leaching"></a>
-</h4>
-<p>Calculates <strong>Indirect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
-emissions</strong> resulting from the leaching and runoff of Nitrogen
-from the manure management system into water tables.</p>
-<hr>
-</div>
-</div>
-<div class="section level3">
-<h3 id="v--resource-use">V. Resource Use<a class="anchor" aria-label="anchor" href="#v--resource-use"></a>
-</h3>
-<div class="section level4">
-<h4 id="calculate_land_use">🌲 <code>calculate_land_use</code><a class="anchor" aria-label="anchor" href="#calculate_land_use"></a>
-</h4>
-<p>Calculates the <strong>Land Use
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>)</strong>
-associated with the production of feed consumed by the animal. The
-calculation links total Dry Matter Intake (DMI) to ingredient share and
-crop yield data.</p>
-<table class="table">
-<colgroup>
-<col width="16%">
-<col width="83%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Argument</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>saveoutput</code></td>
-<td align="left">Logical. If <code>TRUE</code>, saves the land use
-result
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>)
-to CSV.</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Returns</strong></td>
-<td align="left">A tibble containing land use per animal and total land
-use.</td>
-</tr>
-</tbody>
-</table>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Case Sensitivity:</strong> All entries must be
+<strong>lowercase</strong> (e.g., <code>zone_wet</code>, NOT
+<code>Zone_Wet</code>).</li>
+<li>
+<strong>Empty Values:</strong> Leave cells blank for columns marked
+as <code>(leave empty)</code>.</li>
+<li>
+<strong>Allocation:</strong> For each unique animal/region
+combination, the sum of <code>allocation</code> must equal <strong>1.0
+(100%)</strong>.</li>
+</ol>
 </div>
 </div>
 </div>

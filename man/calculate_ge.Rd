@@ -2,7 +2,7 @@
 % Please edit documentation in R/03_calculate_GE.R
 \name{calculate_ge}
 \alias{calculate_ge}
-\title{Calculate Gross Energy (GE) (Fixed & Robust)}
+\title{Calculate Gross Energy (GE)}
 \usage{
 calculate_ge(saveoutput = TRUE)
 }
@@ -10,6 +10,5 @@ calculate_ge(saveoutput = TRUE)
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes gross energy requirements by aggregating all necessary Net Energy (NE) components (NEm, NEa, NEg, NEl, NEwork, NEp, NEwool)
-and adjusting for feed digestibility (DE) and conversion ratios (REM, REG).
+Computes gross energy requirements by aggregating Net Energy (NE) components.
 }

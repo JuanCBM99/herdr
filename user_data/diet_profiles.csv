@@ -1,0 +1,5 @@
+﻿diet_tag,region,subregion,class_flex,forage_share,concentrate_share,milk_share,milk_replacer_share
+diet_dairy_mature,spain,north,dry_phase,70,30,0,0
+diet_dairy_mature,spain,north,lactation_phase,55,45,0,0
+diet_dairy_mature,spain,south,dry_phase,54,46,0,0
+diet_dairy_mature,spain,south,lactation_phase,50,50,0,0

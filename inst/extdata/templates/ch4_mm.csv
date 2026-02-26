@@ -1,4 +1,4 @@
-﻿identification,management_system,system_climate,management_duration,animal_category,animal_type,animal_subtype
+﻿animal_tag,management_system,system_climate,management_duration,animal_category,animal_type,animal_subtype
 feedlot_calves_male,solid_storage,cool,12.00,non dairy cattle,cattle,feedlot
 beef_yearlings_male_replacement,pasture_range_paddock,na,9.00,non dairy cattle,cattle,beef
 beef_yearlings_male_replacement,solid_storage,cool,3.00,non dairy cattle,cattle,beef

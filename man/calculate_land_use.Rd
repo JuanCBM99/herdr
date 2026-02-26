@@ -2,13 +2,16 @@
 % Please edit documentation in R/10_land_use.R
 \name{calculate_land_use}
 \alias{calculate_land_use}
-\title{Calculate land use (Refactored & Fixed)}
+\title{Calculate land use}
 \usage{
-calculate_land_use(saveoutput = TRUE)
+calculate_land_use(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes total land use (m²) per animal based on diet and yields.
+Computes total land use (m2) per animal based on derived DMI (ge / eb).
+This version automatically cleans duplicates in CSVs and normalizes dietary shares.
 }

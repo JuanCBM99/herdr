@@ -12,7 +12,7 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
-    - text: "Introduction"
+    - text: "Summary"
       icon: fas fa-book-open
       href: articles/Introduction.html
     - text: "Guides"
@@ -20,12 +20,15 @@ navbar:
       menu:
         - text: "Workflow Guide: Step-by-Step"
           href: articles/Workflow.html
-        - text: "Data dictionary"
-          href: articles/Data_dictionary.html
-        - text: "Package Function Reference"
-          href: articles/Functions.html
+        - text: "Technical Reference: Files & Parameters"
+          href: articles/Technical_reference.html
+        - text: "Manure System Guide"
+          href: articles/Manure.html
         - text: "Theoretical Basis: IPCC Tier 2 Methodology"
           href: articles/Theoretical_basis.html
+    - icon: fa-tools
+      text: "Practical Cases"
+      href: articles/dairy_cattle_assessment.html
     - icon: fa-file-code-o
       text: "Reference"
       href: reference/index.html

@@ -1,7 +1,6 @@
-# Calculate Net Energy for Maintenance (NEm) Computes NEm based on average weight and CFI coefficients using a relational join approach.
+# Calculate Net Energy for Maintenance (NEm)
 
-Calculate Net Energy for Maintenance (NEm) Computes NEm based on average
-weight and CFI coefficients using a relational join approach.
+Calculate Net Energy for Maintenance (NEm)
 
 ## Usage
 

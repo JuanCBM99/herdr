@@ -2,14 +2,10 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEa}
 \alias{calculate_NEa}
-\title{Calculate Net Energy for Activity (NEa) (Refactored)}
+\title{Calculate Net Energy for Activity (NEa)}
 \usage{
 calculate_NEa(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
-}
 \description{
-Computes NEa based on NEm and activity coefficients (Ca).
-Uses a simplified direct lookup based on the assigned Ca tag.
+Calculate Net Energy for Activity (NEa)
 }

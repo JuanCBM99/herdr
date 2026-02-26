@@ -2,14 +2,16 @@
 % Please edit documentation in R/07_N2O_direct_manure.R
 \name{calculate_N2O_direct_manure}
 \alias{calculate_N2O_direct_manure}
-\title{Calculate direct N₂O emissions from manure (Refactored)}
+\title{Calculate direct N2O emissions from manure}
 \usage{
-calculate_N2O_direct_manure(saveoutput = TRUE)
+calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes direct N₂O emissions based on nitrogen excretion logic,
+Computes direct N2O emissions based on nitrogen excretion logic,
 emission factors, management system, and climate (IPCC Eq 10.25).
 }

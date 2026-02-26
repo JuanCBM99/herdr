@@ -1,4 +1,4 @@
-﻿diet_tag,zone,ingredient,ingredient_share,ingredient_type,group,animal_type,animal_subtype
+﻿diet_tag,subregion,ingredient,ingredient_share,ingredient_type,region,animal_type,animal_subtype
 diet_dairy_calves_replacement,a,corn_national,42.70,feed,spain,cattle,dairy
 diet_dairy_calves_replacement,a,corn_gluten_feed_20_5_cp,0.00,feed,spain,cattle,dairy
 diet_dairy_calves_replacement,a,barley_2_rows_national_11_3_cp,0.00,feed,spain,cattle,dairy

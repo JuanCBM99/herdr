@@ -1,7 +1,7 @@
 library(usethis)
 library(magrittr)
 
-data_folder <- "G:/Other computers/My laptop/CSV_R/Definitive_csv"
+data_folder <- "C:/Users/juancarlos.baez/Desktop/CSV_R/Definitive_csv"
 
 #=========================================================
 # Constants

@@ -2,35 +2,36 @@
 % Please edit documentation in R/11_summary.R
 \name{generate_impact_assessment}
 \alias{generate_impact_assessment}
-\title{Summarize CH₄, N₂O Emissions, and Land Use}
+\title{Summarize CH4, N2O Emissions, and Land Use}
 \usage{
 generate_impact_assessment(
-  group = NULL,
-  zone = NULL,
+  automatic_cycle = FALSE,
+  region = NULL,
+  subregion = NULL,
   animal = NULL,
   type = NULL,
+  class_flex = NULL,
   saveoutput = TRUE,
   group_by_identification = TRUE
 )
 }
 \arguments{
-\item{group}{Character/Numeric vector (optional). Groups to filter. Default `NULL`.}
+\item{automatic_cycle}{Logical. TRUE for built-in model, FALSE for manual livestock_census.csv.}
 
-\item{zone}{Character vector (optional). Zones to filter. Default `NULL`.}
+\item{region}{Character/Numeric vector to filter.}
 
-\item{animal}{Character string (optional). Livestock type (`animal_type`). Default `NULL`.}
+\item{subregion}{Character vector to filter.}
 
-\item{type}{Character string (optional). Livestock subtype (`animal_subtype`). Default `NULL`.}
+\item{animal}{Livestock type (animal_type).}
 
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+\item{type}{Livestock subtype (animal_subtype).}
 
-\item{group_by_identification}{Logical. If `TRUE`, returns results at the `identification` level. If `FALSE`, aggregates all `identification`s.}
-}
-\value{
-A `tibble` with columns for each emission type and land use.
+\item{class_flex}{Management class (e.g., 'grazing', 'stall').}
+
+\item{saveoutput}{If TRUE saves to output folder.}
+
+\item{group_by_identification}{If TRUE returns by animal_tag.}
 }
 \description{
-Calculates a summary of CH₄ and N₂O emissions (direct and indirect) and land use,
-grouped by code, animal type, subtype, and zone. Optionally allows for
-aggregation to a more general level.
+Summarize CH4, N2O Emissions, and Land Use
 }

@@ -1,4 +1,4 @@
-﻿diet_tag,zone,forage_share,feed_share,milk_share,milk_replacer_share,group,animal_type,animal_subtype
+﻿diet_tag,subregion,forage_share,feed_share,milk_share,milk_replacer_share,region,animal_type,animal_subtype
 diet_feedlot_calves,,8.74,88.86,0.00,2.40,spain,cattle,feedlot
 diet_beef_calves_slaughter,montaña,0.00,4.66,95.34,0.00,spain,cattle,beef
 diet_beef_calves_slaughter,dehesa,0.00,0.00,100.00,0.00,spain,cattle,beef

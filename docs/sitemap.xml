@@ -1,14 +1,18 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>/404.html</loc></url>
+<url><loc>/articles/dairy_cattle_assessment.html</loc></url>
 <url><loc>/articles/Data_dictionary.html</loc></url>
 <url><loc>/articles/Functions.html</loc></url>
 <url><loc>/articles/index.html</loc></url>
 <url><loc>/articles/Introduction.html</loc></url>
+<url><loc>/articles/Manure.html</loc></url>
+<url><loc>/articles/Technical_reference.html</loc></url>
 <url><loc>/articles/Theoretical_basis.html</loc></url>
 <url><loc>/articles/Workflow.html</loc></url>
 <url><loc>/authors.html</loc></url>
 <url><loc>/index.html</loc></url>
 <url><loc>/LICENSE-text.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
 <url><loc>/news/index.html</loc></url>
 <url><loc>/reference/AnimalGEILU-package.html</loc></url>
 <url><loc>/reference/calculate_CH4_manure.html</loc></url>
@@ -33,6 +37,7 @@
 <url><loc>/reference/calculate_weighted_variable.html</loc></url>
 <url><loc>/reference/download_templates.html</loc></url>
 <url><loc>/reference/generate_impact_assessment.html</loc></url>
+<url><loc>/reference/herdr-package.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
 <url><loc>/reference/load_dataset.html</loc></url>
 </urlset>

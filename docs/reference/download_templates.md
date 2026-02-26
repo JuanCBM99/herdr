@@ -31,6 +31,6 @@ if (FALSE) { # \dontrun{
  list.files(data_path)
 
  # Read one of the files
- read.csv(file.path(data_path, "categories.csv"))
+ read.csv(file.path(data_path, "livestock_definitions.csv"))
 } # }
 ```

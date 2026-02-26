@@ -1,4 +1,4 @@
-﻿identification,adult_weight,birth_weight,initial_weight,final_weight,wf-wi,ei,ef,productive_period,weight_gain,average_weight,animal_type,animal_subtype
+﻿animal_tag,adult_weight,birth_weight,initial_weight,final_weight,wf-wi,ei,ef,productive_period,weight_gain,average_weight,animal_type,animal_subtype
 feedlot_calves_male,950.00,45.00,45.00,400.00,355.00,,,336.00,1.06,222.50,cattle,feedlot
 feedlot_calves_female,675.00,40.00,40.00,350.00,310.00,,,300.00,1.03,195.00,cattle,feedlot
 beef_calves_male,994.33,39.90,39.90,200.00,160.10,,,183.00,0.87,119.95,cattle,beef

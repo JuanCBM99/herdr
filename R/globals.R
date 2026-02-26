@@ -11,7 +11,7 @@ utils::globalVariables(c(
   "dairy_calves_female_replacement", "de", "de_percent", "de_safe", "description",
   "diet_tag", "dm_ingested_total", "dry_matter_yield", "duration", "ef4",
   "ef_kg_animal_year", "ef_value", "emissions_total", "fat_content", "frac_gas_ms",
-  "frac_leach_ms", "ge", "group", "hours", "identification", "ingredient",
+  "frac_leach_ms", "ge", "region", "hours", "animal_tag", "ingredient",
   "ingredient_share", "land_use_m2_per_unit", "land_use_total", "management_duration",
   "management_system", "mature_beef_bull", "mature_beef_cattle", "mature_dairy_cattle",
   "mature_goat_female_dairy", "mature_goat_female_meat", "mature_goat_male_dairy",
@@ -28,5 +28,5 @@ utils::globalVariables(c(
   "pop_lamb_male_meat_replacement", "pop_lamb_meat_slaughter", "population", "pr",
   "reg", "rem", "sex", "share_weight", "system_climate", "total_beef_births",
   "total_dairy_births", "total_meat_births", "ue_factor", "value", "vs",
-  "weight_factor", "weight_gain", "wool_yield", "ym", "zone", "zone_parent"
+  "weight_factor", "weight_gain", "wool_yield", "ym", "subregion", "zone_parent", "class_flex"
 ))

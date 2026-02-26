@@ -2,14 +2,10 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NE_pregnancy}
 \alias{calculate_NE_pregnancy}
-\title{Calculate Net Energy for Pregnancy (NE_pregnancy) (Refactored)}
+\title{Calculate Net Energy for Pregnancy (NE_pregnancy)}
 \usage{
 calculate_NE_pregnancy(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
-}
 \description{
-Computes NE_pregnancy based on species-specific coefficients (C_pregnancy or PR).
-Keeps all animals (assigns 0 to non-pregnant), ensuring data consistency.
+Calculate Net Energy for Pregnancy (NE_pregnancy)
 }

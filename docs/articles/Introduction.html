@@ -6,6 +6,11 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Introduction to herdr • herdr: GHG &amp; LU Calculator 🌎📊</title>
+<!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
+<link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
+<link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
+<link rel="icon" sizes="any" href="../favicon.ico">
+<link rel="manifest" href="../site.webmanifest">
 <script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.1/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.1/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
@@ -30,18 +35,19 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="active nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book"></span> Introduction</a></li>
+<li class="active nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book"></span> Guides</button>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
-    <li><a class="dropdown-item" href="../articles/Data_dictionary.html">Data dictionary</a></li>
-    <li><a class="dropdown-item" href="../articles/Functions.html">Package Function Reference</a></li>
+    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Reference: Files &amp; Parameters</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
     <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
   </ul>
 </li>
+<li class="nav-item"><a class="nav-link" href="../articles/dairy_cattle_assessment.html"><span class="fa fa-tools"></span> Practical Cases</a></li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-download"></span> Download</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
       </ul>
 <ul class="navbar-nav">
@@ -61,8 +67,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-
-      <h1>Introduction to herdr</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Introduction to herdr</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/JuanCBM99/herdr/blob/HEAD/vignettes/Introduction.Rmd" class="external-link"><code>vignettes/Introduction.Rmd</code></a></small>
@@ -129,13 +134,13 @@ yields.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="spatial-granularity">Spatial Granularity<a class="anchor" aria-label="anchor" href="#spatial-granularity"></a>
+<h4 id="multi-scenario-analysis">Multi-Scenario Analysis<a class="anchor" aria-label="anchor" href="#multi-scenario-analysis"></a>
 </h4>
 <ul>
-<li>The package is designed to handle multiple <strong>Groups</strong>
-(e.g., farms, countries) and <strong>Zones</strong> (e.g., climatic
-regions) simultaneously, allowing for comparative analysis within a
-single dataset.</li>
+<li>herdr allows you to model different farms, regions, or management
+strategies within the same project. You can compare how emissions change
+between a farm in the mountains and one in the valley, or between two
+different countries, all in a single run.</li>
 </ul>
 <hr>
 </div>
@@ -143,9 +148,8 @@ single dataset.</li>
 <div class="section level3">
 <h3 id="calculation-methodology-ipcc-2019">🎯 Calculation Methodology (IPCC 2019)<a class="anchor" aria-label="anchor" href="#calculation-methodology-ipcc-2019"></a>
 </h3>
-<p>All emission calculations within herdr adhere to the Tier 2
-methods established by the Intergovernmental Panel on Climate Change
-(IPCC).</p>
+<p>All emission calculations within herdr adhere to the Tier 2 methods
+established by the Intergovernmental Panel on Climate Change (IPCC).</p>
 <p>Specifically, we use the guidelines from the 2019 Refinement to the
 2006 IPCC Guidelines for National Greenhouse Gas Inventories:</p>
 <p><em>“Volume 4: Agriculture, Forestry and Other Land Use, Chapter 10:
@@ -162,9 +166,8 @@ like the Methane Conversion Factor
 and Nitrogen Excretion
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi></mrow></msub><annotation encoding="application/x-tex">N_{ex}</annotation></semantics></math>).</p>
 <p><strong>Automatic Validation:</strong> Before calculating,
-<code>herdr</code> automatically checks consistency between your
-census (population) and diet files, ensuring every animal defined has a
-corresponding nutritional profile.</p>
+<code>herdr</code> automatically checks consistency of many things,
+ensuring that some impossible things are not committed.</p>
 <hr>
 </div>
 <div class="section level3">
@@ -185,18 +188,24 @@ corresponding nutritional profile.</p>
 <li>Load the package and explore the default datasets:</li>
 </ul>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JuanCBM99/Animal_GEI_LU" class="external-link">herdr</a></span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/JuanCBM99/herdr" class="external-link">herdr</a></span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+<h3 id="next-steps">🚀 Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h3>
-<p>After familiarizing yourself with the package, move on to the Example
-Data vignette for detailed instructions on:</p>
+<p>Ready to start? Depending on your goals, choose your next path:</p>
 <ul>
-<li><p>Loading and exploring datasets</p></li>
-<li><p>Using your own data with templates</p></li>
-<li><p>Preparing data for calculations</p></li>
+<li>
+<strong>Understand the data:</strong> Explore the internal libraries
+in the <a href="Data_dictionary.html">Data Dictionary</a>.</li>
+<li>
+<strong>Configure your study:</strong> Follow the step-by-step <a href="Workflow.html">Workflow Guide</a>.</li>
+<li>
+<strong>Check Manure Systems:</strong> Consult the <a href="Manure.html">Manure System Guide</a> for valid IPCC
+combinations.</li>
+<li>
+</li>
 </ul>
 </div>
 </div>

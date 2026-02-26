@@ -2,9 +2,8 @@
 
 ## Introduction to herdr
 
-**herdr** is an R package designed to calculate **greenhouse gas
-(GHG) emissions** and **land use** (LU) associated with livestock
-production.
+**herdr** is an R package designed to calculate **greenhouse gas (GHG)
+emissions** and **land use** (LU) associated with livestock production.
 
 Currently supported animals: - **Cattle** - **Goat** - **Sheep**
 
@@ -37,19 +36,19 @@ growth, lactation, pregnancy, work, and wool production.
 - Calculates the **land area** ($`m^2`$) required to produce the feed,
   linking animal intake directly to crop yields.
 
-#### Spatial Granularity
+#### Multi-Scenario Analysis
 
-- The package is designed to handle multiple **Groups** (e.g., farms,
-  countries) and **Zones** (e.g., climatic regions) simultaneously,
-  allowing for comparative analysis within a single dataset.
+- herdr allows you to model different farms, regions, or management
+  strategies within the same project. You can compare how emissions
+  change between a farm in the mountains and one in the valley, or
+  between two different countries, all in a single run.
 
 ------------------------------------------------------------------------
 
 ### 🎯 Calculation Methodology (IPCC 2019)
 
-All emission calculations within herdr adhere to the Tier 2
-methods established by the Intergovernmental Panel on Climate Change
-(IPCC).
+All emission calculations within herdr adhere to the Tier 2 methods
+established by the Intergovernmental Panel on Climate Change (IPCC).
 
 Specifically, we use the guidelines from the 2019 Refinement to the 2006
 IPCC Guidelines for National Greenhouse Gas Inventories:
@@ -66,10 +65,9 @@ nutritional data (Energy, Protein, NDF) to determine key parameters like
 the Methane Conversion Factor ($`Y_m`$) and Nitrogen Excretion
 ($`N_{ex}`$).
 
-**Automatic Validation:** Before calculating, `herdr`
-automatically checks consistency between your census (population) and
-diet files, ensuring every animal defined has a corresponding
-nutritional profile.
+**Automatic Validation:** Before calculating, `herdr` automatically
+checks consistency of many things, ensuring that some impossible things
+are not committed.
 
 ------------------------------------------------------------------------
 
@@ -94,13 +92,14 @@ library(herdr)
 
 ------------------------------------------------------------------------
 
-### Next Steps
+### 🚀 Next Steps
 
-After familiarizing yourself with the package, move on to the Example
-Data vignette for detailed instructions on:
+Ready to start? Depending on your goals, choose your next path:
 
-- Loading and exploring datasets
-
-- Using your own data with templates
-
-- Preparing data for calculations
+- **Understand the data:** Explore the internal libraries in the [Data
+  Dictionary](Data_dictionary.md).
+- **Configure your study:** Follow the step-by-step [Workflow
+  Guide](Workflow.md).
+- **Check Manure Systems:** Consult the [Manure System Guide](Manure.md)
+  for valid IPCC combinations.
+- 

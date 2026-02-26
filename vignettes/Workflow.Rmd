@@ -1,93 +1,172 @@
 ---
-title: "Workflow Guide: Step-by-Step"
+title: "General Workflow: Step-by-Step Guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Workflow Guide: Step-by-Step}
+  %\VignetteIndexEntry{General Workflow: Step-by-Step Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-# Workflow Guide: Step-by-Step
+# 🚀 herdr Workflow: From Raw Data to Impact Assessment
 
-This guide explains the workflow for using the `herdr` model, from exploring the default reference datasets to introducing and analysing your own Tier 2 custom scenarios.
-
-<img src="images/workflow.png" alt="" style="width:100%; height:auto;">
+The `herdr` package follows a modular logic where information flows from population and nutrition to biological metabolism and, finally, to environmental impact. All user-defined data must be stored in the `user_data/` directory.
 
 ---
 
-## 1. Preliminary Analysis: Default National Data
+## Phase 1: Population and Geography (`livestock_census.csv`)
 
-**herdr** includes default datasets based on national averages and emission factors for **Spain**. These allow you to run the model immediately and obtain a **baseline environmental footprint**.
+This file is the starting point of your inventory. Here, you define **who** is being studied, **where** they are located, and **how many** animals are present.
 
-### Step 1: Run a Quick Analysis
+### Main Columns:
+* **`animal_tag`**: Unique identifier for the animal group (e.g., `mature_dairy_cattle`).
+* **`region` & `subregion`**: Defines the geographic scope (e.g., `spain` & `north`).
+* **`class_flex`**: A flexible tag for anything you want to study (e.g., `intensive`, `grazing`, `dry_phase`, `lactation_phase`).
+* **`population`**: Total number of heads.
 
-To view the results computed from the internal reference data, simply load the package and run the main function `generate_impact_assessment()`.
+### Calculation Methodologies:
 
-```{r run-default-model, eval=FALSE}
-# Load the package
+#### Option A: Manual Census (Static Populations)
+Best used when you already have the exact numbers for all animal categories (including offspring) and want to study a specific "snapshot" in time.
+
+- **Usage:** Manually enter the population for every category. If you wish to add a new category just add a new row, but you must manually ensure that every new `animal_tag` exists in all other configuration files (definitions, nutrition, manure, etc.), or the model will fail.
+
+#### Option B: Automatic Cycle (Herd Projection)
+Best used when you want the model to **project the herd structure** for you. Based on the number of mature animals (mothers/sires) and biological rates, the model automatically calculates how many offspring are born and how many replacement animals are present.
+
+- **Usage:** Triggered by using standard predefined tags (e.g., `mature_dairy_cattle`, `mature_sheep_female_meat`).
+- **Note:** Custom tags added by the user do not participate in this automatic cycle.
+
+---
+
+## Phase 2: Nutritional Strategy
+
+This phase calculates the **Gross Energy (GE)**, which drives methane and nitrogen results.
+
+### 1. Macro Diet (`diet_profiles.csv`)
+Set the general balance of the diet using a `diet_tag`:
+
+* **Categories**: Forage, Concentrate, Milk, and Milk Replacer.
+* **The 1.0 Rule**: These four must sum to **1.0** (e.g., 0.7 Forage + 0.3 Concentrate).
+
+### 2. Micro Ingredients (`diet_ingredients.csv`)
+List exactly what is inside each diet_tag.
+
+* **The 100% Rule**: Ingredients inside each category (like "Forage") must sum to **1.0**. 
+* **Example:** If your "Forage" macro is 0.70, your ingredient list for Forage (e.g., 0.5 Alfalfa + 0.5 Maize Silage) must sum to 1.0.
+* **Source**: Choose names from the existing library (`feed_characteristics.csv`) or add your own.
+
+### 🟢 Adding a New Ingredient
+If you add a new ingredient name, you **must** add it to these two files:
+
+1. **`feed_characteristics.csv`**: Enter the nutritional data (% Protein, % Digestibility, etc.). This tells the model how it affects the **animal**.
+2. **`crop_yields.csv`**: Enter the yield (kg/ha) and nitrogen data. This tells the model how it affects the **land**.
+
+---
+
+### 💡 Simple Workflow
+* **Browse**: Check `feed_characteristics.csv` for existing ingredients.
+* **Add**: If missing, add the name and data to **both** `feed_characteristics.csv` and `crop_yields.csv`.
+* **Assign**: Use that exact name in your `diet_ingredients.csv`.
+
+---
+
+## Phase 3: Animal Metabolism
+
+This phase connects your animals to their diet and defines their physical characteristics. The model uses this data to calculate energy requirements (IPCC Tier 2).
+
+### 1. Defining Traits (`livestock_definitions.csv`)
+For every `animal_tag` defined in your census, you must now assign its "labels" and its diet.
+
+* **`diet_tag`**: Link the animal to one of the diets you created in Phase 2.
+* **IPCC Coefficients**: Assign the correct **description** (text) from the `ipcc_coefficients.csv` library. The exception occurs with sheep/goat where the c_pregnancy is calculated by pr and single/double birth fraction.
+    * *How it works:* The model sees the description (e.g., `cattle and buffalo`) and automatically fetches the mathematical constants ($C_a$, $C_{fi}$, etc.) needed for the energy equations.
+
+### 2. Body Metrics (`weights.csv`)
+You must replicate the exact combinations of `animal_tag`, `region`, `subregion`, and `class_flex` used in your census and assign their weights.
+
+* **`adult_weight`**: The mature weight of the adult animal.
+* **`average_weight`**: Average weight of . Usually calculated as: $(W_{initial} + W_{final}) / 2$.
+* **`weight_gain`**: Daily weight increase. Calculated as: $(W_{final} - W_{initial}) / \text{productive period}$.
+
+
+### 💡 How to Proceed
+
+1.  **Tag Consistency**: Start by copying the `animal_tag`, `region`, `subregion`, and `class_flex` columns from your `census.csv`. They must be identical.
+2.  **Add New Tags**: If you added custom animals in Phase 1, make sure they are included here too.
+3.  **Assign Diets**: Decide which `diet_tag` applies to each category in `livestock_definitions.csv` .
+4.  **Check the Library**: Open `ipcc_coefficients.csv`, find the description that best fits your animal, and copy that exact text into `livestock_definitions.csv`.
+
+
+---
+
+## Phase 4: Manure Management (`manure_management.csv`)
+
+This phase is dedicated to defining the fate of animal excreta. It is the final link in the chain that connects animal metabolism to environmental impact. By specifying how manure is handled, the model can quantify the gases released during storage, treatment, and application.
+
+### 🎯 Purpose of this Phase
+The goal is to characterize the management systems used for each livestock group. This data allows the model to derive two primary environmental impacts:
+
+* **Methane ($CH_4$):** Driven by the anaerobic conditions of the storage (determined by system type, temperature, and duration).
+* **Nitrous Oxide ($N_2O$):** Driven by the Nitrogen excretion ($N_{ex}$) calculated in Phase 3 and the specific emission factors of each system.
+
+---
+
+### 🛠️ How to Proceed
+
+Follow these steps to fill your `manure_management.csv` file correctly:
+
+1.  **Consult the Reference Guide:** Before entering data, review the **[Manure System Guide](Manure.html)**. You must use the exact system names and variants listed there, as they are the only ones recognized by the IPCC reference database.
+2.  **Sync the Tags:** Copy the `animal_tag`, `region`, `subregion`, and `class_flex` from your `livestock_census.csv`. They must match exactly.
+3.  **Manage Multiple Systems (Row Duplication):** If a single animal group uses more than one system (e.g., 60% in "Pasture" and 40% in "Solid Storage"), you must **create two identical rows** for that group, changing only the system details and the allocation value.
+4.  **Assign Systems and Climates:** For each row, select the appropriate `system_base`, `system_variant`, and `climate_zone` following the logic provided in the System Guide.
+
+---
+
+### ⚖️ The Allocation Rule
+The `allocation` column defines what percentage of the manure is handled by a specific system.
+
+* **The 1.0 Rule:** For every unique livestock group (same tag, region, and class), the sum of the `allocation` column must be exactly **1.0 (100%)**.
+* **Example:** If a group uses three different systems, you will have **three separate rows** for that group, and the total of their allocations (e.g., 0.5 + 0.3 + 0.2) must equal 1.0.
+
+---
+
+## Phase 5: Generating Results
+
+This is the final stage where the `herdr` engine processes all your configuration files to generate a comprehensive environmental impact report.
+
+### 🎯 Purpose of this Phase
+The goal is to consolidate the data from populations, nutrition, metabolism, and manure management into final emission and resource-use metrics. The model will calculate:
+
+* **Total Emissions**: $CH_4$ (Enteric & Manure) and $N_2O$ (Direct & Indirect).
+* **Carbon Footprint**: Total $CO_2eq$ based on IPCC global warming potentials.
+* **Land Use**: Total area required based on your nutritional strategy and crop yields.
+
+---
+
+### 🛠️ How to Proceed
+
+1. **Load the Library**: Ensure the package is active in your R session.
+2. **Run the Assessment**: Use the `generate_impact_assessment()` function. This function automatically looks into your `user_data/` folder for all the CSV files you prepared in Phases 1 through 4.
+3. **Choose Your Mode**:
+    * **`automatic_cycle = TRUE`**: Use this if you want the model to calculate offspring and herd dynamics based on your mature animals (Phase 1, Option B).
+    * **`automatic_cycle = FALSE`**: Use this if you want the model to stick strictly to the population numbers you entered manually in `livestock_census.csv`.
+
+
+
+---
+
+### 💻 Execution Code
+
+```r
 library(herdr)
 
-# Run the complete calculation using only internal package data
-reporte_base <- generate_impact_assessment(
-  group_by_identification = FALSE
+# Execute the master function
+# saveoutput = TRUE creates a CSV file with your results in the output folder
+results <- generate_impact_assessment(
+  automatic_cycle = FALSE, 
+  saveoutput = TRUE
 )
 
-# Display key impact columns
-head(reporte_base)
+# Preview the results
+head(results)
 ```
-
-### 📊 Understanding the Output
-
-The table returned by generate_impact_assessment() contains consolidated results for emissions and land use.
-
-| Column                  | Description                            | Unit        |
-| ----------------------- | -------------------------------------- | ----------- |
-| `Emissions_CH4_enteric` | Methane from enteric fermentation      | kg CH₄/year |
-| `Emissions_CH4_manure`  | Methane from manure management         | kg CH₄/year |
-| `Emissions_N2O_direct`  | Direct nitrous oxide from manure       | kg N₂O/year |
-| `Land_use_m2`           | Land area required for feed production | m²/year     |
-
-
-
-## II. Customisation: Using Your Own Data (Tier 2)
-
-For specific systems or Tier 2 calculations, you can edit the input data to reflect your real case study.
-
-### 📥 Step 2: Download the Templates
-
-Use download_templates() to generate the folder structure and obtain the editable CSV files.
-
-```{r download_templates, eval=FALSE}
-# This function creates the folder 'user_data/' in your working directory
-download_templates()
-```
-### 📝 Step 3: Edit the Key Input Files
-
-The model automatically reads any CSV files inside user_data/.
-
-| File                           | What to Modify                                                       | Importance       |
-| ------------------------------ | -------------------------------------------------------------------- | ---------------- |
-| `census.csv`                   | Animal population per `group` and `zone`.                            | High             |
-| `categories.csv`               | Performance (milk yield, body weight, grazing) and `diet_tag`.       | High             |
-| `diet.csv` / `ingredients.csv` | Diet composition (forage/concentrate, digestibility).                | Medium/High      |
-| `coefficients.csv`, etc.       | Scientific/IPCC factors. Modify only if local studies are available. | Low/Experts only |
-
-## III. Running Custom Scenario Analysis
-
-Once you save your edited files into user_data/, the model will automatically use them in the next run.
-
-### ⚙️ Step 4: Run the Model with Your Own Data
-
-```{r run_model, eval=FALSE}
-# Run the model using the customised data inside /user_data
-resultados_personalizados <- generate_impact_assessment(
-  saveoutput = TRUE,
-  group_by_identification = TRUE
-)
-
-# Example: filter results by zone (if census.csv includes zones)
-resultados_zona_A <- generate_impact_assessment(zone = "Zone_A")
-```
-
-
-

@@ -2,7 +2,7 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NE_work}
 \alias{calculate_NE_work}
-\title{Calculate Net Working Energy (NE_work) (Refactored)}
+\title{Calculate Net Energy for Work (NE_work)}
 \usage{
 calculate_NE_work(saveoutput = TRUE)
 }
@@ -11,5 +11,4 @@ calculate_NE_work(saveoutput = TRUE)
 }
 \description{
 Computes NE_work based on NEm and hours of activity.
-Keeps all animals in the dataset (assigns 0 to non-working animals).
 }

@@ -1,166 +1,87 @@
 # Package Function Reference
 
-## herdr Function Reference
+## 🛠️ Configuration Reference Guide
 
-This manual provides a detailed technical reference for every public
-function within the **herdr** package.
+This guide defines the valid **Paths** for your `manure_management.csv`.
+For the model to function, your entries must match the IPCC database
+logic exactly.
 
-------------------------------------------------------------------------
+### 1. High-Detail Systems (Storage Duration Dependent)
 
-### I. Core Workflow and Data Utilities
+These systems require specific **Management Months**, **Sub-climates**,
+and **Climate Zones**.
 
-#### ⚙️ `generate_impact_assessment`
+#### A. Liquid Slurry & Pit Storage
 
-Orchestrates the entire calculation pipeline (Demographics, Energy,
-Emissions, Land Use) and aggregates all results into a single,
-filterable summary table.
+Factors for these systems change based on exactly how many months the
+manure is stored.
 
-| Argument | Description |
-|:---|:---|
-| `group`, `zone`, `animal` | Filters the summary by specific attributes. |
-| `saveoutput` | Logical. If `TRUE`, saves the final summary to CSV. |
-| `group_by_identification` | Logical. If `FALSE`, aggregates results above the `identification` level. |
-| **Returns** | A tibble containing aggregated emissions ($`CH_4`$, $`N_2O`$) and land use ($`m^2`$). |
+| System Base | System Variant | Months | Climate | Sub-climate | Climate Zone |
+|:---|:---|:---|:---|:---|:---|
+| **liquid_slurry** | `with_natural_crust_cover`, `without_natural_crust_cover`, `with_cover` | **1, 3, 4, 6, 12** | `cool` | `boreal`, `temperate` | `zone_dry`, `zone_wet` |
+| **liquid_slurry** | `with_natural_crust_cover`, `without_natural_crust_cover`, `with_cover` | **1, 3, 4, 6, 12** | `warm` | `temperate` | `zone_dry`, `zone_wet` |
+| **liquid_slurry** | `with_natural_crust_cover`, `without_natural_crust_cover`, `with_cover` | **1, 3, 4, 6, 12** | `warm` | `tropical` | `zone_dry`, `zone_wet`, `zone_montane`, `zone_moist` |
+| **pit_storage** | `below_animal_confinements` | **1, 3, 4, 6, 12** | `cool` | `boreal`, `temperate` | `zone_dry`, `zone_wet` |
+| **pit_storage** | `below_animal_confinements` | **1, 3, 4, 6, 12** | `warm` | `temperate` | `zone_dry`, `zone_wet` |
+| **pit_storage** | `below_animal_confinements` | **1, 3, 4, 6, 12** | `warm` | `tropical` | `zone_dry`, `zone_wet`, `zone_montane`, `zone_moist` |
 
-#### ⚙️ `load_dataset`
+#### B. Anaerobic Lagoon
 
-Internal utility function. Loads datasets (`census`, `diet`,
-`coefficients`, etc.) by prioritizing user files found in the
-`user_data/` directory over internal package defaults.
+Lagoon factors are based on climate/moisture rather than specific
+months.
 
-| Argument    | Description                                                   |
-|:------------|:--------------------------------------------------------------|
-| `name`      | Name of the dataset without the extension (e.g., `"census"`). |
-| **Returns** | A data frame or tibble with the requested data.               |
+| System Base | System Variant | Months | Climate | Sub-climate | Climate Zone |
+|:---|:---|:---|:---|:---|:---|
+| **anaerobic_lagoon** | `below_animal_confinements` | *(leave empty)* | `cool` | `boreal`, `temperate` | `zone_dry`, `zone_wet` |
+| **anaerobic_lagoon** | `below_animal_confinements` | *(leave empty)* | `warm` | `temperate` | `zone_dry`, `zone_wet` |
+| **anaerobic_lagoon** | `below_animal_confinements` | *(leave empty)* | `warm` | `tropical` | `zone_dry`, `zone_wet`, `zone_montane`, `zone_moist` |
 
-------------------------------------------------------------------------
+#### C. Deep Bedding
 
-### II. Demographics and Population Structure
+The logic here focuses on mixing and whether the storage cycle is longer
+or shorter than one month.
 
-#### 🐄 `calculate_population`
-
-The main population orchestrator. Loads census data, validates it, and
-dispatches specialized calculations for each animal type (cattle, sheep,
-goat), unifying the partial results.
-
-| Argument | Description |
-|:---|:---|
-| `saveoutput` | Logical. If `TRUE`, saves the raw population result to CSV. |
-| **Returns** | A tibble containing the calculated population for all animal types. |
-
-#### 🐄 `calculate_population_cattle`
-
-Calculates the complex demographic structure for **Cattle** (including
-calves, yearlings, replacement animals, and feedlot/slaughter animals)
-based on census data and rates.
-
-#### 🐑 `calculate_population_sheep`
-
-Calculates the demographic structure for **Sheep**, including total
-births and separating animals required for replacement from those
-designated for slaughter.
-
-#### 🐐 `calculate_population_goat`
-
-Calculates the demographic structure for **Goats**, primarily focused on
-ensuring replacement populations based on specific rates.
+| System Base | System Variant | Months | Climate | Sub-climate | Climate Zone |
+|:---|:---|:---|:---|:---|:---|
+| **deep_bedding** | `active_mixing`,`no_mixing` | **\>1** | `cool` | `boreal`, `temperate` | `zone_dry`, `zone_wet` |
+| **deep_bedding** | `active_mixing`,`no_mixing` | **\>1** | `warm` | `temperate` | `zone_dry`, `zone_wet` |
+| **deep_bedding** | `active_mixing`,`no_mixing` | **\>1** | `warm` | `tropical` | `zone_dry`, `zone_wet`, `zone_montane`, `zone_moist` |
+| **deep_bedding** | `active_mixing`,`no_mixing` | **\<1** | `cool`, `temperate` OR `warm` | *(leave empty)* | *(leave empty)* |
 
 ------------------------------------------------------------------------
 
-### III. Metabolism and Energy Intake
+### 2. Standard Systems (Climate-Only)
 
-#### 🌱 `calculate_weighted_variable`
+For these systems, sub-climates and zones are not required. Leave those
+columns blank in your CSV.
 
-Calculates the weighted average nutritional profile (DE, CP, NDF, Ash)
-for each animal’s diet by linking ingredients, characteristics, and diet
-shares.
-
-| Argument | Description |
-|:---|:---|
-| `saveoutput` | Logical. If `TRUE`, saves the calculated nutritional profiles to CSV. |
-| **Returns** | A tibble with the final weighted nutritional variables per animal ID. |
-
-#### 🔋 Net Energy Component Functions
-
-These functions calculate the energy required for specific biological
-processes, primarily depending on weights and performance data. All use
-the same input/output structure.
-
-| Function | Biological Process / Calculation | Formula Basis |
+| System Base | Valid Variants | System Climate |
 |:---|:---|:---|
-| `calculate_NEm` | Net Energy for **Maintenance** (Base survival). | Coefficient $`\times (Weight^{0.75})`$. |
-| `calculate_NEa` | Net Energy for **Activity** (Walking/Grazing). | Depends on NEm and specific coefficient (e.g., `pasture` vs `stall`). |
-| `calculate_NEg` | Net Energy for **Growth** (Weight gain). | Complex formulas specific to Cattle vs. Small Ruminants. |
-| `calculate_NEl` | Net Energy for **Lactation** (Milk production). | Depends on milk yield and fat content. |
-| `calculate_NE_work` | Net Energy for **Work** (Draught animals). | Depends on NEm and hours of work. |
-| `calculate_NE_wool` | Net Energy for **Wool Production**. | Depends on wool yield (for sheep). |
-| `calculate_NE_pregnancy` | Net Energy for **Pregnancy** (Gestation). | Depends on NEm and species-specific gestation factors. |
-
-#### ⛽ `calculate_ge`
-
-The crucial function that converts Net Energy Requirements (NEm, NEg,
-etc.) into **Gross Energy (GE)** intake, adjusting for metabolic
-efficiency (REM/REG) based on the diet’s digestibility. This is the
-**estimated total food mass** the animal must consume.
-
-| Argument | Description |
-|:---|:---|
-| `saveoutput` | Logical. If `TRUE`, saves GE and efficiency coefficients to CSV. |
-| **Returns** | A tibble with the total required Gross Energy (`ge`). |
+| **solid_storage** | `additives`, `bulking_agent_addition`, `covered_compacted` OR *(leave empty)* | `cool`, `temperate` OR `warm` |
+| **composting** | `intensive_windrow`, `passive_windrow`, `static_pile` OR `vessel` | `cool`, `temperate` OR `warm` |
+| **anaerobic_digester** | `low_leak_high_gastight`, `low_leakage_open_storage`, `low_leak_low_gastight`, `high_leakage_open_storage`, `high_leakage_high_gastight` OR `high_leakage_low_gastight` | `cool`, `temperate` OR `warm` |
+| **aerobic_treatment** | `forced_aeration` OR `natural_aeration` | `cool`, `temperate` OR `warm` |
+| **pasture_range_paddock** | *(leave empty)* | `cool`, `temperate` OR `warm` |
+| **burned_for_fuel** | *(leave empty)* | `cool`, `temperate` OR `warm` |
+| **dry_lot** | *(leave empty)* | `cool`, `temperate` OR `warm` |
+| **daily_spread** | *(leave empty)* | `cool`, `temperate` OR `warm` |
+| **poultry_manure** | `with_litter` OR `without_litter` | `cool`, `temperate` OR `warm` |
 
 ------------------------------------------------------------------------
 
-### IV. Emissions and Waste Modeling
+### 💡 Quick Logic Rules
 
-#### 💩 `calculate_vs`
+#### The “Warm” Rule
 
-Calculates **Volatile Solids (VS)** excretion, which is the organic
-matter component of the manure. VS forms the substrate for methane
-production in manure management.
+- **Warm + Temperate:** Only supports `zone_dry` and `zone_wet`.
+- **Warm + Tropical:** Unlocks all zones: `zone_dry`, `zone_wet`,
+  `zone_moist`, and `zone_montane`.
 
-#### 💨 `calculate_emissions_enteric`
+#### Data Entry Tips
 
-Calculates **Methane ($`CH_4`$) emissions from Enteric Fermentation**
-using the IPCC Tier 2 methodology. The calculation depends heavily on
-the animal’s Gross Energy (GE) intake and the Methane Conversion Factor
-($`Y_m`$), which varies by diet quality.
-
-#### 🛢️ `calculate_CH4_manure`
-
-Calculates **Methane ($`CH_4`$) emissions from Manure Management**
-systems. Uses the VS value along with management system factors
-($`B_0`$, $`MCF`$) to estimate total $`CH_4`$ output.
-
-#### 💧 `calculate_N2O_direct_manure`
-
-Calculates **Nitrogen ($`N`$) Excretion** based on Nitrogen intake
-(derived from Crude Protein, CP) minus Nitrogen retention (growth/milk).
-Then estimates **Direct Nitrous Oxide ($`N_2O`$)** emissions from that
-excreted nitrogen.
-
-#### 🌬️ `calculate_N2O_indirect_volatilization`
-
-Calculates **Indirect $`N_2O`$ emissions** resulting from the
-volatilization of Nitrogen ($`NH_3`$/$`NO_x`$) from the manure
-management system into the atmosphere.
-
-#### 🌧️ `calculate_N2O_indirect_leaching`
-
-Calculates **Indirect $`N_2O`$ emissions** resulting from the leaching
-and runoff of Nitrogen from the manure management system into water
-tables.
-
-------------------------------------------------------------------------
-
-### V. Resource Use
-
-#### 🌲 `calculate_land_use`
-
-Calculates the **Land Use ($`m^2`$)** associated with the production of
-feed consumed by the animal. The calculation links total Dry Matter
-Intake (DMI) to ingredient share and crop yield data.
-
-| Argument | Description |
-|:---|:---|
-| `saveoutput` | Logical. If `TRUE`, saves the land use result ($`m^2`$) to CSV. |
-| **Returns** | A tibble containing land use per animal and total land use. |
+1.  **Case Sensitivity:** All entries must be **lowercase** (e.g.,
+    `zone_wet`, NOT `Zone_Wet`).
+2.  **Empty Values:** Leave cells blank for columns marked as
+    `(leave empty)`.
+3.  **Allocation:** For each unique animal/region combination, the sum
+    of `allocation` must equal **1.0 (100%)**.

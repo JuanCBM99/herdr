@@ -1,7 +1,6 @@
-# Calculate Net Energy for Growth (NEg) (Refactored)
+# Calculate Net Energy for Growth (NEg)
 
-Computes NEg for all animals using vectorized operations. Replaces
-rowwise lookups with efficient joins.
+Calculate Net Energy for Growth (NEg)
 
 ## Usage
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/05_VS_manure.R
 \name{calculate_vs}
 \alias{calculate_vs}
-\title{Calculate Volatile Solids (VS) for Animals (Refactored)}
+\title{Calculate Volatile Solids (VS) for Animals}
 \usage{
 calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 }
@@ -16,5 +16,5 @@ Tibble with VS for all animal categories.
 }
 \description{
 Computes volatile solids (VS) based on Gross Energy (GE), Digestible Energy (DE),
-and Ash content.
+and Ash content using IPCC Tier 2 methodology.
 }

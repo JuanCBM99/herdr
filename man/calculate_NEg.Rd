@@ -2,14 +2,10 @@
 % Please edit documentation in R/02_energy_net.R
 \name{calculate_NEg}
 \alias{calculate_NEg}
-\title{Calculate Net Energy for Growth (NEg) (Refactored)}
+\title{Calculate Net Energy for Growth (NEg)}
 \usage{
 calculate_NEg(saveoutput = TRUE)
 }
-\arguments{
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
-}
 \description{
-Computes NEg for all animals using vectorized operations.
-Replaces rowwise lookups with efficient joins.
+Calculate Net Energy for Growth (NEg)
 }

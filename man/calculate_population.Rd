@@ -2,14 +2,16 @@
 % Please edit documentation in R/00_population.R
 \name{calculate_population}
 \alias{calculate_population}
-\title{Calculate total animal population (Refactored)}
+\title{Calculate Total Animal Population}
 \usage{
-calculate_population(saveoutput = TRUE)
+calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+\item{automatic_cycle}{Logical. If TRUE, uses species-specific birth models.}
+
+\item{saveoutput}{If TRUE, saves results to the output folder.}
 }
 \description{
-Orchestrates the population calculation by loading census data and dispatching
-sub-calculations for each animal type (cattle, sheep, goat).
+Orchestrates the population calculation. Choose between manual census
+or automatic farm cycle models based on mature animal counts.
 }

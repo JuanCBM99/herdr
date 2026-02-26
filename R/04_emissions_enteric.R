@@ -1,106 +1,88 @@
-#' Calculate methane emissions from enteric fermentation (Refactored)
+#' Calculate methane emissions from enteric fermentation
 #'
 #' Computes enteric methane emissions based on Gross Energy (GE),
-#' Digestible Energy (DE), NDF, and Ym factor.
+#' Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic.
+#'
+#' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_emissions_enteric <- function(saveoutput = TRUE) {
+calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   message("\U0001f7e2 Calculating enteric fermentation emissions...")
 
-  # --- 1. Data Preparation and Loading ---
+  # --- 1. Data Loading and Propagation ---
+  # We pass 'automatic_cycle' to ensure population and energy match the user choice
+  diet_vars <- calculate_weighted_variable(saveoutput = FALSE)
+  ge_df     <- calculate_ge(saveoutput = FALSE)
+  pop_df    <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
-  # Get Base Data: Start with weighted diet variables (DE, NDF)
-  diet_vars <- calculate_weighted_variable(saveoutput = FALSE) %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype, de, ndf)
-
-  # Early exit if no diet data is found
   if (nrow(diet_vars) == 0) {
     message("\u26a0 No diet data found. Returning empty structure.")
-    return(dplyr::tibble(
-      group = character(), zone = character(), identification = character(),
-      animal_type = character(), animal_subtype = character(),
-      de = double(), ndf = double(), ge = double(), ym = double(),
-      ef_kg_animal_year = double(), population = double(), emissions_total = double()
-    ))
+    return(dplyr::tibble())
   }
 
-  join_keys <- c("group", "zone", "identification", "animal_type", "animal_subtype")
+  # Mandatory identity keys for merging all modules
+  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # --- 2. Processing Pipeline: Merge Data ---
+  # --- 2. Processing Pipeline: Merge Energy and Population ---
   results <- diet_vars %>%
-    # Standardize zones (empty -> NA) for robust merging
-    dplyr::mutate(zone = dplyr::na_if(zone, "")) %>%
 
-    # 2.1 Join Gross Energy (GE) from the energy module
+    # Join Gross Energy (GE)
     dplyr::left_join(
-      calculate_ge(saveoutput = FALSE) %>%
-        dplyr::select(all_of(join_keys), ge) %>%
-        dplyr::mutate(zone = dplyr::na_if(zone, "")),
-      by = join_keys,
-      na_matches = "na" # Handles joins where Zone is NA
-    ) %>%
+      ge_df %>%
+        dplyr::select(dplyr::all_of(join_keys), ge)) %>%
 
-    # 2.2 Join Population from the demographic module
+    # Join Population (The parameter automatic_cycle was already applied here)
     dplyr::left_join(
-      calculate_population(saveoutput = FALSE) %>%
-        dplyr::select(all_of(join_keys), population) %>%
-        dplyr::mutate(zone = dplyr::na_if(zone, "")),
-      by = join_keys,
-      na_matches = "na"
-    ) %>%
+      pop_df %>%
+        dplyr::select(dplyr::all_of(join_keys), population)) %>%
 
-    # --- 3. Calculations (Ym and Emission Factor) ---
+    # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2) ---
     dplyr::mutate(
-      # Numeric type safety and NA replacement
+      # Numerical safety: replace NAs with 0
       across(c(de, ndf, ge, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
-      # Calculate Methane Conversion Factor (Ym) based on IPCC Tier 2 Feed Quality
+      # Calculate Methane Conversion Factor (Ym) based on diet quality
       ym = dplyr::case_when(
-        # Small Ruminants (Fixed Ym based on species)
         animal_type == "sheep" ~ 6.7,
         animal_type == "goat"  ~ 5.5,
 
-        # Mature Dairy Cattle (Ym based on DE and NDF thresholds)
-        animal_type == "cattle" & identification == "mature_dairy_cattle" ~ dplyr::case_when(
-          de >= 70 & ndf <= 35 ~ 5.7, # High quality/low NDF
+        # Mature Dairy Cattle: Ym depends on DE and NDF thresholds
+        animal_type == "cattle" & animal_tag == "mature_dairy_cattle" ~ dplyr::case_when(
+          de >= 70 & ndf <= 35 ~ 5.7,
           de >= 70 & ndf > 35  ~ 6.0,
-          de >= 63 & de < 70 & ndf > 37 ~ 6.3, # Medium quality
-          de <= 62 & ndf > 38  ~ 6.5, # Low quality
+          de >= 63 & de < 70 & ndf > 37 ~ 6.3,
+          de <= 62 & ndf > 38  ~ 6.5,
           TRUE ~ 6.5
         ),
 
-        # Other Bovine Categories (Ym based on DE thresholds, simplified feed regimes)
-        animal_type == "cattle" & identification != "mature_dairy_cattle" ~ dplyr::case_when(
-          de >= 75 ~ 3.0, # Feedlot (highest concentration)
-          de >= 72 ~ 4.0, # Feedlot (other grains)
-          de >= 62 & de <= 71 ~ 6.3, # Mixed/High quality forage
-          de < 62  ~ 7.0, # Low quality forage
+        # Other Cattle Categories
+        animal_type == "cattle" & animal_tag != "mature_dairy_cattle" ~ dplyr::case_when(
+          de >= 75 ~ 3.0,
+          de >= 72 ~ 4.0,
+          de >= 62 & de <= 71 ~ 6.3,
+          de < 62  ~ 7.0,
           TRUE ~ 6.3
         ),
-
-        TRUE ~ NA_real_ # Unidentified animal type
+        TRUE ~ NA_real_
       ),
 
-      # Emission Factor (EF) Calculation (IPCC Eq 10.21)
-      # EF = (GE * (Ym/100) * 365) / 55.65
+      # Emission Factor (EF) (kg CH4/animal/year)
+      # Formula: (GE * (Ym/100) * 365) / 55.65 (where 55.65 is methane energy density)
       ef_kg_animal_year = (ge * (ym / 100) * 365) / 55.65,
 
-      # Total Emissions (Gg CH4/year)
-      # Total Emissions = EF * Population / 1e6 (kg to Gg conversion)
+      # Total Enteric Emissions (Gg CH4/year)
       emissions_total = ef_kg_animal_year * (population / 1e6)
     ) %>%
 
-    # --- 4. Final Cleanup and Output ---
-
-    # Select final columns and round results
+    # --- 4. Final Cleanup ---
     dplyr::select(
-      group, zone, identification, animal_type, animal_subtype,
+      dplyr::all_of(join_keys),
       de, ndf, ge, ym, ef_kg_animal_year, population, emissions_total
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
-  # Save Output to CSV
+  # --- 5. Save Results ---
   if (isTRUE(saveoutput) && nrow(results) > 0) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/enteric_emissions.csv")

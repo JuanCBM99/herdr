@@ -1,128 +1,86 @@
-#' Summarize CH₄, N₂O Emissions, and Land Use
+#' Summarize CH4, N2O Emissions, and Land Use
 #'
-#' Calculates a summary of CH₄ and N₂O emissions (direct and indirect) and land use,
-#' grouped by code, animal type, subtype, and zone. Optionally allows for
-#' aggregation to a more general level.
-#'
-#' @param group Character/Numeric vector (optional). Groups to filter. Default `NULL`.
-#' @param zone Character vector (optional). Zones to filter. Default `NULL`.
-#' @param animal Character string (optional). Livestock type (`animal_type`). Default `NULL`.
-#' @param type Character string (optional). Livestock subtype (`animal_subtype`). Default `NULL`.
-#' @param saveoutput If TRUE (default) the results are saved in the output folder.
-#' @param group_by_identification Logical. If `TRUE`, returns results at the `identification` level. If `FALSE`, aggregates all `identification`s.
-#' @return A `tibble` with columns for each emission type and land use.
+#' @param automatic_cycle Logical. TRUE for built-in model, FALSE for manual livestock_census.csv.
+#' @param region Character/Numeric vector to filter.
+#' @param subregion Character vector to filter.
+#' @param animal Livestock type (animal_type).
+#' @param type Livestock subtype (animal_subtype).
+#' @param class_flex Management class (e.g., 'grazing', 'stall').
+#' @param saveoutput If TRUE saves to output folder.
+#' @param group_by_identification If TRUE returns by animal_tag.
 #' @export
-generate_impact_assessment <- function(group = NULL, zone = NULL, animal = NULL, type = NULL,
+generate_impact_assessment <- function(automatic_cycle = FALSE,
+                                       region = NULL, subregion = NULL,
+                                       animal = NULL, type = NULL, class_flex = NULL,
                                        saveoutput = TRUE, group_by_identification = TRUE) {
 
   message("\U0001f4be Starting impact assessment summary...")
+  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # --- 1. Data Validation Step ---
-  message(" -> 1/3: Validating data consistency (census vs. diet)...")
+  # 1. Pipeline calls and unit standardization (Gg)
+  ch4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(CH4_enteric_Gg = sum(emissions_total, na.rm = TRUE), .groups = "drop")
 
-  # Load data ONLY for validation purposes.
-  tryCatch({
-    validation_pop <- calculate_population(saveoutput = FALSE)
-    validation_diet <- calculate_weighted_variable(saveoutput = FALSE)
+  ch4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(CH4_manure_Gg = sum(Emissions_CH4_Gg_year / 1e6, na.rm = TRUE), .groups = "drop")
 
-    # Call the dedicated validation function
-    validate_data(pop_df = validation_pop, diet_df = validation_diet)
+  n2o_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(N2O_direct_Gg = sum(N2O_emissions, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
 
-  }, error = function(e) {
-    # Capture and display error if validate_data() returns a stop()
-    stop("Data validation error! Please check your CSV files.\n",
-         "Original error: ", e$message)
-  })
+  n2o_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(N2O_vol_Gg = sum(n2o_g, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
 
-  message(" -> 2/3: Calculating all emissions and land use.")
-  # --- End of Validation ---
+  n2o_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(N2O_lea_Gg = sum(n2o_l, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
 
+  land_u  <- calculate_land_use(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(Land_m2 = sum(Land_use_Total_m2, na.rm = TRUE), .groups = "drop")
 
-  # --- 2. Core Calculation and Aggregation ---
+  # 2. Consolidation
+  complete_summary <- list(ch4_ent, ch4_man, n2o_dir, n2o_vol, n2o_lea, land_u) %>%
+    purrr::reduce(dplyr::full_join, by = join_keys) %>%
+    dplyr::mutate(across(where(is.numeric), ~ tidyr::replace_na(., 0)))
 
-  # Calculate and aggregate CH4 Enteric Emissions
-  ch4_enteric <- calculate_emissions_enteric(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Emissions_CH4_enteric = sum(emissions_total, na.rm = TRUE), .groups = "drop")
+  # 3. Apply Filters
+  final_summary <- complete_summary
+  if (!is.null(region))     final_summary <- final_summary %>% dplyr::filter(region %in% .env$region)
+  if (!is.null(subregion))  final_summary <- final_summary %>% dplyr::filter(subregion %in% .env$subregion)
+  if (!is.null(animal))     final_summary <- final_summary %>% dplyr::filter(animal_type %in% .env$animal)
+  if (!is.null(type))       final_summary <- final_summary %>% dplyr::filter(animal_subtype %in% .env$type)
+  if (!is.null(class_flex)) final_summary <- final_summary %>% dplyr::filter(class_flex %in% .env$class_flex)
 
-  # Calculate and aggregate CH4 Manure Emissions
-  ch4_manure <- calculate_CH4_manure(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Emissions_CH4_manure = sum(Emissions_CH4_Mg_year, na.rm = TRUE), .groups = "drop")
-
-  # Calculate and aggregate Direct N2O Emissions
-  direct_n2o <- calculate_N2O_direct_manure(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Emissions_N2O_direct = sum(N2O_emissions, na.rm = TRUE), .groups = "drop")
-
-  # Calculate and aggregate Indirect N2O (Volatilization)
-  n2o_indirect_vol <- calculate_N2O_indirect_volatilization(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Emissions_N2O_indirect_vol = sum(n2o_g, na.rm = TRUE), .groups = "drop")
-
-  # Calculate and aggregate Indirect N2O (Leaching)
-  n2o_indirect_leach <- calculate_N2O_indirect_leaching(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Emissions_N2O_indirect_leach = sum(N2O_L, na.rm = TRUE), .groups = "drop")
-
-  # Calculate and aggregate Land Use
-  land_use <- calculate_land_use(saveoutput = FALSE) %>%
-    dplyr::group_by(group, zone, identification, animal_type, animal_subtype) %>%
-    dplyr::summarise(Land_use_m2 = sum(Land_use_Total_m2, na.rm = TRUE), .groups = "drop")
-
-  # --- 3. Consolidate and Filter Results ---
-  message(" -> 3/3: Consolidating and filtering results.")
-
-  # Combine all results using full_join
-  complete_summary <- list(ch4_enteric, ch4_manure, direct_n2o,
-                           n2o_indirect_vol, n2o_indirect_leach, land_use) %>%
-    purrr::reduce(dplyr::full_join,
-                  by = c("group", "zone", "identification", "animal_type", "animal_subtype"),
-                  na_matches = "na") %>%
-    # Replace any residual NAs with 0
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ tidyr::replace_na(., 0)))
-
-  # Filter results based on user arguments (group, zone, animal, type)
-  filtered_summary <- complete_summary
-
-  if (!is.null(group)) {
-    filtered_summary <- filtered_summary %>%
-      dplyr::filter(group %in% .env$group)
-  }
-  if (!is.null(zone)) {
-    if (any(is.na(zone))) {
-      filtered_summary <- filtered_summary %>%
-        dplyr::filter(zone %in% .env$zone | is.na(zone))
-    } else {
-      filtered_summary <- filtered_summary %>%
-        dplyr::filter(zone %in% .env$zone)
-    }
-  }
-  if (!is.null(animal)) {
-    filtered_summary <- filtered_summary %>%
-      dplyr::filter(animal_type %in% .env$animal)
-  }
-  if (!is.null(type)) {
-    filtered_summary <- filtered_summary %>%
-      dplyr::filter(animal_subtype %in% .env$type)
-  }
-
-  # Optional aggregation (if group_by_identification is FALSE)
+  # 4. Aggregation
   if (!group_by_identification) {
-    final_summary <- filtered_summary %>%
-      dplyr::group_by(group, zone, animal_type, animal_subtype) %>%
-      dplyr::summarise(dplyr::across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
-  } else {
-    final_summary <- filtered_summary
+    final_summary <- final_summary %>%
+      dplyr::group_by(region, subregion, class_flex, animal_type, animal_subtype) %>%
+      dplyr::summarise(across(where(is.numeric), sum, na.rm = TRUE), .groups = "drop")
   }
 
-  # Save Final CSV
+  # 5. Calculate CO2eq and Carbon Footprint (AR5 GWP: CH4=28, N2O=265)
+  final_summary <- final_summary %>%
+    dplyr::mutate(
+      CO2eq_enteric  = CH4_enteric_Gg * 28,
+      CO2eq_manure   = CH4_manure_Gg * 28,
+      CO2eq_n2o      = (N2O_direct_Gg + N2O_vol_Gg + N2O_lea_Gg) * 265,
+      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_n2o,
+
+      # Intensity: kg CO2eq per m2
+      # (Gg * 1e6 converts to kg)
+      Carbon_Footprint_m2 = (CO2eq_Total_Gg * 1e6) / Land_m2
+    )
+
+  # 6. Save Output
   if (saveoutput) {
-    dir.create("output", showWarnings = FALSE)
-    readr::write_csv(final_summary, "output/generate_impact_assessment.csv")
-    message("\U0001f4be Saved output to output/generate_impact_assessment.csv")
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(final_summary, "output/impact_assessment_summary.csv")
+    message("\U1F4BE Report saved to output/impact_assessment_summary.csv")
   }
 
-  message("\u2705Summary completed.")
   return(final_summary)
 }

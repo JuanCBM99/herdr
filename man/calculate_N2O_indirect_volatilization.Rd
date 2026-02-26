@@ -2,13 +2,18 @@
 % Please edit documentation in R/08_N2O_indirect_volatilization.R
 \name{calculate_N2O_indirect_volatilization}
 \alias{calculate_N2O_indirect_volatilization}
-\title{Calculate indirect N₂O emissions from volatilization (Refactored)}
+\title{Calculate indirect N2O emissions from volatilization}
 \usage{
-calculate_N2O_indirect_volatilization(saveoutput = TRUE)
+calculate_N2O_indirect_volatilization(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE
+)
 }
 \arguments{
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes indirect N₂O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
+Computes indirect N2O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
 }

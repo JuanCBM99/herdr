@@ -2,17 +2,17 @@
 % Please edit documentation in R/population_cattle.R
 \name{calculate_population_cattle}
 \alias{calculate_population_cattle}
-\title{Calculates the full cattle population structure (Internal Helper)}
+\title{Calculate Cattle Population Structure}
 \usage{
 calculate_population_cattle(census_cattle, rate_parameters, categories)
 }
 \arguments{
-\item{census_cattle}{Edit in csv}
+\item{census_cattle}{Filtered census data for cattle.}
 
-\item{rate_parameters}{Edit in csv}
+\item{rate_parameters}{Reproduction and replacement rates.}
 
-\item{categories}{Edit in csv}
+\item{categories}{Definition table for cross-referencing.}
 }
 \description{
-Calculates the full cattle population structure (Internal Helper)
+Internal helper to model the cattle herd based on mature population and biological rates.
 }

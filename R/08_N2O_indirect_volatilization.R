@@ -1,72 +1,98 @@
-#' Calculate indirect N₂O emissions from volatilization (Refactored)
+#' Calculate indirect N2O emissions from volatilization
 #'
-#' Computes indirect N₂O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
+#' Computes indirect N2O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
+#' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_indirect_volatilization <- function(saveoutput = TRUE) {
+calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   message("\U0001f4be Calculating indirect N2O emissions (volatilization)...")
 
-  # --- 1. Data Processing and Joins ---
+  # --- 1. Data Loading ---
+  user_manure <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
+  ipcc_master <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
 
-  # Base Data: Fetch N Excreted (N_excreted) from the direct N2O calculation
-  results <- calculate_N2O_direct_manure(saveoutput = FALSE) %>%
-    dplyr::select(group, zone, identification, animal_type, animal_subtype, N_excreted) %>%
-    dplyr::distinct() # Ensure uniqueness
+  # Calling internal modules
+  # We fetch N_excreted from the direct N2O function
+  direct_n2o_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
-  # 1.1 Join Population Data (Specific to each Group/Zone)
-  results <- results %>%
+  # --- 2. Allocation Assertion (using assertthat) ---
+  # We group by the unique identity of the animal/system and verify the sum
+  allocation_sums <- user_manure %>%
+    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::summarise(total_alloc = sum(allocation, na.rm = TRUE), .groups = "drop")
+
+  assertthat::assert_that(all(allocation_sums$total_alloc <= 1.001),
+                          msg = paste("Data Error: Manure allocation exceeds 1.0 (100%) for animals in:",
+                                      paste(unique(allocation_sums$animal_tag[allocation_sums$total_alloc > 1.001]), collapse = ", ")))
+
+  # Mandatory identity keys
+  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+
+  # --- 2. Master Dataset Construction & Joins ---
+
+  results <- direct_n2o_df %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted) %>%
+    dplyr::distinct() %>%
+
+    # 2.1 Join Population Data
     dplyr::left_join(
-      calculate_population(saveoutput = FALSE) %>%
-        dplyr::select(group, zone, identification, animal_type, animal_subtype, population),
-      by = c("group", "zone", "identification", "animal_type", "animal_subtype")
+      pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
+      by = join_keys
     ) %>%
 
-    # 1.2 Join Management Parameters (System, Climate, Duration)
+    # 2.2 Join Management Configuration (User Data)
     dplyr::left_join(
-      load_dataset("n2o_indirect"),
-      by = c("identification", "animal_type", "animal_subtype")
+      user_manure %>%
+        dplyr::select(region, subregion, animal_tag, class_flex,
+                      system_base, management_months, system_climate,
+                      system_subclimate, climate_zone, system_variant,
+                      climate_moisture, animal_type, animal_subtype, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
     ) %>%
 
-    # 1.3 Join Gas Fraction (Frac_Gas)
+    # 2.3 Join Volatilization Fraction (frac_gas) and Factor (EF4) from Master Table
     dplyr::left_join(
-      load_dataset("fractions") %>% dplyr::select(management_system, frac_gas_ms),
-      by = "management_system"
+      ipcc_master %>%
+        dplyr::select(system_base, management_months, system_climate,
+                      system_subclimate, climate_zone, system_variant,
+                      climate_moisture, animal_type, animal_subtype, frac_gas, EF4),
+      by = c("system_base", "management_months", "system_climate",
+             "system_subclimate", "climate_zone", "system_variant",
+             "climate_moisture", "animal_type", "animal_subtype")
     ) %>%
 
-    # 1.4 Join Emission Factor (EF4)
-    dplyr::left_join(
-      load_dataset("emission_factors_indirect") %>% dplyr::select(climate, ef4 = value),
-      by = "climate"
-    ) %>%
-
-    # --- 2. Calculations (N Loss and N2O Conversion) ---
+    # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
-      # Numeric Safety: NA replacement
-      across(
-        c(population, N_excreted, duration, frac_gas_ms, ef4),
+      # Numeric Safety
+      dplyr::across(
+        c(population, N_excreted, allocation, frac_gas, EF4),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Calculate AWMS (Annualized Duration)
-      awms = duration / 12,
-
       # Calculate N Loss due to Volatilization (N_volatilization-MMS, Eq 10.26)
-      n_volatilization = population * N_excreted * awms * frac_gas_ms,
+      n_volatilization_kg_year = population * N_excreted * allocation * frac_gas,
 
-      # Calculate Indirect N2O Emissions (N2O_G,mm, Eq 10.28)
-      # N2O_G = EF4 * N_volatilization * (44/28)
-      n2o_g = ef4 * n_volatilization * (44 / 28)
+      # Calculate Indirect N2O Emissions (Eq 10.28)
+      # Factor 44/28 converts N2O-N to N2O
+      n2o_g = EF4 * n_volatilization_kg_year * (44 / 28)
     ) %>%
 
-    # --- 3. Final Output and Cleanup ---
-    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+    # --- 4. Final Selection and Cleanup ---
+    dplyr::select(
+      dplyr::all_of(join_keys),
+      system_base, system_variant,
+      N_excreted, frac_gas, EF4,
+      n_volatilization_kg_year, n2o_g
+    ) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 
-  # --- 4. Save Output ---
+  # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_indirect_volatilization.csv")
-    message("\U0001f4be Saved output to output/N2O_indirect_volatilization.csv")
+    message("\U1F4BE Saved output to output/N2O_indirect_volatilization.csv")
   }
 
   return(results)

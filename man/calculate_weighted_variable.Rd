@@ -2,7 +2,7 @@
 % Please edit documentation in R/01_characteristics.R
 \name{calculate_weighted_variable}
 \alias{calculate_weighted_variable}
-\title{Calculate Weighted Nutritional Variables (Refactored)}
+\title{Calculate Weighted Nutritional Variables}
 \usage{
 calculate_weighted_variable(saveoutput = TRUE)
 }
@@ -10,6 +10,6 @@ calculate_weighted_variable(saveoutput = TRUE)
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes weighted averages of nutritional variables (DE, CP, NDF, Ash)
-by mapping ingredients to diets, and diets to animals.
+Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, EB)
+by mapping ingredients to diets and diets to animals.
 }

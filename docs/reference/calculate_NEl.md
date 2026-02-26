@@ -1,7 +1,6 @@
-# Calculate Net Energy for Lactation (NEl) (Refactored)
+# Calculate Net Energy for Lactation (NEl)
 
-Computes NEl based on milk yield and fat content. Assigns 0 energy for
-non-lactating animals instead of dropping them.
+Calculate Net Energy for Lactation (NEl)
 
 ## Usage
 

@@ -46,7 +46,7 @@ remotes::install_github("JuanCBM99/herdr", ref = "dev")
 
 IPCC Tier 2 Methodology: Robust calculations for enteric emissions, manure management, and indirect N₂O emissions.
 
-Modular and Flexible: Allows detailed input of population, diets, and management systems at farm/zone level.
+Modular and Flexible: Allows detailed input of population, diets, and management systems at farm/subregion level.
 
 Consolidated Output: Generates a single report summarizing impacts (CH₄, N₂O, and LU).
 
