@@ -1,0 +1,37 @@
+Package: herdr
+Title: herdr
+Version: 0.1.0
+Authors@R: c(person("Juan Carlos", "Baez", email = "juancarlos.baez@bc3research.org", role = c("aut", "cre"),
+		   comment = c(ORCID ="0000-0002-7067-265X")))
+Description: Description: Provides a comprehensive set of tools for calculating livestock 
+    greenhouse gas emissions based on Spanish national standards. The package 
+    includes functions to process animal census data for cattle, sheep, and 
+    goats, integrating specific emission factors and rate parameters. It 
+    facilitates the estimation of direct and indirect emissions, such as 
+    methane and nitrous oxide, following standardized methodologies for 
+    environmental reporting.
+URL: https://github.com/JuanCBM99/herdr
+Depends: 
+    R (>= 4.1.0)
+License: MIT + file LICENSE
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.3.3
+Imports: 
+    dplyr,
+    tidyr,
+    purrr,
+    tibble,
+    readr,
+    assertthat,
+    magrittr,
+    utils
+Suggests: 
+    rmarkdown,
+    testthat (>= 3.0.0),
+    pkgdown,
+    withr,
+    knitr
+VignetteBuilder: 
+     knitr
+Config/testthat/edition: 3
