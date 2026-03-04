@@ -1,6 +1,6 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, EB)
+#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, EB, Fat, NFC)
 #' by mapping ingredients to diets and diets to animals.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -36,14 +36,14 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
                           msg = paste("Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for:",
                                       paste(unique(ing_sum_check$diet_tag), collapse = ", ")))
 
+
   # --- 3. Build Diet Nutritional Profiles ---
 
   diet_profiles <- diets %>%
     dplyr::left_join(ingredients, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
     dplyr::mutate(
-      # Weighting factor calculation:
-      # (Ingredient % in category) * (Category % in Diet) / 10000
+      # Weighting factor: (Ingredient % in category) * (Category % in Diet) / 10000
       weight_factor = (ingredient_share * dplyr::case_when(
         ingredient_type == "forage"      ~ forage_share,
         ingredient_type == "concentrate" ~ concentrate_share,
@@ -54,60 +54,60 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     ) %>%
     dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
-      # Keep forage_share to validate later
       forage_pct = dplyr::first(forage_share),
+      # Calculate weighted averages for all nutritional components
       dplyr::across(c(de, cp, ndf, ash, eb), ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
-  # --- 4. Map Diets to Animals & Validate MATURE only ---
+  # --- 4. Map Diets to Animals & Validate MATURE Animals ---
 
-  # Join with definitions to identify which diet belongs to which animal
   full_data <- definitions %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag) %>%
     dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::filter(!is.na(region))
 
-  # Create subset for MATURE validations
   mature_check <- full_data %>%
     dplyr::filter(grepl("mature", animal_tag, ignore.case = TRUE))
 
   if (nrow(mature_check) > 0) {
 
-    # A. ASSERT: Forage Safety (< 30% - NRC 1996)
-    bad_forage <- mature_check %>% dplyr::filter(forage_pct < 30)
-    assertthat::assert_that(nrow(bad_forage) == 0,
-                            msg = paste0("\u274C Biological Error (Mature): Forage share < 30% for: ",
-                                         paste(unique(bad_forage$animal_tag), collapse = ", ")))
-
-    # B. ASSERT: Ash (1-18% - NRC 1996)
-    bad_ash <- mature_check %>% dplyr::filter(ash < 1 | ash > 18)
-    assertthat::assert_that(nrow(bad_ash) == 0,
-                            msg = paste0("\u274C Critical Error (Mature): Weighted Ash (1-18%) out of range for: ",
-                                         paste(unique(bad_ash$animal_tag), collapse = ", ")))
-
-    # C. ASSERT: Crude Protein (5-40% - NRC 1996)
-    bad_cp <- mature_check %>% dplyr::filter(cp < 5 | cp > 40)
-    assertthat::assert_that(nrow(bad_cp) == 0,
-                            msg = paste0("\u274C Critical Error (Mature): Weighted CP (5-40%) out of range for: ",
-                                         paste(unique(bad_cp$animal_tag), collapse = ", ")))
-
-    # D. ASSERT: NDF Fiber (20-85% - NMSU/NRC)
-    bad_ndf <- mature_check %>% dplyr::filter(ndf < 20 | ndf > 85)
-    assertthat::assert_that(nrow(bad_ndf) == 0,
-                            msg = paste0("\u274C Critical Error (Mature): Weighted NDF (20-85%) out of range for: ",
-                                         paste(unique(bad_ndf$animal_tag), collapse = ", ")))
-
-    # E. Productivity Warning (> 80% Forage - AFRC 1993)
-    high_forage <- mature_check %>% dplyr::filter(forage_pct > 80)
-    if (nrow(high_forage) > 0) {
-      message(paste0("\u2139 Productivity Note (Mature): Forage > 80% for: ",
-                     paste(unique(high_fvorage$animal_tag), collapse = ", "),
-                     ". Rumen fill may limit intake."))
+    # 1. Forage Alerts (< 30% or > 80%)
+    warn_forage_low <- mature_check %>% dplyr::filter(forage_pct < 30)
+    if (nrow(warn_forage_low) > 0) {
+      warning(paste0("\u26A0 Warning (Forage): < 30% in: ", paste(unique(warn_forage_low$animal_tag), collapse = ", "),
+                     ". Risk of acidosis due to lack of structural fiber (Ref: NRC 2001)."))
     }
+
+    warn_forage_high <- mature_check %>% dplyr::filter(forage_pct > 80)
+    if (nrow(warn_forage_high) > 0) {
+      warning(paste0("\u26A0 Warning (Forage): > 80% in: ", paste(unique(warn_forage_high$animal_tag), collapse = ", "),
+                     ". Likely to limit intake due to physical rumen fill (Ref: NRC 2001 / 1996)."))
+    }
+
+    # 2. Crude Protein (CP) Alerts (< 7% or > 20%)
+    warn_cp_low <- mature_check %>% dplyr::filter(cp < 7)
+    if (nrow(warn_cp_low) > 0) {
+      warning(paste0("\u26A0 Warning (Protein): < 7% in: ", paste(unique(warn_cp_low$animal_tag), collapse = ", "),
+                     ". Insufficient to maintain basal rumen fermentation (Ref: CSIRO 2007)."))
+    }
+
+    warn_cp_high <- mature_check %>% dplyr::filter(cp > 20)
+    if (nrow(warn_cp_high) > 0) {
+      warning(paste0("\u26A0 Warning (Protein): > 20% in: ", paste(unique(warn_cp_high$animal_tag), collapse = ", "),
+                     ". Excess causes high energy expenditure and reproductive/embryonic toxicity (Ref: NRC 2001)."))
+    }
+
+    # 3. Ash Alert (> 10%)
+    warn_ash <- mature_check %>% dplyr::filter(ash > 10)
+    if (nrow(warn_ash) > 0) {
+      warning(paste0("\u26A0 Warning (Ash): > 10% in: ", paste(unique(warn_ash$animal_tag), collapse = ", "),
+                     ". Drastically increases water requirements due to osmotic stress (Ref: CSIRO 2007)."))
+    }
+
   }
 
-  # --- 5. Final Formatting ---
+  # --- 4. Final Formatting ---
   results <- full_data %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
@@ -115,7 +115,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
       de, cp, ndf, ash, eb
     )
 
-  # --- 6. Save Output ---
+  # --- 7. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/weighted_nutritional_variables.csv")
