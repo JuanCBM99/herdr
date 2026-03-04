@@ -24,6 +24,8 @@
   Lactation (NEl)
 - [`calculate_NEm()`](calculate_NEm.md) : Calculate Net Energy for
   Maintenance (NEm)
+- [`calculate_dmi()`](calculate_dmi.md) : Calculate Dry Matter Intake
+  (DMI)
 - [`calculate_emissions_enteric()`](calculate_emissions_enteric.md) :
   Calculate methane emissions from enteric fermentation
 - [`calculate_ge()`](calculate_ge.md) : Calculate Gross Energy (GE)
