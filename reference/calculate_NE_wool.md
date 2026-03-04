@@ -7,3 +7,9 @@ Calculate Net Energy for Wool (NE_wool)
 ``` r
 calculate_NE_wool(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.

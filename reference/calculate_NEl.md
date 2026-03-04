@@ -7,3 +7,9 @@ Calculate Net Energy for Lactation (NEl)
 ``` r
 calculate_NEl(saveoutput = TRUE)
 ```
+
+## Arguments
+
+- saveoutput:
+
+  If TRUE (default) the results are saved in the output folder.
