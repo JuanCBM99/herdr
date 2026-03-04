@@ -1,63 +1,80 @@
 library(testthat)
 library(herdr)
 library(dplyr)
-library(tidyr)
 
-test_that("calculate_population_cattle correctly expands population with class_flex", {
+# We removed context() to fix the warning.
+# In the 3rd edition, the file name serves as the context.
 
-  # 1. Mock Base Census (The 3 required identifications)
-  # We test with different class_flex to ensure they aren't collapsed
+test_that("calculate_population_cattle returns correct structure", {
+  # 1. Setup minimal Mock Data
   mock_census <- data.frame(
-    region = "G1",
-    subregion = "Z1",
-    animal_tag = c("mature_dairy_cattle", "mature_dairy_cattle", "mature_beef_bull", "mature_beef_cattle"),
-    class_flex = c("stall", "grazing", "stall", "grazing"), # Multiple management types
-    population = c(100, 50, 10, 200),
-    stringsAsFactors = FALSE
+    region = "spain",
+    subregion = "north",
+    animal_tag = "mature_dairy_cattle",
+    class_flex = "lactation",
+    population = 1000
   )
 
-  # 2. Mock Rate Parameters
   mock_rates <- data.frame(
-    animal_type = "cattle",
-    animal_subtype = c("dairy", "beef", "beef", "beef", "dairy"),
-    parameter = c("calving_rate", "calving_rate", "replacement_rate", "replacement_rate", "replacement_rate"),
-    sex = c(NA, NA, "male", "female", "female"),
-    value = c(0.9, 0.8, 0.2, 0.25, 0.3),
-    stringsAsFactors = FALSE
+    parameter = c("calving_rate", "replacement_rate"),
+    animal_tag = c("mature_dairy_cattle", "mature_dairy_cattle"),
+    value = c(0.9, 0.2)
   )
 
-  # 3. Execution
-  # This function returns a long dataframe with calculated offspring
-  res <- calculate_population_cattle(
-    census_cattle = mock_census,
-    rate_parameters = mock_rates,
-    categories = data.frame() # Not used in current logic but required by signature
+  # 2. Run function
+  results <- calculate_population_cattle(mock_census, mock_rates, data.frame())
+
+  # --- BASIC STRUCTURE CHECKS ---
+  expect_s3_class(results, "data.frame")
+  expect_named(results, c("region", "subregion", "animal_tag", "class_flex", "population"))
+})
+
+test_that("population math follows biological sex-ratio and replacement rules", {
+  # Scenario: 1000 cows, 1.0 calving rate, 0.1 replacement rate
+  mock_census <- data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = "mature_dairy_cattle", class_flex = "lactation", population = 1000
+  )
+  mock_rates <- data.frame(
+    parameter = c("calving_rate", "replacement_rate"),
+    animal_tag = "mature_dairy_cattle", value = c(1.0, 0.1)
   )
 
-  # 4. Assertions
-  # Check if identity columns are present
-  expect_true(all(c("region", "subregion", "animal_tag", "class_flex") %in% colnames(res)))
+  res <- calculate_population_cattle(mock_census, mock_rates, data.frame())
 
-  # Validate Dairy expansion for the 'stall' group:
-  # 100 dairy cows * 0.9 calving rate / 2 (females) = 45 dairy_calves_female_replacement
-  # (Since rate_dairy_female_repl is 0.3, the result should be 100 * 0.3 = 30)
-  dairy_repl <- res %>%
-    filter(animal_tag == "dairy_calves_female_replacement", region == "G1") %>%
-    pull(population)
+  # Calculation logic:
+  # 1000 births -> 500 males / 500 females
+  # Replacement: 1000 * 0.1 = 100 female calves kept
+  # Feedlot males: 500
+  # Feedlot females: 500 - 100 = 400
 
-  # Total dairy cows = 150. Total female replacement = 150 * 0.3 = 45
-  expect_equal(sum(dairy_repl), 45)
+  # --- MATH CHECKS ---
+  males <- res %>% filter(animal_tag == "feedlot_calves_male") %>% pull(population)
+  expect_equal(males, 500)
 
-  # Check that offspring have NA in class_flex (as per your Cambio 4)
-  offspring_check <- res %>%
-    filter(animal_tag == "feedlot_calves_male") %>%
-    pull(class_flex)
+  repl_females <- res %>% filter(animal_tag == "dairy_calves_female_replacement") %>% pull(population)
+  expect_equal(repl_females, 100)
+})
 
-  expect_true(all(is.na(offspring_check)))
 
-  # Check that parent animals preserve their class_flex
-  parent_check <- res %>%
-    filter(animal_tag == "mature_dairy_cattle")
 
-  expect_true(all(c("stall", "grazing") %in% parent_check$class_flex))
+test_that("class_flex is only preserved for mature animals", {
+  mock_census <- data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = "mature_dairy_cattle", class_flex = "lactation", population = 100
+  )
+  mock_rates <- data.frame(
+    parameter = c("calving_rate", "replacement_rate"),
+    animal_tag = "mature_dairy_cattle", value = c(1, 0)
+  )
+
+  res <- calculate_population_cattle(mock_census, mock_rates, data.frame())
+
+  # Mature cows should keep "lactation"
+  mature_entry <- res %>% filter(animal_tag == "mature_dairy_cattle")
+  expect_equal(mature_entry$class_flex, "lactation")
+
+  # Calves should have NA in class_flex
+  calf_entry <- res %>% filter(animal_tag == "feedlot_calves_male")
+  expect_true(is.na(calf_entry$class_flex))
 })

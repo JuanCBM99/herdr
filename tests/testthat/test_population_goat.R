@@ -1,87 +1,117 @@
-#' Calculates the full goat population structure (Internal Helper)
-#' @param census_goat Edit in csv
-#' @param rate_parameters Edit in csv
-#' @export
-calculate_population_goat <- function(census_goat, rate_parameters) {
+library(testthat)
+library(herdr)
+library(dplyr)
 
-  message("\U0001F9EE Calculating populations for GOAT...")
+test_that("calculate_population_goat returns correct structure", {
 
-  # (Assume these are the base 'animal_tag' for goats)
-  req_identifications <- c("mature_goat_male_dairy", "mature_goat_male_meat",
-                           "mature_goat_female_dairy", "mature_goat_female_meat")
-  if (!all(req_identifications %in% census_goat$animal_tag)) {
-    stop("Error: 'census.csv' (goat) must contain all 4 base identifications.")
-  }
+  # 1. Setup Mock Data with ALL required tags to prevent "object not found" errors
+  # Even if population is 0, the column must exist after pivot_wider
+  mock_census <- data.frame(
+    region = "spain",
+    subregion = "canary_islands",
+    animal_tag = c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ),
+    class_flex = NA,
+    population = c(1000, 0, 100, 0) # Only dairy goats have population
+  )
 
-  # --- Helper to get rates safely ---
-  get_rate <- function(param, subtype, sex_val = NA) {
-    df <- rate_parameters %>%
-      dplyr::filter(animal_type == "goat", # Filter by goat
-                    parameter == param,
-                    animal_subtype == subtype)
-    if (!is.na(sex_val)) df <- df %>% dplyr::filter(sex == sex_val)
-    val <- df %>% dplyr::pull(value)
-    if (length(val) == 0) {
-      warning(paste("Rate not found for (goat):", param, subtype, sex_val))
-      return(NA_real_)
-    }
-    val[1]
-  }
-
-  # --- Goat Rates ---
-  # (Ensure 'kidding_rate' exists in your 'rate_parameters.csv')
-  rate_dairy_kidding <- get_rate("kidding_rate", "dairy", sex_val = NA)
-  rate_meat_kidding  <- get_rate("kidding_rate", "meat", sex_val = NA)
-  rate_dairy_male_repl   <- get_rate("replacement_rate", "dairy", "male")
-  rate_dairy_female_repl <- get_rate("replacement_rate", "dairy", "female")
-  rate_meat_male_repl    <- get_rate("replacement_rate", "meat", "male")
-  rate_meat_female_repl  <- get_rate("replacement_rate", "meat", "female")
-
-  # --- Goat Calculation ---
-  base_pops_agg <- census_goat %>%
-    dplyr::filter(animal_tag %in% req_identifications) %>%
-    dplyr::group_by(region, subregion, animal_tag) %>%
-    dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop")
-
-  base_pops_wide <- base_pops_agg %>%
-    tidyr::pivot_wider(
-      names_from = animal_tag,
-      values_from = population,
-      values_fill = 0
+  # 2. Setup mock rates
+  mock_rates <- data.frame(
+    parameter = rep(c("kidding_rate", "replacement_rate"), each = 4),
+    animal_tag = rep(c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ), 2),
+    value = c(
+      1.8, 1.2, 0, 0,  # Kidding rates
+      0.2, 0.2, 0.1, 0 # Replacement rates
     )
+  )
 
-  calculated_pops <- base_pops_wide %>%
-    dplyr::group_by(region, subregion) %>%
-    dplyr::mutate(
-      # Replacements (ONLY calculated offspring)
-      pop_kid_goat_female_dairy_replacement = mature_goat_female_dairy * rate_dairy_female_repl,
-      pop_kid_goat_male_dairy_replacement = mature_goat_male_dairy * rate_dairy_male_repl,
-      pop_kid_goat_female_meat_replacement = mature_goat_female_meat * rate_meat_female_repl,
-      pop_kid_goat_male_meat_replacement = mature_goat_male_meat * rate_meat_male_repl
+  # 3. Run function
+  results <- calculate_population_goat(mock_census, mock_rates)
 
-      # (No 'total_births' or 'slaughter')
-    ) %>%
-    dplyr::ungroup()
+  # --- TEST: Structure ---
+  expect_s3_class(results, "data.frame")
+  expect_named(results, c("region", "subregion", "class_flex", "animal_tag", "population"))
+  expect_true(any(grepl("kid", results$animal_tag)))
+})
 
-  # --- Goat Assembly ---
-  all_populations_long <- calculated_pops %>%
-    dplyr::select(
-      region, subregion,
-      # Parents
-      mature_goat_male_dairy, mature_goat_male_meat,
-      mature_goat_female_dairy, mature_goat_female_meat,
-      # Offspring (Replacement Only)
-      kid_goat_female_dairy_replacement = pop_kid_goat_female_dairy_replacement,
-      kid_goat_male_dairy_replacement = pop_kid_goat_male_dairy_replacement,
-      kid_goat_female_meat_replacement = pop_kid_goat_female_meat_replacement,
-      kid_goat_male_meat_replacement = pop_kid_goat_male_meat_replacement
-    ) %>%
-    tidyr::pivot_longer(
-      cols = -c(region, subregion),
-      names_to = "animal_tag",
-      values_to = "population"
-    ) %>%
-    dplyr::filter(round(population, 5) > 0)
 
-  return(all_populations_long)
-}
+
+test_that("goat population correctly calculates replacement cohorts", {
+
+  # Scenario: 1000 Dairy Females (0.2 repl) and 100 Dairy Males (0.1 repl)
+  mock_census <- data.frame(
+    region = "spain", subregion = "test",
+    animal_tag = c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ),
+    class_flex = "grazing",
+    population = c(1000, 0, 100, 0)
+  )
+
+  mock_rates <- data.frame(
+    parameter = rep(c("kidding_rate", "replacement_rate"), each = 4),
+    animal_tag = rep(c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ), 2),
+    value = c(
+      1.5, 0, 0, 0,    # kidding
+      0.2, 0, 0.1, 0   # replacement
+    )
+  )
+
+  res <- calculate_population_goat(mock_census, mock_rates)
+
+  # Math check:
+  # Female replacement: 1000 * 0.2 = 200
+  # Male replacement: 100 * 0.1 = 10
+
+  # --- TEST: Female Replacement ---
+  f_repl <- res %>%
+    filter(animal_tag == "kid_goat_female_dairy_replacement") %>%
+    pull(population)
+  expect_equal(f_repl, 200)
+
+  # --- TEST: Male Replacement ---
+  m_repl <- res %>%
+    filter(animal_tag == "kid_goat_male_dairy_replacement") %>%
+    pull(population)
+  expect_equal(m_repl, 10)
+})
+
+test_that("goat function filters zero populations automatically", {
+
+  mock_census <- data.frame(
+    region = "spain", subregion = "test",
+    animal_tag = c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ),
+    class_flex = NA,
+    population = c(100, 0, 0, 0) # Only dairy females
+  )
+
+  mock_rates <- data.frame(
+    parameter = rep(c("kidding_rate", "replacement_rate"), each = 4),
+    animal_tag = rep(c(
+      "mature_goat_female_dairy", "mature_goat_female_meat",
+      "mature_goat_male_dairy", "mature_goat_male_meat"
+    ), 2),
+    value = 0.5
+  )
+
+  res <- calculate_population_goat(mock_census, mock_rates)
+
+  # The final output should not contain any tags with 0 population
+  # (Since you have dplyr::filter(round(population, 5) > 0) at the end)
+  expect_true(all(res$population > 0))
+
+  # In this scenario, meat categories should be absent
+  expect_false(any(grepl("_meat", res$animal_tag)))
+})

@@ -1,59 +1,65 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_NEl correctly computes lactation energy for cattle and small ruminants", {
+setup_nel_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity and Mock Data
-  test_keys <- data.frame(
-    region = "Reg1", subregion = "Sub1", class_flex = "stall",
-    stringsAsFactors = FALSE
-  )
+  # 1. Definitions: Crucial for milk_yield and fat_content
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("mature_dairy_cow", "mature_dairy_sheep"),
+    class_flex = "lactation",
+    animal_type = c("cattle", "sheep"),
+    animal_subtype = "dairy",
+    milk_yield = c(8000, 500), # kg/year
+    fat_content = c(3.5, 6.0)   # %
+  ), "user_data/livestock_definitions.csv")
 
-  # Mock Categories: Una vaca con grasa variable y una cabra
-  mock_cats <- data.frame(
-    test_keys,
-    animal_tag = c("cow_milk", "goat_milk"),
-    animal_type = c("cattle", "goat"),
-    animal_subtype = c("dairy", "dairy"),
-    milk_yield = c(8000, 1000), # kg/año
-    fat_content = c(4.0, 3.5),   # % grasa
-    stringsAsFactors = FALSE
-  )
+  # 2. Weights: Required for the inner_join (even if not used in math)
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("mature_dairy_cow", "mature_dairy_sheep"),
+    class_flex = "lactation",
+    average_weight = c(600, 70)
+  ), "user_data/livestock_weights.csv")
+}
 
-  # Mock Weights: Solo se usa para el inner_join de identidad
-  mock_weights <- data.frame(
-    test_keys,
-    animal_tag = c("cow_milk", "goat_milk"),
-    stringsAsFactors = FALSE
-  )
+cleanup_nel_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-  # 2. Execution with Mocked readr
-  res <- testthat::with_mocked_bindings(
-    calculate_NEl(saveoutput = FALSE),
+# --- TESTS ---
 
-    read_csv = function(file, ...) {
-      if (grepl("categories.csv", file)) return(mock_cats)
-      if (grepl("weights.csv", file)) return(mock_weights)
-      return(data.frame())
-    },
-    .package = "readr"
-  )
+test_that("calculate_NEl computes cattle lactation energy correctly", {
+  setup_nel_env()
+  results <- calculate_NEl(saveoutput = FALSE)
 
-  # 3. Assertions
-  # --- Cattle Check ---
-  # Yield_day = 8000 / 365 = 21.9178
-  # NEl = 21.9178 * (1.47 + 0.4 * 4.0) = 21.9178 * 3.07 = 67.288
-  val_cattle <- res %>% filter(animal_type == "cattle") %>% pull(NEl)
-  expect_equal(val_cattle, 67.288, tolerance = 0.001)
+  # Cattle Math:
+  # Yield per day = 8000 / 365 = 21.9178
+  # NEl = 21.9178 * (1.47 + 0.4 * 3.5)
+  # NEl = 21.9178 * 2.87 = 62.9041
 
-  # --- Goat Check ---
-  # Yield_day = 1000 / 365 = 2.7397
-  # NEl = 2.7397 * 4.6 = 12.603
-  val_goat <- res %>% filter(animal_type == "goat") %>% pull(NEl)
-  expect_equal(val_goat, 12.603, tolerance = 0.001)
+  cow_val <- results %>% filter(animal_type == "cattle") %>% pull(NEl)
+  expect_equal(cow_val, 62.904, tolerance = 0.002)
 
-  # 4. Identity Check
-  expect_true(all(c("region", "animal_tag", "NEl") %in% colnames(res)))
-  expect_equal(nrow(res), 2)
+  cleanup_nel_env()
+})
+
+
+
+test_that("calculate_NEl computes sheep/goat lactation energy correctly", {
+  setup_nel_env()
+  results <- calculate_NEl(saveoutput = FALSE)
+
+  # Sheep Math:
+  # Yield per day = 500 / 365 = 1.3698
+  # NEl = 1.3698 * 4.6 = 6.3013
+
+  sheep_val <- results %>% filter(animal_type == "sheep") %>% pull(NEl)
+  expect_equal(sheep_val, 6.301, tolerance = 0.002)
+
+  cleanup_nel_env()
 })

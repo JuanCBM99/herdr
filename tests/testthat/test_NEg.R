@@ -1,64 +1,76 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_NEg correctly applies Cattle and Sheep formulas", {
+setup_neg_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity and Mock Data
-  # Creamos dos animales: una vaca y una oveja
-  mock_weights <- data.frame(
-    region = "Reg1", subregion = "Sub1", class_flex = "grazing",
-    animal_tag = c("cow_gain", "sheep_gain"),
-    average_weight = c(450, 40), # Peso actual
-    adult_weight = c(600, 70),   # Peso adulto (solo para cattle)
-    weight_gain = c(0.8, 0.15),  # Ganancia diaria (kg/día)
-    stringsAsFactors = FALSE
-  )
+  # 1. Weights: Must contain the keys for the first join
+  write_csv(data.frame(
+    region = "spain",
+    subregion = "test",
+    animal_tag = c("growing_beef_cattle", "lamb_meat"),
+    class_flex = "none",
+    average_weight = c(300, 30),
+    adult_weight = c(600, 70),
+    weight_gain = c(1.0, 0.2)
+  ), "user_data/livestock_weights.csv")
 
-  mock_cats <- data.frame(
-    animal_tag = c("cow_gain", "sheep_gain"),
-    region = "Reg1", subregion = "Sub1", class_flex = "grazing",
+  # 2. Definitions: Must contain columns c, a, and b for the join to work
+  write_csv(data.frame(
+    region = "spain",
+    subregion = "test",
+    animal_tag = c("growing_beef_cattle", "lamb_meat"),
+    class_flex = "none",
     animal_type = c("cattle", "sheep"),
-    animal_subtype = c("dairy", "meat"),
-    c = c("c_female", NA), # Coeficiente C solo para cattle
-    a = c(NA, "a_sheep"),  # Coeficiente A para sheep
-    b = c(NA, "b_sheep"),  # Coeficiente B para sheep
-    stringsAsFactors = FALSE
-  )
+    animal_subtype = c("beef", "meat"),
+    c = c("steer", NA),
+    a = c(NA, "lamb_a"),
+    b = c(NA, "lamb_b")
+  ), "user_data/livestock_definitions.csv")
 
-  mock_coeffs <- data.frame(
-    description = c("c_female", "a_sheep", "b_sheep"),
-    value = c(0.8, 2.5, 14.5), # Valores típicos IPCC
-    stringsAsFactors = FALSE
-  )
+  # 3. IPCC Coefficients: The lookup table for A, B, and C values
+  write_csv(data.frame(
+    description = c("steer", "lamb_a", "lamb_b"),
+    value = c(1.0, 2.5, 12.0)
+  ), "user_data/ipcc_coefficients.csv")
+}
 
-  # 2. Execution with Mocked readr
-  res <- testthat::with_mocked_bindings(
-    calculate_NEg(saveoutput = FALSE),
+cleanup_neg_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-    read_csv = function(file, ...) {
-      if (grepl("weights.csv", file)) return(mock_weights)
-      if (grepl("categories.csv", file)) return(mock_cats)
-      if (grepl("ipcc_coefficients.csv", file)) return(mock_coeffs)
-      return(data.frame())
-    },
-    .package = "readr"
-  )
+# --- TESTS ---
 
-  # 3. Assertions
-  # --- Cattle Calculation Check ---
-  # Formula: 22.02 * (450 / (0.8 * 600))^0.75 * 0.8^1.097
-  # 22.02 * (0.9375^0.75) * 0.783 = 22.02 * 0.952 * 0.783 ≈ 16.42
-  val_cattle <- res %>% filter(animal_type == "cattle") %>% pull(NEg)
-  expect_gt(val_cattle, 0)
+test_that("calculate_NEg computes cattle growth correctly", {
+  setup_neg_env()
 
-  # --- Sheep Calculation Check ---
-  # Formula: (A + 0.5 * B) * weight_gain
-  # (2.5 + 0.5 * 14.5) * 0.15 = 9.75 * 0.15 = 1.4625
-  val_sheep <- res %>% filter(animal_type == "sheep") %>% pull(NEg)
-  expect_equal(val_sheep, 1.463, tolerance = 0.001)
+  results <- calculate_NEg(saveoutput = FALSE)
 
-  # 4. Integrity Check
-  expect_true(all(c("region", "class_flex", "NEg") %in% colnames(res)))
-  expect_equal(nrow(res), 2)
+  # Calculation check:
+  # Cattle: 22.02 * ((300 / (1.0 * 600))^0.75) * (1^1.097)
+  # 22.02 * (0.5^0.75) * 1 = 13.093
+
+  val <- results %>% filter(animal_type == "cattle") %>% pull(NEg)
+  expect_equal(val, 13.093, tolerance = 0.005)
+
+  cleanup_neg_env()
+})
+
+
+
+test_that("calculate_NEg computes sheep/goat growth correctly", {
+  setup_neg_env()
+
+  results <- calculate_NEg(saveoutput = FALSE)
+
+  # Sheep Math: (A + 0.5 * B) * weight_gain
+  # (2.5 + 0.5 * 12.0) * 0.2 = 1.7
+
+  val <- results %>% filter(animal_type == "sheep") %>% pull(NEg)
+  expect_equal(val, 1.700)
+
+  cleanup_neg_env()
 })

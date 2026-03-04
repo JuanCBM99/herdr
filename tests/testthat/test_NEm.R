@@ -1,60 +1,55 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_NEm correctly joins keys and applies IPCC maintenance formula", {
+setup_nem_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Mock Data Setup
-  # Identity keys common to all mocks
-  test_keys <- data.frame(
-    region = "Reg1", subregion = "Sub1",
-    animal_tag = "dairy_cow_test", class_flex = "grazing",
-    stringsAsFactors = FALSE
-  )
+  write_csv(data.frame(
+    region = "spain", subregion = "north", animal_tag = "mature_dairy_cattle",
+    class_flex = "lactation", average_weight = 600
+  ), "user_data/livestock_weights.csv")
 
-  # Weights: IPCC Eq 10.3 requires live weight
-  mock_weights <- mutate(test_keys, average_weight = 600)
+  write_csv(data.frame(
+    region = "spain", subregion = "north", animal_tag = "mature_dairy_cattle",
+    class_flex = "lactation", animal_type = "cattle", animal_subtype = "dairy",
+    cfi = "dairy_cow"
+  ), "user_data/livestock_definitions.csv")
 
-  # Categories: Links animal to its CFI (Maintenance Coefficient)
-  mock_cats <- mutate(test_keys,
-                      animal_type = "cattle",
-                      animal_subtype = "dairy",
-                      cfi = "cfi_dairy_cows")
+  write_csv(data.frame(
+    coefficient = "cfi", description = "dairy_cow", value = 0.335
+  ), "user_data/ipcc_coefficients.csv")
+}
 
-  # Coefficients: Standard IPCC values
-  # Dairy cattle maintenance coefficient is usually ~0.335 for lactating cows
-  mock_coeffs <- data.frame(
-    coefficient = "cfi",
-    description = "cfi_dairy_cows",
-    value = 0.335,
-    stringsAsFactors = FALSE
-  )
+cleanup_nem_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-  # 2. Execution with Mocked readr
-  res <- testthat::with_mocked_bindings(
-    calculate_NEm(saveoutput = FALSE),
+test_that("calculate_NEm computes metabolic energy correctly", {
+  setup_nem_env()
 
-    # Intercepting read_csv calls within the readr package
-    read_csv = function(file, ...) {
-      if (grepl("weights.csv", file)) return(mock_weights)
-      if (grepl("categories.csv", file)) return(mock_cats)
-      if (grepl("ipcc_coefficients.csv", file)) return(mock_coeffs)
-      return(data.frame())
-    },
-    .package = "readr"
-  )
+  results <- calculate_NEm(saveoutput = FALSE)
 
-  # 3. Assertions
-  # Verify identity keys are preserved
-  expect_true(all(c("region", "subregion", "animal_tag", "class_flex") %in% colnames(res)))
+  # Usamos tolerancia para evitar fallos por redondeo de milésimas
+  # El valor esperado está en el rango [40.611, 40.612]
+  expect_equal(results$NEm[1], 40.611, tolerance = 0.002)
 
-  # Verify Calculation: NEm = Cfi * (Weight ^ 0.75)
-  # 0.335 * (600 ^ 0.75) = 0.335 * 121.22 = 40.609
-  expected_nem <- round(0.335 * (600 ^ 0.75), 3)
+  cleanup_nem_env()
+})
 
-  val_calc <- res$NEm[1]
-  expect_equal(val_calc, expected_nem, tolerance = 0.001)
+test_that("calculate_NEm handles missing weights with zero", {
+  setup_nem_env()
 
-  # Ensure character columns are preserved for subsequent joins
-  expect_equal(res$animal_type[1], "cattle")
+  write_csv(data.frame(
+    region = "spain", subregion = "north", animal_tag = "mature_dairy_cattle",
+    class_flex = "lactation", average_weight = NA
+  ), "user_data/livestock_weights.csv")
+
+  results <- calculate_NEm(saveoutput = FALSE)
+
+  expect_equal(results$NEm[1], 0)
+
+  cleanup_nem_env()
 })

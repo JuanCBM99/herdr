@@ -1,35 +1,32 @@
 ﻿animal_tag,region,subregion,class_flex,diet_tag,cfi,ca,c,a,b,milk_yield,fat_content,wool_yield,work_hours,pr,single birth fraction,double birth fraction,c_pregnancy,animal_type,animal_subtype
-feedlot_calves_male,,,,diet_feedlot_calves,cattle/buffalo,stall,bulls,,,0,0,0,0,0,0,0,,cattle,feedlot
-feedlot_calves_female,,,,diet_feedlot_calves,cattle/buffalo,stall,females,,,0,0,0,0,0,0,0,,cattle,feedlot
-beef_calves_male,,,,diet_beef_calves_slaughter,cattle/buffalo,pasture,bulls,,,0,0,0,0,0,0,0,,cattle,beef
-beef_calves_female,,,,diet_beef_calves_slaughter,cattle/buffalo,pasture,females,,,0,0,0,0,0,0,0,,cattle,beef
-beef_calves_male_replacement,,,,diet_beef_calves_replacement,cattle/buffalo,pasture,bulls,,,0,0,0,0,0,0,0,,cattle,beef
-beef_calves_female_replacement,,,,diet_beef_calves_replacement,cattle/buffalo,pasture,females,,,0,0,0,0,0,0,0,,cattle,beef
-dairy_calves_female_replacement,,,,diet_dairy_calves_replacement,cattle/buffalo,stall,females,,,0,0,0,0,0,0,0,,cattle,dairy
-beef_yearlings_male_replacement,,,,diet_beef_mature_yearlings,cattle/buffalo,pasture,bulls,,,0,0,0,0,0,0,0,,cattle,beef
-beef_yearlings_female_replacement,,,,diet_beef_mature_yearlings,cattle/buffalo,pasture,females,,,0,0,0,0,0,0,0,,cattle,beef
-dairy_yearlings_female_replacement,,,,diet_dairy_yearlings_replacement,cattle/buffalo,stall,females,,,0,0,0,0,0,0,0,,cattle,dairy
-mature_beef_bull,,,,diet_beef_mature_yearlings,cattle_buffalo [bulls],pasture,bulls,,,0,0,0,0,0,0,0,,cattle,beef
-mature_dairy_cattle,spain,north,lactation_phase,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,8295,3.73,0,0,0,0,0,cattle and buffalo,cattle,dairy
-mature_dairy_cattle,spain,north,dry_phase,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,0,0,0,0,0,0,0,cattle and buffalo,cattle,dairy
-mature_dairy_cattle,spain,south,lactation_phase,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,9044,3.73,0,0,0,0,0,cattle and buffalo,cattle,dairy
-mature_dairy_cattle,spain,south,dry_phase,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,0,0,0,0,0,0,0,cattle and buffalo,cattle,dairy
-mature_beef_cattle,,,,diet_beef_mature_yearlings,cattle/buffalo,pasture,females,,,0,0,0,0,0,0,0,cattle and buffalo,cattle,beef
-lamb_female_dairy_replacement,,,,diet_lamb_dairy_female_replacement_pasture,sheep_lamb_to_1_year_a,grazing flat pasture,,a_average_f_m,b_average_f_m,0,0,0,0,0,0,0,,sheep,dairy
-lamb_dairy_slaughter,,,,diet_lamb_dairy_slaughter,sheep_lamb_to_1_year_a,housed fattening lambs,,a_average_f_m,b_average_f_m,0,0,0,0,0,0,0,,sheep,dairy
-lamb_female_meat_replacement,,,,diet_lamb_meat_female_replacement_pasture,sheep_lamb_to_1_year_a,grazing flat pasture,,a_average_f_m,b_average_f_m,0,0,0,0,0,0,0,,sheep,meat
-lamb_meat_slaughter,,,,diet_lamb_meat_slaughter,sheep_lamb_to_1_year_a,housed fattening lambs,,a_average_f_m,b_average_f_m,0,0,0,0,0,0,0,,sheep,meat
-lamb_male_dairy_replacement,,,,diet_lamb_dairy_male_replacement_pasture,sheep_lamb_to_1_year_m,grazing flat pasture,,a_intact males,b_intact males,0,0,0,0,0,0,0,,sheep,dairy
-lamb_male_meat_replacement,,,,diet_lamb_meat_male_replacement_pasture,sheep_lamb_to_1_year_m,grazing flat pasture,,a_intact males,b_intact males,0,0,0,0,0,0,0,,sheep,meat
-mature_sheep_female_dairy,,,,diet_mature_sheep_dairy_female_pasture,sheep_older_than_1_year_f,grazing flat pasture,,a_females,b_females,180,6.71,1.4,0,1.27,0.73,0.27,,sheep,dairy
-mature_sheep_female_meat,,,,diet_mature_sheep_meat_female_pasture,sheep_older_than_1_year_f,grazing flat pasture,,a_females,b_females,30.21,3.45,1.99,0,1,1,0,,sheep,meat
-mature_sheep_male_dairy,,,,diet_mature_sheep_dairy_male_pasture,sheep_older_than_1_year_m,grazing flat pasture,,a_intact males,b_intact males,0,0,2.6,0,0,0,0,,sheep,dairy
-mature_sheep_male_meat,,,,diet_mature_sheep_meat_male_pasture,sheep_older_than_1_year_m,grazing flat pasture,,a_intact males,b_intact males,0,0,2.79,0,0,0,0,,sheep,meat
-kid_goat_male_dairy_replacement,,,,diet_kid_goat_male_dairy_replacement_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,dairy
-kid_goat_male_meat_replacement,,,,diet_kid_goat_male_meat_replacement_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,meat
-mature_goat_male_dairy,,,,diet_mature_goat_male_dairy_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,dairy
-mature_goat_male_meat,,,,diet_mature_goat_male_meat_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,meat
-kid_goat_female_dairy_replacement,,,,diet_kid_goat_female_dairy_replacement_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,dairy
-kid_goat_female_meat_replacement,,,,diet_kid_goat_female_meat_replacement_pasture,goats,lowland goats,,a,b,0,0,0,0,0,0,0,,goat,meat
-mature_goat_female_dairy,,,,diet_mature_goat_female_dairy_pasture,goats,lowland goats,,a,b,530,5.6,0,0,2,0,1,,goat,dairy
-mature_goat_female_meat,,,,diet_mature_goat_female_meat_pasture,goats,lowland goats,,a,b,157.5,4.9,0,0,1.58,0.42,0.58,,goat,meat
+feedlot_calves_male,,,,,,,,,,,,,,,,,,,
+feedlot_calves_female,,,,,,,,,,,,,,,,,,,
+beef_calves_male,,,,,,,,,,,,,,,,,,,
+beef_calves_female,,,,,,,,,,,,,,,,,,,
+beef_calves_male_replacement,,,,,,,,,,,,,,,,,,,
+beef_calves_female_replacement,,,,,,,,,,,,,,,,,,,
+dairy_calves_female_replacement,,,,,,,,,,,,,,,,,,,
+beef_yearlings_male_replacement,,,,,,,,,,,,,,,,,,,
+beef_yearlings_female_replacement,,,,,,,,,,,,,,,,,,,
+dairy_yearlings_female_replacement,,,,,,,,,,,,,,,,,,,
+mature_beef_bull,,,,,,,,,,,,,,,,,,,
+mature_dairy_cattle,,,,,,,,,,,,,,,,,,,
+mature_beef_cattle,,,,,,,,,,,,,,,,,,,
+lamb_female_dairy_replacement,,,,,,,,,,,,,,,,,,,
+lamb_dairy_slaughter,,,,,,,,,,,,,,,,,,,
+lamb_female_meat_replacement,,,,,,,,,,,,,,,,,,,
+lamb_meat_slaughter,,,,,,,,,,,,,,,,,,,
+lamb_male_dairy_replacement,,,,,,,,,,,,,,,,,,,
+lamb_male_meat_replacement,,,,,,,,,,,,,,,,,,,
+mature_sheep_female_dairy,,,,,,,,,,,,,,,,,,,
+mature_sheep_female_meat,,,,,,,,,,,,,,,,,,,
+mature_sheep_male_dairy,,,,,,,,,,,,,,,,,,,
+mature_sheep_male_meat,,,,,,,,,,,,,,,,,,,
+kid_goat_male_dairy_replacement,,,,,,,,,,,,,,,,,,,
+kid_goat_male_meat_replacement,,,,,,,,,,,,,,,,,,,
+mature_goat_male_dairy,,,,,,,,,,,,,,,,,,,
+mature_goat_male_meat,,,,,,,,,,,,,,,,,,,
+kid_goat_female_dairy_replacement,,,,,,,,,,,,,,,,,,,
+kid_goat_female_meat_replacement,,,,,,,,,,,,,,,,,,,
+mature_goat_female_dairy,,,,,,,,,,,,,,,,,,,
+mature_goat_female_meat,,,,,,,,,,,,,,,,,,,

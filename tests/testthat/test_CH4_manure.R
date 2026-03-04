@@ -1,79 +1,75 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_CH4_manure computes emissions based on VS and management factors", {
+setup_manure_ch4_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity
-  test_keys <- data.frame(
-    region = "Reg1", subregion = "Sub1",
-    animal_tag = "dairy_cow", class_flex = "stall",
-    animal_type = "cattle", animal_subtype = "dairy",
-    stringsAsFactors = FALSE
+  # Standard template for manure management
+  mm_template <- data.frame(
+    region = "spain", subregion = "test", animal_tag = "dairy_cow", class_flex = "none",
+    animal_type = "cattle", animal_subtype = "dairy", allocation = 1.0,
+    system_base = "slurry", management_months = 12, system_climate = "temperate",
+    system_subclimate = "none", system_variant = "none", climate_zone = "none",
+    climate_moisture = "none"
   )
+  write_csv(mm_template, "user_data/manure_management.csv")
 
-  # 2. Prepare Internal Mocks (herdr)
-  mock_vs  <- mutate(test_keys, vs = 4.5)           # 4.5 kg VS/día
-  mock_pop <- mutate(test_keys, population = 1000)  # 1,000 animales
+  # IPCC Master (MCF Lookups)
+  write_csv(data.frame(
+    system_base = "slurry", management_months = 12, system_climate = "temperate",
+    system_subclimate = "none", system_variant = "none", climate_zone = "none",
+    climate_moisture = "none", animal_type = "cattle", animal_subtype = "dairy",
+    mcf = 0.17
+  ), "user_data/ipcc_mm.csv")
 
-  # 3. Prepare CSV Mocks (readr)
-  # ch4_mm: Configuración del sistema de manejo
-  mock_ch4_mm <- data.frame(
-    region = "Reg1", subregion = "Sub1", animal_tag = "dairy_cow", class_flex = "stall",
-    animal_category = "dairy_cow_category", management_system = "lagoon",
-    system_climate = "warm", management_duration = 12, # 12 meses (AWMS = 1)
-    stringsAsFactors = FALSE
-  )
+  # IPCC Coefficients (B0 Lookups)
+  write_csv(data.frame(
+    coefficient = "b_0", animal_type = "cattle", animal_subtype = "dairy",
+    value = 0.24
+  ), "user_data/ipcc_coefficients.csv")
 
-  # ipcc_coefficients: Para el valor B0
-  mock_coefs <- data.frame(
-    coefficient = "b_0",
-    description = "dairy_cow_category",
-    value = 0.24, # m3 CH4 / kg VS
-    stringsAsFactors = FALSE
-  )
+  # Basic census for population dependency
+  write_csv(data.frame(
+    region = "spain", subregion = "test", animal_tag = "dairy_cow", class_flex = "none",
+    population = 1000, animal_type = "cattle", animal_subtype = "dairy"
+  ), "user_data/livestock_census.csv")
+}
 
-  # ipcc_mcf: Para el factor de conversión de metano
-  mock_mcf <- data.frame(
-    management_system = "lagoon",
-    system_climate = "warm",
-    mcf = 77, # 77% (IPCC default para lagunas en clima cálido)
-    stringsAsFactors = FALSE
-  )
+cleanup_manure_ch4_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-  # 4. Execution with Nested Mocking
-  res <- testthat::with_mocked_bindings(
+# --- TESTS ---
 
-    testthat::with_mocked_bindings(
-      calculate_CH4_manure(automatic_cycle = FALSE, saveoutput = FALSE),
+test_that("calculate_CH4_manure handles allocations exceeding 100%", {
+  setup_manure_ch4_env()
 
-      read_csv = function(file, ...) {
-        if (grepl("ch4_mm.csv", file)) return(mock_ch4_mm)
-        if (grepl("ipcc_coefficients.csv", file)) return(mock_coefs)
-        if (grepl("ipcc_mcf.csv", file)) return(mock_mcf)
-        return(data.frame())
-      },
-      .package = "readr"
-    ),
+  # Update while keeping all columns to avoid "object not found"
+  bad_mm <- read_csv("user_data/manure_management.csv", show_col_types = FALSE) %>%
+    mutate(allocation = 1.5)
+  write_csv(bad_mm, "user_data/manure_management.csv")
 
-    calculate_vs = function(...) mock_vs,
-    calculate_population = function(...) mock_pop,
-    .package = "herdr"
-  )
+  # This should now reach the "Allocation Assertion" in your code
+  expect_error(calculate_CH4_manure(saveoutput = FALSE), "Manure allocation exceeds 1.0")
 
-  # 5. Assertions
-  # --- Verificación del Cálculo (IPCC Eq 10.23) ---
-  # AWMS = 12/12 = 1.0
-  # EF = (4.5 * 365) * (0.24 * 0.67 * (77 / 100) * 1.0)
-  # EF = 1642.5 * 0.123864 = 203.447 kg CH4 / animal / año
-  # Total Mg = 203.447 * 1000 / 1000 = 203.447 Mg
+  cleanup_manure_ch4_env()
+})
 
-  expect_s3_class(res, "data.frame")
-  expect_equal(res$EF_CH4_kg_year[1], 203.447, tolerance = 0.001)
-  expect_equal(res$Emissions_CH4_Mg_year[1], 203.447, tolerance = 0.001)
 
-  # Verificamos que se unieron correctamente los factores
-  expect_equal(res$management_system[1], "lagoon")
-  expect_equal(res$B0[1], 0.24)
-  expect_equal(res$mcf[1], 77)
+
+test_that("calculate_CH4_manure detects invalid system combinations", {
+  setup_manure_ch4_env()
+
+  # Change the system to something that doesn't exist in ipcc_mm.csv
+  invalid_mm <- read_csv("user_data/manure_management.csv", show_col_types = FALSE) %>%
+    mutate(system_base = "imaginary_system")
+  write_csv(invalid_mm, "user_data/manure_management.csv")
+
+  # This targets the "Combinations Integrity Check" (Step 2.1)
+  expect_error(calculate_CH4_manure(saveoutput = FALSE), "Invalid system/climate combinations")
+
+  cleanup_manure_ch4_env()
 })

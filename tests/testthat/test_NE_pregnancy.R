@@ -1,72 +1,74 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_NE_pregnancy computes pregnancy energy for cattle and small ruminants", {
+setup_pregnancy_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity and Mock Data
-  test_keys <- data.frame(
-    region = "Reg1", subregion = "Sub1", class_flex = "grazing",
-    stringsAsFactors = FALSE
-  )
+  # 1. Weights (Required by NEm)
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("pregnant_cow", "pregnant_ewe"),
+    class_flex = "gestation",
+    average_weight = c(600, 70)
+  ), "user_data/livestock_weights.csv")
 
-  # Mock NEm (Base energy)
-  mock_nem_res <- data.frame(
-    test_keys,
-    animal_tag = c("cow_preg", "sheep_preg"),
+  # 2. Definitions: Mapping C_pregnancy for cattle and PR for sheep
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("pregnant_cow", "pregnant_ewe"),
+    class_flex = "gestation",
     animal_type = c("cattle", "sheep"),
-    animal_subtype = c("dairy", "meat"),
-    NEm = c(40.0, 4.0),
-    stringsAsFactors = FALSE
-  )
+    animal_subtype = "dairy",
+    cfi = c("dairy_cow", "dairy_sheep"),
+    c_pregnancy = c("cattle_preg", NA), # Coefficient tag for cattle
+    pr = c(NA, 1.5)                      # Pregnancy rate for sheep (150%)
+  ), "user_data/livestock_definitions.csv")
 
-  # CORRECCIÓN: Añadimos animal_type y animal_subtype al mock de categories
-  mock_cats <- data.frame(
-    test_keys,
-    animal_tag = c("cow_preg", "sheep_preg"),
-    animal_type = c("cattle", "sheep"),      # <--- FALTA ESTO
-    animal_subtype = c("dairy", "meat"),     # <--- Y ESTO
-    c_pregnancy = c("cp_cattle", "cp_sheep"),
-    pr = c(1, 1.5),
-    stringsAsFactors = FALSE
-  )
+  # 3. IPCC Coefficients
+  write_csv(data.frame(
+    coefficient = c("cfi", "cfi", "c_pregnancy"),
+    description = c("dairy_cow", "dairy_sheep", "cattle_preg"),
+    value = c(0.335, 0.335, 0.10) # 0.10 factor for cattle pregnancy
+  ), "user_data/ipcc_coefficients.csv")
+}
 
-  # Mock Coefficients
-  mock_coeffs <- data.frame(
-    coefficient = "c_pregnancy",
-    description = "cp_cattle",
-    value = 0.10,
-    stringsAsFactors = FALSE
-  )
+cleanup_pregnancy_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-  # 2. Execution with Nested Mocks
-  res <- testthat::with_mocked_bindings(
+# --- TESTS ---
 
-    # Level 2: readr CSVs
-    testthat::with_mocked_bindings(
-      calculate_NE_pregnancy(saveoutput = FALSE),
+test_that("calculate_NE_pregnancy computes cattle energy correctly", {
+  setup_pregnancy_env()
+  results <- calculate_NE_pregnancy(saveoutput = FALSE)
 
-      read_csv = function(file, ...) {
-        if (grepl("categories.csv", file)) return(mock_cats)
-        if (grepl("ipcc_coefficients.csv", file)) return(mock_coeffs)
-        return(data.frame())
-      },
-      .package = "readr"
-    ),
+  # Cattle Math:
+  # 1. NEm = 0.335 * (600 ^ 0.75) ≈ 40.612
+  # 2. NE_preg = c_value (0.10) * NEm ≈ 4.061
 
-    # Level 1: herdr NEm call
-    calculate_NEm = function(...) mock_nem_res,
-    .package = "herdr"
-  )
+  cow_val <- results %>% filter(animal_type == "cattle") %>% pull(NE_pregnancy)
+  expect_equal(cow_val, 4.061, tolerance = 0.005)
 
-  # 3. Assertions
-  # Cattle: 0.10 * 40.0 = 4.0
-  val_cattle <- res %>% filter(animal_type == "cattle") %>% pull(NE_pregnancy)
-  expect_equal(val_cattle, 4.0)
+  cleanup_pregnancy_env()
+})
 
-  # Sheep: pr = 1.5 -> Factor 0.1015 * 4.0 = 0.406
-  val_sheep <- res %>% filter(animal_type == "sheep") %>% pull(NE_pregnancy)
-  expect_equal(val_sheep, 0.406)
 
-  expect_true("NE_pregnancy" %in% colnames(res))
+
+test_that("calculate_NE_pregnancy computes sheep energy correctly", {
+  setup_pregnancy_env()
+  results <- calculate_NE_pregnancy(saveoutput = FALSE)
+
+  # Sheep Math (pr = 1.5):
+  # 1. NEm = 0.335 * (70 ^ 0.75) ≈ 8.106
+  # 2. Factor = (0.126 * (1.5-1)) + (0.077 * (1 - (1.5-1)))
+  #    Factor = (0.126 * 0.5) + (0.077 * 0.5) = 0.063 + 0.0385 = 0.1015
+  # 3. NE_preg = 0.1015 * 8.106 ≈ 0.823
+
+  sheep_val <- results %>% filter(animal_type == "sheep") %>% pull(NE_pregnancy)
+  expect_equal(sheep_val, 0.823, tolerance = 0.005)
+
+  cleanup_pregnancy_env()
 })

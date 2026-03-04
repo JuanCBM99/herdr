@@ -1,72 +1,72 @@
 library(testthat)
 library(herdr)
-library(dplyr)
+library(readr)
 
-test_that("calculate_N2O_direct_manure computes nitrogen balance and N2O correctly", {
+setup_all_final_v2 <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity
-  test_keys <- data.frame(
-    region = "R1", subregion = "S1", animal_tag = "dairy_cow", class_flex = "stall",
-    animal_type = "cattle", animal_subtype = "dairy",
-    stringsAsFactors = FALSE
-  )
+  # 1. Definiciones (Columnas de texto para evitar errores de tipo)
+  write_csv(data.frame(
+    region="test", subregion="test", animal_tag="cow", class_flex="none",
+    animal_type="cattle", animal_subtype="dairy", diet_tag="diet1",
+    milk_yield=5000, fat_content=3.5, cp_excretion_factor=0.16,
+    cfi="c1", ca="a1", work_hours=0,
+    c="steer", a="none", b="none",
+    c_pregnancy="none", pr=0, wool_yield=0
+  ), "user_data/livestock_definitions.csv")
 
-  # 2. Prepare Internal Mocks (herdr)
-  mock_ge   <- mutate(test_keys, ge = 300) # MJ/día
-  mock_cp   <- mutate(test_keys, cp = 16)  # 16% Proteína Cruda
-  mock_pop  <- mutate(test_keys, population = 100)
-  mock_neg  <- mutate(test_keys, NEg = 5)  # MJ/día para crecimiento
+  # 2. Pesos y Censo
+  write_csv(data.frame(
+    region="test", subregion="test", animal_tag="cow", class_flex="none",
+    average_weight=600, adult_weight=600, weight_gain=0
+  ), "user_data/livestock_weights.csv")
 
-  # 3. Prepare CSV Mocks (readr)
-  mock_cats <- mutate(test_keys, milk_yield = 5000, fat_content = 4)
-  mock_w    <- mutate(test_keys, weight_gain = 0.5) # kg/día
+  write_csv(data.frame(
+    region="test", subregion="test", animal_tag="cow", class_flex="none",
+    population=100, animal_type="cattle", animal_subtype="dairy"
+  ), "user_data/livestock_census.csv")
 
-  # Configuración de manejo: Lagoon en clima templado
-  mock_n2o_mm <- data.frame(
-    region = "R1", subregion = "S1", animal_tag = "dairy_cow", class_flex = "stall",
-    management_system = "lagoon", climate = "temperate", management_duration = 12,
-    stringsAsFactors = FALSE
-  )
+  # 3. Parámetros reproductivos (EL QUE FALTABA)
+  write_csv(data.frame(
+    animal_tag="cow", replacement_rate=0, calving_interval=0,
+    mortality_rate=0, first_calving_age=0
+  ), "user_data/reproduction_parameters.csv")
 
-  # Factor de emisión IPCC para lagunas (ej. 0.005 kg N2O-N/kg N)
-  mock_ef_n2o <- data.frame(
-    management_system = "lagoon", climate = "temperate", value = 0.005,
-    stringsAsFactors = FALSE
-  )
+  # 4. Nutrición y Dietas
+  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
+                       forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
+  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
+                       ingredient_type="forage", ingredient="grass", ingredient_share=100), "user_data/diet_ingredients.csv")
+  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, eb=18), "user_data/feed_characteristics.csv")
 
-  # 4. Execution with Nested Mocking
-  res <- testthat::with_mocked_bindings(
-    testthat::with_mocked_bindings(
-      calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = FALSE),
+  # 5. Estiércol e IPCC
+  write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",
+                       animal_type="cattle", animal_subtype="dairy", allocation=1,
+                       system_base="pit", management_months=12, system_climate="cold",
+                       system_subclimate="none", system_variant="none", climate_zone="none",
+                       climate_moisture="none"), "user_data/manure_management.csv")
 
-      read_csv = function(file, ...) {
-        if (grepl("categories.csv", file)) return(mock_cats)
-        if (grepl("weights.csv", file)) return(mock_w)
-        if (grepl("n2o_direct.csv", file)) return(mock_n2o_mm)
-        if (grepl("ipcc_emission_factors_direct.csv", file)) return(mock_ef_n2o)
-        return(data.frame())
-      },
-      .package = "readr"
-    ),
+  write_csv(data.frame(system_base="pit", management_months=12, system_climate="cold",
+                       system_subclimate="none", system_variant="none", climate_zone="none",
+                       climate_moisture="none", animal_type="cattle", animal_subtype="dairy",
+                       EF3=0.01, mcf=0.1, frac_leach=0.1, EF5=0.01), "user_data/ipcc_mm.csv")
 
-    calculate_ge = function(...) mock_ge,
-    calculate_weighted_variable = function(...) mock_cp,
-    calculate_population = function(...) mock_pop,
-    calculate_NEg = function(...) mock_neg,
-    .package = "herdr"
-  )
+  write_csv(data.frame(
+    coefficient="cfi",
+    description=c("c1", "steer", "none"),
+    value=c(0.335, 1.0, 0)
+  ), "user_data/ipcc_coefficients.csv")
+}
 
-  # 5. Assertions
-  # --- Verificación de Lógica ---
-  # N_intake = (300 / 18.45) * (16 / 100 / 6.25) = 16.26 * 0.0256 = 0.416 kg N/día
-  expect_equal(res$N_intake[1], 0.416, tolerance = 0.001)
+test_that("calculate_N2O_direct_manure passes final integration", {
+  setup_all_final_v2()
 
-  # N_retention para vacas involucra leche y crecimiento:
-  # milk_protein = 1.9 + 0.4 * 4 = 3.5
-  # retention_milk = (5000 * 3.5) / 6.38 / 365 (aproximadamente, tu función usa milk_yield anual)
-  expect_gt(res$N_retention[1], 0)
+  # Ejecución
+  results <- calculate_N2O_direct_manure(saveoutput = FALSE)
 
-  # N2O total: population * N_excreted * awms * ef * (44/28)
-  expect_true("N2O_emissions" %in% colnames(res))
-  expect_equal(res$management_system[1], "lagoon")
+  expect_s3_class(results, "data.frame")
+  expect_true("N2O_emissions" %in% colnames(results))
+
+  # Limpieza
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
 })

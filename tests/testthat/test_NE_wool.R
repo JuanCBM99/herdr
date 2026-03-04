@@ -1,48 +1,61 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-test_that("calculate_NE_wool computes daily wool energy correctly", {
+setup_wool_env <- function() {
+  if (!dir.exists("user_data")) dir.create("user_data")
 
-  # 1. Setup Identity and Mock Data
-  test_keys <- data.frame(
-    region = "Reg1", subregion = "Sub1",
-    animal_tag = "sheep_wool_test", class_flex = "grazing",
-    stringsAsFactors = FALSE
-  )
+  # 1. Definitions: Including wool_yield (kg/year)
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("merino_sheep", "dairy_cow"),
+    class_flex = "none",
+    animal_type = c("sheep", "cattle"),
+    animal_subtype = c("wool", "dairy"),
+    wool_yield = c(4.5, NA) # 4.5 kg/year for sheep, NA for cow
+  ), "user_data/livestock_definitions.csv")
 
-  # Mock Categories: Definimos la producción anual de lana
-  mock_cats <- mutate(test_keys,
-                      animal_type = "sheep",
-                      animal_subtype = "merino",
-                      wool_yield = 4.5) # 4.5 kg de lana al año
+  # 2. Weights: Required for the inner_join
+  write_csv(data.frame(
+    region = "spain", subregion = "north",
+    animal_tag = c("merino_sheep", "dairy_cow"),
+    class_flex = "none",
+    average_weight = c(70, 600)
+  ), "user_data/livestock_weights.csv")
+}
 
-  # Mock Weights: Necesario para el inner_join de identidad
-  mock_weights <- select(test_keys, region, subregion, animal_tag, class_flex)
+cleanup_wool_env <- function() {
+  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+}
 
-  # 2. Execution with Mocked readr
-  res <- testthat::with_mocked_bindings(
-    calculate_NE_wool(saveoutput = FALSE),
+# --- TESTS ---
 
-    # Interceptamos la lectura de los dos archivos necesarios
-    read_csv = function(file, ...) {
-      if (grepl("categories.csv", file)) return(mock_cats)
-      if (grepl("weights.csv", file)) return(mock_weights)
-      return(data.frame())
-    },
-    .package = "readr"
-  )
+test_that("calculate_NE_wool computes energy for wool correctly", {
+  setup_wool_env()
 
-  # 3. Assertions
-  # Fórmula: (wool_yield * 24) / 365
-  # (4.5 * 24) / 365 = 108 / 365 = 0.29589...
-  expected_wool <- round((4.5 * 24) / 365, 3)
+  results <- calculate_NE_wool(saveoutput = FALSE)
 
-  val_calc <- res$NE_wool[1]
+  # Math check for Sheep:
+  # NE_wool = (4.5 * 24) / 365
+  # 108 / 365 = 0.29589...
+  # Rounded to 3 decimals: 0.296
 
-  expect_true("NE_wool" %in% colnames(res))
-  expect_equal(val_calc, expected_wool)
+  sheep_val <- results %>% filter(animal_tag == "merino_sheep") %>% pull(NE_wool)
+  expect_equal(sheep_val, 0.296)
 
-  # Verificamos que la identidad se mantiene
-  expect_equal(res$animal_tag[1], "sheep_wool_test")
+  cleanup_wool_env()
+})
+
+test_that("calculate_NE_wool handles missing or NA yield with zero", {
+  setup_wool_env()
+
+  results <- calculate_NE_wool(saveoutput = FALSE)
+
+  # Cattle should have 0.000 since wool_yield was NA
+  cow_val <- results %>% filter(animal_tag == "dairy_cow") %>% pull(NE_wool)
+  expect_equal(cow_val, 0)
+
+  cleanup_wool_env()
 })

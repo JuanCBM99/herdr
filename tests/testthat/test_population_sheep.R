@@ -1,54 +1,78 @@
 library(testthat)
 library(herdr)
 library(dplyr)
-library(tidyr)
 
-test_that("calculate_population_sheep correctly expands population with class_flex", {
+test_that("calculate_population_sheep returns correct structure and math", {
 
-  # 1. Mock Base Census (Sheep)
-  # Usamos las 4 identificaciones requeridas
-  mock_census_sheep <- data.frame(
-    region = "G1",
-    subregion = "Z1",
-    animal_tag = c("mature_sheep_male_dairy", "mature_sheep_female_dairy",
-                   "mature_sheep_male_meat", "mature_sheep_female_meat"),
-    class_flex = "grazing", # Mantenemos la llave de identidad
-    population = c(5, 100, 10, 200),
-    stringsAsFactors = FALSE
+  # 1. Setup Mock Data including ALL required categories (even if 0)
+  # This prevents the "object not found" error during the pivot/mutate
+  mock_census <- data.frame(
+    region = "spain",
+    subregion = "extremadura",
+    animal_tag = c(
+      "mature_sheep_female_meat",
+      "mature_sheep_female_dairy",
+      "mature_sheep_male_meat",
+      "mature_sheep_male_dairy"
+    ),
+    class_flex = "grazing",
+    population = c(1000, 0, 0, 0) # Only meat females have population
   )
 
-  # 2. Mock Rate Parameters (Sheep)
-  mock_rates_sheep <- data.frame(
-    animal_type = "sheep",
-    animal_subtype = c("dairy", "meat", "dairy", "dairy", "meat", "meat"),
-    parameter = c("lambing_rate", "lambing_rate", "replacement_rate", "replacement_rate", "replacement_rate", "replacement_rate"),
-    sex = c(NA, NA, "male", "female", "male", "female"),
-    value = c(1.5, 1.2, 0.1, 0.2, 0.15, 0.25),
-    stringsAsFactors = FALSE
+  # 2. Setup rates for all categories
+  mock_rates <- data.frame(
+    parameter = rep(c("lambing_rate", "replacement_rate"), each = 4),
+    animal_tag = rep(c(
+      "mature_sheep_female_meat", "mature_sheep_female_dairy",
+      "mature_sheep_male_meat", "mature_sheep_male_dairy"
+    ), 2),
+    value = c(
+      1.5, 1.2, 0, 0,  # Lambing rates
+      0.2, 0.2, 0, 0   # Replacement rates
+    )
   )
 
-  # 3. Execution
-  # Nota: Si tu función actual NO tiene class_flex, este test fallará en la columna class_flex.
-  # Es vital añadir class_flex al group_by y pivot_longer de la función original.
-  res <- calculate_population_sheep(
-    census_sheep = mock_census_sheep,
-    rate_parameters = mock_rates_sheep
-  )
+  # 3. Run function
+  # This will now work because all columns exist (even if they are 0)
+  results <- calculate_population_sheep(mock_census, mock_rates)
 
-  # 4. Assertions
-  # Verificamos que las crías se calculen bien
-  # Dairy: 100 hembras * 1.5 lambing_rate = 150 corderos totales
-  # Reemplazos: 100 hembras * 0.2 = 20 hembras / 5 machos * 0.1 = 0.5 machos
-  # Slaughter: 150 - 20 - 0.5 = 129.5
+  # --- TEST: Structure ---
+  expect_s3_class(results, "data.frame")
+  expect_true(all(c("region", "subregion", "animal_tag", "population") %in% colnames(results)))
 
-  slaughter_val <- res %>%
-    filter(animal_tag == "lamb_dairy_slaughter") %>%
+  # --- TEST: Math logic ---
+  # 1000 meat ewes * 1.5 lambs = 1500 total lambs
+  # Female replacement = 1000 * 0.2 = 200
+  # Slaughter = 1500 - 200 = 1300
+  meat_slaughter <- results %>%
+    filter(animal_tag == "lamb_meat_slaughter") %>%
     pull(population)
 
-  expect_equal(slaughter_val, 129.5)
+  expect_equal(meat_slaughter, 1300)
+})
 
-  # Verificamos que no se pierdan las llaves de identidad
-  expect_true("region" %in% colnames(res))
-  expect_true("subregion" %in% colnames(res))
-  expect_true("animal_tag" %in% colnames(res))
+test_that("calculate_population_sheep filters out zero populations", {
+
+  # Create a scenario where one category is 0
+  mock_census <- data.frame(
+    region = "spain", subregion = "test",
+    animal_tag = c("mature_sheep_female_meat", "mature_sheep_female_dairy",
+                   "mature_sheep_male_meat", "mature_sheep_male_dairy"),
+    class_flex = NA,
+    population = c(100, 0, 0, 0)
+  )
+
+  mock_rates <- data.frame(
+    parameter = rep(c("lambing_rate", "replacement_rate"), each = 4),
+    animal_tag = rep(c("mature_sheep_female_meat", "mature_sheep_female_dairy",
+                       "mature_sheep_male_meat", "mature_sheep_male_dairy"), 2),
+    value = 0.1
+  )
+
+  res <- calculate_population_sheep(mock_census, mock_rates)
+
+  # The output should only contain tags with population > 0
+  expect_true(all(res$population > 0))
+  # Dairy slaughter should not be in the results because dairy population was 0
+  expect_false("lamb_dairy_slaughter" %in% res$animal_tag)
 })

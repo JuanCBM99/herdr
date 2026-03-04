@@ -26,7 +26,7 @@ concentrate,soybean_meal_44_cp,Soybean meal (solvent extracted),Co-product (High
 concentrate,soybean_meal_47_cp,Soybean meal (high protein),Co-product (High value allocation),0.14,,,,,2943.78,brasil
 concentrate,brewery_yeast,Brewer's yeast,Co-product,0,0,0,0,0,0,
 concentrate,forage_meal_mix_12_5_cp,Mixed forage meal,Main Crop (100% Biomass yield),0.79,9911,48184,56439,126007,7632.32,spain
-concentrate,out_hulls,Oat hulls,Co-product (Low allocation),0.13,885,2865,353616,46400,969.76,spain
+concentrate,oat_hulls,Oat hulls,Co-product (Low allocation),0.13,885,2865,353616,46400,969.76,spain
 concentrate,soybean_hulls_12_cp,Soybean hulls,Co-product (Low allocation),0.14,,,,,2943.78,brasil
 concentrate,corn_ddgs_12_5_ee_3_5_starch,Corn DDGS (Distillers Grains),Co-product (Allocation needed),0.15,6260,12253,15722,223365,10080.07,spain
 forage,cereals_silage_wheat_barley_oat_triticale,Mixed cereal silage,Main Crop (100% Biomass yield),0.74,8149,13883,318253,17825,2197.81,spain
