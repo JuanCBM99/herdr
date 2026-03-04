@@ -28,7 +28,14 @@ navbar:
           href: articles/Theoretical_basis.html
     - icon: fa-tools
       text: "Practical Cases"
-      href: articles/dairy_cattle_assessment.html
+      menu:
+        - text: "Dairy Cattle Spain"
+          href: articles/Easy_Example.html
+        - text: "Dairy Cattle Spain: North vs South"
+          href: articles/Moderate_Example.html
+        - text: "Dairy Cattle Spain: North vs South in different Life Satages"
+          href: articles/Difficult_Example.html
+
     - icon: fa-file-code-o
       text: "Reference"
       href: reference/index.html

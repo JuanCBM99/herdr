@@ -31,7 +31,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     missing_tags <- setdiff(required_bases, present_tags)
 
     if (length(missing_tags) > 0) {
-      message("⚠️  Watch out! You have removed or set to zero these mature animals: ",
+      message("\u26A0  Watch out! You have removed or set to zero these mature animals: ",
               paste(missing_tags, collapse = ", "),
               ". Their respective kids/offspring will NOT appear in the results.")
     }

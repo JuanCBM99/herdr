@@ -15,7 +15,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters) {
     rate_parameters %>%
       dplyr::filter(parameter == param, animal_tag == tag) %>%
       dplyr::pull(value) %>%
-      .[1] # Coge el primer valor que encuentre
+      .[1]
   }
 
   # --- Sheep Rates ---

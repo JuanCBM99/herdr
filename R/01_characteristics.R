@@ -54,22 +54,68 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     ) %>%
     dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
+      # Keep forage_share to validate later
+      forage_pct = dplyr::first(forage_share),
       dplyr::across(c(de, cp, ndf, ash, eb), ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
-  # --- 4. Map Diets to Animals ---
-  results <- definitions %>%
+  # --- 4. Map Diets to Animals & Validate MATURE only ---
+
+  # Join with definitions to identify which diet belongs to which animal
+  full_data <- definitions %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag) %>%
     dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
-    dplyr::filter(!is.na(region)) %>%
+    dplyr::filter(!is.na(region))
+
+  # Create subset for MATURE validations
+  mature_check <- full_data %>%
+    dplyr::filter(grepl("mature", animal_tag, ignore.case = TRUE))
+
+  if (nrow(mature_check) > 0) {
+
+    # A. ASSERT: Forage Safety (< 30% - NRC 1996)
+    bad_forage <- mature_check %>% dplyr::filter(forage_pct < 30)
+    assertthat::assert_that(nrow(bad_forage) == 0,
+                            msg = paste0("\u274C Biological Error (Mature): Forage share < 30% for: ",
+                                         paste(unique(bad_forage$animal_tag), collapse = ", ")))
+
+    # B. ASSERT: Ash (1-18% - NRC 1996)
+    bad_ash <- mature_check %>% dplyr::filter(ash < 1 | ash > 18)
+    assertthat::assert_that(nrow(bad_ash) == 0,
+                            msg = paste0("\u274C Critical Error (Mature): Weighted Ash (1-18%) out of range for: ",
+                                         paste(unique(bad_ash$animal_tag), collapse = ", ")))
+
+    # C. ASSERT: Crude Protein (5-40% - NRC 1996)
+    bad_cp <- mature_check %>% dplyr::filter(cp < 5 | cp > 40)
+    assertthat::assert_that(nrow(bad_cp) == 0,
+                            msg = paste0("\u274C Critical Error (Mature): Weighted CP (5-40%) out of range for: ",
+                                         paste(unique(bad_cp$animal_tag), collapse = ", ")))
+
+    # D. ASSERT: NDF Fiber (20-85% - NMSU/NRC)
+    bad_ndf <- mature_check %>% dplyr::filter(ndf < 20 | ndf > 85)
+    assertthat::assert_that(nrow(bad_ndf) == 0,
+                            msg = paste0("\u274C Critical Error (Mature): Weighted NDF (20-85%) out of range for: ",
+                                         paste(unique(bad_ndf$animal_tag), collapse = ", ")))
+
+    # E. Productivity Warning (> 80% Forage - AFRC 1993)
+    high_forage <- mature_check %>% dplyr::filter(forage_pct > 80)
+    if (nrow(high_forage) > 0) {
+      message(paste0("\u2139 Productivity Note (Mature): Forage > 80% for: ",
+                     paste(unique(high_fvorage$animal_tag), collapse = ", "),
+                     ". Rumen fill may limit intake."))
+    }
+  }
+
+  # --- 5. Final Formatting ---
+  results <- full_data %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
       de, cp, ndf, ash, eb
     )
 
-  # --- 5. Save Output ---
+  # --- 6. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/weighted_nutritional_variables.csv")

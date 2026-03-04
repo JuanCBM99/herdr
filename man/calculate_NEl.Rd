@@ -6,6 +6,9 @@
 \usage{
 calculate_NEl(saveoutput = TRUE)
 }
+\arguments{
+\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+}
 \description{
 Calculate Net Energy for Lactation (NEl)
 }

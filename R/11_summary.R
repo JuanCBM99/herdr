@@ -28,15 +28,15 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   n2o_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_direct_Gg = sum(N2O_emissions, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
+    dplyr::summarise(N2O_direct_Gg = sum(N2O_emissions, na.rm = TRUE) / 1e6, .groups = "drop")
 
   n2o_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_vol_Gg = sum(n2o_g, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
+    dplyr::summarise(N2O_vol_Gg = sum(n2o_g, na.rm = TRUE) / 1e6, .groups = "drop")
 
   n2o_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_lea_Gg = sum(n2o_l, na.rm = TRUE) / 1e6, .groups = "drop") # Convierte kg a Gg
+    dplyr::summarise(N2O_lea_Gg = sum(n2o_l, na.rm = TRUE) / 1e6, .groups = "drop")
 
   land_u  <- calculate_land_use(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%

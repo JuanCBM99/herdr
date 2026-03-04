@@ -1,4 +1,5 @@
 #' Calculate Net Energy for Maintenance (NEm)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEm <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Maintenance (NEm)...")
@@ -40,6 +41,7 @@ calculate_NEm <- function(saveoutput = TRUE) {
 }
 
 #' Calculate Net Energy for Activity (NEa)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEa <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Activity (NEa)...")
@@ -83,6 +85,7 @@ calculate_NEa <- function(saveoutput = TRUE) {
 }
 
 #' Calculate Net Energy for Growth (NEg)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEg <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Growth (NEg)...")
@@ -125,6 +128,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
 }
 
 #' Calculate Net Energy for Lactation (NEl)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NEl <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Lactation (NEl)...")
@@ -211,6 +215,7 @@ calculate_NE_work <- function(saveoutput = TRUE) {
 }
 
 #' Calculate Net Energy for Wool (NE_wool)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NE_wool <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Wool (NE_wool)...")
@@ -240,6 +245,7 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
 }
 
 #' Calculate Net Energy for Pregnancy (NE_pregnancy)
+#' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
 calculate_NE_pregnancy <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
