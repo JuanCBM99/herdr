@@ -38,6 +38,8 @@ different livestock systems.
 
 - [`calculate_CH4_manure()`](calculate_CH4_manure.md) : Calculate CH4
   Emissions from Manure Management
+- [`calculate_dmi()`](calculate_dmi.md) : Calculate Dry Matter Intake
+  (DMI)
 - [`calculate_emissions_enteric()`](calculate_emissions_enteric.md) :
   Calculate methane emissions from enteric fermentation
 - [`calculate_ge()`](calculate_ge.md) : Calculate Gross Energy (GE)
