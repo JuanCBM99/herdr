@@ -7,16 +7,13 @@
 
 ## Citation
 
-Source:
-[`DESCRIPTION`](https://github.com/JuanCBM99/herdr/blob/dev/DESCRIPTION)
-
 Baez J (2026). *herdr: herdr*. R package version 0.1.0,
-<https://github.com/JuanCBM99/herdr>.
+<https://juancbm99.github.io/herdr>.
 
     @Manual{,
       title = {herdr: herdr},
       author = {Juan Carlos Baez},
       year = {2026},
       note = {R package version 0.1.0},
-      url = {https://github.com/JuanCBM99/herdr},
+      url = {https://juancbm99.github.io/herdr},
     }

@@ -13,7 +13,7 @@ For more information, see:
 
 Useful links:
 
-- <https://github.com/JuanCBM99/herdr>
+- <https://juancbm99.github.io/herdr>
 
 ## Author
 

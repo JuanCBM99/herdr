@@ -34,7 +34,7 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Home"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
@@ -49,19 +49,18 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-practical-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Practical Cases</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-practical-cases">
 <li><a class="dropdown-item" href="../articles/Easy_Example.html">Dairy Cattle Spain</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">Dairy Cattle Spain: North vs South</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">Dairy Cattle Spain: North vs South in different Life Satages</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">Dairy Cattle Spain: North/South</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">Dairy Cattle Spain: North/South in different Life Satages</a></li>
   </ul>
 </li>
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span> Download</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span> GitHub</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download ZIP"><span class="fa fa-download"></span> Download</a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fa-github"></span> GitHub</a></li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
 </form></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/" aria-label="GitHub"><span class="fa fab fa-github fa-lg"></span></a></li>
       </ul>
 </div>
 
@@ -77,30 +76,27 @@
       <img src="../logo.png" class="logo" alt=""><h1>Technical Reference: Files &amp; Parameters</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/JuanCBM99/herdr/blob/dev/vignettes/Technical_reference.Rmd" class="external-link"><code>vignettes/Technical_reference.Rmd</code></a></small>
+
       <div class="d-none name"><code>Technical_reference.Rmd</code></div>
     </div>
 
     
     
-<div class="section level2">
-<h2 id="technical-reference-files-parameters">Technical Reference: Files &amp; Parameters<a class="anchor" aria-label="anchor" href="#technical-reference-files-parameters"></a>
-</h2>
 <p><strong>herdr</strong> operates on a data-driven approach. To ensure
 the model works correctly, files are divided into two categories:
 <strong>User Inputs</strong> (files you fill in <code>user_data/</code>)
 and <strong>Reference Libraries</strong> (internal files you
 consult).</p>
 <hr>
-<div class="section level3">
-<h3 id="i--user-input-files-user_data">I. User Input Files (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-files-user_data"></a>
-</h3>
+<div class="section level2">
+<h2 id="i--user-input-files-user_data">I. User Input Files (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-files-user_data"></a>
+</h2>
 <p>These are the templates you must complete to run your specific
 analysis. Follow the <a href="Workflow.html">Workflow Guide</a> for
 step-by-step instructions.</p>
-<div class="section level4">
-<h4 id="population-metrics">🐄 Population &amp; Metrics<a class="anchor" aria-label="anchor" href="#population-metrics"></a>
-</h4>
+<div class="section level3">
+<h3 id="population-metrics">🐄 Population &amp; Metrics<a class="anchor" aria-label="anchor" href="#population-metrics"></a>
+</h3>
 <ul>
 <li>
 <strong><code>livestock_census.csv</code></strong>: Defines the
@@ -116,9 +112,9 @@ file. It links each <code>animal_tag</code> to a <code>diet_tag</code>
 and an <strong>IPCC Description</strong>.</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="nutrition-diets">🍚 Nutrition &amp; Diets<a class="anchor" aria-label="anchor" href="#nutrition-diets"></a>
-</h4>
+<div class="section level3">
+<h3 id="nutrition-diets">🍚 Nutrition &amp; Diets<a class="anchor" aria-label="anchor" href="#nutrition-diets"></a>
+</h3>
 <ul>
 <li>
 <strong><code>diet_macro.csv</code></strong>: Sets the high-level
@@ -129,9 +125,9 @@ micro-breakdown of exactly which ingredients (from the library) make up
 the macro categories.</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="manure-management">💩 Manure Management<a class="anchor" aria-label="anchor" href="#manure-management"></a>
-</h4>
+<div class="section level3">
+<h3 id="manure-management">💩 Manure Management<a class="anchor" aria-label="anchor" href="#manure-management"></a>
+</h3>
 <ul>
 <li>
 <strong><code>manure_management.csv</code></strong>: Defines how
@@ -141,16 +137,16 @@ waste is handled, specifying the system, the climate, and the
 <hr>
 </div>
 </div>
-<div class="section level3">
-<h3 id="ii--reference-libraries-consult-only">II. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#ii--reference-libraries-consult-only"></a>
-</h3>
+<div class="section level2">
+<h2 id="ii--reference-libraries-consult-only">II. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#ii--reference-libraries-consult-only"></a>
+</h2>
 <p>These files are the “brain” of the package. You should
 <strong>not</strong> edit them unless you are an advanced user, but you
 must <strong>consult them</strong> to copy the exact names for your
 inputs.</p>
-<div class="section level4">
-<h4 id="feed_characteristics-csv-nutritional-values">🧪 <code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
-</h4>
+<div class="section level3">
+<h3 id="feed_characteristics-csv-nutritional-values">🧪 <code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
+</h3>
 <p>Consult this to find the correct names for your ingredients to use in
 <code>diet_ingredients.csv</code>.</p>
 <ul>
@@ -165,9 +161,9 @@ is the main driver for the Methane Conversion Factor
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math>).</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="ipcc_coefficients-csv-metabolic-constants">🧬 <code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
-</h4>
+<div class="section level3">
+<h3 id="ipcc_coefficients-csv-metabolic-constants">🧬 <code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
+</h3>
 <p>Consult this to find the <code>description</code> you need to copy
 into your <code>livestock_definitions.csv</code>.</p>
 <ul>
@@ -182,9 +178,9 @@ etc.), and <code>value</code>.</li>
 that define energy needs for maintenance, pregnancy, and lactation.</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="ipcc_mm-csv-manure-reference">💩 <code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
-</h4>
+<div class="section level3">
+<h3 id="ipcc_mm-csv-manure-reference">💩 <code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
+</h3>
 <p>The master list for Phase 4. It contains every valid combination of
 manure systems.</p>
 <ul>
@@ -198,9 +194,9 @@ manure systems.</p>
 model will return zero emissions.</li>
 </ul>
 </div>
-<div class="section level4">
-<h4 id="crop_yields-csv-land-use-factors">🌳 <code>crop_yields.csv</code> — Land Use Factors<a class="anchor" aria-label="anchor" href="#crop_yields-csv-land-use-factors"></a>
-</h4>
+<div class="section level3">
+<h3 id="crop_yields-csv-land-use-factors">🌳 <code>crop_yields.csv</code> — Land Use Factors<a class="anchor" aria-label="anchor" href="#crop_yields-csv-land-use-factors"></a>
+</h3>
 <p>Links your ingredients to the land requirements.</p>
 <ul>
 <li>
@@ -215,9 +211,9 @@ of your livestock.</li>
 <hr>
 </div>
 </div>
-<div class="section level3">
-<h3 id="iii--quick-reference-table">III. Quick Reference Table<a class="anchor" aria-label="anchor" href="#iii--quick-reference-table"></a>
-</h3>
+<div class="section level2">
+<h2 id="iii--quick-reference-table">III. Quick Reference Table<a class="anchor" aria-label="anchor" href="#iii--quick-reference-table"></a>
+</h2>
 <p>Use this table to know where to look when filling out your data:</p>
 <table class="table">
 <colgroup>
@@ -257,13 +253,12 @@ of your livestock.</li>
 </tbody>
 </table>
 <hr>
-<div class="section level4">
-<h4 id="tip">💡 Tip<a class="anchor" aria-label="anchor" href="#tip"></a>
-</h4>
+<div class="section level3">
+<h3 id="tip">💡 Tip<a class="anchor" aria-label="anchor" href="#tip"></a>
+</h3>
 <p>The model is case-sensitive and does not like spaces. Always use
 <strong>lowercase</strong> and <strong>underscores</strong> (e.g.,
 <code>maize_silage</code> instead of <code>Maize Silage</code>).</p>
-</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

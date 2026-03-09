@@ -1,4 +1,4 @@
-# Dairy Cattle Spain: North vs South in different Life Satages
+# Dairy Cattle Spain: North/South in different Life Satages
 
 ## Advanced Assessment: Managing Complexity with `class_flex`
 
