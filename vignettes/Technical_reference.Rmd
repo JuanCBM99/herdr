@@ -9,8 +9,6 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-# Technical Reference: Files & Parameters
-
 **herdr** operates on a data-driven approach. To ensure the model works correctly, files are divided into two categories: **User Inputs** (files you fill in `user_data/`) and **Reference Libraries** (internal files you consult).
 
 ---

@@ -1,8 +1,8 @@
 ---
-title: "Manure System Guide 💩"
+title: "Manure System Guide"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Package Function Reference}
+  %\VignetteIndexEntry{Manure System Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -12,6 +12,7 @@ vignette: >
 This guide defines the valid **Paths** for your `manure_management.csv`. For the model to function, your entries must match the IPCC database logic exactly.
 
 ## 1. High-Detail Systems (Storage Duration Dependent)
+
 
 These systems require specific **Management Months**, **Sub-climates**, and **Climate Zones**.
 

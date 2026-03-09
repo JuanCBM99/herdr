@@ -46,25 +46,29 @@ remotes::install_github("JuanCBM99/herdr", ref = "dev")
 
 IPCC Tier 2 Methodology: Robust calculations for enteric emissions, manure management, and indirect N₂O emissions.
 
-Modular and Flexible: Allows detailed input of population, diets, and management systems at farm/subregion level.
+Land Use Assessment: Integrated calculation of land requirements (m²/year) associated with different livestock management systems.
+
+Nutritional Precision: Integrated Dry Matter Intake (DMI) estimation and nutritional alerts for Cattle, Sheep, and Goats.
+
+Modular and Flexible: Allows detailed input of population census, diet profiles, and management systems at the farm or subregion level.
 
 Consolidated Output: Generates a single report summarizing impacts (CH₄, N₂O, and LU).
 
 
 ## 📋 Workflow (Quick Start)
 
-1. Download Templates
+1. Prepare your Data
+The package relies on a set of interconnected CSV files located in the user_data/ folder. For the full assessment to work correctly, ensure these files are configured:
 
-If you wish to change the default data:
+Livestock & Census: livestock_definitions.csv and livestock_census.csv.
 
-```r
-library(herdr)
+Weight & Growth: livestock_weights.csv.
 
-# Download templates into the 'user_data/' folder of your working directory
-download_templates()
-```
+Diets & Nutrition: diet_profiles.csv, diet_ingredients.csv, and feed_characteristics.csv.
 
-After this, open the downloaded folder and edit them following the website guide.
+Manure & Land: manure_management.csv and any land-specific parameters required for LU calculations.
+
+Parameters: reproduction_parameters.csv and ipcc_coefficients.csv.
 
 2. Generate Impact Assessment
 
@@ -82,9 +86,9 @@ The output includes total CH₄, N₂O emissions, and land use.
 
 ## 📚 Documentation & Reference
 
-[Package Documentation Website]: Workflow guides, data dictionary, function references, and theoretical basis (IPCC Tier 2).
+[Package Documentation Website]: Includes workflow guides, some comprehensive examples and the theoretical basis (IPCC Tier 2).
 
-Website URL: 
+Website URL: https://juancbm99.github.io/herdr/
 
 ## 🤝 Contributions
 

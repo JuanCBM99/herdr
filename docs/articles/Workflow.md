@@ -173,9 +173,10 @@ environmental impacts:
 Follow these steps to fill your `manure_management.csv` file correctly:
 
 1.  **Consult the Reference Guide:** Before entering data, review the
-    **[Manure System Guide](Manure.md)**. You must use the exact system
-    names and variants listed there, as they are the only ones
-    recognized by the IPCC reference database.
+    **[Manure System
+    Guide](https://juancbm99.github.io/herdr/articles/Manure.md)**. You
+    must use the exact system names and variants listed there, as they
+    are the only ones recognized by the IPCC reference database.
 2.  **Sync the Tags:** Copy the `animal_tag`, `region`, `subregion`, and
     `class_flex` from your `livestock_census.csv`. They must match
     exactly.
@@ -229,7 +230,7 @@ metrics. The model will calculate:
 1.  **Load the Library**: Ensure the package is active in your R
     session.
 2.  **Run the Assessment**: Use the
-    [`generate_impact_assessment()`](../reference/generate_impact_assessment.md)
+    [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)
     function. This function automatically looks into your `user_data/`
     folder for all the CSV files you prepared in Phases 1 through 4.
 3.  **Choose Your Mode**:

@@ -1,4 +1,4 @@
-# Manure System Guide 💩
+# Manure System Guide
 
 ## 🛠️ Configuration Reference Guide
 

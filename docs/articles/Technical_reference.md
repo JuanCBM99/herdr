@@ -1,7 +1,5 @@
 # Technical Reference: Files & Parameters
 
-## Technical Reference: Files & Parameters
-
 **herdr** operates on a data-driven approach. To ensure the model works
 correctly, files are divided into two categories: **User Inputs** (files
 you fill in `user_data/`) and **Reference Libraries** (internal files
@@ -9,12 +7,14 @@ you consult).
 
 ------------------------------------------------------------------------
 
-### I. User Input Files (`user_data/`)
+## I. User Input Files (`user_data/`)
 
 These are the templates you must complete to run your specific analysis.
-Follow the [Workflow Guide](Workflow.md) for step-by-step instructions.
+Follow the [Workflow
+Guide](https://juancbm99.github.io/herdr/articles/Workflow.md) for
+step-by-step instructions.
 
-#### 🐄 Population & Metrics
+### 🐄 Population & Metrics
 
 - **`livestock_census.csv`**: Defines the `animal_tag`, location
   (`region`), and the number of heads (`population`).
@@ -23,27 +23,27 @@ Follow the [Workflow Guide](Workflow.md) for step-by-step instructions.
 - **`livestock_definitions.csv`**: The bridge file. It links each
   `animal_tag` to a `diet_tag` and an **IPCC Description**.
 
-#### 🍚 Nutrition & Diets
+### 🍚 Nutrition & Diets
 
 - **`diet_macro.csv`**: Sets the high-level balance between Forage,
   Concentrate, Milk, and Milk Replacer.
 - **`diet_ingredients.csv`**: The micro-breakdown of exactly which
   ingredients (from the library) make up the macro categories.
 
-#### 💩 Manure Management
+### 💩 Manure Management
 
 - **`manure_management.csv`**: Defines how waste is handled, specifying
   the system, the climate, and the `allocation` (0 to 1).
 
 ------------------------------------------------------------------------
 
-### II. Reference Libraries (Consult Only)
+## II. Reference Libraries (Consult Only)
 
 These files are the “brain” of the package. You should **not** edit them
 unless you are an advanced user, but you must **consult them** to copy
 the exact names for your inputs.
 
-#### 🧪 `feed_characteristics.csv` — Nutritional Values
+### 🧪 `feed_characteristics.csv` — Nutritional Values
 
 Consult this to find the correct names for your ingredients to use in
 `diet_ingredients.csv`.
@@ -54,7 +54,7 @@ Consult this to find the correct names for your ingredients to use in
 - **Why it matters:** `de` (Digestible Energy) is the main driver for
   the Methane Conversion Factor ($`Y_m`$).
 
-#### 🧬 `ipcc_coefficients.csv` — Metabolic Constants
+### 🧬 `ipcc_coefficients.csv` — Metabolic Constants
 
 Consult this to find the `description` you need to copy into your
 `livestock_definitions.csv`.
@@ -64,7 +64,7 @@ Consult this to find the `description` you need to copy into your
 - **Why it matters:** It contains the Tier 2 constants that define
   energy needs for maintenance, pregnancy, and lactation.
 
-#### 💩 `ipcc_mm.csv` — Manure Reference
+### 💩 `ipcc_mm.csv` — Manure Reference
 
 The master list for Phase 4. It contains every valid combination of
 manure systems.
@@ -74,7 +74,7 @@ manure systems.
 - **Why it matters:** Your entry in `manure_management.csv` must match a
   row here exactly, or the model will return zero emissions.
 
-#### 🌳 `crop_yields.csv` — Land Use Factors
+### 🌳 `crop_yields.csv` — Land Use Factors
 
 Links your ingredients to the land requirements.
 
@@ -84,7 +84,7 @@ Links your ingredients to the land requirements.
 
 ------------------------------------------------------------------------
 
-### III. Quick Reference Table
+## III. Quick Reference Table
 
 Use this table to know where to look when filling out your data:
 
@@ -97,7 +97,7 @@ Use this table to know where to look when filling out your data:
 
 ------------------------------------------------------------------------
 
-#### 💡 Tip
+### 💡 Tip
 
 The model is case-sensitive and does not like spaces. Always use
 **lowercase** and **underscores** (e.g., `maize_silage` instead of

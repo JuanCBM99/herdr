@@ -1,4 +1,4 @@
-# Dairy Cattle Spain: North vs South
+# Dairy Cattle Spain: North/South
 
 ## Basic Assessment: A Step-by-Step Guide
 

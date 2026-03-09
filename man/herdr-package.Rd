@@ -18,7 +18,7 @@ For more information, see:
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/JuanCBM99/herdr}
+  \item \url{https://juancbm99.github.io/herdr}
 }
 
 }

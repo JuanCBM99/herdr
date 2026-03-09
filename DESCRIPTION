@@ -10,7 +10,7 @@ Description: Description: Provides a comprehensive set of tools for calculating 
     facilitates the estimation of direct and indirect emissions, such as 
     methane and nitrous oxide, following standardized methodologies for 
     environmental reporting.
-URL: https://github.com/JuanCBM99/herdr
+URL: https://juancbm99.github.io/herdr
 Depends: 
     R (>= 4.1.0)
 License: MIT + file LICENSE

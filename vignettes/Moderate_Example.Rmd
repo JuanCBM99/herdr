@@ -1,8 +1,8 @@
 ---
-title: "Dairy Cattle Spain: North vs South"
+title: "Dairy Cattle Spain: North/South"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Dairy Cattle Spain: North vs South}
+  %\VignetteIndexEntry{Dairy Cattle Spain: North/South}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

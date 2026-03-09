@@ -1,17 +1,19 @@
-# Título de la web
+url: https://juancbm99.github.io/herdr/
+
 title: "herdr: GHG & LU Calculator 🌎📊"
 
-# Tema moderno
+
 template:
   bootstrap: 5
   bootswatch: yeti
 
-# Navbar
+
 navbar:
   type: inverse
   left:
     - icon: fa-home
       href: index.html
+      aria-label: Home
     - text: "Summary"
       icon: fas fa-book-open
       href: articles/Introduction.html
@@ -31,9 +33,9 @@ navbar:
       menu:
         - text: "Dairy Cattle Spain"
           href: articles/Easy_Example.html
-        - text: "Dairy Cattle Spain: North vs South"
+        - text: "Dairy Cattle Spain: North/South"
           href: articles/Moderate_Example.html
-        - text: "Dairy Cattle Spain: North vs South in different Life Satages"
+        - text: "Dairy Cattle Spain: North/South in different Life Satages"
           href: articles/Difficult_Example.html
 
     - icon: fa-file-code-o
@@ -42,16 +44,20 @@ navbar:
     - icon: fa-download
       text: "Download"
       href: https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip
+      aria-label: Download ZIP
     - icon: fa-github
       text: "GitHub"
       href: https://github.com/JuanCBM99/herdr
+      aria-label: GitHub Repository
 
 # Table of contents
 toc:
   depth: 3
 
 # Logo y meta
-logo: man_logo.png
+logo:
+  image: man_logo.png
 favicon: favicon.ico
+
 meta:
   description: "herdr: calculation of CH4 and N2O emissions and land use for livestock."
