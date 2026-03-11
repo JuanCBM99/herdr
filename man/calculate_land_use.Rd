@@ -12,6 +12,6 @@ calculate_land_use(automatic_cycle = FALSE, saveoutput = TRUE)
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes total land use (m2) per animal based on derived DMI (ge / eb).
-This version automatically cleans duplicates in CSVs and normalizes dietary shares.
+Computes total land use (m2) per animal based on validated DMI.
+This version integrates calculate_dmi() to ensure physiological consistency.
 }
