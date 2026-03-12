@@ -1,7 +1,7 @@
 # Calculate Dry Matter Intake (DMI)
 
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand
-(GE/EB). Includes physiological normality filters differentiated by
+(GE/ed). Includes physiological normality filters differentiated by
 species.
 
 ## Usage
