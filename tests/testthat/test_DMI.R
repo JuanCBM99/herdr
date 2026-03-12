@@ -19,12 +19,12 @@ setup_dmi_high_intake_env <- function() {
     class_flex="none", average_weight=400, adult_weight=400, weight_gain=0
   ), "user_data/livestock_weights.csv")
 
-  # 2. Extremely low EB (Energy density) forces higher mass intake
+  # 2. Extremely low ed (Energy density) forces higher mass intake
   write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
                        forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
   write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
                        ingredient_type="forage", ingredient="straw", ingredient_share=100), "user_data/diet_ingredients.csv")
-  write_csv(data.frame(ingredient="straw", ingredient_type="forage", de=30, cp=4, ndf=80, ash=10, eb=5, fat=1), "user_data/feed_characteristics.csv")
+  write_csv(data.frame(ingredient="straw", ingredient_type="forage", de=30, cp=4, ndf=80, ash=10, ed=5, fat=1), "user_data/feed_characteristics.csv")
 
   # 3. Required boilerplate
   write_csv(data.frame(region="test", subregion="test", animal_tag="greedy_cow",

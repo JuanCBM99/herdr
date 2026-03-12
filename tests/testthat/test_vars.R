@@ -27,7 +27,7 @@ setup_nutritional_test_env <- function(type = "integrity") {
                        ingredient_share=100), file.path(target_dir, "diet_ingredients.csv"))
 
   write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=5,
-                       ndf=40, ash=15, eb=18),
+                       ndf=40, ash=15, ed=18),
             file.path(target_dir, "feed_characteristics.csv"))
 
   write_csv(data.frame(region="test", subregion="test", animal_tag="mature_cow",

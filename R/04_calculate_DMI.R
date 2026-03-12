@@ -1,6 +1,6 @@
 #' Calculate Dry Matter Intake (DMI)
 #'
-#' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/EB).
+#' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ed).
 #' Includes physiological normality filters differentiated by species.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -18,7 +18,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
   results <- ge_req %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, ge) %>%
     dplyr::left_join(
-      diet_char %>% dplyr::select(region, subregion, animal_tag, class_flex, eb),
+      diet_char %>% dplyr::select(region, subregion, animal_tag, class_flex, ed),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::left_join(
@@ -26,7 +26,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::mutate(
-      dmi_day    = dplyr::if_else(eb > 0, ge / eb, 0),
+      dmi_day    = dplyr::if_else(ed > 0, ge / ed, 0),
       dmi_bw_pct = dplyr::if_else(average_weight > 0, (dmi_day / average_weight) * 100, 0)
     )
 
@@ -45,7 +45,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
     warning(paste0(
       "\u26A0 Intake Warning: DMI (% BW) exceeds maximum physiological limits for: ",
       paste(unique(warn_high$animal_tag), collapse = ", "),
-      ". This is physically unlikely. Check GE requirements or diet EB (Ref: NRC 1996 / DSN 2004)."
+      ". This is physically unlikely. Check GE requirements or diet ed (Ref: NRC 1996 / DSN 2004)."
     ))
   }
 
@@ -67,7 +67,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
       ge_mj_day = ge,
-      eb_mj_kg = eb,
+      eb_mj_kg = ed,
       dmi_day_kg = dmi_day,
       dmi_bw_pct
     )

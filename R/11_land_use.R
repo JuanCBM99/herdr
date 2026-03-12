@@ -11,7 +11,7 @@ calculate_land_use <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   # --- 1. Data Loading ---
 
-  # Fetch validated DMI (Step 5) - This already includes GE/EB and Normality Filters
+  # Fetch validated DMI (Step 5) - This already includes GE/ed and Normality Filters
   dmi_df <- calculate_dmi(saveoutput = FALSE) %>%
     dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
@@ -38,7 +38,7 @@ calculate_land_use <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   results <- dmi_df %>%
     dplyr::left_join(
       diet_csv,
-      by = c("region", "subregion", "class_flex") # Note: dmi_df doesn't have diet_tag yet, it comes from diet_profiles or weighted_var
+      by = c("region", "subregion", "class_flex")
     ) %>%
     # Join with ingredients breakdown
     dplyr::inner_join(

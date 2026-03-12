@@ -10,6 +10,6 @@ calculate_dmi(saveoutput = TRUE)
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/EB).
+Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ed).
 Includes physiological normality filters differentiated by species.
 }

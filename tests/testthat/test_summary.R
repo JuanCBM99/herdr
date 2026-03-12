@@ -28,7 +28,7 @@ setup_omni_env_final <- function() {
                        forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
   write_csv(data.frame(region="test_reg", subregion="test_sub", class_flex="grazing", diet_tag="standard",
                        ingredient_type="forage", ingredient="grass", ingredient_share=100), "user_data/diet_ingredients.csv")
-  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, eb=18.4), "user_data/feed_characteristics.csv")
+  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, ed=18.4), "user_data/feed_characteristics.csv")
   write_csv(data.frame(ingredient="grass", dry_matter_yield=10000), "user_data/crop_yields.csv")
 
   # 4. Manure & IPCC Master Table (CH4 and N2O factors)

@@ -1,8 +1,7 @@
 # Calculate land use
 
-Computes total land use (m2) per animal based on derived DMI (ge / eb).
-This version automatically cleans duplicates in CSVs and normalizes
-dietary shares.
+Computes total land use (m2) per animal based on validated DMI. This
+version integrates calculate_dmi() to ensure physiological consistency.
 
 ## Usage
 

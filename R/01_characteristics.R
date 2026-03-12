@@ -1,6 +1,6 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, EB, Fat, NFC)
+#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, ed, Fat, NFC)
 #' by mapping ingredients to diets and diets to animals.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -56,7 +56,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
       # Calculate weighted averages for all nutritional components
-      dplyr::across(c(de, cp, ndf, ash, eb), ~ sum(. * weight_factor, na.rm = TRUE)),
+      dplyr::across(c(de, cp, ndf, ash, ed), ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
@@ -112,7 +112,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
-      de, cp, ndf, ash, eb
+      de, cp, ndf, ash, ed
     )
 
   # --- 7. Save Output ---

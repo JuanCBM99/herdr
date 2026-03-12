@@ -31,7 +31,7 @@ setup_n2o_leaching_final <- function() {
                        forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
   write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
                        ingredient_type="forage", ingredient="grass", ingredient_share=100), "user_data/diet_ingredients.csv")
-  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, eb=18), "user_data/feed_characteristics.csv")
+  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, ed=18), "user_data/feed_characteristics.csv")
 
   # 5. Estiércol e IPCC (Frac_leach y EF5 son los factores específicos de este test)
   write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",

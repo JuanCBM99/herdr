@@ -9,7 +9,7 @@ utils::globalVariables(c(
   "parameter", "description", "coefficient", "value",
 
   # --- Energy, Physics & Nutrition ---
-  "ge", "de", "eb", "ash", "ndf", "ym", "fat", "nfc", "average_weight",
+  "ge", "de", "ed", "ash", "ndf", "ym", "fat", "nfc", "average_weight",
   "adult_weight", "weight_gain", "milk_yield", "fat_content", "wool_yield",
   "work_hours", "NEm", "NEa", "NEg", "NEl", "NE_work", "NE_pregnancy", "NE_wool",
   "C_val", "A_val", "B_val", "a", "b", "cfi", "cfi_value", "ca", "ca_value",

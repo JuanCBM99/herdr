@@ -52,7 +52,7 @@ setup_land_use_final <- function() {
   # 4. Características y Coeficientes
   write_csv(data.frame(
     ingredient="alfalfa", ingredient_type="forage",
-    de=60, cp=18, ndf=40, ash=8, eb=18.4
+    de=60, cp=18, ndf=40, ash=8, ed=18.4
   ), "user_data/feed_characteristics.csv")
 
   write_csv(data.frame(
