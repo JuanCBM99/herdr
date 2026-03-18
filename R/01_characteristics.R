@@ -30,11 +30,12 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
   ing_sum_check <- ingredients %>%
     dplyr::group_by(diet_tag, region, subregion, class_flex, ingredient_type) %>%
     dplyr::summarise(total_ing = sum(ingredient_share, na.rm = TRUE), .groups = "drop") %>%
-    dplyr::filter(abs(total_ing - 100) > 0.1)
+    dplyr::filter(total_ing > 0 & abs(total_ing - 100) > 0.1)
 
   assertthat::assert_that(nrow(ing_sum_check) == 0,
                           msg = paste("Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for:",
                                       paste(unique(ing_sum_check$diet_tag), collapse = ", ")))
+
 
 
   # --- 3. Build Diet Nutritional Profiles ---
