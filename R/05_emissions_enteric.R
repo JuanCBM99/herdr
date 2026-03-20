@@ -30,7 +30,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
     # Join Gross Energy (GE)
     dplyr::left_join(
       ge_df %>%
-        dplyr::select(dplyr::all_of(join_keys), ge)) %>%
+        dplyr::select(dplyr::all_of(join_keys), ge_MJ_day)) %>%
 
     # Join Population (The parameter automatic_cycle was already applied here)
     dplyr::left_join(
@@ -40,7 +40,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
     # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2) ---
     dplyr::mutate(
       # Numerical safety: replace NAs with 0
-      across(c(de, ndf, ge, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      across(c(de, ndf, ge_MJ_day, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
       # Calculate Methane Conversion Factor (Ym) based on diet quality
       ym = dplyr::case_when(
@@ -69,7 +69,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
 
       # Emission Factor (EF) (kg CH4/animal/year)
       # Formula: (GE * (Ym/100) * 365) / 55.65 (where 55.65 is methane energy density)
-      ef_kg_animal_year = (ge * (ym / 100) * 365) / 55.65,
+      ef_kg_animal_year = (ge_MJ_day * (ym / 100) * 365) / 55.65,
 
       # Total Enteric Emissions (Gg CH4/year)
       emissions_total = ef_kg_animal_year * (population / 1e6)
@@ -78,7 +78,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
     # --- 4. Final Cleanup ---
     dplyr::select(
       dplyr::all_of(join_keys),
-      de, ndf, ge, ym, ef_kg_animal_year, population, emissions_total
+      de, ndf, ge_MJ_day, ym, ef_kg_animal_year, population, emissions_total
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 

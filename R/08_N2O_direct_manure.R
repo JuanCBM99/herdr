@@ -72,7 +72,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   # --- 2. Master Dataset Construction & Joins ---
 
   results <- ge_df %>%
-    dplyr::select(dplyr::all_of(join_keys), ge) %>%
+    dplyr::select(dplyr::all_of(join_keys), ge_MJ_day) %>%
 
     # 2.1 Join Nutritional (CP) and Population Data
     dplyr::left_join(
@@ -87,19 +87,19 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     # 2.2 Join categories data (Milk & Fat)
     dplyr::left_join(
       cat_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, milk_yield, fat_content),
+        dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
     # 2.3 Join weight gain and NEg
     dplyr::left_join(
       weights_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, weight_gain),
+        dplyr::select(region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg, productive_period_days),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::left_join(
       neg_df %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, NEg),
+        dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJ_day),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
@@ -128,23 +128,23 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     dplyr::mutate(
       # Numeric Safety
       dplyr::across(
-        c(ge, cp, population, milk_yield, fat_content, weight_gain, NEg, allocation, EF3),
+        c(ge_MJ_day, cp, population, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJ_day, allocation, EF3),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
       # Nitrogen Balance logic (IPCC)
-      milk_protein = 1.9 + 0.4 * fat_content,
+      milk_protein = 1.9 + 0.4 * fat_content_pct,
 
       # N Retention
       N_retention = dplyr::case_when(
         animal_type %in% c("sheep", "goat") ~ 0.1,
-        weight_gain > 0 & NEg > 0  ~ ((milk_yield * milk_protein) / 6.38) +
-          ((weight_gain * (268 - (7.03 * NEg / weight_gain)) / 1000) / 6.25),
+        ((final_weight_kg - initial_weight_kg)/productive_period_days) > 0 & NEg_MJ_day > 0  ~ ((milk_yield_kg_year * milk_protein) / 6.38) +
+          ((((final_weight_kg - initial_weight_kg)/productive_period_days) * (268 - (7.03 * NEg_MJ_day / ((final_weight_kg - initial_weight_kg)/productive_period_days))) / 1000) / 6.25),
         TRUE ~ 0
       ),
 
       # N Intake and Excretion (IPCC Eqs 10.31 & 10.32)
-      N_intake   = (ge / 18.45) * (cp / 100 / 6.25),
+      N_intake   = (ge_MJ_day / 18.45) * (cp / 100 / 6.25),
       N_excreted = dplyr::if_else(
         animal_type %in% c("sheep", "goat"),
         (N_intake * (1 - N_retention)) * 365,

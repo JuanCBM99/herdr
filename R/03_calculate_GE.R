@@ -25,13 +25,13 @@ calculate_ge <- function(saveoutput = TRUE) {
   }
 
   # Fetching all energy puzzle pieces
-  NEm_df          <- get_ne(calculate_NEm, "NEm")
-  NEa_df          <- get_ne(calculate_NEa, "NEa")
-  NEg_df          <- get_ne(calculate_NEg, "NEg")
-  NEl_df          <- get_ne(calculate_NEl, "NEl")
-  NE_work_df      <- get_ne(calculate_NE_work, "NE_work")
-  NE_pregnancy_df <- get_ne(calculate_NE_pregnancy, "NE_pregnancy")
-  NE_wool_df      <- get_ne(calculate_NE_wool, "NE_wool")
+  NEm_df          <- get_ne(calculate_NEm, "NEm_MJ_day")
+  NEa_df          <- get_ne(calculate_NEa, "NEa_MJ_day")
+  NEg_df          <- get_ne(calculate_NEg, "NEg_MJ_day")
+  NEl_df          <- get_ne(calculate_NEl, "NEl_MJ_day")
+  NE_work_df      <- get_ne(calculate_NE_work, "NE_work_MJ_day")
+  NE_pregnancy_df <- get_ne(calculate_NE_pregnancy, "NE_pregnancy_MJ_day")
+  NE_wool_df      <- get_ne(calculate_NE_wool, "NE_wool_MJ_day")
 
   # --- 3. Aggregation and GE Calculation (IPCC) ---
   results <- de_df %>%
@@ -47,7 +47,7 @@ calculate_ge <- function(saveoutput = TRUE) {
     dplyr::mutate(
       # Numerical safety: replace NAs with 0
       across(
-        c(de, NEm, NEa, NEg, NEl, NE_work, NE_pregnancy, NE_wool),
+        c(de, NEm_MJ_day, NEa_MJ_day, NEg_MJ_day, NEl_MJ_day, NE_work_MJ_day, NE_pregnancy_MJ_day, NE_wool_MJ_day),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
@@ -64,13 +64,13 @@ calculate_ge <- function(saveoutput = TRUE) {
 
       # FINAL IPCC GE FORMULA:
       # GE = [ (NE_Maint + NE_Activity + NE_Lact + NE_Work + NE_Preg) / REM + (NE_Growth + NE_Wool) / REG ] / DE%
-      ge = ((NEm + NEa + NEl + NE_work + NE_pregnancy) / rem + (NEg + NE_wool) / reg) / de_percent
+      ge_MJ_day = ((NEm_MJ_day + NEa_MJ_day + NEl_MJ_day + NE_work_MJ_day + NE_pregnancy_MJ_day) / rem + (NEg_MJ_day + NE_wool_MJ_day) / reg) / de_percent
     ) %>%
 
     # 5. Final Selection
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      NEm, NEa, NEg, NEl, NE_pregnancy, ge, de, rem, reg
+      NEm_MJ_day, NEa_MJ_day, NEg_MJ_day, NEl_MJ_day, NE_pregnancy_MJ_day, ge_MJ_day, de, rem, reg
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 

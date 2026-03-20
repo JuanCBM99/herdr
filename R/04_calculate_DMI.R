@@ -16,18 +16,18 @@ calculate_dmi <- function(saveoutput = TRUE) {
 
   # --- 2. Calculation ---
   results <- ge_req %>%
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, ge) %>%
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, ge_MJ_day) %>%
     dplyr::left_join(
       diet_char %>% dplyr::select(region, subregion, animal_tag, class_flex, ed),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::left_join(
-      weights %>% dplyr::select(region, subregion, animal_tag, class_flex, average_weight),
+      weights %>% dplyr::select(region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::mutate(
-      dmi_day    = dplyr::if_else(ed > 0, ge / ed, 0),
-      dmi_bw_pct = dplyr::if_else(average_weight > 0, (dmi_day / average_weight) * 100, 0)
+      dmi_day    = dplyr::if_else(ed > 0, ge_MJ_day / ed, 0),
+      dmi_bw_pct = dplyr::if_else(((initial_weight_kg + final_weight_kg)/2) > 0, (dmi_day / ((initial_weight_kg + final_weight_kg)/2)) * 100, 0)
     )
 
   # --- 3. Physiological Normality Filters ---
@@ -66,7 +66,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      ge_mj_day = ge,
+      ge_mj_day = ge_MJ_day,
       eb_mj_kg = ed,
       dmi_day_kg = dmi_day,
       dmi_bw_pct

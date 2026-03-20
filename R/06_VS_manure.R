@@ -18,7 +18,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
 
   # Fetch GE and DE (from Energy Module) - GE results already use the 4-key structure
   results <- calculate_ge(saveoutput = FALSE) %>%
-    dplyr::select(dplyr::all_of(join_keys), ge, de) %>%
+    dplyr::select(dplyr::all_of(join_keys), ge_MJ_day, de) %>%
 
     # Join Ash content (from Diet Characteristics) - Essential for VS calculation
     dplyr::left_join(
@@ -31,7 +31,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
     dplyr::mutate(
       # Numerical safety: replace NAs with 0
       across(
-        c(ge, de, ash),
+        c(ge_MJ_day, de, ash),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
@@ -40,13 +40,13 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
 
       # Final VS calculation (kg dm/animal/day)
       # Formula: VS = [GE * (1 - DE/100) + (UE * GE)] * [(1 - ASH/100) / 18.45]
-      vs = ((ge * (1 - de/100)) + (ue_factor * ge)) * ((1 - ash/100) / 18.45)
+      vs = ((ge_MJ_day * (1 - de/100)) + (ue_factor * ge_MJ_day)) * ((1 - ash/100) / 18.45)
     ) %>%
 
     # --- 3. Final Output and Cleanup ---
     dplyr::select(
       dplyr::all_of(join_keys),
-      ge, de, ash, urinary_energy = ue_factor, vs
+      ge_MJ_day, de, ash, urinary_energy = ue_factor, vs
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 

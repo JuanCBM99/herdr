@@ -1,38 +1,38 @@
-﻿description,value,coefficient,units,animal_type
-stall,0,ca,Dimensionless,cattle
-pasture,0.17,ca,Dimensionless,cattle
-grazing large areas,0.36,ca,Dimensionless,cattle
-cattle/buffalo,0.322,cfi,MJ/day/kg,cattle
-cattle_buffalo [lactating cows],0.386,cfi,MJ/day/kg,cattle
-cattle_buffalo [bulls],0.37,cfi,MJ/day/kg,cattle
-females,0.8,c,Dimensionless,cattle
-castrates,1,c,Dimensionless,cattle
-bulls,1.2,c,Dimensionless,cattle
-dairy cattle,0.24,b_0,m³ CH₄/kg VS,cattle
-non dairy cattle,0.18,b_0,m³ CH₄/kg VS,cattle
-cattle and buffalo,0.1,c_pregnancy,Dimensionless,cattle
-housed ewes,0.0096,ca,MJ/day/kg,sheep
-grazing flat pasture,0.0107,ca,MJ/day/kg,sheep
-grazing hilly pasture,0.024,ca,MJ/day/kg,sheep
-sheep_lamb_to_1_year_f,0.236,cfi,MJ/day/kg,sheep
-sheep_lamb_to_1_year_m,0.271,cfi,MJ/day/kg,sheep
-sheep_lamb_to_1_year_a,0.2535,cfi,MJ/day/kg,sheep
-sheep_older_than_1_year_f,0.217,cfi,MJ/day/kg,sheep
-sheep_older_than_1_year_m,0.249,cfi,MJ/day/kg,sheep
-sheep_older_than_1_year_a,0.233,cfi,MJ/day/kg,sheep
-a_females,2.1,a,MJ/kg,sheep
-a_castrates,4.4,a,MJ/kg,sheep
-a_intact males,2.5,a,MJ/kg,sheep
-a_average_f_m,2.3,a,MJ/kg,sheep
-b_females,0.45,b,MJ/kg,sheep
-b_castrates,0.32,b,MJ/kg,sheep
-b_intact males,0.35,b,MJ/kg,sheep
-b_average_f_m,0.4,b,MJ/kg,sheep
-sheep,0.19,b_0,m³ CH₄/kg VS,sheep
-housed fattening lambs,0.0067,ca,MJ/day/kg,goat
-lowland goats,0.019,ca,MJ/day/kg,goat
-hill and mountain goats,0.024,ca,MJ/day/kg,goat
-goats,0.32,cfi,MJ/day/kg,goat
-a,5,a,MJ/kg,goat
-b,0.33,b,MJ/kg,goat
-goat,0.18,b_0,m³ CH₄/kg VS,goat
+﻿description,value,coefficient,units,animal_type,animal_subtype
+stall,0,ca,Dimensionless,cattle,
+pasture,0.17,ca,Dimensionless,cattle,
+grazing large areas,0.36,ca,Dimensionless,cattle,
+cattle/buffalo,0.322,cfi,MJ/day/kg,cattle,
+cattle_buffalo [lactating cows],0.386,cfi,MJ/day/kg,cattle,
+cattle_buffalo [bulls],0.37,cfi,MJ/day/kg,cattle,
+females,0.8,c,Dimensionless,cattle,
+castrates,1,c,Dimensionless,cattle,
+bulls,1.2,c,Dimensionless,cattle,
+dairy cattle,0.24,b_0,m³ CH₄/kg VS,cattle,dairy
+non dairy cattle,0.18,b_0,m³ CH₄/kg VS,cattle,beef
+cattle and buffalo,0.1,c_pregnancy,Dimensionless,cattle,
+housed ewes,0.0096,ca,MJ/day/kg,sheep,
+grazing flat pasture,0.0107,ca,MJ/day/kg,sheep,
+grazing hilly pasture,0.024,ca,MJ/day/kg,sheep,
+sheep_lamb_to_1_year_f,0.236,cfi,MJ/day/kg,sheep,
+sheep_lamb_to_1_year_m,0.271,cfi,MJ/day/kg,sheep,
+sheep_lamb_to_1_year_a,0.2535,cfi,MJ/day/kg,sheep,
+sheep_older_than_1_year_f,0.217,cfi,MJ/day/kg,sheep,
+sheep_older_than_1_year_m,0.249,cfi,MJ/day/kg,sheep,
+sheep_older_than_1_year_a,0.233,cfi,MJ/day/kg,sheep,
+a_females,2.1,a,MJ/kg,sheep,
+a_castrates,4.4,a,MJ/kg,sheep,
+a_intact males,2.5,a,MJ/kg,sheep,
+a_average_f_m,2.3,a,MJ/kg,sheep,
+b_females,0.45,b,MJ/kg,sheep,
+b_castrates,0.32,b,MJ/kg,sheep,
+b_intact males,0.35,b,MJ/kg,sheep,
+b_average_f_m,0.4,b,MJ/kg,sheep,
+sheep,0.19,b_0,m³ CH₄/kg VS,sheep,
+housed fattening lambs,0.0067,ca,MJ/day/kg,goat,
+lowland goats,0.019,ca,MJ/day/kg,goat,
+hill and mountain goats,0.024,ca,MJ/day/kg,goat,
+goats,0.32,cfi,MJ/day/kg,goat,
+a,5,a,MJ/kg,goat,
+b,0.33,b,MJ/kg,goat,
+goat,0.18,b_0,m³ CH₄/kg VS,goat,
