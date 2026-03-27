@@ -7,7 +7,7 @@
 calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
-\item{automatic_cycle}{Logical. If TRUE, uses species-specific birth models.}
+\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
 \item{saveoutput}{If TRUE, saves results to the output folder.}
 }

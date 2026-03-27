@@ -10,6 +10,6 @@ calculate_weighted_variable(saveoutput = TRUE)
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
-Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, ed, Fat, NFC)
+Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)
 by mapping ingredients to diets and diets to animals.
 }

@@ -3,7 +3,7 @@
 #' Orchestrates the population calculation. Choose between manual census
 #' or automatic farm cycle models based on mature animal counts.
 #'
-#' @param automatic_cycle Logical. If TRUE, uses species-specific birth models.
+#' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE, saves results to the output folder.
 #' @export
 calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
@@ -22,7 +22,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   # --- 3. Automatic Cycle Validation ---
   if (automatic_cycle) {
-    # Define the required mature base tags for the 3 helper functions
+
     required_bases <- c("mature_dairy_cattle", "mature_beef_cattle", "mature_beef_bull",
                         "mature_sheep_female_dairy", "mature_sheep_female_meat",
                         "mature_goat_female_dairy", "mature_goat_female_meat")

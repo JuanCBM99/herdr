@@ -11,39 +11,39 @@
 #' @export
 generate_impact_assessment <- function(automatic_cycle = FALSE,
                                        region = NULL, subregion = NULL,
-                                       animal = NULL, type = NULL, class_flex = NULL,
+                                       animal = NULL, type = NULL, class_flex = NULL, crop_yield_country,
                                        saveoutput = TRUE, group_by_identification = TRUE) {
 
   message("\U0001f4be Starting impact assessment summary...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # 1. Pipeline calls and unit standardization (Gg)
-  ch4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  CH4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(CH4_enteric_Gg = sum(emissions_total, na.rm = TRUE), .groups = "drop")
+    dplyr::summarise(CH4_enteric_Gg = sum(total_CH4_enteric_Ggyear, na.rm = TRUE), .groups = "drop")
 
-  ch4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  CH4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(CH4_manure_Gg = sum(Emissions_CH4_Gg_year / 1e6, na.rm = TRUE), .groups = "drop")
+    dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_Ggyear / 1e6, na.rm = TRUE), .groups = "drop")
 
-  n2o_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_direct_Gg = sum(N2O_emissions, na.rm = TRUE) / 1e6, .groups = "drop")
+    dplyr::summarise(N2O_direct_Gg = sum(direct_N2O_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  n2o_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_vol_Gg = sum(n2o_g, na.rm = TRUE) / 1e6, .groups = "drop")
+    dplyr::summarise(N2O_vol_Gg = sum(N2O_vol_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  n2o_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(N2O_lea_Gg = sum(n2o_l, na.rm = TRUE) / 1e6, .groups = "drop")
+    dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  land_u  <- calculate_land_use(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  land_u  <- calculate_land_use(automatic_cycle = automatic_cycle, crop_yield_country, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(Land_m2 = sum(Land_use_Total_m2, na.rm = TRUE), .groups = "drop")
+    dplyr::summarise(Land_m2 = sum(total_land_use_m2, na.rm = TRUE), .groups = "drop")
 
   # 2. Consolidation
-  complete_summary <- list(ch4_ent, ch4_man, n2o_dir, n2o_vol, n2o_lea, land_u) %>%
+  complete_summary <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u) %>%
     purrr::reduce(dplyr::full_join, by = join_keys) %>%
     dplyr::mutate(across(where(is.numeric), ~ tidyr::replace_na(., 0)))
 
@@ -67,11 +67,9 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::mutate(
       CO2eq_enteric  = CH4_enteric_Gg * 28,
       CO2eq_manure   = CH4_manure_Gg * 28,
-      CO2eq_n2o      = (N2O_direct_Gg + N2O_vol_Gg + N2O_lea_Gg) * 265,
-      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_n2o,
+      CO2eq_N2O      = (N2O_direct_Gg + N2O_vol_Gg + N2O_lea_Gg) * 265,
+      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_N2O,
 
-      # Intensity: kg CO2eq per m2
-      # (Gg * 1e6 converts to kg)
       Carbon_Footprint_m2 = (CO2eq_Total_Gg * 1e6) / Land_m2
     )
 

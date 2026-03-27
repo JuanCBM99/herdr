@@ -11,27 +11,23 @@ calculate_NEm <- function(saveoutput = TRUE) {
 
   # --- 2. Calculation Pipeline ---
   results <- weights %>%
-    # Join with categories using the 4-key identity structure
     dplyr::left_join(
       categories %>%
         dplyr::select(animal_tag, region, subregion, class_flex, animal_type, animal_subtype, cfi_tag = cfi),
       by = c("animal_tag", "region", "subregion", "class_flex")
     ) %>%
-    # Join with IPCC coefficients for CFI
     dplyr::left_join(
       coefficients %>%
         dplyr::filter(tolower(coefficient) == "cfi") %>%
         dplyr::select(cfi_tag = description, cfi_value = value),
       by = "cfi_tag"
     ) %>%
-    # Calculate NEm using IPCC formula
     dplyr::mutate(
       across(c(initial_weight_kg, final_weight_kg, cfi_value), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
-      NEm_MJ_day = cfi_value * (((initial_weight_kg + final_weight_kg)/2) ^ 0.75)
+      NEm_MJday = cfi_value * (((initial_weight_kg + final_weight_kg)/2) ^ 0.75)
     ) %>%
-    # Final selection of columns
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEm_MJ_day) %>%
-    dplyr::mutate(NEm_MJ_day = round(NEm_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEm_MJday) %>%
+    dplyr::mutate(NEm_MJday = round(NEm_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -70,12 +66,12 @@ calculate_NEa <- function(saveoutput = TRUE) {
     dplyr::left_join(ca_table, by = "ca_tag") %>%
     # Calculate NEa: Factor * NEm
     dplyr::mutate(
-      across(c(ca_value, NEm_MJ_day), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
-      NEa_MJ_day = ca_value * NEm_MJ_day
+      across(c(ca_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      NEa_MJday = ca_value * NEm_MJday
     ) %>%
     # Final selection of columns
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEa_MJ_day) %>%
-    dplyr::mutate(NEa_MJ_day = round(NEa_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEa_MJday) %>%
+    dplyr::mutate(NEa_MJday = round(NEa_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -109,7 +105,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
     # --- 3. Calculations ---
     dplyr::mutate(
       across(c(initial_weight_kg, final_weight_kg, adult_weight_kg, productive_period_days, C_val, A_val, B_val), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
-      NEg_MJ_day = dplyr::case_when(
+      NEg_MJday = dplyr::case_when(
         tolower(animal_type) == "cattle" ~ 22.02 * ((((initial_weight_kg + final_weight_kg)/2) / (C_val * adult_weight_kg))^0.75) * (((final_weight_kg - initial_weight_kg)/productive_period_days)^1.097),
         tolower(animal_type) %in% c("sheep", "goat") ~ ((final_weight_kg - initial_weight_kg)/productive_period_days) * (A_val + 0.5 * B_val * (initial_weight_kg + final_weight_kg)),
         TRUE ~ 0
@@ -117,8 +113,8 @@ calculate_NEg <- function(saveoutput = TRUE) {
     ) %>%
 
     # --- 4. Final Selection ---
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEg_MJ_day) %>%
-    dplyr::mutate(NEg_MJ_day = round(NEg_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEg_MJday) %>%
+    dplyr::mutate(NEg_MJday = round(NEg_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -144,7 +140,7 @@ calculate_NEl <- function(saveoutput = TRUE) {
     dplyr::mutate(
       across(c(milk_yield_kg_year, fat_content_pct), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       Milk_yield_kg_day = milk_yield_kg_year / 365,
-      NEl_MJ_day = dplyr::case_when(
+      NEl_MJday = dplyr::case_when(
         tolower(animal_type) == "cattle" ~ Milk_yield_kg_day * (1.47 + 0.4 * fat_content_pct),
         tolower(animal_type) == "sheep" ~ Milk_yield_kg_day * 4.6,
         tolower(animal_type) == "goat" ~ Milk_yield_kg_day * 3,
@@ -153,8 +149,8 @@ calculate_NEl <- function(saveoutput = TRUE) {
     ) %>%
 
     # --- 3. Final Selection ---
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEl_MJ_day) %>%
-    dplyr::mutate(NEl = round(NEl_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEl_MJday) %>%
+    dplyr::mutate(NEl = round(NEl_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -173,35 +169,30 @@ calculate_NE_work <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading from user_data ---
-  # Load categories to get work hours assigned [cite: 24, 28]
   categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
 
-  # Fetch NEm as the base (provides geography and baseline energy)
   nem_df <- calculate_NEm(saveoutput = FALSE)
 
   # --- 2. Calculation Pipeline ---
   results <- nem_df %>%
-    # 2.1 Join with categories to get work hours [cite: 26, 27]
-    # We use the 4-key identity structure for a perfect match [cite: 16, 32]
+
     dplyr::left_join(
       categories %>%
         dplyr::select(animal_tag, region, subregion, class_flex, work_hours),
       by = c("animal_tag", "region", "subregion", "class_flex")
     ) %>%
 
-    # 2.2 Calculations
     dplyr::mutate(
-      # Ensure hours and NEm are numeric and handle NAs
-      across(c(work_hours, NEm_MJ_day), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
-      # Formula: NE_work = hours * NEm (or specific factor based on intensity)
-      NE_work_MJ_day = work_hours * NEm_MJ_day
+      across(c(work_hours, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+
+      NEwork_MJday = work_hours * NEm_MJday
     ) %>%
 
     # --- 3. Final Selection and Cleanup ---
     dplyr::select(
       region, subregion, animal_tag, class_flex,
-      animal_type, animal_subtype, work_hours, NEm_MJ_day, NE_work_MJ_day
+      animal_type, animal_subtype, work_hours, NEm_MJday, NEwork_MJday
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 
@@ -231,12 +222,12 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
     dplyr::inner_join(weights, by = c("region", "subregion", "animal_tag", "class_flex")) %>%
     dplyr::mutate(
       wool_yield_kg_year = tidyr::replace_na(suppressWarnings(as.numeric(wool_yield_kg_year)), 0),
-      NE_wool_MJ_day = (wool_yield_kg_year * 24) / 365
+      NEwool_MJday = (wool_yield_kg_year * 24) / 365
     ) %>%
 
     # --- 3. Final Selection ---
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NE_wool_MJ_day) %>%
-    dplyr::mutate(NE_wool_MJ_day = round(NE_wool_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEwool_MJday) %>%
+    dplyr::mutate(NEwool_MJday = round(NEwool_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -268,18 +259,18 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE) {
     ) %>%
     dplyr::left_join(coeff_lookup, by = c("c_pregnancy" = "c_pregnancy_tag")) %>%
     dplyr::mutate(
-      across(c(pr, c_value, NEm_MJ_day), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      across(c(pr, c_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       C_preg_factor = dplyr::case_when(
         tolower(animal_type) == "cattle" ~ c_value,
         tolower(animal_type) %in% c("sheep", "goat") ~ (0.126 * pmax(pr - 1, 0)) + (0.077 * (1 - pmax(pr - 1, 0))),
         TRUE ~ 0
       ),
-      NE_pregnancy_MJ_day = C_preg_factor * NEm_MJ_day
+      NEpregnancy_MJday = C_preg_factor * NEm_MJday
     ) %>%
 
     # --- 3. Final Selection ---
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NE_pregnancy_MJ_day) %>%
-    dplyr::mutate(NE_pregnancy_MJ_day = round(NE_pregnancy_MJ_day, 3))
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEpregnancy_MJday) %>%
+    dplyr::mutate(NEpregnancy_MJday = round(NEpregnancy_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")

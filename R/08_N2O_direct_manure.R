@@ -10,13 +10,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   message("\U0001f4be Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  # Load reference tables
   cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
   weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
   user_manure  <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
 
-  # Calling internal modules (dependencies)
   ge_df  <- calculate_ge(saveoutput = FALSE)
   cp_df  <- calculate_weighted_variable(saveoutput = FALSE)
   pop_df <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
@@ -66,17 +64,15 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     )
   }
 
-  # Mandatory keys for merging
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 2. Master Dataset Construction & Joins ---
 
   results <- ge_df %>%
-    dplyr::select(dplyr::all_of(join_keys), ge_MJ_day) %>%
+    dplyr::select(dplyr::all_of(join_keys), GE_MJday) %>%
 
-    # 2.1 Join Nutritional (CP) and Population Data
     dplyr::left_join(
-      cp_df %>% dplyr::select(dplyr::all_of(join_keys), cp),
+      cp_df %>% dplyr::select(dplyr::all_of(join_keys), CP_pct),
       by = join_keys
     ) %>%
     dplyr::left_join(
@@ -84,14 +80,12 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       by = join_keys
     ) %>%
 
-    # 2.2 Join categories data (Milk & Fat)
     dplyr::left_join(
       cat_csv %>%
         dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
-    # 2.3 Join weight gain and NEg
     dplyr::left_join(
       weights_csv %>%
         dplyr::select(region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg, productive_period_days),
@@ -99,11 +93,10 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     ) %>%
     dplyr::left_join(
       neg_df %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJ_day),
+        dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJday),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
-    # 2.4 Join Management Configuration (User Data)
     dplyr::left_join(
       user_manure %>%
         dplyr::select(region, subregion, animal_tag, class_flex,
@@ -113,12 +106,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
     ) %>%
 
-    # 2.5 Join Direct Emission Factor (EF3) from Master Table
     dplyr::left_join(
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, EF3),
+                      climate_moisture, animal_type, animal_subtype, EF3), #EF3 kg N2O-N/kg N
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
@@ -126,41 +118,35 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
     # --- 3. Calculations ---
     dplyr::mutate(
-      # Numeric Safety
       dplyr::across(
-        c(ge_MJ_day, cp, population, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJ_day, allocation, EF3),
+        c(GE_MJday, CP_pct, population, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJday, allocation, EF3),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Nitrogen Balance logic (IPCC)
       milk_protein = 1.9 + 0.4 * fat_content_pct,
 
-      # N Retention
       N_retention = dplyr::case_when(
         animal_type %in% c("sheep", "goat") ~ 0.1,
-        ((final_weight_kg - initial_weight_kg)/productive_period_days) > 0 & NEg_MJ_day > 0  ~ ((milk_yield_kg_year * milk_protein) / 6.38) +
-          ((((final_weight_kg - initial_weight_kg)/productive_period_days) * (268 - (7.03 * NEg_MJ_day / ((final_weight_kg - initial_weight_kg)/productive_period_days))) / 1000) / 6.25),
+        ((final_weight_kg - initial_weight_kg)/productive_period_days) > 0 & NEg_MJday > 0  ~ ((milk_yield_kg_year * milk_protein) / 6.38) +
+          ((((final_weight_kg - initial_weight_kg)/productive_period_days) * (268 - (7.03 * NEg_MJday / ((final_weight_kg - initial_weight_kg)/productive_period_days))) / 1000) / 6.25),
         TRUE ~ 0
       ),
 
-      # N Intake and Excretion (IPCC Eqs 10.31 & 10.32)
-      N_intake   = (ge_MJ_day / 18.45) * (cp / 100 / 6.25),
-      N_excreted = dplyr::if_else(
+      N_intake_kgheadday   = (GE_MJday / 18.45) * (CP_pct / 100 / 6.25),
+      N_excreted_kgheadday = dplyr::if_else(
         animal_type %in% c("sheep", "goat"),
-        (N_intake * (1 - N_retention)) * 365,
-        (N_intake - N_retention) * 365
+        (N_intake_kgheadday * (1 - N_retention)) * 365,
+        (N_intake_kgheadday - N_retention) * 365
       ),
 
-      # Direct N2O Emissions (IPCC Eq 10.25)
-      # 44/28 is the conversion factor from N2O-N to N2O
-      N2O_emissions = population * N_excreted * allocation * EF3 * (44 / 28)
+      direct_N2O_kgyear = population * N_excreted_kgheadday * allocation * EF3 * (44 / 28)
     ) %>%
 
     # --- 4. Final Formatting ---
     dplyr::select(
       dplyr::all_of(join_keys),
       system_base, system_variant, climate_moisture, climate_zone,
-      N_intake, N_retention, N_excreted, EF3, population, N2O_emissions
+      N_intake_kgheadday, N_retention, N_excreted_kgheadday, EF3, population, direct_N2O_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 

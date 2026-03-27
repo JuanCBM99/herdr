@@ -1,11 +1,9 @@
 #' Calculate Dry Matter Intake (DMI)
 #'
-#' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ed).
-#' Includes physiological normality filters differentiated by species.
-#'
+#' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED).
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_dmi <- function(saveoutput = TRUE) {
+calculate_DMI <- function(saveoutput = TRUE) {
 
   message("\U0001f37d Calculating Dry Matter Intake (DMI)...")
 
@@ -16,9 +14,9 @@ calculate_dmi <- function(saveoutput = TRUE) {
 
   # --- 2. Calculation ---
   results <- ge_req %>%
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, ge_MJ_day) %>%
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, GE_MJday) %>%
     dplyr::left_join(
-      diet_char %>% dplyr::select(region, subregion, animal_tag, class_flex, ed),
+      diet_char %>% dplyr::select(region, subregion, animal_tag, class_flex, ED_MJkg),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::left_join(
@@ -26,8 +24,8 @@ calculate_dmi <- function(saveoutput = TRUE) {
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     dplyr::mutate(
-      dmi_day    = dplyr::if_else(ed > 0, ge_MJ_day / ed, 0),
-      dmi_bw_pct = dplyr::if_else(((initial_weight_kg + final_weight_kg)/2) > 0, (dmi_day / ((initial_weight_kg + final_weight_kg)/2)) * 100, 0)
+      DMI_kgday    = dplyr::if_else(ED_MJkg > 0, GE_MJday / ED_MJkg, 0),
+      DMI_bw_pct = dplyr::if_else(((initial_weight_kg + final_weight_kg)/2) > 0, (DMI_kgday / ((initial_weight_kg + final_weight_kg)/2)) * 100, 0)
     )
 
   # --- 3. Physiological Normality Filters ---
@@ -36,9 +34,9 @@ calculate_dmi <- function(saveoutput = TRUE) {
   # Cattle > 4.4% (NRC 1996) | Sheep > 5.5% (DSN 2004) | Goat > 6.7% (DGFN 2008)
   warn_high <- results %>%
     dplyr::filter(
-      (animal_type == "Cattle" & dmi_bw_pct > 4.4) |
-        (animal_type == "Sheep"  & dmi_bw_pct > 5.5) |
-        (animal_type == "Goat"   & dmi_bw_pct > 6.7)
+      (animal_type == "Cattle" & DMI_bw_pct > 4.4) |
+        (animal_type == "Sheep"  & DMI_bw_pct > 5.5) |
+        (animal_type == "Goat"   & DMI_bw_pct > 6.7)
     )
 
   if (nrow(warn_high) > 0) {
@@ -51,7 +49,7 @@ calculate_dmi <- function(saveoutput = TRUE) {
 
   # B. Low Intake Warning (< 0.8% BW)
   # Minimum survival threshold recorded in global databases.
-  warn_low <- results %>% dplyr::filter(dmi_bw_pct < 0.8 & dmi_bw_pct > 0)
+  warn_low <- results %>% dplyr::filter(DMI_bw_pct < 0.8 & DMI_bw_pct > 0)
 
   if (nrow(warn_low) > 0) {
     warning(paste0(
@@ -62,22 +60,22 @@ calculate_dmi <- function(saveoutput = TRUE) {
   }
 
   # --- 4. Final Selection & Rounding ---
-  final_dmi <- results %>%
+  final_DMI <- results %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      ge_mj_day = ge_MJ_day,
-      eb_mj_kg = ed,
-      dmi_day_kg = dmi_day,
-      dmi_bw_pct
+      GE_MJday,
+      ED_MJkg,
+      DMI_kgday,
+      DMI_bw_pct
     )
 
   # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
-    readr::write_csv(final_dmi, "output/DMI_report.csv")
+    readr::write_csv(final_DMI, "output/DMI_report.csv")
     message("\U0001f4be Saved DMI report to output/DMI_report.csv")
   }
 
-  return(final_dmi)
+  return(final_DMI)
 }

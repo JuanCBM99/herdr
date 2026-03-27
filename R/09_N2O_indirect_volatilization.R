@@ -12,9 +12,7 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
   user_manure <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
   ipcc_master <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
 
-  # Calling internal modules
-  # We fetch N_excreted from the direct N2O function
-  direct_n2o_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  direct_N2O_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
   pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
   # --- 2. Validations (Asserts) ---
@@ -60,13 +58,13 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
                   paste(unique(allocation_sums$animal_tag[allocation_sums$total_alloc > 1.001]), collapse = ", "))
     )
   }
-  # Mandatory identity keys
+
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 2. Master Dataset Construction & Joins ---
 
-  results <- direct_n2o_df %>%
-    dplyr::select(dplyr::all_of(join_keys), N_excreted) %>%
+  results <- direct_N2O_df %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted_kgheadday) %>%
     dplyr::distinct() %>%
 
     # 2.1 Join Population Data
@@ -75,7 +73,6 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
       by = join_keys
     ) %>%
 
-    # 2.2 Join Management Configuration (User Data)
     dplyr::left_join(
       user_manure %>%
         dplyr::select(region, subregion, animal_tag, class_flex,
@@ -85,12 +82,11 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
       by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
     ) %>%
 
-    # 2.3 Join Volatilization Fraction (frac_gas) and Factor (EF4) from Master Table
     dplyr::left_join(
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, frac_gas, EF4),
+                      climate_moisture, animal_type, animal_subtype, frac_gas, EF4), #EF4 kg N2O-N/ (kg NH3-N + NOx-N volatilised)
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
@@ -98,26 +94,22 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
 
     # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
-      # Numeric Safety
       dplyr::across(
-        c(population, N_excreted, allocation, frac_gas, EF4),
+        c(population, N_excreted_kgheadday, allocation, frac_gas, EF4),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Calculate N Loss due to Volatilization (N_volatilization-MMS, Eq 10.26)
-      n_volatilization_kg_year = population * N_excreted * allocation * frac_gas,
+      N_volatilization_kg_year = population * N_excreted_kgheadday * allocation * frac_gas,
 
-      # Calculate Indirect N2O Emissions (Eq 10.28)
-      # Factor 44/28 converts N2O-N to N2O
-      n2o_g = EF4 * n_volatilization_kg_year * (44 / 28)
+      N2O_vol_kgyear = EF4 * N_volatilization_kg_year * (44 / 28)
     ) %>%
 
     # --- 4. Final Selection and Cleanup ---
     dplyr::select(
       dplyr::all_of(join_keys),
       system_base, system_variant,
-      N_excreted, frac_gas, EF4,
-      n_volatilization_kg_year, n2o_g
+      N_excreted_kgheadday, frac_gas, EF4,
+      N_volatilization_kg_year, N2O_vol_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 

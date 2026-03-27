@@ -58,13 +58,12 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     )
   }
 
-  # Identity keys for consistent joins
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 3. Processing and Joins ---
 
   results <- calculate_vs(saveoutput = FALSE) %>%
-    dplyr::select(dplyr::all_of(join_keys), vs) %>%
+    dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
 
     dplyr::left_join(
       calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
@@ -92,7 +91,7 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, mcf),
+                      climate_moisture, animal_type, animal_subtype, MCF_pct),
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
@@ -101,19 +100,19 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     # --- 4. Calculations (IPCC Eq 10.23) ---
     dplyr::mutate(
       dplyr::across(
-        c(vs, population, allocation, B0, mcf),
+        c(VS_kgday, population, allocation, B0, MCF_pct),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      ef_ch4_kg_year = (vs * 365) * (B0 * 0.67 * mcf * allocation),
-      Emissions_CH4_Gg_year = (ef_ch4_kg_year * population)
+      EF_kgyear = (VS_kgday * 365) * (B0 * 0.67 * MCF_pct/100 * allocation),
+      total_CH4_mm_Ggyear = (EF_kgyear * population)
     ) %>%
 
     # --- 5. Selection and Rounding ---
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      system_base, system_variant, vs, B0, mcf, allocation,
-      ef_ch4_kg_year, population, Emissions_CH4_Gg_year
+      system_base, system_variant, VS_kgday, B0_m3kg = B0, MCF_pct, allocation,
+      EF_kgyear, population, total_CH4_mm_Ggyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 6)))
 

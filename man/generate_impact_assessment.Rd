@@ -11,6 +11,7 @@ generate_impact_assessment(
   animal = NULL,
   type = NULL,
   class_flex = NULL,
+  crop_yield_country,
   saveoutput = TRUE,
   group_by_identification = TRUE
 )

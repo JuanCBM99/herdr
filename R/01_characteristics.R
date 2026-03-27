@@ -1,6 +1,6 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (DE, CP, NDF, Ash, ed, Fat, NFC)
+#' Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)
 #' by mapping ingredients to diets and diets to animals.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -43,21 +43,26 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
   diet_profiles <- diets %>%
     dplyr::left_join(ingredients, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
+    # --- PASO DE SEGURIDAD ---
     dplyr::mutate(
-      # Weighting factor: (Ingredient % in category) * (Category % in Diet) / 10000
-      weight_factor = (ingredient_share * dplyr::case_when(
-        ingredient_type == "forage"      ~ forage_share,
-        ingredient_type == "concentrate" ~ concentrate_share,
-        ingredient_type == "milk"        ~ milk_share,
-        ingredient_type == "replacer"    ~ milk_replacer_share,
-        TRUE ~ 0
-      )) / 10000
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg),
+                    ~ as.numeric(as.character(.)))
     ) %>%
+    # -------------------------
+  dplyr::mutate(
+    weight_factor = (ingredient_share * dplyr::case_when(
+      ingredient_type == "forage"      ~ forage_share,
+      ingredient_type == "concentrate" ~ concentrate_share,
+      ingredient_type == "milk"        ~ milk_share,
+      ingredient_type == "replacer"    ~ milk_replacer_share,
+      TRUE ~ 0
+    )) / 10000
+  ) %>%
     dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
-      # Calculate weighted averages for all nutritional components
-      dplyr::across(c(de, cp, ndf, ash, ed), ~ sum(. * weight_factor, na.rm = TRUE)),
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg),
+                    ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
@@ -87,20 +92,20 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     }
 
     # 2. Crude Protein (CP) Alerts (< 7% or > 20%)
-    warn_cp_low <- mature_check %>% dplyr::filter(cp < 7)
+    warn_cp_low <- mature_check %>% dplyr::filter(CP_pct < 7)
     if (nrow(warn_cp_low) > 0) {
       warning(paste0("\u26A0 Warning (Protein): < 7% in: ", paste(unique(warn_cp_low$animal_tag), collapse = ", "),
                      ". Insufficient to maintain basal rumen fermentation (Ref: CSIRO 2007)."))
     }
 
-    warn_cp_high <- mature_check %>% dplyr::filter(cp > 20)
+    warn_cp_high <- mature_check %>% dplyr::filter(CP_pct > 20)
     if (nrow(warn_cp_high) > 0) {
       warning(paste0("\u26A0 Warning (Protein): > 20% in: ", paste(unique(warn_cp_high$animal_tag), collapse = ", "),
                      ". Excess causes high energy expenditure and reproductive/embryonic toxicity (Ref: NRC 2001)."))
     }
 
     # 3. Ash Alert (> 10%)
-    warn_ash <- mature_check %>% dplyr::filter(ash > 10)
+    warn_ash <- mature_check %>% dplyr::filter(ASH_pct > 10)
     if (nrow(warn_ash) > 0) {
       warning(paste0("\u26A0 Warning (Ash): > 10% in: ", paste(unique(warn_ash$animal_tag), collapse = ", "),
                      ". Drastically increases water requirements due to osmotic stress (Ref: CSIRO 2007)."))
@@ -113,7 +118,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
-      de, cp, ndf, ash, ed
+      DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg
     )
 
   # --- 7. Save Output ---

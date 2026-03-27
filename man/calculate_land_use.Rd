@@ -4,14 +4,19 @@
 \alias{calculate_land_use}
 \title{Calculate land use}
 \usage{
-calculate_land_use(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_land_use(
+  automatic_cycle = FALSE,
+  crop_yield_country,
+  saveoutput = TRUE
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+
+\item{crop_yield_country}{Character. FAO Area to use for crop yields.}
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 }
 \description{
 Computes total land use (m2) per animal based on validated DMI.
-This version integrates calculate_dmi() to ensure physiological consistency.
 }
