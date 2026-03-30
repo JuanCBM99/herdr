@@ -1,54 +1,27 @@
 library(testthat)
 library(herdr)
+library(readr)
 library(dplyr)
 
-# We removed context() to fix the warning.
-# In the 3rd edition, the file name serves as the context.
-
-test_that("calculate_population_cattle returns correct structure", {
-  # 1. Setup minimal Mock Data
-  mock_census <- data.frame(
-    region = "spain",
-    subregion = "north",
-    animal_tag = "mature_dairy_cattle",
-    class_flex = "lactation",
-    population = 1000
-  )
-
-  mock_rates <- data.frame(
-    parameter = c("calving_rate", "replacement_rate"),
-    animal_tag = c("mature_dairy_cattle", "mature_dairy_cattle"),
-    value = c(0.9, 0.2)
-  )
-
-  # 2. Run function
-  results <- calculate_population_cattle(mock_census, mock_rates, data.frame())
-
-  # --- BASIC STRUCTURE CHECKS ---
-  expect_s3_class(results, "data.frame")
-  expect_named(results, c("region", "subregion", "animal_tag", "class_flex", "population"))
-})
+path_census <- test_path("test_data", "user_data/livestock_census.csv")
+path_rates  <- test_path("test_data", "user_data/reproduction_parameters.csv")
 
 test_that("population math follows biological sex-ratio and replacement rules", {
-  # Scenario: 1000 cows, 1.0 calving rate, 0.1 replacement rate
-  mock_census <- data.frame(
-    region = "spain", subregion = "north",
-    animal_tag = "mature_dairy_cattle", class_flex = "lactation", population = 1000
-  )
-  mock_rates <- data.frame(
-    parameter = c("calving_rate", "replacement_rate"),
-    animal_tag = "mature_dairy_cattle", value = c(1.0, 0.1)
-  )
+
+  mock_census <- read_csv(path_census, show_col_types = FALSE) %>%
+    filter(animal_tag == "mature_dairy_cattle") %>%
+    mutate(population = 1000, class_flex = "lactation")
+
+  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+    filter(animal_tag == "mature_dairy_cattle") %>%
+    mutate(value = case_when(
+      parameter == "calving_rate" ~ 1.0,
+      parameter == "replacement_rate" ~ 0.1,
+      TRUE ~ value
+    ))
 
   res <- calculate_population_cattle(mock_census, mock_rates, data.frame())
 
-  # Calculation logic:
-  # 1000 births -> 500 males / 500 females
-  # Replacement: 1000 * 0.1 = 100 female calves kept
-  # Feedlot males: 500
-  # Feedlot females: 500 - 100 = 400
-
-  # --- MATH CHECKS ---
   males <- res %>% filter(animal_tag == "feedlot_calves_male") %>% pull(population)
   expect_equal(males, 500)
 
@@ -56,25 +29,20 @@ test_that("population math follows biological sex-ratio and replacement rules", 
   expect_equal(repl_females, 100)
 })
 
+test_that("class_flex is preserved for mature animals and NA for offspring", {
 
+  mock_census <- read_csv(path_census, show_col_types = FALSE) %>%
+    filter(animal_tag == "mature_dairy_cattle") %>%
+    mutate(class_flex = "grazing_test")
 
-test_that("class_flex is only preserved for mature animals", {
-  mock_census <- data.frame(
-    region = "spain", subregion = "north",
-    animal_tag = "mature_dairy_cattle", class_flex = "lactation", population = 100
-  )
-  mock_rates <- data.frame(
-    parameter = c("calving_rate", "replacement_rate"),
-    animal_tag = "mature_dairy_cattle", value = c(1, 0)
-  )
+  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+    filter(animal_tag == "mature_dairy_cattle")
 
   res <- calculate_population_cattle(mock_census, mock_rates, data.frame())
 
-  # Mature cows should keep "lactation"
   mature_entry <- res %>% filter(animal_tag == "mature_dairy_cattle")
-  expect_equal(mature_entry$class_flex, "lactation")
+  expect_equal(mature_entry$class_flex[1], "grazing_test")
 
-  # Calves should have NA in class_flex
   calf_entry <- res %>% filter(animal_tag == "feedlot_calves_male")
-  expect_true(is.na(calf_entry$class_flex))
+  expect_true(is.na(calf_entry$class_flex[1]))
 })

@@ -1,0 +1,368 @@
+ingredient,yield_name,agribalyse_name,allocation
+broken_rice,Rice,Full allocation,1
+oats,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
+oats_decorticated,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
+barley_2_rows_national_11_3_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+barley_2_rows_national_9_6_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+rye_national,Rye,Full allocation,1
+rye_german,Rye,Full allocation,1
+corn_national,Maize (corn),"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
+high_oil_corn_grain,Mixed grain,"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
+white_sorghum_grain,Sorghum,"Sorghum grain, conventional, national average, animal feed, at farm gate {FR} U",1
+wheat_soft_national_12_9_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_national_11_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_national_10_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_english,Wheat,"Soft wheat grain, conventional, Great Britain, animal feed, at french port {FR} U",1
+wheat_hard_national,Wheat,Full allocation,1
+triticale,Triticale,"Triticale grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+rice_cooked,Rice,Full allocation,1
+corn_heat_processed_national,Wheat,Full allocation,1
+white_sorghum_heat_processed,Wheat,Full allocation,1
+rice_bran_14_ee,Rice,As wheat bran,0.0822
+rice_bran_high_fat_17_ee,Rice,As wheat bran,0.0822
+rice_bran_defatted,Rice,As wheat bran,0.0822
+barley_ddgs,Barley,As wheat ddgs,1
+corn_ddgs_7_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+corn_ddgs_12_5_ee_3_5_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+corn_ddgs_12_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+sorghum_ddgs,Sorghum,As wheat ddgs,1
+wheat_ddgs,Wheat,"DDGS, dehydrated, from wheat distillation, animal feed, at plant {FR} U",1
+brewers_grains,Grapes,No allocation,0
+corn_flour_6_ee,Maize (corn),As corn/maize,1
+corn_gluten_feed_19_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
+corn_gluten_feed_20_5_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
+corn_gluten_meal_60,Maize (corn),"Corn gluten meal (gluten 60), national average, animal feed, at plant {FR} U",0.0832
+wheat_bran_15_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {FR} U",0.0822
+wheat_bran_20_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {FR} U",0.0822
+wheat_middlings_25_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
+wheat_middlings_30_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
+bakery_byproduct_2_5_ash,Wheat,As wheat,1
+bakery_byproduct_6_ash,Wheat,As wheat,1
+bread_byproduct,Wheat,As wheat,1
+malt_rootlets_barley_sprouts,Barley,No allocation,0
+whole_acorn,NA,Full allocation,1
+acorn_decorticated,NA,Full allocation,1
+tapioca_62_5,NA,Full allocation,1
+tapioca_65,NA,Full allocation,1
+tapioca_70,NA,Full allocation,1
+molasses_sugarcane,Sugar cane,As beet molasses,0.066
+molasses_beet,Sugar beet,"Molasses, from sugar beet, animal feed, at plant {FR} U",0.066
+vinasses_beet,Sugar beet,"Vinasse, from sugar beet molasses, animal feed, at plant {FR} U",0.1476
+potato_dehydrated,Potatoes,Full allocation,1
+sweet_potato_dehydrated,Sweet potatoes,Full allocation,1
+cotton_seed_whole,"Seed cotton, unginned","Manually assigned (USA, FAO 2023 data)",0.2736
+cotton_seed_meal_38_cp,"Seed cotton, unginned",As sunflower meal without dehulling,0.189
+lupin_australian,Lupins,"Lupin, conventional, national average, at farm gate, production {FR} U",1
+peanut_meal_48_cp,"Groundnuts, excluding shelled",As sunflower meal without dehulling,0.189
+peanut_meal_52_cp,"Groundnuts, excluding shelled",As sunflower meal low dehulling,0.185
+camelina_meal_national,NA,As sunflower meal without dehulling,0.189
+camelina_meal_expeller,NA,As sunflower meal expeller with low dehulling,0.185
+rapeseed_meal_00,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_33_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_36_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_expeller_7_3_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_expeller_12_7_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+coprah_meal,NA,As sunflower meal without dehulling,0.189
+coprah_expeller,NA,As sunflower meal expeller with low dehulling,0.185
+sunflower_seed,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
+sunflower_seed_high_oileic,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
+sunflower_meal_28_cp,Sunflower seed,"Sunflower meal without dehulling, conventional, animal feed, at transformation plant {FR} U",0.189
+sunflower_meal_32_cp,Sunflower seed,"Sunflower meal, with low dehulling, animal feed, at transformation plant {FR} U",0.185
+sunflower_meal_36_cp,Sunflower seed,"Sunflower meal, with high dehulling, animal feed, at transformation plant {FR} U",0.225
+sunflower_meal_expeller_31_cp,Sunflower seed,"Sunflower meal, with low dehulling, animal feed, at transformation plant {FR} U",0.185
+sunflower_meal_expeller_34_cp,Sunflower seed,"Sunflower meal, with high dehulling, animal feed, at transformation plant {FR} U",0.225
+field_pea_spring,String beans,"Spring pea, conventional, 15% moisture, animal feed, at farm gate, production {FR} U",1
+field_pea_heat_processed,Wheat,Full allocation,1
+horse_bean_white_flower_variety,"Broad beans and horse beans, dry",Full allocation,1
+horse_bean_white_flower_variety_dehulled,"Broad beans and horse beans, dry",Full allocation,1
+lentils,"Lentils, dry",Full allocation,1
+linseed,Linseed,Full allocation,1
+linseed_meal_expeller,Linseed,As sunflower meal expeller with low dehulling,0.185
+linseed_meal,Linseed,As sunflower meal without dehulling,0.189
+palm_kernel_expeller,NA,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
+palm_kernel_expeller_2,NA,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
+roasted_soybeans,Soya beans,"Soybean toasted BR, animal feed, at french transformation plant {FR} U",1
+extruded_soybeans,Soya beans,"Soybean extruded, animal feed, at french transformation plant {FR} U",1
+soybean_meal_44_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_45_5_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_47_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_48_5_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_micronized_51_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+common_vetch,Vetches,Full allocation,1
+ervil_bitter_vetch,Vetches,Full allocation,1
+soybean_protein_concentrates_extraction,Soya beans,Full allocation,1
+soybean_protein_concentrates_fermentation,Soya beans,Full allocation,1
+soybean_protein_isolates,Soya beans,Full allocation,1
+peas_protein_concentrate,Oil palm fruit,Full allocation,1
+peas_protein_isolate,Oil palm fruit,Full allocation,1
+potato_protein_isolate,Potatoes,"Protein, Potato, at feed plant {FR} U",0.0097
+wheat_protein_hydrolyzed,NA,NA,NA
+rice_protein_concentrate,Rice,NA,NA
+brewery_yeast,Barley,NA,0
+alfalfa_hay_dehydrated,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_meal_17_5_cp,alfalfa,Full allocation,1
+alfalfa_meal_15_cp,alfalfa,Full allocation,1
+forage_meal_mix_12_5_cp,alfalfa,Full allocation,1
+cottonseed_hulls,"Seed cotton, unginned",As sunflower hulls,0.03
+rise_hulls,Rice,As sunflower hulls,0.03
+oat_hulls,Oats,As sunflower hulls,0.03
+sunflower_hulls,Sunflower seed,NA,0.03
+horse_bean_hulls_low_in_tannins,"Broad beans and horse beans, dry",As sunflower hulls,0.03
+soybean_hulls_10_cp,Soya beans,As sunflower hulls,0.03
+soybean_hulls_12_cp,Soya beans,As sunflower hulls,0.03
+carob_bean,Locust beans (carobs),NA,0
+olive_leaves,Olives,NA,0
+olive_pulp,Olives,NA,0
+olive_pulp_partially_defatted,Olives,NA,0
+extracted_olive_pulp,Olives,NA,0
+grape_seed,Grapes,NA,0
+grape_seed_meal,Grapes,NA,0
+grape_marc,Grapes,NA,0
+straw_cereals_wheat_and_barley,NA,NA,0
+straw_naoh_treated,NA,NA,0
+straw_lentils,"Lentils, dry",NA,0
+citrus_pulp_orange_tangerine,Oranges,NA,0
+apple_pulp,Apples,NA,0
+beet_pulp_4_ash,Sugar beet,"Sugar beet pulp dehydrated, animal feed, at plant {FR} U",0.203
+beet_pulp_7_5_ash,Sugar beet,"Sugar beet pulp pressed, from sugar beet, animal feed, at plant {FR} U",0.203
+meat_meal_44_15_28,NA,NA,1
+meat_meal_50_14_26,NA,NA,1
+meat_meal_52_14_25,NA,NA,1
+meat_meal_57_13_24,NA,NA,1
+poultry_byproduct,NA,NA,1
+poultry_meat_meal,NA,NA,1
+fish_meal_national_59_9_21,NA,NA,1
+fish_meal_national_62_9_18,NA,NA,1
+fish_meal_67_10_15,NA,NA,1
+fish_meal_70_9_13,NA,NA,1
+feather_meal_hydrolyzed,NA,No allocation,0
+blood_meal_spray,NA,No allocation,0
+hemoglobine,NA,No allocation,0
+animal_plasma_70_cp,NA,No allocation,0
+animal_plasma_78_cp,NA,No allocation,0
+egg_meal,NA,No allocation,0
+mucose_hydrolyzed_52_cp,NA,No allocation,0
+mucose_hydrolyzed_62_cp,NA,No allocation,0
+mucose_hydrolyzed_70_cp,NA,No allocation,0
+casein,NA,Full allocation,1
+skimmed_milk,NA,Full allocation,1
+skimmed_milk_denatured,NA,Full allocation,1
+wheypowder_acid,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_sweet_sheep,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_sweet_cattle,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_50_fat,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_partially_lactose_free_22_39_22,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+tallow,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+wheypowder_partially_lactose_free_20_fat,NA,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+whey_permeate,NA,"Whey, at plant {FR} U",0.0282
+butterfat,NA,NA,1
+tallow,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+lard,NA,"Lard, from pig, animal feed, at retailer gate {FR} U",1
+animal_fat_3_5,NA,As tallow,1
+animal_fat_5_9,NA,As tallow,1
+animal_fat_9_12,NA,As tallow,1
+poultry_fat,NA,As tallow,1
+chilean_fish_oil,NA,NA,1
+nordic_fish_oil,NA,"Fish oil, with wastewater treatment, from Norway, at feed plant S {FR} U",1
+national_fish_oil,NA,NA,1
+fish_acid_oil_oleins,NA,NA,1
+cotton_oil,"Seed cotton, unginned",NA,1
+corn_oil,Maize (corn),"Corn oil, national average, animal feed, at plant {FR} U",0.0715
+soybean_oil,Soya beans,"Soybean oil BR, crushing in France, animal feed, at french mill, average {FR} U",0.3854
+rapeseed_oil,Rape or colza seed,NA,1
+sunflower_oil,Sunflower seed,"Sunflower oil without dehulling, crude, conventional, animal feed, at transformation plant {FR} U",0.811
+high_oleic_sunflower_oil,Sunflower seed,As sunflower oil,0.811
+olive_oil,Olives,NA,NA
+palm_oil,Oil palm fruit,"Crude palm oil MY, animal feed, at french port, average {FR} U",0.9328
+coconut_oil,"Coconuts, in shell","Crude coconut oil, from Philippines, at feed plant {FR} U",1
+palm_stearin,Oil palm fruit,NA,1
+palm_kernel_oil,Oil palm fruit,As crude palm oil MY,0.9328
+linseed_oil,Linseed,NA,1
+peanut_oil,"Groundnuts, excluding shelled",NA,1
+crude_soybean_lecithins,Soya beans,No allocation,0
+soya_acid_oil_oleins,Soya beans,No allocation,0
+sunflower_acid_oil_oleins,Sunflower seed,No allocation,0
+olive_acid_oil_oleins,Olives,No allocation,0
+coconut_acid_oil_oleins,"Coconuts, in shell",No allocation,0
+palm_distillers,Oil palm fruit,No allocation,0
+yellow_grease,NA,No allocation,0
+grasoleins_gt_50,NA,No allocation,0
+grasoleins_gt_35,NA,No allocation,0
+grasoleins_lt_20,NA,No allocation,0
+palm_calcium_soap,NA,No allocation,0
+mixed_calcium_soaps,NA,No allocation,0
+hydrogenated_fat_gt_55,NA,No allocation,0
+hydrogenated_fat_gt_90,NA,No allocation,0
+glycerin_85,NA,Full allocation,1
+calcium_carbonate,NA,Full allocation,1
+oyster_shells,NA,Full allocation,1
+mollusk_shells,NA,Full allocation,1
+maerl_marine_algae,NA,Full allocation,1
+dolomitic_carbonate,NA,Full allocation,1
+bone_meal_degelatinized,NA,No allocation,0
+stone_phosphate_defluorinized,NA,Full allocation,1
+dicalcium_phosphate_anhydrous,NA,"Dicalcium phosphate, animal feed, at retailer gate {FR} U",1
+dicalcium_phosphate_dihydrated,NA,"Dicalcium phosphate, animal feed, at retailer gate {FR} U",1
+mono_dicalcium_phosphate_hydrated,NA,Full allocation,1
+monocalcium_phosphate_hydrated,NA,"Monocalcium phosphate, animal feed, at retailer gate {FR} U",1
+monosodium_phosphate_monohydrated,NA,Full allocation,1
+calcium_sodium_phosphate,NA,Full allocation,1
+magnesium_phosphate_hydrated,NA,Full allocation,1
+triple_na_ca_mg_phosphate_hydrated,NA,Full allocation,1
+mono_ammonium_phosphate,NA,Full allocation,1
+mg_oxide_calcined_magnesite,NA,Full allocation,1
+anhydrous_magnesium_sulfate,NA,Full allocation,1
+magnesium_sulfate_heptahydrate,NA,Full allocation,1
+magnesium_chloride_hexahydrate,NA,Full allocation,1
+magnesium_propionate_dihydrate,NA,Full allocation,1
+sodium_chloride_marine,NA,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_92,NA,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_96,NA,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_98,NA,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_bicarbonate,NA,"Sodium bicarbonate, animal feed, at retailer gate {RER} U",1
+sodium_carbonate,NA,Full allocation,1
+sodium_sulfate,NA,Full allocation,1
+urea,NA,Full allocation,1
+ammonium_sulphate,NA,Full allocation,1
+ammonium_chloride,NA,Full allocation,1
+dl_methionine,NA,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+l_methionine,NA,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+sodium_dl_methionine_54,NA,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+methionine_hydroxy_analog,NA,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+methionine_hydrozylate_analog_calcium_salts,NA,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+l_lysine_hcl,NA,Lysine solid (HCl) S {FR} U,1
+l_lysine_50,NA,Lysine solid (HCl) S {FR} U,1
+l_lysine_sulfate,NA,Lysine sulfate S {CN} U,1
+l_threonine,NA,Threonine S {CN} U,1
+l_triptophane,NA,Tryptophane S {FR} U,1
+l_valine,NA,Valine S {FR} U,1
+l_arginine,NA,Arginine S {FR} U,1
+l_isoleucine,NA,Isoleucine S {FR} U,1
+l_histidine_hcl,NA,Histidine S {BR} U,1
+starch_96,NA,Full allocation,1
+starch_84,NA,Full allocation,1
+sucrose,NA,Full allocation,1
+dextrose_monohydrated,NA,Full allocation,1
+lactose,NA,Full allocation,1
+citric_acid,NA,Full allocation,1
+fumaric_acid,NA,Full allocation,1
+propionic_acid,NA,Full allocation,1
+formic_acid,NA,Full allocation,1
+butiric_acid,NA,Full allocation,1
+dl_malic_acid,NA,Full allocation,1
+benzoic_acid,NA,Full allocation,1
+aceyic_acid,NA,Full allocation,1
+lactic_acid,NA,Full allocation,1
+sorbic_acid,NA,Full allocation,1
+propylenglycol,NA,Full allocation,1
+sodium_formiate,NA,Full allocation,1
+ammonium_formiate,NA,Full allocation,1
+potasium_diformiate,NA,Full allocation,1
+calcium_formiate,NA,Full allocation,1
+sodium_propionate,NA,Full allocation,1
+ammonium_propionate,NA,Full allocation,1
+calcium_propionate,NA,Full allocation,1
+sodium_butyrate,NA,Full allocation,1
+calcium_butyrate,NA,Full allocation,1
+choline_chloride_75,NA,Full allocation,1
+choline_chloride_60,NA,Full allocation,1
+choline_chloride_50_vegetable,NA,Full allocation,1
+choline_chloride_50_mineral,NA,Full allocation,1
+betaine_anhydrous_97,NA,Full allocation,1
+betaine_anhydrous_93,NA,Full allocation,1
+betaine_hydrocloride,NA,Full allocation,1
+copper_sulphate_pentahydrate,NA,"Copper sulfate, animal feed, at retailer gate {FR} U",1
+copper_oxide_ii,NA,"Copper oxide, at feed plant {FR} U",1
+dichloro_trihydroxychloride_tbcc,NA,Full allocation,1
+zinc_hydroxy_chlorur_monohydrate,NA,Full allocation,1
+zinc_sulfate_monohydrated,NA,Full allocation,1
+zinc_sulfate_pentahydrated,NA,Full allocation,1
+zinc_oxide_72,NA,"Zinc oxide, animal feed, at retailer gate {FR} U",1
+zinc_oxide_75,NA,"Zinc oxide, animal feed, at retailer gate {FR} U",1
+iron_sulfate_ii_monohydrated,NA,Full allocation,1
+iron_sulfate_ii_heptahydrated,NA,Full allocation,1
+iron_carbonate_ii_siderita,NA,Full allocation,1
+manganose_sulfate_monohydrated,NA,Full allocation,1
+manganese_oxide_ii,NA,Full allocation,1
+dimanganese_trihydroxychlorur,NA,Full allocation,1
+potaisum_iodine,NA,Full allocation,1
+calcium_iodate_anhydrous,NA,Full allocation,1
+cobalt_ii_acetate_tetrahydrate,NA,Full allocation,1
+cobalt_ii_carbonate,NA,Full allocation,1
+coated_granulated_cobalt_ii_carbonate,NA,Full allocation,1
+sodium_selenite,NA,Full allocation,1
+sodium_molybdate,NA,Full allocation,1
+alfalfa_hay_excellent,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_first,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_second,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_third,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_fourth,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+ryegrass_hay_excellent,ryegrass,Full allocation,1
+ryegrass_hay_first,ryegrass,Full allocation,1
+ryegrass_hay_second,ryegrass,Full allocation,1
+ryegrass_hay_third,ryegrass,Full allocation,1
+ryegrass_hay_fourth,ryegrass,Full allocation,1
+ryegrass_hay_fifth,ryegrass,Full allocation,1
+vetch_hay_excellent,forage_vetch,Full allocation,1
+vetch_hay_first,forage_vetch,Full allocation,1
+vetch_hay_second,forage_vetch,Full allocation,1
+vetch_hay_third,forage_vetch,Full allocation,1
+corn_silage_lt20,forage_maize,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_20_25,forage_maize,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_25_30,forage_maize,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_30_35,forage_maize,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_gt35,forage_maize,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+sorghum_silage_lt20,forage_sorghum,"Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_20_25,forage_sorghum,"Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_25_30,forage_sorghum,"Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_30_35,forage_sorghum,"Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_gt35,forage_sorghum,"Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+oat_silage_20_25,forage_oat,Full allocation,1
+oat_silage_25_30,forage_oat,Full allocation,1
+oat_silage_30_35,forage_oat,Full allocation,1
+oat_silage_gt35,forage_oat,Full allocation,1
+barley_silage_lt20,forage_barley,Full allocation,1
+barley_silage_20_25,forage_barley,Full allocation,1
+barley_silage_25_30,forage_barley,Full allocation,1
+barley_silage_30_35,forage_barley,Full allocation,1
+barley_silage_gt35,forage_barley,Full allocation,1
+wheat_silage_lt20,forage_wheat,Full allocation,1
+wheat_silage_20_25,forage_wheat,Full allocation,1
+wheat_silage_25_30,forage_wheat,Full allocation,1
+wheat_silage_30_35,forage_wheat,Full allocation,1
+wheat_silage_gt35,forage_wheat,Full allocation,1
+triticale_silage_lt20,forage_triticale,Full allocation,1
+triticale_silage_20_25,forage_triticale,Full allocation,1
+triticale_silage_25_30,forage_triticale,Full allocation,1
+triticale_silage_30_35,forage_triticale,Full allocation,1
+triticale_silage_gt35,forage_triticale,Full allocation,1
+ryegrass_fresh_excellent,ryegrass,Full allocation,1
+ryegrass_fresh_first,ryegrass,Full allocation,1
+ryegrass_fresh_second,ryegrass,Full allocation,1
+ryegrass_fresh_third,ryegrass,Full allocation,1
+ryegrass_fresh_fourth,ryegrass,Full allocation,1
+ryegrass_silage_excellent,ryegrass,Full allocation,1
+ryegrass_silage_first,ryegrass,Full allocation,1
+ryegrass_silage_second,ryegrass,Full allocation,1
+ryegrass_silage_third,ryegrass,Full allocation,1
+ryegrass_silage_fourth,ryegrass,Full allocation,1
+grass_silage_excellent,grass,Full allocation,1
+grass_silage_first,grass,Full allocation,1
+grass_silage_second,grass,Full allocation,1
+grass_silage_third,grass,Full allocation,1
+grass_silage_fourth,grass,Full allocation,1
+grass_silage_fifth,grass,Full allocation,1
+rapeseed_silage,forage_rapeseed,Full allocation,1
+sunflower_silage_lt20,forage_sunflower,Full allocation,1
+sunflower_silage_20_25,forage_sunflower,Full allocation,1
+sunflower_silage_gt25,forage_sunflower,Full allocation,1
+mycotoxin_adsorbent,NA,Full allocation,1
+cereals_silage_wheat_barley_oat_triticale,forage_winter_cereal,Full allocation,1
+alfalfa_silage,alfalfa,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+cow_breast_milk,NA,Full allocation,1
+sheep_breast_milk,NA,Full allocation,1
+goat_breast_milk,NA,Full allocation,1
+milk_replacer,NA,Full allocation,1
+aroma,NA,Full allocation,1
+Vitamin/mineral_supplement,NA,"Vitamin, animal feed, at retailer gate {FR} U",1
+potassium_carbonate,NA,"Potassium carbonate, at feed plant {FR} U",1

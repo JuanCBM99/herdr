@@ -6,6 +6,7 @@
 #' @param animal Livestock type (animal_type).
 #' @param type Livestock subtype (animal_subtype).
 #' @param class_flex Management class (e.g., 'grazing', 'stall').
+#' @param crop_yield_country Character. FAO Area to use for crop yields.
 #' @param saveoutput If TRUE saves to output folder.
 #' @param group_by_identification If TRUE returns by animal_tag.
 #' @export

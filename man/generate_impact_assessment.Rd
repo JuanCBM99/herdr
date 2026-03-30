@@ -29,6 +29,8 @@ generate_impact_assessment(
 
 \item{class_flex}{Management class (e.g., 'grazing', 'stall').}
 
+\item{crop_yield_country}{Character. FAO Area to use for crop yields.}
+
 \item{saveoutput}{If TRUE saves to output folder.}
 
 \item{group_by_identification}{If TRUE returns by animal_tag.}

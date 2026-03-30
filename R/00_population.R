@@ -11,9 +11,16 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Total Population...")
 
   # --- 1. Load Data ---
-  census_raw      <- readr::read_csv("user_data/livestock_census.csv", show_col_types = FALSE)
-  definitions     <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
-  rate_parameters <- readr::read_csv("user_data/reproduction_parameters.csv", show_col_types = FALSE)
+  census_raw <- readr::read_csv("user_data/livestock_census.csv",
+                                col_types = readr::cols(subregion = "c", class_flex = "c"),
+                                show_col_types = FALSE)
+
+  definitions <- readr::read_csv("user_data/livestock_definitions.csv",
+                                 col_types = readr::cols(subregion = "c", class_flex = "c"),
+                                 show_col_types = FALSE)
+
+  rate_parameters <- readr::read_csv("user_data/reproduction_parameters.csv",
+                                     show_col_types = FALSE)
 
   # --- 2. Quick Integrity Check ---
   if (any(census_raw$population < 0, na.rm = TRUE)) {
@@ -22,7 +29,6 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   # --- 3. Automatic Cycle Validation ---
   if (automatic_cycle) {
-
     required_bases <- c("mature_dairy_cattle", "mature_beef_cattle", "mature_beef_bull",
                         "mature_sheep_female_dairy", "mature_sheep_female_meat",
                         "mature_goat_female_dairy", "mature_goat_female_meat")
@@ -53,26 +59,28 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     # Cattle
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
+      message("\U0001f403 Calculating populations for CATTLE...")
       results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions)
     }
 
     # Sheep
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
+      message("\U0001f411 Calculating populations for SHEEP...")
       results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters)
     }
 
     # Goat
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
+      message("\U0001f410 Calculating populations for GOAT...")
       results_list$goat <- calculate_population_goat(df_goat, rate_parameters)
     }
 
     if (length(results_list) == 0) return(tibble::tibble())
 
     final_pop_raw <- results_list %>%
-      dplyr::bind_rows() %>%
-      dplyr::mutate(across(any_of(c("region", "subregion", "class_flex")), as.character))
+      dplyr::bind_rows()
   }
 
   # --- 5. Final Assembly ---
@@ -82,7 +90,8 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
       definitions %>% dplyr::select(animal_tag, animal_type, animal_subtype) %>% dplyr::distinct(),
       by = "animal_tag"
     ) %>%
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population)
+    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population) %>%
+    dplyr::filter(population > 0)
 
   if (saveoutput) {
     if (!dir.exists("output")) dir.create("output")

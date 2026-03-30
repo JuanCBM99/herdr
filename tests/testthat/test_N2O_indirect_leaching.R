@@ -1,69 +1,62 @@
 library(testthat)
 library(herdr)
 library(readr)
+library(dplyr)
+library(withr)
 
-# Setup simplificado con todo el ecosistema herdr
-setup_n2o_leaching_final <- function() {
-  if (!dir.exists("user_data")) dir.create("user_data")
+test_that("calculate_N2O_indirect_leaching integrates correctly using CSV data", {
+  # 1. Set test directory to use your existing data
+  withr::local_dir(test_path("test_data"))
 
-  # 1. Definiciones completas (a, b, c como texto para evitar errores de join)
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    animal_type="cattle", animal_subtype="dairy", diet_tag="diet1",
-    milk_yield=5000, fat_content=3.5, cp_excretion_factor=0.16,
-    cfi="c1", ca="a1", work_hours=0,
-    c="steer", a="none", b="none",
-    c_pregnancy="none", pr=0, wool_yield=0
-  ), "user_data/livestock_definitions.csv")
+  # 2. Normalize input CSVs
+  # Essential for joining manure systems, leaching fractions (frac_leach) and EF5
+  files_to_fix <- c(
+    "livestock_definitions.csv", "livestock_weights.csv",
+    "livestock_census.csv", "manure_management.csv",
+    "ipcc_mm.csv", "diet_profiles.csv",
+    "diet_ingredients.csv", "feed_characteristics.csv",
+    "ipcc_coefficients.csv"
+  )
 
-  # 2. Pesos y Censo
-  write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",
-                       average_weight=600, adult_weight=600, weight_gain=0), "user_data/livestock_weights.csv")
-  write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",
-                       population=100, animal_type="cattle", animal_subtype="dairy"), "user_data/livestock_census.csv")
-
-  # 3. Parámetros reproductivos (requeridos por calculate_population)
-  write_csv(data.frame(animal_tag="cow", replacement_rate=0, calving_interval=0,
-                       mortality_rate=0, first_calving_age=0), "user_data/reproduction_parameters.csv")
-
-  # 4. Nutrición (requeridos para el cálculo de N_intake dentro de N2O directo)
-  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
-                       forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
-  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
-                       ingredient_type="forage", ingredient="grass", ingredient_share=100), "user_data/diet_ingredients.csv")
-  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, ed=18), "user_data/feed_characteristics.csv")
-
-  # 5. Estiércol e IPCC (Frac_leach y EF5 son los factores específicos de este test)
-  write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",
-                       animal_type="cattle", animal_subtype="dairy", allocation=1,
-                       system_base="pit", management_months=12, system_climate="cold",
-                       system_subclimate="none", system_variant="none", climate_zone="none",
-                       climate_moisture="none"), "user_data/manure_management.csv")
-
-  write_csv(data.frame(system_base="pit", management_months=12, system_climate="cold",
-                       system_subclimate="none", system_variant="none", climate_zone="none",
-                       climate_moisture="none", animal_type="cattle", animal_subtype="dairy",
-                       EF3=0.01, frac_leach=0.3, EF5=0.0075), "user_data/ipcc_mm.csv")
-
-  # 6. Coeficientes
-  write_csv(data.frame(coefficient="cfi", description=c("c1", "steer", "none"), value=c(0.335, 1, 0)), "user_data/ipcc_coefficients.csv")
-}
-
-test_that("calculate_N2O_indirect_leaching integrates correctly with N balance", {
-  setup_n2o_leaching_final()
-
-  # Ejecución
-  results <- calculate_N2O_indirect_leaching(saveoutput = FALSE)
-
-  # Verificaciones
-  expect_s3_class(results, "data.frame")
-  expect_true("n2o_l" %in% colnames(results))
-
-  # Comprobar que el cálculo de lixiviación no sea cero si hay excreción
-  if(nrow(results) > 0) {
-    expect_true(all(results$n_leaching_kg_year >= 0))
+  for (f in files_to_fix) {
+    path <- file.path("user_data", f)
+    if (file.exists(path)) {
+      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+        mutate(across(everything(), trimws)) %>%
+        write_csv(path)
+    }
   }
 
-  # Limpieza
-  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  # 3. Execute Indirect Leaching calculation
+  # This triggers: Leaching -> Direct N2O -> Nitrogen Balance -> GE -> Population
+  results <- suppressWarnings(
+    calculate_N2O_indirect_leaching(automatic_cycle = FALSE, saveoutput = FALSE)
+  )
+
+  # 4. Assertions: Structure
+  expect_s3_class(results, "data.frame")
+
+  # Check for core columns as defined in your function
+  required_cols <- c("frac_leach", "EF5", "N_leaching_kg_year", "N2O_leach_kgyear")
+  expect_true(all(required_cols %in% colnames(results)))
+
+  # 5. Assertions: Mathematical Logic
+  if(nrow(results) > 0) {
+    # The leaching fraction (frac_leach) should be correctly joined from ipcc_mm.csv
+    expect_false(any(is.na(results$frac_leach)))
+    expect_false(any(is.na(results$EF5)))
+
+    # Verify the stoichiometry: N2O = EF5 * N_leaching * (44/28)
+    # We test the first row to ensure the conversion factor is applied
+    res1 <- results[1, ]
+    if(res1$N_leaching_kg_year > 0) {
+      expected_n2o <- res1$EF4 * res1$N_volatilization_kg_year * (44 / 28) # Note: Use EF5 for leaching
+      # Stoichiometric check for Leaching specifically:
+      expected_leach_n2o <- res1$EF5 * res1$N_leaching_kg_year * (44 / 28)
+      expect_equal(res1$N2O_leach_kgyear, expected_leach_n2o, tolerance = 0.001)
+    }
+
+    # Ensure results are non-negative
+    expect_true(all(results$N2O_leach_kgyear >= 0))
+  }
 })

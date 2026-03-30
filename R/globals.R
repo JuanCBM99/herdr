@@ -1,57 +1,68 @@
-# Define global variables to satisfy R CMD check
+# Generated to satisfy R CMD check - herdr global variables
 #' @importFrom utils globalVariables
 NULL
 
-utils::globalVariables(c(
-  # --- Identity & Metadata ---
-  ".", ".env", "animal_tag", "region", "subregion", "class_flex", "key",
-  "animal_type", "animal_subtype", "diet_tag", "ingredient", "ingredient_type",
-  "parameter", "description", "coefficient", "value",
+if(getRversion() >= "2.15.1") {
+  utils::globalVariables(c(
+    # --- Identifiers and Metadata ---
+    ".", ".env", "region", "subregion", "animal_tag", "class_flex",
+    "animal_type", "animal_subtype", "diet_tag", "key", "parameter",
+    "description", "coefficient", "value",
 
-  # --- Energy, Physics & Nutrition ---
-  "ge", "de", "ed", "ash", "ndf", "ym", "fat", "nfc", "average_weight",
-  "adult_weight", "weight_gain", "milk_yield", "fat_content", "wool_yield",
-  "work_hours", "NEm", "NEa", "NEg", "NEl", "NE_work", "NE_pregnancy", "NE_wool",
-  "C_val", "A_val", "B_val", "a", "b", "cfi", "cfi_value", "ca", "ca_value",
-  "c_pregnancy", "c_value", "pr", "C_preg_factor", "rem", "reg", "de_safe",
-  "de_percent", "ue_factor", "cp",
+    # --- Energy and Physical Parameters ---
+    "initial_weight_kg", "final_weight_kg", "adult_weight_kg",
+    "productive_period_days", "milk_yield_kg_year", "fat_content_pct",
+    "wool_yield_kg_year", "work_hours", "a", "b", "C_val", "A_val", "B_val",
+    "cfi", "cfi_value", "ca", "ca_value", "c_pregnancy", "c_value", "pr",
+    "C_preg_factor", "REM", "REG", "de_safe", "de_percent",
 
-  # --- Intake (DMI) & Diet Structure ---
-  "dmi_day", "dmi_day_kg", "dmi_bw_pct", "ge_mj_day", "eb_mj_kg", "total_diet",
-  "total_ing", "forage_share", "concentrate_share", "milk_share", "milk_replacer_share",
-  "ingredient_share", "forage_pct", "high_forage", "consumption_kg", "share_weight_factor",
+    # --- Nutrition and Intake (DMI) ---
+    "GE_MJday", "ED_MJkg", "DE_pct", "CP_pct", "NDF_pct", "ASH_pct",
+    "DMI_kgday", "DMI_bw_pct", "forage_share", "concentrate_share",
+    "milk_share", "milk_replacer_share", "total_diet", "total_ing",
+    "ingredient", "ingredient_share", "ingredient_type", "forage_pct",
 
-  # --- Population & Reproduction ---
-  "population", "mature_beef_bull", "mature_beef_cattle", "mature_dairy_cattle",
-  "pop_feedlot_calves_male", "pop_feedlot_calves_female", "pop_beef_calves_male",
-  "pop_beef_calves_female", "beef_calves_male_replacement", "beef_calves_female_replacement",
-  "dairy_calves_female_replacement", "mature_goat_female_dairy", "mature_goat_male_dairy",
-  "mature_goat_female_meat", "mature_goat_male_meat", "pop_kid_goat_female_dairy_replacement",
-  "pop_kid_goat_male_dairy_replacement", "pop_kid_goat_female_meat_replacement",
-  "pop_kid_goat_male_meat_replacement", "mature_sheep_female_dairy", "mature_sheep_male_dairy",
-  "mature_sheep_female_meat", "mature_sheep_male_meat", "total_dairy_births",
-  "total_meat_births", "pop_lamb_female_dairy_replacement", "pop_lamb_male_dairy_replacement",
-  "pop_lamb_female_meat_replacement", "pop_lamb_male_meat_replacement",
-  "pop_lamb_dairy_slaughter", "pop_lamb_meat_slaughter", "dairy_births_half",
-  "pop_dairy_calves_female_repl", "beef_births_half", "pop_beef_calves_male_repl",
-  "pop_beef_calves_female_repl",
+    # --- Population and Herd Dynamics ---
+    "population", "mature_beef_bull", "mature_beef_cattle", "mature_dairy_cattle",
+    "dairy_births_half", "pop_dairy_calves_female_repl", "beef_births_half",
+    "pop_beef_calves_male_repl", "pop_beef_calves_female_repl",
+    "pop_feedlot_calves_male", "pop_feedlot_calves_female", "pop_beef_calves_male",
+    "pop_beef_calves_female", "beef_calves_male_replacement",
+    "beef_calves_female_replacement", "dairy_calves_female_replacement",
+    "mature_goat_female_dairy", "mature_goat_male_dairy", "mature_goat_female_meat",
+    "mature_goat_male_meat", "pop_kid_goat_female_dairy_replacement",
+    "pop_kid_goat_male_dairy_replacement", "pop_kid_goat_female_meat_replacement",
+    "pop_kid_goat_male_meat_replacement", "mature_sheep_female_dairy",
+    "mature_sheep_male_dairy", "mature_sheep_female_meat", "mature_sheep_male_meat",
+    "total_dairy_births", "pop_lamb_female_dairy_replacement",
+    "pop_lamb_male_dairy_replacement", "total_meat_births",
+    "pop_lamb_female_meat_replacement", "pop_lamb_male_meat_replacement",
+    "pop_lamb_dairy_slaughter", "pop_lamb_meat_slaughter",
 
-  # --- Manure Management & Methane ---
-  "system_base", "management_months", "system_climate", "system_subclimate",
-  "system_variant", "climate_zone", "climate_moisture", "allocation", "mcf",
-  "B0", "vs", "ef_ch4_kg_year", "Emissions_CH4_Gg_year", "EF3",
+    # --- Net Energy Components ---
+    "NEm_MJday", "NEa_MJday", "NEg_MJday", "NEl_MJday", "NEwork_MJday",
+    "NEpregnancy_MJday", "NEwool_MJday",
 
-  # --- Nitrous Oxide (Direct & Indirect) ---
-  "EF4", "EF5", "frac_leach", "frac_gas", "n_leaching_kg_year",
-  "n_volatilization_kg_year", "n2o_l", "n2o_g", "N_intake", "N_retention",
-  "N_excreted", "N2O_emissions",
+    # --- Manure and Methane (CH4) ---
+    "system_base", "management_months", "system_climate", "system_subclimate",
+    "system_variant", "climate_zone", "climate_moisture", "allocation",
+    "VS_kgday", "MCF_pct", "B0", "EF_kgheadyear", "EF_kgyear", "Ym_pct",
+    "total_CH4_enteric_Ggyear", "total_CH4_mm_Ggyear",
 
-  # --- Land Use & Crop Data ---
-  "dry_matter_yield", "dm_ingested_derived", "ing_share_num", "yield_num",
-  "land_use_m2_per_unit", "Land_use_Total_m2", "Land_m2",
+    # --- Nitrogen and Nitrous Oxide (N2O) ---
+    "EF3", "EF4", "EF5", "frac_leach", "frac_gas", "N_intake_kgheadday",
+    "N_retention", "N_excreted_kgheadday", "direct_N2O_kgyear",
+    "N_volatilization_kg_year", "N2O_vol_kgyear", "N_leaching_kg_year",
+    "N2O_leach_kgyear",
 
-  # --- Summary & Impact Assessment (CO2eq) ---
-  "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
-  "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_n2o",
-  "CO2eq_Total_Gg", "ef_kg_animal_year", "emissions_total"
-))
+    # --- Land Use and FAO Data ---
+    "Area", "Item", "Year", "Value", "yield_name", "agribalyse_name", "avg",
+    "dm_yield", "ha_per_kg", "economic_allocation", "share_factor",
+    "ha_kg_allocated", "annual_cons_kg", "land_use_m2", "total_land_use_m2",
+
+    # --- Impacts and Summary (CO2eq) ---
+    "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
+    "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
+    "CO2eq_Total_Gg", "Land_m2"
+  ))
+}

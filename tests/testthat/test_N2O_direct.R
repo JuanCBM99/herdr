@@ -1,72 +1,66 @@
 library(testthat)
 library(herdr)
 library(readr)
+library(dplyr)
+library(withr)
 
-setup_all_final_v2 <- function() {
-  if (!dir.exists("user_data")) dir.create("user_data")
+test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen excretion", {
+  # 1. Set test directory
+  withr::local_dir(test_path("test_data"))
 
-  # 1. Definiciones (Columnas de texto para evitar errores de tipo)
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    animal_type="cattle", animal_subtype="dairy", diet_tag="diet1",
-    milk_yield=5000, fat_content=3.5, cp_excretion_factor=0.16,
-    cfi="c1", ca="a1", work_hours=0,
-    c="steer", a="none", b="none",
-    c_pregnancy="none", pr=0, wool_yield=0
-  ), "user_data/livestock_definitions.csv")
+  # 2. Normalize and prepare input CSVs
+  # N2O calculation requires almost all master files to be consistent
+  files_to_fix <- c(
+    "livestock_definitions.csv", "livestock_weights.csv",
+    "livestock_census.csv", "manure_management.csv",
+    "ipcc_mm.csv", "diet_profiles.csv",
+    "diet_ingredients.csv", "feed_characteristics.csv",
+    "ipcc_coefficients.csv"
+  )
 
-  # 2. Pesos y Censo
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    average_weight=600, adult_weight=600, weight_gain=0
-  ), "user_data/livestock_weights.csv")
+  for (f in files_to_fix) {
+    path <- file.path("user_data", f)
+    if (file.exists(path)) {
+      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+        mutate(across(everything(), trimws)) %>%
+        write_csv(path)
+    }
+  }
 
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    population=100, animal_type="cattle", animal_subtype="dairy"
-  ), "user_data/livestock_census.csv")
+  # 3. Execute N2O Direct Manure calculation
+  # We use suppressWarnings to skip nutritional alerts during the GE/CP sub-calls
+  results <- suppressWarnings(
+    calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = FALSE)
+  )
 
-  # 3. Parámetros reproductivos (EL QUE FALTABA)
-  write_csv(data.frame(
-    animal_tag="cow", replacement_rate=0, calving_interval=0,
-    mortality_rate=0, first_calving_age=0
-  ), "user_data/reproduction_parameters.csv")
-
-  # 4. Nutrición y Dietas
-  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
-                       forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0), "user_data/diet_profiles.csv")
-  write_csv(data.frame(region="test", subregion="test", class_flex="none", diet_tag="diet1",
-                       ingredient_type="forage", ingredient="grass", ingredient_share=100), "user_data/diet_ingredients.csv")
-  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=12, ndf=40, ash=5, ed=18), "user_data/feed_characteristics.csv")
-
-  # 5. Estiércol e IPCC
-  write_csv(data.frame(region="test", subregion="test", animal_tag="cow", class_flex="none",
-                       animal_type="cattle", animal_subtype="dairy", allocation=1,
-                       system_base="pit", management_months=12, system_climate="cold",
-                       system_subclimate="none", system_variant="none", climate_zone="none",
-                       climate_moisture="none"), "user_data/manure_management.csv")
-
-  write_csv(data.frame(system_base="pit", management_months=12, system_climate="cold",
-                       system_subclimate="none", system_variant="none", climate_zone="none",
-                       climate_moisture="none", animal_type="cattle", animal_subtype="dairy",
-                       EF3=0.01, mcf=0.1, frac_leach=0.1, EF5=0.01), "user_data/ipcc_mm.csv")
-
-  write_csv(data.frame(
-    coefficient="cfi",
-    description=c("c1", "steer", "none"),
-    value=c(0.335, 1.0, 0)
-  ), "user_data/ipcc_coefficients.csv")
-}
-
-test_that("calculate_N2O_direct_manure passes final integration", {
-  setup_all_final_v2()
-
-  # Ejecución
-  results <- calculate_N2O_direct_manure(saveoutput = FALSE)
-
+  # 4. Assertions: Structure
   expect_s3_class(results, "data.frame")
-  expect_true("N2O_emissions" %in% colnames(results))
 
-  # Limpieza
-  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  # Check for mandatory IPCC columns for Nitrogen reporting
+  required_cols <- c("N_intake_kgheadday", "N_retention", "N_excreted_kgheadday",
+                     "EF3", "direct_N2O_kgyear")
+  expect_true(all(required_cols %in% colnames(results)))
+
+  # 5. Assertions: Biological & Mathematical Logic
+  if(nrow(results) > 0) {
+    # N_intake must be positive if animal eats (GE > 0 and CP > 0)
+    expect_true(all(results$N_intake_kgheadday >= 0))
+
+    # N_retention logic check:
+    # For sheep/goats it should be a fixed 0.1 according to your function
+    small_ruminants <- results %>% filter(tolower(animal_type) %in% c("sheep", "goat"))
+    if(nrow(small_ruminants) > 0) {
+      expect_equal(unique(small_ruminants$N_retention), 0.1)
+    }
+
+    # Total N2O must be numeric and not NA
+    expect_false(any(is.na(results$direct_N2O_kgyear)))
+
+    # Unit check: direct_N2O_kgyear includes the molecular weight conversion (44/28)
+    # If N_excreted and EF3 are > 0, emissions must be > 0
+    sample_active <- results %>% filter(N_excreted_kgheadday > 0 & EF3 > 0) %>% head(1)
+    if(nrow(sample_active) > 0) {
+      expect_gt(sample_active$direct_N2O_kgyear, 0)
+    }
+  }
 })

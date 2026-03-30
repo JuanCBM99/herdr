@@ -2,77 +2,59 @@ library(testthat)
 library(herdr)
 library(readr)
 library(dplyr)
+library(withr)
 
-setup_land_use_final <- function() {
-  if (!dir.exists("user_data")) dir.create("user_data")
+test_that("calculate_land_use computes m2 requirements correctly using CSV data", {
+  # 1. Set test directory
+  withr::local_dir(test_path("test_data"))
 
-  # 1. El Super-Archivo de Definiciones (Evita el error de 'wool_yield' y otros)
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    animal_type="cattle", animal_subtype="dairy", diet_tag="diet1",
-    milk_yield=5000, fat_content=3.5,
-    wool_yield=0,           # <--- La columna que faltaba
-    cp_excretion_factor=0.16,
-    cfi="c1", ca="a1", work_hours=0,
-    c="steer", a="none", b="none",
-    c_pregnancy="none", pr=0
-  ), "user_data/livestock_definitions.csv")
+  # 2. Normalize and prepare input CSVs
+  # Land use depends on yields, mapping, and the entire nutrition chain
+  files_to_fix <- c(
+    "fao_crop_yields.csv", "forage_yields.csv", "mapping.csv",
+    "diet_profiles.csv", "diet_ingredients.csv", "feed_characteristics.csv",
+    "livestock_definitions.csv", "livestock_weights.csv",
+    "livestock_census.csv", "ipcc_coefficients.csv", "reproduction_parameters.csv"
+  )
 
-  # 2. Pesos y Censo (Necesarios para GE y Población)
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    average_weight=600, adult_weight=600, weight_gain=0
-  ), "user_data/livestock_weights.csv")
-
-  write_csv(data.frame(
-    region="test", subregion="test", animal_tag="cow", class_flex="none",
-    population=100, animal_type="cattle", animal_subtype="dairy"
-  ), "user_data/livestock_census.csv")
-
-  write_csv(data.frame(
-    animal_tag="cow", replacement_rate=0, calving_interval=0,
-    mortality_rate=0, first_calving_age=0
-  ), "user_data/reproduction_parameters.csv")
-
-  # 3. Dieta y Cultivos (Necesarios para Land Use)
-  write_csv(data.frame(
-    region="test", subregion="test", class_flex="none", diet_tag="diet1",
-    forage_share=100, concentrate_share=0, milk_share=0, milk_replacer_share=0
-  ), "user_data/diet_profiles.csv")
-
-  write_csv(data.frame(
-    region="test", subregion="test", class_flex="none", diet_tag="diet1",
-    ingredient_type="forage", ingredient="alfalfa", ingredient_share=100
-  ), "user_data/diet_ingredients.csv")
-
-  write_csv(data.frame(
-    ingredient="alfalfa", dry_matter_yield=12000
-  ), "user_data/crop_yields.csv")
-
-  # 4. Características y Coeficientes
-  write_csv(data.frame(
-    ingredient="alfalfa", ingredient_type="forage",
-    de=60, cp=18, ndf=40, ash=8, ed=18.4
-  ), "user_data/feed_characteristics.csv")
-
-  write_csv(data.frame(
-    coefficient="cfi", description=c("c1", "steer", "none"), value=c(0.335, 1, 0)
-  ), "user_data/ipcc_coefficients.csv")
-}
-
-test_that("calculate_land_use computes m2 based on metabolic demand", {
-  setup_land_use_final()
-
-  # Ejecución: Ahora la cadena NE_wool -> GE -> Land Use tiene todas sus columnas
-  results <- calculate_land_use(saveoutput = FALSE)
-
-  expect_s3_class(results, "data.frame")
-  expect_true("Land_use_per_animal" %in% colnames(results))
-
-  if(nrow(results) > 0) {
-    expect_gt(results$Land_use_per_animal[1], 0)
+  for (f in files_to_fix) {
+    path <- file.path("user_data", f)
+    if (file.exists(path)) {
+      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+        mutate(across(everything(), trimws)) %>%
+        write_csv(path)
+    }
   }
 
-  # Limpieza
-  if (dir.exists("user_data")) unlink("user_data", recursive = TRUE)
+  # 3. Execute land use calculation
+  # We specify the country that exists in your fao_crop_yields.csv (e.g., "Spain")
+  results <- suppressWarnings(
+    calculate_land_use(crop_yield_country = "Spain", saveoutput = FALSE)
+  )
+
+  # 4. Assertions: Structure
+  expect_s3_class(results, "data.frame")
+  expect_true("land_use_per_animal_m2" %in% colnames(results))
+  expect_true("total_land_use_m2" %in% colnames(results))
+
+  # 5. Assertions: Biological and Mathematical Logic
+  if(nrow(results) > 0) {
+    # Land use must be positive (it's physically impossible to occupy negative space)
+    expect_true(all(results$land_use_per_animal_m2 >= 0))
+
+    # Check that total land use is consistent with population
+    # Total = per_animal * population
+    sample <- results[1, ]
+    if(sample$population > 0) {
+      calc_total <- sample$land_use_per_animal_m2 * sample$population
+      expect_equal(sample$total_land_use_m2, calc_total, tolerance = 0.01)
+    }
+  }
+
+  # 6. Assertion: Error Handling
+  # The function should stop if the country is not in the FAO database
+  expect_error(
+    calculate_land_use(crop_yield_country = "Mars", saveoutput = FALSE),
+    "must be a valid area"
+  )
 })

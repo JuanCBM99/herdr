@@ -1,62 +1,47 @@
 library(testthat)
 library(herdr)
 library(readr)
+library(dplyr)
+library(withr)
 
-# --- Helper: Setup environment relative to test directory ---
-setup_nutritional_test_env <- function(type = "integrity") {
-  # El test se ejecuta en tests/testthat, creamos user_data ahí
-  target_dir <- "user_data"
+test_that("calculate_weighted_variable handles integrity errors and biological warnings", {
+  # Set test directory
+  withr::local_dir(test_path("test_data"))
 
-  if (!dir.exists(target_dir)) dir.create(target_dir, recursive = TRUE)
+  # Fix column types to avoid logical vs character errors
+  read_csv("user_data/diet_profiles.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/diet_profiles.csv")
+  read_csv("user_data/diet_ingredients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/diet_ingredients.csv")
+  read_csv("user_data/feed_characteristics.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/feed_characteristics.csv")
+  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/livestock_definitions.csv")
 
-  # Archivos CSV
-  if (type == "integrity") {
-    write_csv(data.frame(
-      region="test", subregion="test", class_flex="grazing", diet_tag="bad_diet",
-      forage_share=50, concentrate_share=10, milk_share=0, milk_replacer_share=0
-    ), file.path(target_dir, "diet_profiles.csv"))
-  } else {
-    write_csv(data.frame(
-      region="test", subregion="test", class_flex="grazing", diet_tag="bad_bio",
-      forage_share=10, concentrate_share=90, milk_share=0, milk_replacer_share=0
-    ), file.path(target_dir, "diet_profiles.csv"))
-  }
+  # Load base data for manipulation
+  diet_path <- "user_data/diet_profiles.csv"
+  original_diets <- read_csv(diet_path, show_col_types = FALSE)
 
-  write_csv(data.frame(diet_tag=c("bad_diet", "bad_bio"), region="test", subregion="test",
-                       class_flex="grazing", ingredient="grass", ingredient_type="forage",
-                       ingredient_share=100), file.path(target_dir, "diet_ingredients.csv"))
-
-  write_csv(data.frame(ingredient="grass", ingredient_type="forage", de=60, cp=5,
-                       ndf=40, ash=15, ed=18),
-            file.path(target_dir, "feed_characteristics.csv"))
-
-  write_csv(data.frame(region="test", subregion="test", animal_tag="mature_cow",
-                       class_flex="grazing", animal_type="Cattle", animal_subtype="dairy",
-                       diet_tag=c("bad_diet", "bad_bio")),
-            file.path(target_dir, "livestock_definitions.csv"))
-}
-
-# --- TESTS ---
-
-test_that("Data integrity assertions catch non-100% shares (ERROR)", {
-  setup_nutritional_test_env(type = "integrity")
-
-  # Nos aseguramos de borrar todo al terminar este bloque
-  on.exit(unlink("user_data", recursive = TRUE, force = TRUE))
+  # Block: Test Integrity Error (Shares < 100%)
+  bad_integrity <- original_diets[1, ] %>%
+    mutate(forage_share = 50, concentrate_share = 10, milk_share = 0, milk_replacer_share = 0)
+  write_csv(bad_integrity, diet_path)
 
   expect_error(
     calculate_weighted_variable(saveoutput = FALSE),
     "Diet Profile Error"
   )
-})
 
-test_that("Nutritional alerts trigger warnings for mature animals (WARNING)", {
-  setup_nutritional_test_env(type = "biological")
-
-  on.exit(unlink("user_data", recursive = TRUE, force = TRUE))
+  # Block: Test Biological Warning (High concentrate)
+  bad_biology <- original_diets[1, ] %>%
+    mutate(forage_share = 10, concentrate_share = 90, milk_share = 0, milk_replacer_share = 0)
+  write_csv(bad_biology, diet_path)
 
   expect_warning(
+   expect_warning(
     calculate_weighted_variable(saveoutput = FALSE),
-    "Warning \\(Forage\\)|Warning \\(Protein\\)"
+    "Warning \\(Forage\\)"
+  ),
+  "Warning \\(Protein\\)"
   )
 })

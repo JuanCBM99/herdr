@@ -18,7 +18,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # Validation for country selection
   if (missing(crop_yield_country) || !crop_yield_country %in% unique(fao_raw$Area)) {
-    stop("❌ 'crop_yield_country' must be a valid area in the dataset.")
+    stop("U+274C 'crop_yield_country' must be a valid area in the dataset.")
   }
 
   # --- 2. Yield Processing ---
