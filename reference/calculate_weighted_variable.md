@@ -1,7 +1,7 @@
 # Calculate Weighted Nutritional Variables
 
-Computes weighted averages of nutritional variables (DE, CP, NDF, Ash,
-ed, Fat, NFC) by mapping ingredients to diets and diets to animals.
+Computes weighted averages of nutritional variables (DE, CP, NDF, ASH,
+ED, Fat, NFC) by mapping ingredients to diets and diets to animals.
 
 ## Usage
 

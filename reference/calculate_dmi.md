@@ -1,13 +1,12 @@
 # Calculate Dry Matter Intake (DMI)
 
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand
-(GE/ed). Includes physiological normality filters differentiated by
-species.
+(GE/ED).
 
 ## Usage
 
 ``` r
-calculate_dmi(saveoutput = TRUE)
+calculate_DMI(saveoutput = TRUE)
 ```
 
 ## Arguments

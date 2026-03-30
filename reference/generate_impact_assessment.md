@@ -12,6 +12,7 @@ generate_impact_assessment(
   animal = NULL,
   type = NULL,
   class_flex = NULL,
+  crop_yield_country,
   saveoutput = TRUE,
   group_by_identification = TRUE
 )
@@ -43,6 +44,10 @@ generate_impact_assessment(
 - class_flex:
 
   Management class (e.g., 'grazing', 'stall').
+
+- crop_yield_country:
+
+  Character. FAO Area to use for crop yields.
 
 - saveoutput:
 

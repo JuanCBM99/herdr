@@ -24,7 +24,7 @@
   : Calculate Net Energy for Lactation (NEl)
 - [`calculate_NEm()`](https://juancbm99.github.io/herdr/reference/calculate_NEm.md)
   : Calculate Net Energy for Maintenance (NEm)
-- [`calculate_dmi()`](https://juancbm99.github.io/herdr/reference/calculate_dmi.md)
+- [`calculate_DMI()`](https://juancbm99.github.io/herdr/reference/calculate_dmi.md)
   : Calculate Dry Matter Intake (DMI)
 - [`calculate_emissions_enteric()`](https://juancbm99.github.io/herdr/reference/calculate_emissions_enteric.md)
   : Calculate methane emissions from enteric fermentation

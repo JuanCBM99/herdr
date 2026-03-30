@@ -13,7 +13,8 @@ calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 
 - automatic_cycle:
 
-  Logical. If TRUE, uses species-specific birth models.
+  Logical. If TRUE, uses the built-in model for automatic farm cycle
+  calculation. Default is FALSE.
 
 - saveoutput:
 
