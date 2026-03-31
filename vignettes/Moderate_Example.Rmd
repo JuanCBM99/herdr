@@ -16,7 +16,7 @@ This guide will walk you through a **Moderate Assessment** for **Mature Dairy Ca
 ### 📂 Folder Structure
 * **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `livestock_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
 * **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
-* **Reference Files (Expert use only):** `feed_characteristics.csv`, `crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+* **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
 
 ---
 

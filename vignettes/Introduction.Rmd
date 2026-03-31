@@ -18,27 +18,43 @@ Currently supported animals:
 
 ---
 
-## What the Package Calculates
+# ⬇️ Installation & Loading 
+
+Install the package directly from GitHub using **remotes**:
+
+```r
+# Install 'remotes' if necessary
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+
+# Install the herdr package with vignettes
+remotes::install_github("JuanCBM99/herdr", build_vignettes = TRUE)
+```
+
+---
+
+# *What the Package Calculates*
 
 The package offers specific functions to model the primary sources of environmental impact from livestock based on a detailed **Energy Balance** model. It accounts for energy requirements for maintenance, growth, lactation, pregnancy, work, and wool production.
 
-### Methane (CH$_4$) Emissions
+## Methane (CH$_4$) Emissions
 * **Enteric fermentation:** Emissions produced during the digestive process based on Gross Energy intake and diet digestibility.
 * **Manure management:** Emissions derived from Volatile Solids ($VS$) decay, adjusting for the specific conditions (MCF) of diverse management systems (e.g., liquid lagoons, solid storage, pasture, composting).
 
-### Nitrous Oxide (N$_2$O) Emissions
+## Nitrous Oxide (N$_2$O) Emissions
 * **Direct:** Emissions from manure storage/treatment systems.
 * **Indirect:** Emissions via nitrogen volatilization ($NH_3$, $NO_x$) and leaching into water systems.
 
-### Land Use
-* Calculates the **land area** ($m^2$) required to produce the feed, linking animal intake directly to crop yields.
+## Land Use
+* Calculates the **land area** ($m^2$) required to produce the feed based on economic allocation, linking animal intake directly to crop yields. Work in progress, check [Land use](land_use.html) for more info.
 
-### Multi-Scenario Analysis
+## Multi-Scenario Analysis
 * `herdr` allows you to model different farms, regions, or management strategies within the same project. You can compare how emissions change between a farm in the mountains and one in the valley, or between two different countries, all in a single run.
 
 ---
 
-## 🎯 Calculation Methodology (IPCC 2019)
+# 🎯 Calculation Methodology (IPCC 2019)
 
 All emission calculations within `herdr` adhere to the Tier 2 methods established by the Intergovernmental Panel on Climate Change (IPCC).
 
@@ -48,7 +64,7 @@ Specifically, we use the guidelines from the 2019 Refinement to the 2006 IPCC Gu
 
 ---
 
-## 🥕 The Role of Diet & Validation
+# 🥕 The Role of Diet & Validation
 
 Diet composition is the primary driver of the results. The functions use nutritional data (Energy, Protein, NDF) to determine key parameters like the Methane Conversion Factor ($Y_m$) and Nitrogen Excretion ($N_{ex}$).
 
@@ -56,16 +72,3 @@ Diet composition is the primary driver of the results. The functions use nutriti
 Before calculating, `herdr` automatically checks the consistency of input data, ensuring that biologically impossible values are flagged or prevented.
 
 ---
-
-## ⬇️ Installation & Loading 
-
-Install the package directly from GitHub using **remotes**:
-
-```r
-# Install 'remotes' if necessary
-if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-}
-# Install the herdr package
-remotes::install_github("JuanCBM99/Animal_GEI_LU")
-```

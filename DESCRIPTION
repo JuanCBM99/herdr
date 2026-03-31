@@ -1,9 +1,25 @@
 Package: herdr
 Title: herdr
-Version: 0.1.0
-Authors@R: c(person("Juan Carlos", "Baez", email = "juancarlos.baez@bc3research.org", role = c("aut", "cre"),
-		   comment = c(ORCID ="0000-0002-7067-265X")))
-Description: Description: Provides a comprehensive set of tools for calculating livestock 
+Version: 1.0.0
+Authors@R: c(
+    person("Juan Carlos", "Baez", 
+           email = "juancarlos.baez@bc3research.org", 
+           role = c("aut", "cre"), 
+           comment = c(ORCID = "0000-0002-7067-265X")),
+    person("Jon", "Sampedro", 
+           email = "jon.sampedro@bc3research.org", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0002-2277-1530")),
+    person("Guillermo", "Pardo", 
+           email = "guillermo.pardo@bc3research.org", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0002-7961-8457")),
+    person("Agustín", "del Prado", 
+           email = "agustin.delprado@bc3research.org", 
+           role = "aut", 
+           comment = c(ORCID = "0000-0003-3895-4478"))
+  )
+Description: Provides a comprehensive set of tools for calculating livestock 
     greenhouse gas emissions based on Spanish national standards. The package 
     includes functions to process animal census data for cattle, sheep, and 
     goats, integrating specific emission factors and rate parameters. It 

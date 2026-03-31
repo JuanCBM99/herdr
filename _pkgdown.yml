@@ -1,6 +1,6 @@
 url: https://juancbm99.github.io/herdr/
 
-title: "herdr: GHG & LU Calculator 🌎📊"
+title: "herdr"
 
 
 template:
@@ -13,42 +13,41 @@ navbar:
   left:
     - icon: fa-home
       href: index.html
-      aria-label: Home
-    - text: "Summary"
+    - text: "Introduction"
       icon: fas fa-book-open
       href: articles/Introduction.html
+    - text: "Workflow: Step-by-Step"
+      icon: fas fa-route
+      href: articles/Workflow.html
     - text: "Guides"
       icon: fas fa-map-signs
       menu:
-        - text: "Workflow Guide: Step-by-Step"
-          href: articles/Workflow.html
-        - text: "Technical Reference: Files & Parameters"
+        - text: "Technical File Reference"
           href: articles/Technical_reference.html
         - text: "Manure System Guide"
           href: articles/Manure.html
-        - text: "Theoretical Basis: IPCC Tier 2 Methodology"
-          href: articles/Theoretical_basis.html
-    - icon: fa-tools
-      text: "Practical Cases"
+        - text: "Land use Guide & Disclaimers"
+          href: articles/Land_use.html
+    - text: "Cases"
+      icon: fa-tools
       menu:
-        - text: "Dairy Cattle Spain"
+        - text: "1. Dairy Cattle (Basic)"
           href: articles/Easy_Example.html
-        - text: "Dairy Cattle Spain: North/South"
+        - text: "2. Regional Differences (Moderate)"
           href: articles/Moderate_Example.html
-        - text: "Dairy Cattle Spain: North/South in different Life Satages"
+        - text: "3. Life Stages (Advanced)"
           href: articles/Difficult_Example.html
+    - text: "Theoretical: IPCC Tier 2"
+      icon: fas fa-scroll
+      href: articles/Theoretical_basis.html
 
+  right:
     - icon: fa-file-code-o
-      text: "Reference"
       href: reference/index.html
     - icon: fa-download
-      text: "Download"
       href: https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip
-      aria-label: Download ZIP
     - icon: fa-github
-      text: "GitHub"
       href: https://github.com/JuanCBM99/herdr
-      aria-label: GitHub Repository
 
 # Table of contents
 toc:

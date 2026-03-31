@@ -25,7 +25,7 @@ This guide will walk you through a **Basic Assessment** for **Mature Dairy Cattl
 ### 📂 Folder Structure
 * **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `livestock_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
 * **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
-* **Reference Files (Expert use only):** `feed_characteristics.csv`, `crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+* **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
 
 ---
 
@@ -42,7 +42,7 @@ Open `livestock_census.csv`. This is where you define who is on the farm. For th
 The diet must be fulfilled manually based on nutritional reports (e.g., Informe Zootécnico 2015).
 
 ### A. Check Ingredients
-Open `feed_characteristics.csv` and `crop_yields.csv` to see the list of available feed items. If you wish, you can add as many new ingredients as you want, always fulfilling all columns.
+Open `feed_characteristics.csv` to see the list of available feed items. If you wish, you can add as many new ingredients as you want, always fulfilling all columns.
 
 ### B. Define the Profile (`diet.csv`)
 | diet_tag | region | forage | concentrate | milk | milk_replacer |
