@@ -1,0 +1,368 @@
+﻿ingredient,yield_name,agribalyse_name,allocation
+broken_rice,Rice,,1
+oats,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
+oats_decorticated,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
+barley_2_rows_national_11_3_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+barley_2_rows_national_9_6_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+rye_national,Rye,,1
+rye_german,Rye,,1
+corn_national,Maize (corn),"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
+high_oil_corn_grain,Mixed grain,"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
+white_sorghum_grain,Sorghum,"Sorghum grain, conventional, national average, animal feed, at farm gate {FR} U",1
+wheat_soft_national_12_9_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_national_11_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_national_10_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_english,Wheat,"Soft wheat grain, conventional, Great Britain, animal feed, at french port {FR} U",1
+wheat_hard_national,Wheat,,1
+triticale,Triticale,"Triticale grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+rice_cooked,Rice,,1
+corn_heat_processed_national,Wheat,,1
+white_sorghum_heat_processed,Wheat,,1
+rice_bran_14_ee,Rice,As wheat bran,0.0822
+rice_bran_high_fat_17_ee,Rice,As wheat bran,0.0822
+rice_bran_defatted,Rice,As wheat bran,0.0822
+barley_ddgs,Barley,As wheat ddgs,1
+corn_ddgs_7_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+corn_ddgs_12_5_ee_3_5_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+corn_ddgs_12_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
+sorghum_ddgs,Sorghum,As wheat ddgs,1
+wheat_ddgs,Wheat,"DDGS, dehydrated, from wheat distillation, animal feed, at plant {FR} U",1
+brewers_grains,Grapes,,0
+corn_flour_6_ee,Maize (corn),As corn/maize,1
+corn_gluten_feed_19_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
+corn_gluten_feed_20_5_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
+corn_gluten_meal_60,Maize (corn),"Corn gluten meal (gluten 60), national average, animal feed, at plant {FR} U",0.0832
+wheat_bran_15_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {FR} U",0.0822
+wheat_bran_20_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {FR} U",0.0822
+wheat_middlings_25_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
+wheat_middlings_30_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
+bakery_byproduct_2_5_ash,Wheat,As wheat,1
+bakery_byproduct_6_ash,Wheat,As wheat,1
+bread_byproduct,Wheat,As wheat,1
+malt_rootlets_barley_sprouts,Barley,,0
+whole_acorn,,,1
+acorn_decorticated,,,1
+tapioca_62_5,,,1
+tapioca_65,,,1
+tapioca_70,,,1
+molasses_sugarcane,Sugar cane,As beet molasses,0.066
+molasses_beet,Sugar beet,"Molasses, from sugar beet, animal feed, at plant {FR} U",0.066
+vinasses_beet,Sugar beet,"Vinasse, from sugar beet molasses, animal feed, at plant {FR} U",0.1476
+potato_dehydrated,Potatoes,,1
+sweet_potato_dehydrated,Sweet potatoes,,1
+cotton_seed_whole,"Seed cotton, unginned","Manually assigned (USA, FAO 2023 data)",0.2736
+cotton_seed_meal_38_cp,"Seed cotton, unginned",As sunflower meal without dehulling,0.189
+lupin_australian,Lupins,"Lupin, conventional, national average, at farm gate, production {FR} U",1
+peanut_meal_48_cp,"Groundnuts, excluding shelled",As sunflower meal without dehulling,0.189
+peanut_meal_52_cp,"Groundnuts, excluding shelled",As sunflower meal low dehulling,0.185
+camelina_meal_national,,As sunflower meal without dehulling,0.189
+camelina_meal_expeller,,As sunflower meal expeller with low dehulling,0.185
+rapeseed_meal_00,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_33_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_36_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_expeller_7_3_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+rapeseed_meal_00_expeller_12_7_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
+coprah_meal,,As sunflower meal without dehulling,0.189
+coprah_expeller,,As sunflower meal expeller with low dehulling,0.185
+sunflower_seed,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
+sunflower_seed_high_oileic,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
+sunflower_meal_28_cp,Sunflower seed,"Sunflower meal without dehulling, conventional, animal feed, at transformation plant {FR} U",0.189
+sunflower_meal_32_cp,Sunflower seed,"Sunflower meal, with low dehulling, animal feed, at transformation plant {FR} U",0.185
+sunflower_meal_36_cp,Sunflower seed,"Sunflower meal, with high dehulling, animal feed, at transformation plant {FR} U",0.225
+sunflower_meal_expeller_31_cp,Sunflower seed,"Sunflower meal, with low dehulling, animal feed, at transformation plant {FR} U",0.185
+sunflower_meal_expeller_34_cp,Sunflower seed,"Sunflower meal, with high dehulling, animal feed, at transformation plant {FR} U",0.225
+field_pea_spring,String beans,"Spring pea, conventional, 15% moisture, animal feed, at farm gate, production {FR} U",1
+field_pea_heat_processed,Wheat,,1
+horse_bean_white_flower_variety,"Broad beans and horse beans, dry",,1
+horse_bean_white_flower_variety_dehulled,"Broad beans and horse beans, dry",,1
+lentils,"Lentils, dry",,1
+linseed,Linseed,,1
+linseed_meal_expeller,Linseed,As sunflower meal expeller with low dehulling,0.185
+linseed_meal,Linseed,As sunflower meal without dehulling,0.189
+palm_kernel_expeller,,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
+palm_kernel_expeller_2,,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
+roasted_soybeans,Soya beans,"Soybean toasted BR, animal feed, at french transformation plant {FR} U",1
+extruded_soybeans,Soya beans,"Soybean extruded, animal feed, at french transformation plant {FR} U",1
+soybean_meal_44_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_45_5_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_47_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_48_5_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+soybean_meal_micronized_51_cp,Soya beans,"Soybean meal BR, crushing in France, animal feed, at french mill, average {FR} U",0.6146
+common_vetch,Vetches,,1
+ervil_bitter_vetch,Vetches,,1
+soybean_protein_concentrates_extraction,Soya beans,,1
+soybean_protein_concentrates_fermentation,Soya beans,,1
+soybean_protein_isolates,Soya beans,,1
+peas_protein_concentrate,Oil palm fruit,,1
+peas_protein_isolate,Oil palm fruit,,1
+potato_protein_isolate,Potatoes,"Protein, Potato, at feed plant {FR} U",0.0097
+wheat_protein_hydrolyzed,,,
+rice_protein_concentrate,Rice,,
+brewery_yeast,Barley,,0
+alfalfa_hay_dehydrated,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_meal_17_5_cp,Alfalfa for forage and silage,,1
+alfalfa_meal_15_cp,Alfalfa for forage and silage,,1
+forage_meal_mix_12_5_cp,Alfalfa for forage and silage,,1
+cottonseed_hulls,"Seed cotton, unginned",As sunflower hulls,0.03
+rise_hulls,Rice,As sunflower hulls,0.03
+oat_hulls,Oats,As sunflower hulls,0.03
+sunflower_hulls,Sunflower seed,,0.03
+horse_bean_hulls_low_in_tannins,"Broad beans and horse beans, dry",As sunflower hulls,0.03
+soybean_hulls_10_cp,Soya beans,As sunflower hulls,0.03
+soybean_hulls_12_cp,Soya beans,As sunflower hulls,0.03
+carob_bean,Locust beans (carobs),,0
+olive_leaves,Olives,,0
+olive_pulp,Olives,,0
+olive_pulp_partially_defatted,Olives,,0
+extracted_olive_pulp,Olives,,0
+grape_seed,Grapes,,0
+grape_seed_meal,Grapes,,0
+grape_marc,Grapes,,0
+straw_cereals_wheat_and_barley,,,0
+straw_naoh_treated,,,0
+straw_lentils,"Lentils, dry",,0
+citrus_pulp_orange_tangerine,Oranges,,0
+apple_pulp,Apples,,0
+beet_pulp_4_ash,Sugar beet,"Sugar beet pulp dehydrated, animal feed, at plant {FR} U",0.203
+beet_pulp_7_5_ash,Sugar beet,"Sugar beet pulp pressed, from sugar beet, animal feed, at plant {FR} U",0.203
+meat_meal_44_15_28,,,1
+meat_meal_50_14_26,,,1
+meat_meal_52_14_25,,,1
+meat_meal_57_13_24,,,1
+poultry_byproduct,,,1
+poultry_meat_meal,,,1
+fish_meal_national_59_9_21,,,1
+fish_meal_national_62_9_18,,,1
+fish_meal_67_10_15,,,1
+fish_meal_70_9_13,,,1
+feather_meal_hydrolyzed,,,0
+blood_meal_spray,,,0
+hemoglobine,,,0
+animal_plasma_70_cp,,,0
+animal_plasma_78_cp,,,0
+egg_meal,,,0
+mucose_hydrolyzed_52_cp,,,0
+mucose_hydrolyzed_62_cp,,,0
+mucose_hydrolyzed_70_cp,,,0
+casein,,,1
+skimmed_milk,,,1
+skimmed_milk_denatured,,,1
+wheypowder_acid,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_sweet_sheep,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_sweet_cattle,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_50_fat,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+wheypowder_partially_lactose_free_22_39_22,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+tallow,,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+wheypowder_partially_lactose_free_20_fat,,"Whey powder, animal feed, at retailer gate {FR} U",0.0282
+whey_permeate,,"Whey, at plant {FR} U",0.0282
+butterfat,,,1
+tallow,,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+lard,,"Lard, from pig, animal feed, at retailer gate {FR} U",1
+animal_fat_3_5,,As tallow,1
+animal_fat_5_9,,As tallow,1
+animal_fat_9_12,,As tallow,1
+poultry_fat,,As tallow,1
+chilean_fish_oil,,,1
+nordic_fish_oil,,"Fish oil, with wastewater treatment, from Norway, at feed plant S {FR} U",1
+national_fish_oil,,,1
+fish_acid_oil_oleins,,,1
+cotton_oil,"Seed cotton, unginned",,1
+corn_oil,Maize (corn),"Corn oil, national average, animal feed, at plant {FR} U",0.0715
+soybean_oil,Soya beans,"Soybean oil BR, crushing in France, animal feed, at french mill, average {FR} U",0.3854
+rapeseed_oil,Rape or colza seed,,1
+sunflower_oil,Sunflower seed,"Sunflower oil without dehulling, crude, conventional, animal feed, at transformation plant {FR} U",0.811
+high_oleic_sunflower_oil,Sunflower seed,As sunflower oil,0.811
+olive_oil,Olives,,
+palm_oil,Oil palm fruit,"Crude palm oil MY, animal feed, at french port, average {FR} U",0.9328
+coconut_oil,"Coconuts, in shell","Crude coconut oil, from Philippines, at feed plant {FR} U",1
+palm_stearin,Oil palm fruit,,1
+palm_kernel_oil,Oil palm fruit,As crude palm oil MY,0.9328
+linseed_oil,Linseed,,1
+peanut_oil,"Groundnuts, excluding shelled",,1
+crude_soybean_lecithins,Soya beans,,0
+soya_acid_oil_oleins,Soya beans,,0
+sunflower_acid_oil_oleins,Sunflower seed,,0
+olive_acid_oil_oleins,Olives,,0
+coconut_acid_oil_oleins,"Coconuts, in shell",,0
+palm_distillers,Oil palm fruit,,0
+yellow_grease,,,0
+grasoleins_gt_50,,,0
+grasoleins_gt_35,,,0
+grasoleins_lt_20,,,0
+palm_calcium_soap,,,0
+mixed_calcium_soaps,,,0
+hydrogenated_fat_gt_55,,,0
+hydrogenated_fat_gt_90,,,0
+glycerin_85,,,1
+calcium_carbonate,,,1
+oyster_shells,,,1
+mollusk_shells,,,1
+maerl_marine_algae,,,1
+dolomitic_carbonate,,,1
+bone_meal_degelatinized,,,0
+stone_phosphate_defluorinized,,,1
+dicalcium_phosphate_anhydrous,,"Dicalcium phosphate, animal feed, at retailer gate {FR} U",1
+dicalcium_phosphate_dihydrated,,"Dicalcium phosphate, animal feed, at retailer gate {FR} U",1
+mono_dicalcium_phosphate_hydrated,,,1
+monocalcium_phosphate_hydrated,,"Monocalcium phosphate, animal feed, at retailer gate {FR} U",1
+monosodium_phosphate_monohydrated,,,1
+calcium_sodium_phosphate,,,1
+magnesium_phosphate_hydrated,,,1
+triple_na_ca_mg_phosphate_hydrated,,,1
+mono_ammonium_phosphate,,,1
+mg_oxide_calcined_magnesite,,,1
+anhydrous_magnesium_sulfate,,,1
+magnesium_sulfate_heptahydrate,,,1
+magnesium_chloride_hexahydrate,,,1
+magnesium_propionate_dihydrate,,,1
+sodium_chloride_marine,,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_92,,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_96,,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_chloride_mine_98,,"Sodium chloride, animal feed, at retailer gate {FR} U",1
+sodium_bicarbonate,,"Sodium bicarbonate, animal feed, at retailer gate {RER} U",1
+sodium_carbonate,,,1
+sodium_sulfate,,,1
+urea,,,1
+ammonium_sulphate,,,1
+ammonium_chloride,,,1
+dl_methionine,,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+l_methionine,,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+sodium_dl_methionine_54,,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+methionine_hydroxy_analog,,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+methionine_hydrozylate_analog_calcium_salts,,"DL-Methionine, animal feed, at retailer gate {RER} U",1
+l_lysine_hcl,,Lysine solid (HCl) S {FR} U,1
+l_lysine_50,,Lysine solid (HCl) S {FR} U,1
+l_lysine_sulfate,,Lysine sulfate S {CN} U,1
+l_threonine,,Threonine S {CN} U,1
+l_triptophane,,Tryptophane S {FR} U,1
+l_valine,,Valine S {FR} U,1
+l_arginine,,Arginine S {FR} U,1
+l_isoleucine,,Isoleucine S {FR} U,1
+l_histidine_hcl,,Histidine S {BR} U,1
+starch_96,,,1
+starch_84,,,1
+sucrose,,,1
+dextrose_monohydrated,,,1
+lactose,,,1
+citric_acid,,,1
+fumaric_acid,,,1
+propionic_acid,,,1
+formic_acid,,,1
+butiric_acid,,,1
+dl_malic_acid,,,1
+benzoic_acid,,,1
+aceyic_acid,,,1
+lactic_acid,,,1
+sorbic_acid,,,1
+propylenglycol,,,1
+sodium_formiate,,,1
+ammonium_formiate,,,1
+potasium_diformiate,,,1
+calcium_formiate,,,1
+sodium_propionate,,,1
+ammonium_propionate,,,1
+calcium_propionate,,,1
+sodium_butyrate,,,1
+calcium_butyrate,,,1
+choline_chloride_75,,,1
+choline_chloride_60,,,1
+choline_chloride_50_vegetable,,,1
+choline_chloride_50_mineral,,,1
+betaine_anhydrous_97,,,1
+betaine_anhydrous_93,,,1
+betaine_hydrocloride,,,1
+copper_sulphate_pentahydrate,,"Copper sulfate, animal feed, at retailer gate {FR} U",1
+copper_oxide_ii,,"Copper oxide, at feed plant {FR} U",1
+dichloro_trihydroxychloride_tbcc,,,1
+zinc_hydroxy_chlorur_monohydrate,,,1
+zinc_sulfate_monohydrated,,,1
+zinc_sulfate_pentahydrated,,,1
+zinc_oxide_72,,"Zinc oxide, animal feed, at retailer gate {FR} U",1
+zinc_oxide_75,,"Zinc oxide, animal feed, at retailer gate {FR} U",1
+iron_sulfate_ii_monohydrated,,,1
+iron_sulfate_ii_heptahydrated,,,1
+iron_carbonate_ii_siderita,,,1
+manganose_sulfate_monohydrated,,,1
+manganese_oxide_ii,,,1
+dimanganese_trihydroxychlorur,,,1
+potaisum_iodine,,,1
+calcium_iodate_anhydrous,,,1
+cobalt_ii_acetate_tetrahydrate,,,1
+cobalt_ii_carbonate,,,1
+coated_granulated_cobalt_ii_carbonate,,,1
+sodium_selenite,,,1
+sodium_molybdate,,,1
+alfalfa_hay_excellent,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_first,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_second,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_third,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+alfalfa_hay_fourth,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+ryegrass_hay_excellent,"Rye grass, for forage",,1
+ryegrass_hay_first,"Rye grass, for forage",,1
+ryegrass_hay_second,"Rye grass, for forage",,1
+ryegrass_hay_third,"Rye grass, for forage",,1
+ryegrass_hay_fourth,"Rye grass, for forage",,1
+ryegrass_hay_fifth,"Rye grass, for forage",,1
+vetch_hay_excellent,"Other legumes, for forage",,1
+vetch_hay_first,"Other legumes, for forage",,1
+vetch_hay_second,"Other legumes, for forage",,1
+vetch_hay_third,"Other legumes, for forage",,1
+corn_silage_lt20,Maize for forage and silage,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_20_25,Maize for forage and silage,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_25_30,Maize for forage and silage,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_30_35,Maize for forage and silage,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+corn_silage_gt35,Maize for forage and silage,"Silage maize, conventional, national average, animal feed, at farm gate, production {FR} U",1
+sorghum_silage_lt20,"Sorghum, for forage","Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_20_25,"Sorghum, for forage","Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_25_30,"Sorghum, for forage","Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_30_35,"Sorghum, for forage","Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+sorghum_silage_gt35,"Sorghum, for forage","Silage sorghum, national average, animal feed, at farm gate {FR} U",1
+oat_silage_20_25,"Other grasses, for forage",,1
+oat_silage_25_30,"Other grasses, for forage",,1
+oat_silage_30_35,"Other grasses, for forage",,1
+oat_silage_gt35,"Other grasses, for forage",,1
+barley_silage_lt20,"Other grasses, for forage",,1
+barley_silage_20_25,"Other grasses, for forage",,1
+barley_silage_25_30,"Other grasses, for forage",,1
+barley_silage_30_35,"Other grasses, for forage",,1
+barley_silage_gt35,"Other grasses, for forage",,1
+wheat_silage_lt20,"Other grasses, for forage",,1
+wheat_silage_20_25,"Other grasses, for forage",,1
+wheat_silage_25_30,"Other grasses, for forage",,1
+wheat_silage_30_35,"Other grasses, for forage",,1
+wheat_silage_gt35,"Other grasses, for forage",,1
+triticale_silage_lt20,"Other grasses, for forage",,1
+triticale_silage_20_25,"Other grasses, for forage",,1
+triticale_silage_25_30,"Other grasses, for forage",,1
+triticale_silage_30_35,"Other grasses, for forage",,1
+triticale_silage_gt35,"Other grasses, for forage",,1
+ryegrass_fresh_excellent,"Rye grass, for forage",,1
+ryegrass_fresh_first,"Rye grass, for forage",,1
+ryegrass_fresh_second,"Rye grass, for forage",,1
+ryegrass_fresh_third,"Rye grass, for forage",,1
+ryegrass_fresh_fourth,"Rye grass, for forage",,1
+ryegrass_silage_excellent,"Rye grass, for forage",,1
+ryegrass_silage_first,"Rye grass, for forage",,1
+ryegrass_silage_second,"Rye grass, for forage",,1
+ryegrass_silage_third,"Rye grass, for forage",,1
+ryegrass_silage_fourth,"Rye grass, for forage",,1
+grass_silage_excellent,"Other grasses, for forage",,1
+grass_silage_first,"Other grasses, for forage",,1
+grass_silage_second,"Other grasses, for forage",,1
+grass_silage_third,"Other grasses, for forage",,1
+grass_silage_fourth,"Other grasses, for forage",,1
+grass_silage_fifth,"Other grasses, for forage",,1
+rapeseed_silage,"Other forage crops, n.e.c.",,1
+sunflower_silage_lt20,"Other forage crops, n.e.c.",,1
+sunflower_silage_20_25,"Other forage crops, n.e.c.",,1
+sunflower_silage_gt25,"Other forage crops, n.e.c.",,1
+mycotoxin_adsorbent,,,1
+cereals_silage_wheat_barley_oat_triticale,"Other grasses, for forage",,1
+alfalfa_silage,Alfalfa for forage and silage,"Alfalfa, conventional, for animal feeding, at farm gate {FR} U",1
+cow_breast_milk,,,1
+sheep_breast_milk,,,1
+goat_breast_milk,,,1
+milk_replacer,,,1
+aroma,,,1
+Vitamin/mineral_supplement,,"Vitamin, animal feed, at retailer gate {FR} U",1
+potassium_carbonate,,"Potassium carbonate, at feed plant {FR} U",1

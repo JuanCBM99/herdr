@@ -25,5 +25,12 @@ Useful links:
 \author{
 \strong{Maintainer}: Juan Carlos Baez \email{juancarlos.baez@bc3research.org} (\href{https://orcid.org/0000-0002-7067-265X}{ORCID})
 
+Authors:
+\itemize{
+  \item Jon Sampedro \email{jon.sampedro@bc3research.org} (\href{https://orcid.org/0000-0002-2277-1530}{ORCID})
+  \item Guillermo Pardo \email{guillermo.pardo@bc3research.org} (\href{https://orcid.org/0000-0002-7961-8457}{ORCID})
+  \item Agustín del Prado \email{agustin.delprado@bc3research.org} (\href{https://orcid.org/0000-0003-3895-4478}{ORCID})
+}
+
 }
 \keyword{internal}
