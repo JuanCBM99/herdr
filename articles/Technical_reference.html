@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Technical Reference: Files &amp; Parameters • herdr: GHG &amp; LU Calculator 🌎📊</title>
+<title>Technical Reference: Files &amp; Parameters • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -23,9 +23,9 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="inverse" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">herdr: GHG &amp; LU Calculator 🌎📊</a>
+    <a class="navbar-brand me-2" href="../index.html">herdr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,33 +34,31 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Home"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Reference: Files &amp; Parameters</a></li>
+<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/Land_use.html">Land use Guide &amp; Disclaimers</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-practical-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Practical Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-practical-cases">
-<li><a class="dropdown-item" href="../articles/Easy_Example.html">Dairy Cattle Spain</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">Dairy Cattle Spain: North/South</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">Dairy Cattle Spain: North/South in different Life Satages</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-cases">
+<li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download ZIP"><span class="fa fa-download"></span> Download</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fa-github"></span> GitHub</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
-</form></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -105,7 +103,8 @@ of heads (<code>population</code>).</li>
 <li>
 <strong><code>weights.csv</code></strong>: Defines the physical
 scale of the animals, including <code>adult_weight</code>,
-<code>average_weight</code>, and <code>weight_gain</code>.</li>
+<code>initial_weight</code>, <code>final_weight</code> and
+<code>productive_period</code>.</li>
 <li>
 <strong><code>livestock_definitions.csv</code></strong>: The bridge
 file. It links each <code>animal_tag</code> to a <code>diet_tag</code>
@@ -117,7 +116,7 @@ and an <strong>IPCC Description</strong>.</li>
 </h3>
 <ul>
 <li>
-<strong><code>diet_macro.csv</code></strong>: Sets the high-level
+<strong><code>diet_profiles.csv</code></strong>: Sets the high-level
 balance between Forage, Concentrate, Milk, and Milk Replacer.</li>
 <li>
 <strong><code>diet_ingredients.csv</code></strong>: The
@@ -195,18 +194,47 @@ model will return zero emissions.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="crop_yields-csv-land-use-factors">🌳 <code>crop_yields.csv</code> — Land Use Factors<a class="anchor" aria-label="anchor" href="#crop_yields-csv-land-use-factors"></a>
+<h3 id="mapping-csv-database-connector">🗺️ <code>mapping.csv</code> — Database Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-database-connector"></a>
 </h3>
-<p>Links your ingredients to the land requirements.</p>
+<p>The “bridge” that links your diet names to the agricultural yield
+databases.</p>
+<ul>
+<li><p><strong>Key Columns</strong>: <code>ingredient</code>,
+<code>yield_name</code>,<code>allocation (0-1 factor)</code>.</p></li>
+<li><p><strong>Why it matters</strong>: Tells the model which crop
+productivity to use and how much of that land footprint is attributed to
+the animal (e.g., grain vs. straw allocation).</p></li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="forage_yields-csv-grass-silage-data-bc3">🌾 <code>forage_yields.csv</code> — Grass &amp; Silage Data
+(BC3)<a class="anchor" aria-label="anchor" href="#forage_yields-csv-grass-silage-data-bc3"></a>
+</h3>
+<p>Provisional database for forages supplemented by BC3 researchers.</p>
 <ul>
 <li>
-<strong>Key Columns:</strong> <code>ingredient</code>,
-<code>dry_matter_yield</code> (kg/ha).</li>
+<strong>Key Columns</strong>: <code>Area (Country)</code>,
+<code>Item (Crop name)</code>, <code>Value (kg DM/ha)</code>.</li>
 <li>
-<strong>Why it matters:</strong> Essential for calculating the total
-land footprint
+<strong>Why it matters</strong>: Provides essential yield data for
+grazing and forage-based systems where official FAOSTAT records are
+often incomplete or missing.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="fao_crop_yields-csv-official-statutory-yields">📈 <code>fao_crop_yields.csv</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crop_yields-csv-official-statutory-yields"></a>
+</h3>
+<p>Direct yield data for grains and pulses from the FAOSTAT (2024)
+database.</p>
+<ul>
+<li>
+<strong>Key Columns</strong>: <code>Area</code>, <code>Item</code>,
+<code>Year</code>, <code>Value (kg DM/ha)</code>.</li>
+<li>
+<strong>Why it matters</strong>: Sets the international standard for
+calculating the land footprint
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>)
-of your livestock.</li>
+of concentrate feeds and commercial crops.</li>
 </ul>
 <hr>
 </div>
@@ -244,10 +272,11 @@ of your livestock.</li>
 </tr>
 <tr class="even">
 <td align="left"><strong>Add a custom crop</strong></td>
-<td align="left"><em>Add a new row to both</em></td>
+<td align="left"></td>
 <td align="left">
-<code>feed_characteristics</code> &amp;
-<code>crop_yields</code>
+<code>feed_characteristics</code>,
+<code>forage_yields.csv</code>, <code>mapping.csv</code> &amp;
+<code>fao_crop_yields.csv</code>
 </td>
 </tr>
 </tbody>
@@ -268,7 +297,7 @@ of your livestock.</li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Juan Carlos Baez.</p>
+  <p>Developed by Juan Carlos Baez, Jon Sampedro, Guillermo Pardo, Agustín del Prado.</p>
 </div>
 
 <div class="pkgdown-footer-right">

@@ -7,7 +7,23 @@ Currently supported animals: \* **Cattle** \* **Goat** \* **Sheep**
 
 ------------------------------------------------------------------------
 
-## What the Package Calculates
+## ⬇️ Installation & Loading
+
+Install the package directly from GitHub using **remotes**:
+
+``` r
+# Install 'remotes' if necessary
+if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+}
+
+# Install the herdr package with vignettes
+remotes::install_github("JuanCBM99/herdr", build_vignettes = TRUE)
+```
+
+------------------------------------------------------------------------
+
+## *What the Package Calculates*
 
 The package offers specific functions to model the primary sources of
 environmental impact from livestock based on a detailed **Energy
@@ -31,8 +47,11 @@ growth, lactation, pregnancy, work, and wool production.
 
 ### Land Use
 
-- Calculates the **land area** ($m^{2}$) required to produce the feed,
-  linking animal intake directly to crop yields.
+- Calculates the **land area** ($m^{2}$) required to produce the feed
+  based on economic allocation, linking animal intake directly to crop
+  yields. Work in progress, check [Land
+  use](https://juancbm99.github.io/herdr/articles/land_use.md) for more
+  info.
 
 ### Multi-Scenario Analysis
 
@@ -68,16 +87,3 @@ checks the consistency of input data, ensuring that biologically
 impossible values are flagged or prevented.
 
 ------------------------------------------------------------------------
-
-## ⬇️ Installation & Loading
-
-Install the package directly from GitHub using **remotes**:
-
-``` r
-# Install 'remotes' if necessary
-if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-}
-# Install the herdr package
-remotes::install_github("JuanCBM99/Animal_GEI_LU")
-```

@@ -7,6 +7,21 @@ Cattle**. We will split the population by **geography** (North vs. South
 Spain) and by **physiological state** using the `class_flex` column to
 distinguish between the **Lactation Phase** and the **Dry Phase**.
 
+> **Note on File Locations:** All files are located in the `user_data/`
+> folder.
+
+#### 📂 Folder Structure
+
+- **User Files (Update these):** `livestock_census.csv`,
+  `diet_profiles.csv`, `diet_ingredients.csv`,
+  `livestock_definitions.csv`, `livestock_weights.csv`,
+  `manure_management.csv`.
+- **In case of usage of the automatic cycle:**
+  `reproduction_parameters.csv`
+- **Reference Files (Expert use only):** `feed_characteristics.csv`,
+  `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+
 ------------------------------------------------------------------------
 
 ### Step 1: Multi-Dimensional Census (`livestock_census.csv`)

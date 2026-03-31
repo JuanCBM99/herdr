@@ -4,8 +4,34 @@
 
 The `herdr` package follows a modular logic where information flows from
 population and nutrition to biological metabolism and, finally, to
-environmental impact. All user-defined data must be stored in the
-`user_data/` directory.
+environmental impact.
+
+------------------------------------------------------------------------
+
+### Step 0: Setting up your Workspace
+
+Before entering your data, you must locate your working directories.
+When the package is loaded, `herdr` interacts with specific folders in
+your project root:
+
+- **`user_data/`**: This is your active production folder. It contains
+  CSV templates with the required headers. **This is where you should
+  input your data.**
+- **`examples/`**: This folder contains pre-filled datasets for the
+  cases shown in the website (Easy, Moderate, Difficult).
+
+> **Tip:** We highly recommend copying the files from one of the
+> `examples/` subfolders into `user_data/` for your first run to ensure
+> everything is configured correctly.
+
+------------------------------------------------------------------------
+
+### 📂 Folder Structure & File Roles
+
+To keep your project organized, *herdr* separates your project data from
+internal scientific libraries. To see which specific files you should
+edit and which ones to leave as references, check the [Technical
+Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md).
 
 ------------------------------------------------------------------------
 
@@ -84,17 +110,29 @@ files:
 1.  **`feed_characteristics.csv`**: Enter the nutritional data (%
     Protein, % Digestibility, etc.). This tells the model how it affects
     the **animal**.
-2.  **`crop_yields.csv`**: Enter the yield (kg/ha) and nitrogen data.
-    This tells the model how it affects the **land**.
+2.  **`forage_yields.csv`**: If your ingredient is a forage (grass,
+    silage, alfalfa), ensure a row exists for your target country with
+    its productivity in kg DM/ha.
+3.  **`fao_crop_yields.csv`**: This contains official FAOSTAT data for
+    crops (grains, pulses). If more recent year is available you could
+    download and substitute the one in the package by setting th exact
+    name.
+4.  **`mapping.csv`**: This is the “bridge”. You must add a row where:
 
-------------------------------------------------------------------------
+- ingredient: Matches exactly the name used in your diet files.
+- yield_name: Matches exactly the name used in the yield databases
+  (`forage_yields.csv` or `fao_crop_yields.csv`).
+- allocation : Set the factor (0 to 1) to define how much land impact is
+  attributed to the feed based on economy.
 
-#### 💡 Simple Workflow
+*The Diet File:* Don’t forget that the new ingredient must also be
+present in your diet_ingredients.csv. If you define an ingredient in the
+databases but don’t add it to a diet, it won’t be calculated.
 
-- **Browse**: Check `feed_characteristics.csv` for existing ingredients.
-- **Add**: If missing, add the name and data to **both**
-  `feed_characteristics.csv` and `crop_yields.csv`.
-- **Assign**: Use that exact name in your `diet_ingredients.csv`.
+*Dry Matter (DM) Basis:* All yields in `forage_yields.csv` and
+`fao_crop_yields.csv` must be expressed in Dry Matter, not fresh weight.
+If you enter fresh weight, your land use requirements will be
+significantly underestimated.
 
 ------------------------------------------------------------------------
 
@@ -119,17 +157,17 @@ For every `animal_tag` defined in your census, you must now assign its
     `cattle and buffalo`) and automatically fetches the mathematical
     constants ($C_{a}$, $C_{fi}$, etc.) needed for the energy equations.
 
-#### 2. Body Metrics (`weights.csv`)
+#### 2. Body Metrics (`livestock_weights.csv`)
 
 You must replicate the exact combinations of `animal_tag`, `region`,
 `subregion`, and `class_flex` used in your census and assign their
 weights.
 
-- **`adult_weight`**: The mature weight of the adult animal.
-- **`average_weight`**: Average weight of . Usually calculated as:
-  $\left( W_{initial} + W_{final} \right)/2$.
-- **`weight_gain`**: Daily weight increase. Calculated as:
-  $\left( W_{final} - W_{initial} \right)/\text{productive period}$.
+\*\* **`adult_weight`**: The mature weight of the adult animal. \*\*
+**`inital_weight`**: Live weight of the animal at the start of the
+period (kg). \*\* **`final_weight`**: Live weight of the animal at the
+end of the period (kg). \*\* **`productive_period`**: Duration of the
+productive period (days).
 
 #### 💡 How to Proceed
 
@@ -185,7 +223,7 @@ Follow these steps to fill your `manure_management.csv` file correctly:
     group, changing only the system details and the allocation value.
 4.  **Assign Systems and Climates:** For each row, select the
     appropriate `system_base`, `system_variant`, and `climate_zone`
-    following the logic provided in the System Guide.
+    following the logic provided in the Manure System Guide.
 
 ------------------------------------------------------------------------
 

@@ -18,7 +18,8 @@ and South).
 - **In case of usage of the automatic cycle:**
   `reproduction_parameters.csv`
 - **Reference Files (Expert use only):** `feed_characteristics.csv`,
-  `crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+  `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
 
 ------------------------------------------------------------------------
 

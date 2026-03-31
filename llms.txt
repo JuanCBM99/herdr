@@ -11,29 +11,44 @@ Below are the main guides and examples for using the package:
 ### 1. Introduction
 
 Learn what herdr does, which animals are supported, and how to install
-the package.  
-[Go to Introduction
-→](https://juancbm99.github.io/herdr/articles/Introduction.md)
+the package.
 
-### 2. Data Dictionary
+- [Go to Introduction
+  →](https://juancbm99.github.io/herdr/articles/Introduction.md)
 
-Explore the included datasets like diets and emission factors, and see
-how to load and inspect them.  
-[Go to Technical Reference: Files & Parameters
-→](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+### 2. Technical reference
 
-### 3. Function Dictionary
+Explore the included files and some explanation about them.
 
-Explore the included functions and the information that is inside of
-each one. [Go to Manure System Guide
-→](https://juancbm99.github.io/herdr/articles/Manure.md)
+- [Go to Technical Reference: Files & Parameters
+  →](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
 
-### 3. Workflow
+### 3. Manure & Land use Guide
 
-Step-by-step examples of calculations for CH₄, N₂O, and land use for
-different livestock systems.  
-[Go to Workflow Guide: Step-by-Step
-→](https://juancbm99.github.io/herdr/articles/Workflow.md)
+Explore the included manure management systems based on IPCC 2019
+tables.
+
+- [Go to Manure System Guide
+  →](https://juancbm99.github.io/herdr/articles/Manure.md)
+- [Land use →](https://juancbm99.github.io/herdr/articles/land_use.md)
+
+### 4. Workflow
+
+Step-by-step guide on how to perform a general use of the package.
+
+- [Go to Workflow Guide: Step-by-Step
+  →](https://juancbm99.github.io/herdr/articles/Workflow.md)
+
+### 5. Examples
+
+Simple guide that explains how to do a concrete example (3 included)
+
+- [Go to Easy Example
+  →](https://juancbm99.github.io/herdr/articles/Easy_Example.md)
+- [Go to Moderate Example
+  →](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
+- [Go to Hard Example
+  →](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
 
 # Package index
 
@@ -96,6 +111,8 @@ different livestock systems.
   Impact](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
 - [Introduction to
   herdr](https://juancbm99.github.io/herdr/articles/Introduction.md):
+- [Land Use Methodology and Data
+  Disclaimers](https://juancbm99.github.io/herdr/articles/land_use.md):
 - [Manure System
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md):
 - [Dairy Cattle Spain:

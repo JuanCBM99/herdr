@@ -19,13 +19,14 @@ step-by-step instructions.
 - **`livestock_census.csv`**: Defines the `animal_tag`, location
   (`region`), and the number of heads (`population`).
 - **`weights.csv`**: Defines the physical scale of the animals,
-  including `adult_weight`, `average_weight`, and `weight_gain`.
+  including `adult_weight`, `initial_weight`, `final_weight` and
+  `productive_period`.
 - **`livestock_definitions.csv`**: The bridge file. It links each
   `animal_tag` to a `diet_tag` and an **IPCC Description**.
 
 ### 🍚 Nutrition & Diets
 
-- **`diet_macro.csv`**: Sets the high-level balance between Forage,
+- **`diet_profiles.csv`**: Sets the high-level balance between Forage,
   Concentrate, Milk, and Milk Replacer.
 - **`diet_ingredients.csv`**: The micro-breakdown of exactly which
   ingredients (from the library) make up the macro categories.
@@ -74,13 +75,36 @@ manure systems.
 - **Why it matters:** Your entry in `manure_management.csv` must match a
   row here exactly, or the model will return zero emissions.
 
-### 🌳 `crop_yields.csv` — Land Use Factors
+### 🗺️ `mapping.csv` — Database Connector
 
-Links your ingredients to the land requirements.
+The “bridge” that links your diet names to the agricultural yield
+databases.
 
-- **Key Columns:** `ingredient`, `dry_matter_yield` (kg/ha).
-- **Why it matters:** Essential for calculating the total land footprint
-  ($m^{2}$) of your livestock.
+- **Key Columns**: `ingredient`, `yield_name`,`allocation (0-1 factor)`.
+
+- **Why it matters**: Tells the model which crop productivity to use and
+  how much of that land footprint is attributed to the animal (e.g.,
+  grain vs. straw allocation).
+
+### 🌾 `forage_yields.csv` — Grass & Silage Data (BC3)
+
+Provisional database for forages supplemented by BC3 researchers.
+
+- **Key Columns**: `Area (Country)`, `Item (Crop name)`,
+  `Value (kg DM/ha)`.
+- **Why it matters**: Provides essential yield data for grazing and
+  forage-based systems where official FAOSTAT records are often
+  incomplete or missing.
+
+### 📈 `fao_crop_yields.csv` — Official Statutory Yields
+
+Direct yield data for grains and pulses from the FAOSTAT (2024)
+database.
+
+- **Key Columns**: `Area`, `Item`, `Year`, `Value (kg DM/ha)`.
+- **Why it matters**: Sets the international standard for calculating
+  the land footprint ($m^{2}$) of concentrate feeds and commercial
+  crops.
 
 ------------------------------------------------------------------------
 
@@ -88,12 +112,12 @@ Links your ingredients to the land requirements.
 
 Use this table to know where to look when filling out your data:
 
-| If you want to…             | Consult this library:      | To fill this input file:               |
-|:----------------------------|:---------------------------|:---------------------------------------|
-| **Identify an animal type** | `ipcc_coefficients.csv`    | `livestock_definitions.csv`            |
-| **Pick a feed ingredient**  | `feed_characteristics.csv` | `diet_ingredients.csv`                 |
-| **Choose a manure system**  | `ipcc_mm.csv`              | `manure_management.csv`                |
-| **Add a custom crop**       | *Add a new row to both*    | `feed_characteristics` & `crop_yields` |
+| If you want to…             | Consult this library:      | To fill this input file:                                                           |
+|:----------------------------|:---------------------------|:-----------------------------------------------------------------------------------|
+| **Identify an animal type** | `ipcc_coefficients.csv`    | `livestock_definitions.csv`                                                        |
+| **Pick a feed ingredient**  | `feed_characteristics.csv` | `diet_ingredients.csv`                                                             |
+| **Choose a manure system**  | `ipcc_mm.csv`              | `manure_management.csv`                                                            |
+| **Add a custom crop**       |                            | `feed_characteristics`, `forage_yields.csv`, `mapping.csv` & `fao_crop_yields.csv` |
 
 ------------------------------------------------------------------------
 

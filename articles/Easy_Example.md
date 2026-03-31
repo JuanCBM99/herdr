@@ -19,7 +19,8 @@ impact.
 - **In case of usage of the automatic cycle:**
   `reproduction_parameters.csv`
 - **Reference Files (Expert use only):** `feed_characteristics.csv`,
-  `crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+  `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
 
 ------------------------------------------------------------------------
 
@@ -41,9 +42,9 @@ Informe Zootécnico 2015).
 
 #### A. Check Ingredients
 
-Open `feed_characteristics.csv` and `crop_yields.csv` to see the list of
-available feed items. If you wish, you can add as many new ingredients
-as you want, always fulfilling all columns.
+Open `feed_characteristics.csv` to see the list of available feed items.
+If you wish, you can add as many new ingredients as you want, always
+fulfilling all columns.
 
 #### B. Define the Profile (`diet.csv`)
 

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>General Workflow: Step-by-Step Guide • herdr: GHG &amp; LU Calculator 🌎📊</title>
+<title>General Workflow: Step-by-Step Guide • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -23,9 +23,9 @@
 
     <nav class="navbar navbar-expand-lg fixed-top bg-primary" data-bs-theme="inverse" aria-label="Site navigation"><div class="container">
 
-    <a class="navbar-brand me-2" href="../index.html">herdr: GHG &amp; LU Calculator 🌎📊</a>
+    <a class="navbar-brand me-2" href="../index.html">herdr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -34,33 +34,31 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item"><a class="nav-link" href="../index.html" aria-label="Home"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Summary</a></li>
+<li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Workflow.html">Workflow Guide: Step-by-Step</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Reference: Files &amp; Parameters</a></li>
+<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis: IPCC Tier 2 Methodology</a></li>
+    <li><a class="dropdown-item" href="../articles/Land_use.html">Land use Guide &amp; Disclaimers</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-practical-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Practical Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-practical-cases">
-<li><a class="dropdown-item" href="../articles/Easy_Example.html">Dairy Cattle Spain</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">Dairy Cattle Spain: North/South</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">Dairy Cattle Spain: North/South in different Life Satages</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-cases">
+<li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span> Reference</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download ZIP"><span class="fa fa-download"></span> Download</a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fa-github"></span> GitHub</a></li>
+<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><form class="form-inline" role="search">
- <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json">
-</form></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
       </ul>
 </div>
 
@@ -87,9 +85,40 @@
 </h2>
 <p>The <code>herdr</code> package follows a modular logic where
 information flows from population and nutrition to biological metabolism
-and, finally, to environmental impact. All user-defined data must be
-stored in the <code>user_data/</code> directory.</p>
+and, finally, to environmental impact.</p>
 <hr>
+<div class="section level3">
+<h3 id="step-0-setting-up-your-workspace">Step 0: Setting up your Workspace<a class="anchor" aria-label="anchor" href="#step-0-setting-up-your-workspace"></a>
+</h3>
+<p>Before entering your data, you must locate your working directories.
+When the package is loaded, <code>herdr</code> interacts with specific
+folders in your project root:</p>
+<ul>
+<li>
+<strong><code>user_data/</code></strong>: This is your active
+production folder. It contains CSV templates with the required headers.
+<strong>This is where you should input your data.</strong>
+</li>
+<li>
+<strong><code>examples/</code></strong>: This folder contains
+pre-filled datasets for the cases shown in the website (Easy, Moderate,
+Difficult).</li>
+</ul>
+<blockquote>
+<p><strong>Tip:</strong> We highly recommend copying the files from one
+of the <code>examples/</code> subfolders into <code>user_data/</code>
+for your first run to ensure everything is configured correctly.</p>
+</blockquote>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="folder-structure-file-roles">📂 Folder Structure &amp; File Roles<a class="anchor" aria-label="anchor" href="#folder-structure-file-roles"></a>
+</h3>
+<p>To keep your project organized, <em>herdr</em> separates your project
+data from internal scientific libraries. To see which specific files you
+should edit and which ones to leave as references, check the <a href="Technical_reference.html">Technical Reference</a>.</p>
+<hr>
+</div>
 <div class="section level3">
 <h3 id="phase-1-population-and-geography-livestock_census-csv">Phase 1: Population and Geography
 (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#phase-1-population-and-geography-livestock_census-csv"></a>
@@ -204,27 +233,34 @@ these two files:</p>
 nutritional data (% Protein, % Digestibility, etc.). This tells the
 model how it affects the <strong>animal</strong>.</li>
 <li>
-<strong><code>crop_yields.csv</code></strong>: Enter the yield
-(kg/ha) and nitrogen data. This tells the model how it affects the
-<strong>land</strong>.</li>
+<strong><code>forage_yields.csv</code></strong>: If your ingredient
+is a forage (grass, silage, alfalfa), ensure a row exists for your
+target country with its productivity in kg DM/ha.</li>
+<li>
+<strong><code>fao_crop_yields.csv</code></strong>: This contains
+official FAOSTAT data for crops (grains, pulses). If more recent year is
+available you could download and substitute the one in the package by
+setting th exact name.</li>
+<li>
+<strong><code>mapping.csv</code></strong>: This is the “bridge”. You
+must add a row where:</li>
 </ol>
-<hr>
-</div>
-<div class="section level4">
-<h4 id="simple-workflow">💡 Simple Workflow<a class="anchor" aria-label="anchor" href="#simple-workflow"></a>
-</h4>
 <ul>
-<li>
-<strong>Browse</strong>: Check <code>feed_characteristics.csv</code>
-for existing ingredients.</li>
-<li>
-<strong>Add</strong>: If missing, add the name and data to
-<strong>both</strong> <code>feed_characteristics.csv</code> and
-<code>crop_yields.csv</code>.</li>
-<li>
-<strong>Assign</strong>: Use that exact name in your
-<code>diet_ingredients.csv</code>.</li>
+<li>ingredient: Matches exactly the name used in your diet files.</li>
+<li>yield_name: Matches exactly the name used in the yield databases
+(<code>forage_yields.csv</code> or
+<code>fao_crop_yields.csv</code>).</li>
+<li>allocation : Set the factor (0 to 1) to define how much land impact
+is attributed to the feed based on economy.</li>
 </ul>
+<p><em>The Diet File:</em> Don’t forget that the new ingredient must
+also be present in your diet_ingredients.csv. If you define an
+ingredient in the databases but don’t add it to a diet, it won’t be
+calculated.</p>
+<p><em>Dry Matter (DM) Basis:</em> All yields in
+<code>forage_yields.csv</code> and <code>fao_crop_yields.csv</code> must
+be expressed in Dry Matter, not fresh weight. If you enter fresh weight,
+your land use requirements will be significantly underestimated.</p>
 <hr>
 </div>
 </div>
@@ -262,24 +298,18 @@ etc.) needed for the energy equations.</li>
 </ul>
 </div>
 <div class="section level4">
-<h4 id="body-metrics-weights-csv">2. Body Metrics (<code>weights.csv</code>)<a class="anchor" aria-label="anchor" href="#body-metrics-weights-csv"></a>
+<h4 id="body-metrics-livestock_weights-csv">2. Body Metrics (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#body-metrics-livestock_weights-csv"></a>
 </h4>
 <p>You must replicate the exact combinations of <code>animal_tag</code>,
 <code>region</code>, <code>subregion</code>, and <code>class_flex</code>
 used in your census and assign their weights.</p>
-<ul>
-<li>
-<strong><code>adult_weight</code></strong>: The mature weight of the
-adult animal.</li>
-<li>
-<strong><code>average_weight</code></strong>: Average weight of .
-Usually calculated as:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>+</mo><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mn>2</mn></mrow><annotation encoding="application/x-tex">(W_{initial} + W_{final}) / 2</annotation></semantics></math>.</li>
-<li>
-<strong><code>weight_gain</code></strong>: Daily weight increase.
-Calculated as:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mrow><mo stretchy="true" form="prefix">(</mo><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>−</mo><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mtext mathvariant="normal">productive period</mtext></mrow><annotation encoding="application/x-tex">(W_{final} - W_{initial}) / \text{productive period}</annotation></semantics></math>.</li>
-</ul>
+<p>** <strong><code>adult_weight</code></strong>: The mature weight of
+the adult animal. ** <strong><code>inital_weight</code></strong>: Live
+weight of the animal at the start of the period (kg). **
+<strong><code>final_weight</code></strong>: Live weight of the animal at
+the end of the period (kg). **
+<strong><code>productive_period</code></strong>: Duration of the
+productive period (days).</p>
 </div>
 <div class="section level4">
 <h4 id="how-to-proceed">💡 How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed"></a>
@@ -362,8 +392,8 @@ allocation value.</li>
 <li>
 <strong>Assign Systems and Climates:</strong> For each row, select
 the appropriate <code>system_base</code>, <code>system_variant</code>,
-and <code>climate_zone</code> following the logic provided in the System
-Guide.</li>
+and <code>climate_zone</code> following the logic provided in the Manure
+System Guide.</li>
 </ol>
 <hr>
 </div>
@@ -468,7 +498,7 @@ entered manually in <code>livestock_census.csv</code>.</li>
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Juan Carlos Baez.</p>
+  <p>Developed by Juan Carlos Baez, Jon Sampedro, Guillermo Pardo, Agustín del Prado.</p>
 </div>
 
 <div class="pkgdown-footer-right">

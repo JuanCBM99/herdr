@@ -127,15 +127,7 @@ Precipitation (P).
 
 ------------------------------------------------------------------------
 
-### 💡 Quick Logic Rules
-
-#### The “Warm” Rule
-
-- **Warm + Temperate:** Only supports `zone_dry` and `zone_moist`.
-- **Warm + Tropical:** Unlocks all zones: `zone_dry`, `zone_wet`,
-  `zone_moist`, and `zone_montane`.
-
-#### Data Entry Tips
+#### Data Entry
 
 1.  **Case Sensitivity:** All entries must be **lowercase** (e.g.,
     `zone_wet`, NOT `Zone_Wet`).
