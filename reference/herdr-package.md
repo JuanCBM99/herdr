@@ -19,3 +19,14 @@ Useful links:
 
 **Maintainer**: Juan Carlos Baez <juancarlos.baez@bc3research.org>
 ([ORCID](https://orcid.org/0000-0002-7067-265X))
+
+Authors:
+
+- Jon Sampedro <jon.sampedro@bc3research.org>
+  ([ORCID](https://orcid.org/0000-0002-2277-1530))
+
+- Guillermo Pardo <guillermo.pardo@bc3research.org>
+  ([ORCID](https://orcid.org/0000-0002-7961-8457))
+
+- Agustín del Prado <agustin.delprado@bc3research.org>
+  ([ORCID](https://orcid.org/0000-0003-3895-4478))

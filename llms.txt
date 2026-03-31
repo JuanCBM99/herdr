@@ -83,6 +83,8 @@ different livestock systems.
   : Calculate Weighted Nutritional Variables
 - [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)
   : Summarize CH4, N2O Emissions, and Land Use
+- [`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
+  : Initialize herdr project folders and example data
 
 # Articles
 
