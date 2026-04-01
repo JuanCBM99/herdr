@@ -7,6 +7,6 @@
 herdr_init()
 }
 \description{
-This function creates the 'user_data', 'Examples', and 'output' folders in your
+This function creates the 'user_data' and 'Examples' folders in your
 current working directory and populates them with the default files from the package.
 }

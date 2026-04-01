@@ -28,11 +28,13 @@ b_females,0.45,b,MJ/kg,sheep,
 b_castrates,0.32,b,MJ/kg,sheep,
 b_intact males,0.35,b,MJ/kg,sheep,
 b_average_f_m,0.4,b,MJ/kg,sheep,
-sheep,0.19,b_0,m³ CH₄/kg VS,sheep,
+sheep,0.19,b_0,m³ CH₄/kg VS,sheep,meat
+sheep,0.19,b_0,m³ CH₄/kg VS,sheep,dairy
 housed fattening lambs,0.0067,ca,MJ/day/kg,goat,
 lowland goats,0.019,ca,MJ/day/kg,goat,
 hill and mountain goats,0.024,ca,MJ/day/kg,goat,
 goats,0.32,cfi,MJ/day/kg,goat,
 a,5,a,MJ/kg,goat,
 b,0.33,b,MJ/kg,goat,
-goat,0.18,b_0,m³ CH₄/kg VS,goat,
+goat,0.18,b_0,m³ CH₄/kg VS,goat,meat
+goat,0.18,b_0,m³ CH₄/kg VS,goat,dairy
