@@ -8,7 +8,7 @@
   Impact](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
 - [Introduction to
   herdr](https://juancbm99.github.io/herdr/articles/Introduction.md):
-- [Land Use %
+- [Land Use Guide &
   Disclaimers](https://juancbm99.github.io/herdr/articles/land_use.md):
 - [Manure System
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md):
