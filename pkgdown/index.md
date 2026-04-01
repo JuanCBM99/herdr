@@ -1,12 +1,8 @@
-# Welcome to herdr: GHG & LU Calculator 🌎📊
+# Welcome to herdr: GHG & LU Calculator 
 
 **herdr** is an R package designed to calculate **Greenhouse Gas
 (GHG) emissions** and **Land Use (LU)** associated with different
 livestock systems based on **IPCC Tier 2** methodologies.
-
-# Welcome to herdr: GHG & LU Calculator 🌎📊
-
-herdr is an R package designed to calculate Greenhouse Gas (GHG) emissions and Land Use (LU) associated with different livestock systems based on IPCC Tier 2 methodologies.
 
 ---
 

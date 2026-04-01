@@ -8,7 +8,7 @@
 [![Minimal-R](https://img.shields.io/badge/Made%20with-R-276DC3.svg)](https://www.r-project.org/)
 ---
 
-# 🌟 herdr: GHG & LU Calculator 🌎📊
+# 🌟 herdr: GHG & LU Calculator 
 
 An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (LU) in livestock systems, based on the IPCC Tier 2 methodology.
 
