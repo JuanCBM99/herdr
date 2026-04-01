@@ -81,43 +81,93 @@
     
     
 <div class="section level2">
-<h2 id="herdr-workflow-from-raw-data-to-impact-assessment">🚀 herdr Workflow: From Raw Data to Impact Assessment<a class="anchor" aria-label="anchor" href="#herdr-workflow-from-raw-data-to-impact-assessment"></a>
+<h2 id="herdr-workflow-from-raw-data-to-impact-assessment">herdr Workflow: From Raw Data to Impact Assessment<a class="anchor" aria-label="anchor" href="#herdr-workflow-from-raw-data-to-impact-assessment"></a>
 </h2>
 <p>The <code>herdr</code> package follows a modular logic where
 information flows from population and nutrition to biological metabolism
 and, finally, to environmental impact.</p>
 <hr>
 <div class="section level3">
-<h3 id="step-0-setting-up-your-workspace">Step 0: Setting up your Workspace<a class="anchor" aria-label="anchor" href="#step-0-setting-up-your-workspace"></a>
+<h3 id="step-by-step-setup">🛠️ Step-by-Step Setup<a class="anchor" aria-label="anchor" href="#step-by-step-setup"></a>
 </h3>
-<p>Before entering your data, you must locate your working directories.
-When the package is loaded, <code>herdr</code> interacts with specific
-folders in your project root:</p>
-<ul>
-<li>
-<strong><code>user_data/</code></strong>: This is your active
-production folder. It contains CSV templates with the required headers.
-<strong>This is where you should input your data.</strong>
-</li>
-<li>
-<strong><code>examples/</code></strong>: This folder contains
-pre-filled datasets for the cases shown in the website (Easy, Moderate,
-Difficult).</li>
-</ul>
-<blockquote>
-<p><strong>Tip:</strong> We highly recommend copying the files from one
-of the <code>examples/</code> subfolders into <code>user_data/</code>
-for your first run to ensure everything is configured correctly.</p>
-</blockquote>
+<p>Follow these steps in order to prepare your environment and run your
+first model.</p>
+<div class="section level4">
+<h4 id="installation">1. Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h4>
+<p>First, you need to install <code>herdr</code> from GitHub. Open your
+R console and run:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Install 'remotes' if you haven't already</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span><span class="co"># Install herdr</span></span>
+<span></span>
+<span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JuanCBM99/herdr"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
-<div class="section level3">
-<h3 id="folder-structure-file-roles">📂 Folder Structure &amp; File Roles<a class="anchor" aria-label="anchor" href="#folder-structure-file-roles"></a>
-</h3>
+<div class="section level4">
+<h4 id="create-an-r-project">2. Create an R project<a class="anchor" aria-label="anchor" href="#create-an-r-project"></a>
+</h4>
+<p>Open RStudio and go to File &gt; New Project… &gt; New Directory &gt;
+New Project. Name your folder (e.g., “my_livestock_study”). Working
+inside an .Rproj is essential; it ensures herdr knows exactly where to
+find your data and keeps your workspace organized.</p>
+</div>
+<div class="section level4">
+<h4 id="initialize-your-workspace">3. Initialize your Workspace<a class="anchor" aria-label="anchor" href="#initialize-your-workspace"></a>
+</h4>
+<p>Once inside your new project, load the library and generate the
+folder structure:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># This creates 'user_data/' and 'Examples/' folders</span></span>
+<span><span class="fu"><a href="../reference/herdr_init.html">herdr_init</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level4">
+<h4 id="fill-the-csvs">4. Fill the CSVs<a class="anchor" aria-label="anchor" href="#fill-the-csvs"></a>
+</h4>
+<p>Go to the <code>user_data/</code> folder in your project directory.
+Fill the blank templates following the Phases 1-4 detailed below. To
+test the package immediately, copy the files from
+<code>Examples/Easy_Cattle/</code> into <code>user_data/</code> and skip
+to step 6.</p>
+<div class="section level5">
+<h5 id="folder-structure-file-roles">📂 Folder Structure &amp; File Roles<a class="anchor" aria-label="anchor" href="#folder-structure-file-roles"></a>
+</h5>
 <p>To keep your project organized, <em>herdr</em> separates your project
 data from internal scientific libraries. To see which specific files you
 should edit and which ones to leave as references, check the <a href="Technical_reference.html">Technical Reference</a>.</p>
+</div>
+</div>
+<div class="section level4">
+<h4 id="choose-your-population-mode">5. Choose Your Population Mode<a class="anchor" aria-label="anchor" href="#choose-your-population-mode"></a>
+</h4>
+<p>Decide how the model should handle your animal numbers:</p>
+<ul>
+<li><p><code>automatic_cycle = TRUE</code>: The model projects offspring
+and replacements automatically based on your mature animals (Phase 1,
+Option B).</p></li>
+<li><p><code>automatic_cycle = FALSE</code>: The model uses the exact
+numbers you enter manually in livestock_census.csv.</p></li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="run-the-assessment">6. Run the Assessment<a class="anchor" aria-label="anchor" href="#run-the-assessment"></a>
+</h4>
+<p>Execute the main function. It will scan your <code>user_data/</code>,
+perform the calculations, and save the results in
+<code>output/</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <hr>
+</div>
 </div>
 <div class="section level3">
 <h3 id="phase-1-population-and-geography-livestock_census-csv">Phase 1: Population and Geography
@@ -243,19 +293,24 @@ available you could download and substitute the one in the package by
 setting th exact name.</li>
 <li>
 <strong><code>mapping.csv</code></strong>: This is the “bridge”. You
-must add a row where:</li>
-</ol>
+must add a row where:
 <ul>
-<li>ingredient: Matches exactly the name used in your diet files.</li>
-<li>yield_name: Matches exactly the name used in the yield databases
-(<code>forage_yields.csv</code> or
+<li>
+<strong>ingredient</strong>: Matches exactly the name used in your
+diet files.</li>
+<li>
+<strong>yield_name</strong>: Matches exactly the name used in the
+yield databases (<code>forage_yields.csv</code> or
 <code>fao_crop_yields.csv</code>).</li>
-<li>allocation : Set the factor (0 to 1) to define how much land impact
-is attributed to the feed based on economy.</li>
+<li>
+<strong>allocation</strong>: Set the factor (0 to 1) to define how
+much land impact is attributed to the feed based on economy.</li>
 </ul>
+</li>
+</ol>
 <p><em>The Diet File:</em> Don’t forget that the new ingredient must
-also be present in your diet_ingredients.csv. If you define an
-ingredient in the databases but don’t add it to a diet, it won’t be
+also be present in your <code>diet_ingredients.csv.</code> If you define
+an ingredient in the databases but don’t add it to a diet, it won’t be
 calculated.</p>
 <p><em>Dry Matter (DM) Basis:</em> All yields in
 <code>forage_yields.csv</code> and <code>fao_crop_yields.csv</code> must
@@ -280,7 +335,7 @@ now assign its “labels” and its diet.</p>
 <strong><code>diet_tag</code></strong>: Link the animal to one of
 the diets you created in Phase 2.</li>
 <li>
-<strong>IPCC Coefficients</strong>: Assign the correct
+<strong>IPCC coefficients</strong>: Assign the correct
 <strong>description</strong> (text) from the
 <code>ipcc_coefficients.csv</code> library. The exception occurs with
 sheep/goat where the c_pregnancy is calculated by pr and single/double
@@ -303,13 +358,20 @@ etc.) needed for the energy equations.</li>
 <p>You must replicate the exact combinations of <code>animal_tag</code>,
 <code>region</code>, <code>subregion</code>, and <code>class_flex</code>
 used in your census and assign their weights.</p>
-<p>** <strong><code>adult_weight</code></strong>: The mature weight of
-the adult animal. ** <strong><code>inital_weight</code></strong>: Live
-weight of the animal at the start of the period (kg). **
-<strong><code>final_weight</code></strong>: Live weight of the animal at
-the end of the period (kg). **
+<ul>
+<li>
+<strong><code>adult_weight</code></strong>: The mature weight of the
+adult animal.</li>
+<li>
+<strong><code>inital_weight</code></strong>: Live weight of the
+animal at the start of the period (kg).</li>
+<li>
+<strong><code>final_weight</code></strong>: Live weight of the
+animal at the end of the period (kg).</li>
+<li>
 <strong><code>productive_period</code></strong>: Duration of the
-productive period (days).</p>
+productive period (days).</li>
+</ul>
 </div>
 <div class="section level4">
 <h4 id="how-to-proceed">💡 How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed"></a>
@@ -354,15 +416,14 @@ environmental impacts:</p>
 <li>
 <strong>Methane
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>):</strong>
-Driven by the anaerobic conditions of the storage (determined by system
-type, temperature, and duration).</li>
+Driven by the conditions of the storage (determined by system type,
+temperature, and duration).</li>
 <li>
 <strong>Nitrous Oxide
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>):</strong>
 Driven by the Nitrogen excretion
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi></mrow></msub><annotation encoding="application/x-tex">N_{ex}</annotation></semantics></math>)
-calculated in Phase 3 and the specific emission factors of each
-system.</li>
+and the specific emission factors of each system.</li>
 </ul>
 <hr>
 </div>
@@ -414,80 +475,6 @@ the total of their allocations (e.g., 0.5 + 0.3 + 0.2) must equal
 1.0.</li>
 </ul>
 <hr>
-</div>
-</div>
-<div class="section level3">
-<h3 id="phase-5-generating-results">Phase 5: Generating Results<a class="anchor" aria-label="anchor" href="#phase-5-generating-results"></a>
-</h3>
-<p>This is the final stage where the <code>herdr</code> engine processes
-all your configuration files to generate a comprehensive environmental
-impact report.</p>
-<div class="section level4">
-<h4 id="purpose-of-this-phase-1">🎯 Purpose of this Phase<a class="anchor" aria-label="anchor" href="#purpose-of-this-phase-1"></a>
-</h4>
-<p>The goal is to consolidate the data from populations, nutrition,
-metabolism, and manure management into final emission and resource-use
-metrics. The model will calculate:</p>
-<ul>
-<li>
-<strong>Total Emissions</strong>:
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>
-(Enteric &amp; Manure) and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
-(Direct &amp; Indirect).</li>
-<li>
-<strong>Carbon Footprint</strong>: Total
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>O</mi><mn>2</mn></msub><mi>e</mi><mi>q</mi></mrow><annotation encoding="application/x-tex">CO_2eq</annotation></semantics></math>
-based on IPCC global warming potentials.</li>
-<li>
-<strong>Land Use</strong>: Total area required based on your
-nutritional strategy and crop yields.</li>
-</ul>
-<hr>
-</div>
-<div class="section level4">
-<h4 id="how-to-proceed-2">🛠️ How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed-2"></a>
-</h4>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Load the Library</strong>: Ensure the package is active in
-your R session.</li>
-<li>
-<strong>Run the Assessment</strong>: Use the
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code> function. This function
-automatically looks into your <code>user_data/</code> folder for all the
-CSV files you prepared in Phases 1 through 4.</li>
-<li>
-<strong>Choose Your Mode</strong>:
-<ul>
-<li>
-<strong><code>automatic_cycle = TRUE</code></strong>: Use this if
-you want the model to calculate offspring and herd dynamics based on
-your mature animals (Phase 1, Option B).</li>
-<li>
-<strong><code>automatic_cycle = FALSE</code></strong>: Use this if
-you want the model to stick strictly to the population numbers you
-entered manually in <code>livestock_census.csv</code>.</li>
-</ul>
-</li>
-</ol>
-<hr>
-</div>
-<div class="section level4">
-<h4 id="execution-code">💻 Execution Code<a class="anchor" aria-label="anchor" href="#execution-code"></a>
-</h4>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Execute the master function</span></span>
-<span><span class="co"># saveoutput = TRUE creates a CSV file with your results in the output folder</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
-<span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># Preview the results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
 </div>

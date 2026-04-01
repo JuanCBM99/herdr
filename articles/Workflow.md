@@ -1,6 +1,6 @@
 # General Workflow: Step-by-Step Guide
 
-## 🚀 herdr Workflow: From Raw Data to Impact Assessment
+## herdr Workflow: From Raw Data to Impact Assessment
 
 The `herdr` package follows a modular logic where information flows from
 population and nutrition to biological metabolism and, finally, to
@@ -8,30 +8,84 @@ environmental impact.
 
 ------------------------------------------------------------------------
 
-### Step 0: Setting up your Workspace
+### 🛠️ Step-by-Step Setup
 
-Before entering your data, you must locate your working directories.
-When the package is loaded, `herdr` interacts with specific folders in
-your project root:
+Follow these steps in order to prepare your environment and run your
+first model.
 
-- **`user_data/`**: This is your active production folder. It contains
-  CSV templates with the required headers. **This is where you should
-  input your data.**
-- **`examples/`**: This folder contains pre-filled datasets for the
-  cases shown in the website (Easy, Moderate, Difficult).
+#### 1. Installation
 
-> **Tip:** We highly recommend copying the files from one of the
-> `examples/` subfolders into `user_data/` for your first run to ensure
-> everything is configured correctly.
+First, you need to install `herdr` from GitHub. Open your R console and
+run:
+
+``` r
+# Install 'remotes' if you haven't already
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+
+# Install herdr
+
+remotes::install_github("JuanCBM99/herdr")
+```
 
 ------------------------------------------------------------------------
 
-### 📂 Folder Structure & File Roles
+#### 2. Create an R project
+
+Open RStudio and go to File \> New Project… \> New Directory \> New
+Project. Name your folder (e.g., “my_livestock_study”). Working inside
+an .Rproj is essential; it ensures herdr knows exactly where to find
+your data and keeps your workspace organized.
+
+#### 3. Initialize your Workspace
+
+Once inside your new project, load the library and generate the folder
+structure:
+
+``` r
+library(herdr)
+
+# This creates 'user_data/' and 'Examples/' folders
+herdr_init()
+```
+
+#### 4. Fill the CSVs
+
+Go to the `user_data/` folder in your project directory. Fill the blank
+templates following the Phases 1-4 detailed below. To test the package
+immediately, copy the files from `Examples/Easy_Cattle/` into
+`user_data/` and skip to step 6.
+
+##### 📂 Folder Structure & File Roles
 
 To keep your project organized, *herdr* separates your project data from
 internal scientific libraries. To see which specific files you should
 edit and which ones to leave as references, check the [Technical
 Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md).
+
+#### 5. Choose Your Population Mode
+
+Decide how the model should handle your animal numbers:
+
+- `automatic_cycle = TRUE`: The model projects offspring and
+  replacements automatically based on your mature animals (Phase 1,
+  Option B).
+
+- `automatic_cycle = FALSE`: The model uses the exact numbers you enter
+  manually in livestock_census.csv.
+
+#### 6. Run the Assessment
+
+Execute the main function. It will scan your `user_data/`, perform the
+calculations, and save the results in `output/`.
+
+``` r
+results <- generate_impact_assessment(
+  automatic_cycle = FALSE, 
+  saveoutput = TRUE
+)
+```
 
 ------------------------------------------------------------------------
 
@@ -118,16 +172,15 @@ files:
     download and substitute the one in the package by setting th exact
     name.
 4.  **`mapping.csv`**: This is the “bridge”. You must add a row where:
-
-- ingredient: Matches exactly the name used in your diet files.
-- yield_name: Matches exactly the name used in the yield databases
-  (`forage_yields.csv` or `fao_crop_yields.csv`).
-- allocation : Set the factor (0 to 1) to define how much land impact is
-  attributed to the feed based on economy.
+    - **ingredient**: Matches exactly the name used in your diet files.
+    - **yield_name**: Matches exactly the name used in the yield
+      databases (`forage_yields.csv` or `fao_crop_yields.csv`).
+    - **allocation**: Set the factor (0 to 1) to define how much land
+      impact is attributed to the feed based on economy.
 
 *The Diet File:* Don’t forget that the new ingredient must also be
-present in your diet_ingredients.csv. If you define an ingredient in the
-databases but don’t add it to a diet, it won’t be calculated.
+present in your `diet_ingredients.csv.` If you define an ingredient in
+the databases but don’t add it to a diet, it won’t be calculated.
 
 *Dry Matter (DM) Basis:* All yields in `forage_yields.csv` and
 `fao_crop_yields.csv` must be expressed in Dry Matter, not fresh weight.
@@ -149,7 +202,7 @@ For every `animal_tag` defined in your census, you must now assign its
 
 - **`diet_tag`**: Link the animal to one of the diets you created in
   Phase 2.
-- **IPCC Coefficients**: Assign the correct **description** (text) from
+- **IPCC coefficients**: Assign the correct **description** (text) from
   the `ipcc_coefficients.csv` library. The exception occurs with
   sheep/goat where the c_pregnancy is calculated by pr and single/double
   birth fraction.
@@ -163,11 +216,12 @@ You must replicate the exact combinations of `animal_tag`, `region`,
 `subregion`, and `class_flex` used in your census and assign their
 weights.
 
-\*\* **`adult_weight`**: The mature weight of the adult animal. \*\*
-**`inital_weight`**: Live weight of the animal at the start of the
-period (kg). \*\* **`final_weight`**: Live weight of the animal at the
-end of the period (kg). \*\* **`productive_period`**: Duration of the
-productive period (days).
+- **`adult_weight`**: The mature weight of the adult animal.
+- **`inital_weight`**: Live weight of the animal at the start of the
+  period (kg).
+- **`final_weight`**: Live weight of the animal at the end of the period
+  (kg).
+- **`productive_period`**: Duration of the productive period (days).
 
 #### 💡 How to Proceed
 
@@ -197,11 +251,10 @@ The goal is to characterize the management systems used for each
 livestock group. This data allows the model to derive two primary
 environmental impacts:
 
-- **Methane ($CH_{4}$):** Driven by the anaerobic conditions of the
-  storage (determined by system type, temperature, and duration).
+- **Methane ($CH_{4}$):** Driven by the conditions of the storage
+  (determined by system type, temperature, and duration).
 - **Nitrous Oxide ($N_{2}O$):** Driven by the Nitrogen excretion
-  ($N_{ex}$) calculated in Phase 3 and the specific emission factors of
-  each system.
+  ($N_{ex}$) and the specific emission factors of each system.
 
 ------------------------------------------------------------------------
 
@@ -240,58 +293,3 @@ by a specific system.
   allocations (e.g., 0.5 + 0.3 + 0.2) must equal 1.0.
 
 ------------------------------------------------------------------------
-
-### Phase 5: Generating Results
-
-This is the final stage where the `herdr` engine processes all your
-configuration files to generate a comprehensive environmental impact
-report.
-
-#### 🎯 Purpose of this Phase
-
-The goal is to consolidate the data from populations, nutrition,
-metabolism, and manure management into final emission and resource-use
-metrics. The model will calculate:
-
-- **Total Emissions**: $CH_{4}$ (Enteric & Manure) and $N_{2}O$ (Direct
-  & Indirect).
-- **Carbon Footprint**: Total $CO_{2}eq$ based on IPCC global warming
-  potentials.
-- **Land Use**: Total area required based on your nutritional strategy
-  and crop yields.
-
-------------------------------------------------------------------------
-
-#### 🛠️ How to Proceed
-
-1.  **Load the Library**: Ensure the package is active in your R
-    session.
-2.  **Run the Assessment**: Use the
-    [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)
-    function. This function automatically looks into your `user_data/`
-    folder for all the CSV files you prepared in Phases 1 through 4.
-3.  **Choose Your Mode**:
-    - **`automatic_cycle = TRUE`**: Use this if you want the model to
-      calculate offspring and herd dynamics based on your mature animals
-      (Phase 1, Option B).
-    - **`automatic_cycle = FALSE`**: Use this if you want the model to
-      stick strictly to the population numbers you entered manually in
-      `livestock_census.csv`.
-
-------------------------------------------------------------------------
-
-#### 💻 Execution Code
-
-``` r
-library(herdr)
-
-# Execute the master function
-# saveoutput = TRUE creates a CSV file with your results in the output folder
-results <- generate_impact_assessment(
-  automatic_cycle = FALSE, 
-  saveoutput = TRUE
-)
-
-# Preview the results
-head(results)
-```

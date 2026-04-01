@@ -30,7 +30,8 @@ tables.
 
 - [Go to Manure System Guide
   →](https://juancbm99.github.io/herdr/articles/Manure.md)
-- [Land use →](https://juancbm99.github.io/herdr/articles/land_use.md)
+- [Go to Land use
+  →](https://juancbm99.github.io/herdr/articles/land_use.md)
 
 ### 4. Workflow
 

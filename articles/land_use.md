@@ -1,133 +1,114 @@
-# Land Use Methodology and Data Disclaimers
+# Land Use Methodology
 
-## **I.Introduction**
+## Land Use Methodology and Data Disclaimers
+
+### I. Introduction
 
 The
 [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
 function in the **herdr** package provides an estimation of the total
-land area (in m^2) required to produce the feed consumed by a given
+land area (in $m^{2}$) required to produce the feed consumed by a given
 livestock population.
 
 This assessment is critical for understanding the environmental
-footprint and spatial efficiency of different production systems.
+footprint and spatial efficiency of different production systems,
+allowing users to compare the “land cost” of different dietary
+strategies.
 
-## **II.Methodology**
+------------------------------------------------------------------------
+
+### II. Methodology
 
 The model integrates animal nutritional requirements with crop
-productivity.
+productivity through a three-step calculation for each feed ingredient.
 
-The land requirement for each feed ingredient is computed in three
-steps.
+#### 1. Inverse of Crop Yield
 
-- First, the inverse of crop yield is calculated to obtain the land
-  required per unit of feed:
+First, we calculate the land required per unit of feed:
+$$LandPerKg_{i} = \frac{1}{Yield_{i}}$$*This expresses hectares required
+per kilogram of feed (ha/kg).*
 
-$$LandPerKg_{i} = \frac{1}{Yield_{i}}$$
+#### 2. Economic Allocation Adjustment
 
-This expresses hectares required per kilogram of feed (ha/kg).
-
-- Second, this value is adjusted by the economic allocation factor to
-  account for the share of land attributed to the co-product:
-
+This value is adjusted by an allocation factor to account for the share
+of land attributed to co-products (e.g., grain vs. straw):
 $$AdjustedLandPerKg_{i} = \frac{1}{Yield_{i}} \times Allocation_{i}$$
 
-- Finally, the total land use is obtained by multiplying the annual feed
-  consumption by the adjusted land requirement and converting hectares
-  to square meters:
+#### 3. Total Land Use
 
+Finally, the total land use is obtained by multiplying the annual feed
+consumption by the adjusted land requirement and converting hectares to
+square meters:
 $$LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times Allocation_{i} \right) \times 10,000$$
 
-Where:
+**Where:**
 
 - **AnnualConsumption**: Total kg of dry matter (DM) consumed by the
-  population per year  
-- **Yield**: Productivity of the crop in kg DM per hectare (kg/ha)  
-- **Allocation**: Economic or physical factor to account for co-products
-  (e.g., grain vs. straw)  
-- **10,000**: Conversion factor from hectares to square meters (m^2)
+  population per year.
+- **Yield**: Productivity of the crop in kg DM per hectare (kg/ha).
+- **Allocation**: Economic or physical factor (0 to 1) to account for
+  co-products.
+- **10,000**: Conversion factor from hectares (ha) to square meters
+  ($m^{2}$).
 
-## **III.Country-Specific Yield Assumption**
+------------------------------------------------------------------------
 
-The package uses a complete FAO-based global database of crop yields
-covering all major agricultural commodities.
+### III. Country-Specific Yield Assumption
 
-However, for the land use calculations, the user must specify a single
-country via the `crop_yield_country` argument. A total of 197 valid
-countries can be found in `fao_crop_yields.csv` or `forage_yields.csv`.
+The package uses a comprehensive FAO-based global database. However, for
+the calculation, the user must specify a **single country** via the
+`crop_yield_country` argument.
 
-This country selection determines the yield values used for **all feed
-ingredients** in the calculation. In other words, the selected country
-acts as a universal reference for crop productivity, regardless of the
-geographical origin specified elsewhere in the dataset (e.g., region or
-subregion in the livestock census or diet files).
+> ⚠️ **Important Limitation:** It is not possible to assign different
+> countries of origin to individual ingredients within a single run. For
+> example, you cannot specify that barley comes from Ukraine while maize
+> comes from Spain. All ingredients will use the yields of the single
+> selected country.
 
-### *Important Limitation*
+------------------------------------------------------------------------
 
-It is not possible to assign different countries of origin to individual
-feed ingredients within a single calculation.
-
-For example:
-
-- It is **not possible** to specify that barley comes from Ukraine while
-  maize comes from Spain within the same run.  
-- All ingredients will use the yields corresponding to the single
-  selected country.
-
-## **IV.Data Sources and Disclaimers**
+### IV. Data Sources and Disclaimers
 
 The accuracy of land use estimation depends heavily on the underlying
-yield databases.
+yield databases:
 
-Users must be aware of the following data characteristics:
+1.  **Official Crop Yields (FAOSTAT 2024)**: Yields for major crops
+    (barley, maize, soya, etc.) represent standardized, country-level
+    average yields reported by national authorities.
+2.  **Non-Official Forage Yields**: Forage data (grasses, alfalfa,
+    silage) often lacks official global statistics. **herdr** includes
+    compiled non-official values to provide broader coverage.
 
-### *1. Official Crop Yields (FAOSTAT 2024)*
+*Users conducting high-precision analyses should cross-reference these
+values with local data sources where possible.*
 
-Yields for major agricultural crops (barley, maize, soya, etc.) are
-sourced from official FAOSTAT (2024) databases.
+------------------------------------------------------------------------
 
-These represent standardized, country-level average yields reported by
-national authorities.
+### V. The Mapping System
 
-### *2. Non-Official Forage Yields*
+The `mapping.csv` file acts as a “translator” between your diets and the
+yield databases:
 
-Forage data (grasses, alfalfa, silage) is not always fully available in
-official global statistics.
+| ingredient   | yield_name | allocation |
+|:-------------|:-----------|:-----------|
+| grass_fresh  | Grass      | 1.0        |
+| barley_grain | Barley     | 0.8        |
 
-The forage dataset included in **herdr** contains non-official values
-that have been compiled to provide broader coverage where official
-records are incomplete.
-
-- These values are subject to revision and improvement as more reliable
-  or updated data becomes available.
-
-- Users conducting high-precision analyses should interpret these values
-  with care and, where possible, cross-reference with local or
-  independent data sources.
-
-## **V.The Mapping System**
-
-The package bridges the gap between user-defined diets and yield
-databases through the `mapping.csv` file.
-
-This file acts as a translator:
-
-- **ingredient**: The name used in `diet_ingredients.csv`  
+- **ingredient**: The name used in your `diet_ingredients.csv`.
 - **yield_name**: The exact key used to match the FAO or forage yield
-  databases  
-- **allocation**: A value between 0 and 1 representing the economic
-  share of land impact attributed to the animal feed component
+  databases.
+- **allocation**: The economic share (0 to 1) of land impact attributed
+  to the feed.
 
-Example:
+------------------------------------------------------------------------
 
-| ingredient   | yield_name | agribalyse_name | allocation |
-|--------------|------------|-----------------|------------|
-| grass_fresh  | Grass      | grass_ext       | 1.0        |
-| barley_grain | Barley     | barley_ext      | 0.8        |
+### VI. Technical Implementation
 
-## **VI.Technical Implementation**
-
-The function should be called this way or just modifying the country.
+You can call the function directly or as part of the full assessment. To
+find valid country names, check the `fao_crop_yields.csv` file in the
+package.
 
 ``` r
-calculate_land_use(crop_yield_country = "Spain")
+# Example: Calculating land use for a study based on Spanish productivity
+results <- calculate_land_use(crop_yield_country = "Spain")
 ```
