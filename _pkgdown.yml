@@ -26,7 +26,7 @@ navbar:
           href: articles/Technical_reference.html
         - text: "Manure System Guide"
           href: articles/Manure.html
-        - text: "Land use Guide & Disclaimers" Land Use Guide & Disclaimers
+        - text: "Land use Guide & Disclaimers"
           href: articles/land_use.html
     - text: "Cases"
       icon: fa-tools
