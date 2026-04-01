@@ -1,4 +1,4 @@
-# Land Use Methodology
+# Land Use % Disclaimers
 
 ## Land Use Methodology and Data Disclaimers
 
