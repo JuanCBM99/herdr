@@ -1,10 +1,10 @@
 ---
-title: "Land Use Methodology"
+title: "Land Use % Disclaimers"
 output: 
   rmarkdown::html_vignette:
     toc: true
 vignette: >
-  %\VignetteIndexEntry{Land Use Methodology}
+  %\VignetteIndexEntry{Land Use % Disclaimers}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
