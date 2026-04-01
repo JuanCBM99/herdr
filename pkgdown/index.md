@@ -26,7 +26,7 @@ Explore the included files and some explanation about them.
 Explore the included manure management systems based on IPCC 2019 tables.
 
 - [Go to Manure System Guide &rarr; ](articles/Manure.html)
-- [Land use &rarr; ](articles/land_use.html)
+- [Go to Land use &rarr; ](articles/land_use.html)
 
 ### 4. Workflow
 

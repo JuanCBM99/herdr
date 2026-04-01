@@ -87,7 +87,6 @@ calculate_NEg <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Growth (NEg)...")
 
   # --- 1. Data Loading (Robust reading) ---
-  # Forzamos que las columnas de unión sean texto ('c') para evitar errores de tipo logical
   weights <- readr::read_csv("user_data/livestock_weights.csv",
                              col_types = readr::cols(subregion = "c", class_flex = "c"),
                              show_col_types = FALSE)
@@ -117,7 +116,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
       dplyr::across(c(initial_weight_kg, final_weight_kg, adult_weight_kg, productive_period_days, C_val, A_val, B_val),
                     ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
-      # Añadimos comprobación de denominadores > 0 para evitar NaN
+
       NEg_MJday = dplyr::case_when(
         tolower(animal_type) == "cattle" & (C_val * adult_weight_kg) > 0 & productive_period_days > 0 ~
           22.02 * ((((initial_weight_kg + final_weight_kg)/2) / (C_val * adult_weight_kg))^0.75) * (((final_weight_kg - initial_weight_kg)/productive_period_days)^1.097),
@@ -125,7 +124,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
         tolower(animal_type) %in% c("sheep", "goat") & productive_period_days > 0 ~
           ((final_weight_kg - initial_weight_kg)/productive_period_days) * (A_val + 0.5 * B_val * (initial_weight_kg + final_weight_kg)),
 
-        TRUE ~ 0 # Si falta algún dato crítico, la energía es 0, no NA
+        TRUE ~ 0
       )
     ) %>%
 

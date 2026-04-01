@@ -1,13 +1,13 @@
 #' Initialize herdr project folders and example data
 #'
-#' This function creates the 'user_data', 'Examples', and 'output' folders in your
+#' This function creates the 'user_data' and 'Examples' folders in your
 #' current working directory and populates them with the default files from the package.
 #'
 #' @export
 herdr_init <- function() {
 
   # 1. Definir las carpetas necesarias
-  folders <- c("user_data", "Examples", "output")
+  folders <- c("user_data", "Examples")
 
   message("\u2699\ufe0f Initializing herdr project structure...")
 
