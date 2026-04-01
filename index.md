@@ -4,6 +4,40 @@
 emissions** and **Land Use (LU)** associated with different livestock
 systems based on **IPCC Tier 2** methodologies.
 
+# Welcome to herdr: GHG & LU Calculator 🌎📊
+
+herdr is an R package designed to calculate Greenhouse Gas (GHG)
+emissions and Land Use (LU) associated with different livestock systems
+based on IPCC Tier 2 methodologies.
+
+------------------------------------------------------------------------
+
+## 🚀 Quick Start (run in \<1 min)
+
+``` r
+# Install
+if (!requireNamespace("remotes", quietly = TRUE)) {
+  install.packages("remotes")
+}
+remotes::install_github("JuanCBM99/herdr")
+
+library(herdr)
+
+# Initialize project
+herdr_init()
+
+# Load example data
+file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
+
+# Run model
+results <- generate_impact_assessment()
+```
+
+This runs a complete example of a cattle production system and returns
+greenhouse gas emissions and land use results.
+
+------------------------------------------------------------------------
+
 ## 📚 Guides and Examples
 
 Below are the main guides and examples for using the package:
