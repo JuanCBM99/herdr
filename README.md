@@ -45,7 +45,7 @@ library(herdr)
 herdr_init()
 
 # Copy example CSVs to user_data/ (overwrite existing)
-file.copy(list.files("Examples/Easy_Cattle", full.names = TRUE), "user_data", overwrite = TRUE)
+file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
 
 # Run a full impact assessment
 results <- generate_impact_assessment()
