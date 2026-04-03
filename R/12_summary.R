@@ -69,10 +69,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       CO2eq_enteric  = CH4_enteric_Gg * 28,
       CO2eq_manure   = CH4_manure_Gg * 28,
       CO2eq_N2O      = (N2O_direct_Gg + N2O_vol_Gg + N2O_lea_Gg) * 265,
-      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_N2O,
-
-      Carbon_Footprint_m2 = (CO2eq_Total_Gg * 1e6) / Land_m2
-    )
+      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_N2O)
 
   # 6. Save Output
   if (saveoutput) {

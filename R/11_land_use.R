@@ -41,6 +41,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     ) %>%
     dplyr::ungroup() %>%
     dplyr::filter(Area == crop_yield_country) %>%
+    dplyr::filter(!is.na(dm_yield)) %>%
     dplyr::group_by(ingredient) %>%
     dplyr::filter(Year == max(Year, na.rm = TRUE)) %>%
     dplyr::slice(1) %>%
@@ -64,7 +65,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   diet_ingredients <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE) %>%
     dplyr::distinct(diet_tag, region, subregion, class_flex, ingredient, .keep_all = TRUE)
 
-  population_df <- calculate_population(automatic_cycle = FALSE, saveoutput = FALSE) %>%
+  population_df <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::distinct(animal_tag, region, subregion, class_flex, .keep_all = TRUE)
 
   # --- 4. Impact Calculation ---
