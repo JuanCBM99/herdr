@@ -10,8 +10,8 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   message("\U0001f4be Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Loading ---
-  user_manure  <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
+  user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
 
   # --- 2. Validations (Asserts) ---

@@ -9,8 +9,8 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
   message("\U0001f4be Calculating indirect N2O emissions (volatilization)...")
 
   # --- 1. Data Loading ---
-  user_manure <- readr::read_csv("user_data/manure_management.csv", show_col_types = FALSE)
-  ipcc_master <- readr::read_csv("user_data/ipcc_mm.csv", show_col_types = FALSE)
+  user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
 
   direct_N2O_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
   pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
