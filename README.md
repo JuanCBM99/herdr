@@ -19,8 +19,7 @@ An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (
 
 If you prefer a visual guide, watch this official tutorial covering installation, data setup, and running your first assessment.
 
-[![herdr Tutorial](https://img.youtube.com/vi/wmGIQ3g-ZFk/maxresdefault.jpg)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk)
-
+[![herdr Tutorial](https://markdown-videos.deta.dev/youtube/wmGIQ3g-ZFk)](https://youtu.be/wmGIQ3g-ZFk)
 ---
 
 ## 🖥️ Prerequisites: Installing R and RStudio
