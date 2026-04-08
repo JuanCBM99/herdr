@@ -31,6 +31,16 @@ This runs a complete example of a cattle production system and returns greenhous
 
 ---
 
+## 🎥 Video Tutorial
+
+<h2>Test video</h2>
+
+<div class="ratio ratio-16x9">
+  <iframe src="https://www.youtube.com/embed/wmGIQ3g-ZFk"></iframe>
+</div>
+
+---
+
 ## 📚 Guides and Examples
 
 Below are the main guides and examples for using the package:

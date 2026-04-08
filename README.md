@@ -5,12 +5,21 @@
 [![docs](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml)
 [![codecov](https://codecov.io/gh/JuanCBM99/herdr/branch/dev/graph/badge.svg?token=GMIP6FM869)](https://codecov.io/gh/JuanCBM99/herdr)
 [![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml)
+[![Tutorial](https://img.shields.io/badge/Video-Tutorial-red?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk&t=29s)
 [![Minimal-R](https://img.shields.io/badge/Made%20with-R-276DC3.svg)](https://www.r-project.org/)
 ---
 
 # 🌟 herdr: GHG & LU Calculator 
 
 An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (LU) in livestock systems, based on the IPCC Tier 2 methodology.
+
+---
+
+## 📺 Video Tutorial: Get Started in 5 Minutes
+
+If you prefer a visual guide, watch this official tutorial covering installation, data setup, and running your first assessment.
+
+[![herdr Tutorial](https://img.youtube.com/vi/ID_DE_TU_VIDEO/maxresdefault.jpg)](https://www.youtube.com/watch?v=ID_DE_TU_VIDEO)
 
 ---
 

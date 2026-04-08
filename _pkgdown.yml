@@ -48,6 +48,8 @@ navbar:
       href: https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip
     - icon: fa-github
       href: https://github.com/JuanCBM99/herdr
+    - icon: fa-youtube
+      href: https://www.youtube.com/@JuanCBM9
 
 # Table of contents
 toc:
