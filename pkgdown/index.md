@@ -33,10 +33,17 @@ This runs a complete example of a cattle production system and returns greenhous
 
 ## 🎥 Video Tutorial
 
-<h2>Test video</h2>
-
-<div class="ratio ratio-16x9">
-  <iframe src="https://www.youtube.com/embed/wmGIQ3g-ZFk"></iframe>
+<div style="text-align: center; margin: 30px 0;">
+  <iframe 
+    width="560" 
+    height="315" 
+    src="https://www.youtube-nocookie.com/embed/wmGIQ3g-ZFk" 
+    title="herdr tutorial" 
+    frameborder="0" 
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+    allowfullscreen 
+    style="border-radius: 12px; box-shadow: 0px 10px 25px rgba(0,0,0,0.15);">
+  </iframe>
 </div>
 
 ---
