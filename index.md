@@ -34,8 +34,6 @@ greenhouse gas emissions and land use results.
 
 ## 🎥 Video Tutorial
 
-## Test video
-
 ------------------------------------------------------------------------
 
 ## 📚 Guides and Examples
