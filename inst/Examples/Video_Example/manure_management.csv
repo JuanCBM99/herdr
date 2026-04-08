@@ -1,4 +1,4 @@
-﻿animal_tag,region,subregion,class_flex,system_base,management_months,system_climate,system_subclimate,climate_zone,system_variant,climate_moisture,animal_type,animal_subtype,allocation
+﻿animal_tag,region,subregion,class_flex,system_base,system_variant,management_months,system_climate,system_subclimate,climate_zone,climate_moisture,animal_type,animal_subtype,allocation
 feedlot_calves_male,,,,,,,,,,,,,
 feedlot_calves_female,,,,,,,,,,,,,
 beef_calves_male,,,,,,,,,,,,,
@@ -30,5 +30,5 @@ kid_goat_female_dairy_replacement,,,,,,,,,,,,,
 kid_goat_female_meat_replacement,,,,,,,,,,,,,
 mature_goat_female_dairy,,,,,,,,,,,,,
 mature_goat_female_meat,,,,,,,,,,,,,
-random_goat,france,,,dry_lot,,cool,,,,wet,goat,meat,0.5
-random_goat,france,,,daily_spread,,cool,,,,wet,goat,meat,0.5
+random_goat,france,,,anaerobic_lagoon,uncovered,,warm,tropical,zone_dry,dry,goat,meat,0.5
+random_goat,france,,,deep_bedding,no_mixing,>1,warm,tropical,zone_dry,dry,goat,meat,0.5

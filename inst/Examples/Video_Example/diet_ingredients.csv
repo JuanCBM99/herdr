@@ -1349,8 +1349,8 @@ diet_random_goat,france,,,citrus_pulp_orange_tangerine,0,concentrate
 diet_random_goat,france,,,molasses_beet,0,concentrate
 diet_random_goat,france,,,cotton_seed_whole,0,concentrate
 diet_random_goat,france,,,straw_cereals_wheat_and_barley,0,forage
-diet_random_goat,france,,,ryegrass_fresh_second,0,forage
-diet_random_goat,france,,,ryegrass_fresh_third,100,forage
+diet_random_goat,france,,,ryegrass_fresh_second,100,forage
+diet_random_goat,france,,,ryegrass_fresh_third,0,forage
 diet_random_goat,france,,,ryegrass_hay_third,0,forage
 diet_random_goat,france,,,alfalfa_hay_first,0,forage
 diet_random_goat,france,,,sheep_breast_milk,0,milk
