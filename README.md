@@ -15,11 +15,11 @@ An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (
 
 ---
 
-## 📺 Video Tutorial: Get Started in 5 Minutes
+## 📺 Video Tutorial: 
 
 If you prefer a visual guide, watch this official tutorial covering installation, data setup, and running your first assessment.
 
-[![herdr Tutorial](https://img.youtube.com/vi/wmGIQ3g-ZFk/0.jpg)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk)
+[![herdr Tutorial](https://img.youtube.com/vi/wmGIQ3g-ZFk/maxresdefault.jpg)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk)
 
 ---
 
