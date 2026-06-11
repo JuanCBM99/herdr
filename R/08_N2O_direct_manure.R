@@ -12,18 +12,19 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   # --- 1. Data Loading ---
   cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
   weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  user_manure  <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
 
   ge_df  <- calculate_ge(saveoutput = FALSE)
   cp_df  <- calculate_weighted_variable(saveoutput = FALSE)
   pop_df <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
   neg_df <- calculate_NEg(saveoutput = FALSE)
+  # [POULTRY MODIFICATION] Cargar la ingesta de materia seca (DMI) para monogástricos
+  dmi_df <- calculate_DMI(saveoutput = FALSE)
 
   # --- 2. Validations (Asserts) ---
 
   # 2.1 Combinations Integrity Check (Validates against ipcc_mm.csv)
-  # Filter out rows where key fields are missing to avoid false positives with NAs
   check_data <- user_manure %>%
     dplyr::filter(!is.na(system_base))
 
@@ -50,7 +51,6 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   }
 
   # 2.2 Allocation Assertion
-  # Verify that the sum of allocations for each unique animal group does not exceed 100%
   allocation_sums <- user_manure %>%
     dplyr::filter(!is.na(allocation)) %>%
     dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
@@ -66,7 +66,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # --- 2. Master Dataset Construction & Joins ---
+  # --- 3. Master Dataset Construction & Joins ---
 
   results <- ge_df %>%
     dplyr::select(dplyr::all_of(join_keys), GE_MJday) %>%
@@ -77,6 +77,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     ) %>%
     dplyr::left_join(
       pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
+      by = join_keys
+    ) %>%
+    # [POULTRY MODIFICATION] Unir la columna DMI_kgday al dataset maestro
+    dplyr::left_join(
+      dmi_df %>% dplyr::select(dplyr::all_of(join_keys), DMI_kgday),
       by = join_keys
     ) %>%
 
@@ -110,47 +115,84 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, EF3), #EF3 kg N2O-N/kg N
+                      climate_moisture, animal_type, animal_subtype, EF3),
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
     ) %>%
 
-    # --- 3. Calculations ---
+    # --- 4. Calculations ---
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, CP_pct, population, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJday, allocation, EF3),
+        c(GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJday, allocation, EF3),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      # Convertimos variables anuales a tasas diarias antes del cálculo
+      daily_milk = milk_yield_kg_year / 365,
+
+      # Evitamos división por cero en el cálculo de la ganancia diaria
+      daily_gain = dplyr::if_else(
+        productive_period_days > 0,
+        (final_weight_kg - initial_weight_kg) / productive_period_days,
+        0
       ),
 
       milk_protein = 1.9 + 0.4 * fat_content_pct,
 
+      # Estructura segura: Evaluamos los escenarios para evitar evaluar divisiones prohibidas
       N_retention = dplyr::case_when(
+        # [POULTRY MODIFICATION] Cálculo de retención para aves (layers y broilers)
+        # Nota: Ponemos un freno seguro para evitar división por cero si productive_period_days es 0
+        animal_type == "poultry" & productive_period_days > 0 ~
+          ((final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
+
+        animal_type == "poultry" & productive_period_days <= 0 ~ 0,
+
         animal_type %in% c("sheep", "goat") ~ 0.1,
-        ((final_weight_kg - initial_weight_kg)/productive_period_days) > 0 & NEg_MJday > 0  ~ ((milk_yield_kg_year * milk_protein) / 6.38) +
-          ((((final_weight_kg - initial_weight_kg)/productive_period_days) * (268 - (7.03 * NEg_MJday / ((final_weight_kg - initial_weight_kg)/productive_period_days))) / 1000) / 6.25),
+
+        # Escenario Bovinos 1: Dan leche Y están creciendo (Evita división por cero porque daily_gain > 0)
+        animal_type == "cattle" & daily_gain > 0 & NEg_MJday > 0 ~
+          ((daily_milk * (milk_protein / 100)) / 6.38) +
+          ((daily_gain * (268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
+
+        # Escenario Bovinos 2: Animales adultos que solo producen leche (No crecen, ganancia es <= 0)
+        animal_type == "cattle" & daily_milk > 0 & (daily_gain <= 0 | NEg_MJday <= 0) ~
+          ((daily_milk * (milk_protein / 100)) / 6.38),
+
+        # Escenario Bovinos 3: Animales jóvenes en crecimiento que no producen leche
+        animal_type == "cattle" & daily_milk == 0 & daily_gain > 0 & NEg_MJday > 0 ~
+          ((daily_gain * (268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
+
         TRUE ~ 0
       ),
 
-      N_intake_kgheadday   = (GE_MJday / 18.45) * (CP_pct / 100 / 6.25),
-      N_excreted_kgheadday = dplyr::if_else(
+      # [POULTRY MODIFICATION] Ingesta de nitrógeno diferenciada por tipo de animal
+      N_intake_kgheadday = dplyr::if_else(
+        animal_type == "poultry",
+        DMI_kgday * (CP_pct / 100 / 6.25),
+        (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
+      ),
+
+      N_excreted_kgheadyear = dplyr::if_else(
         animal_type %in% c("sheep", "goat"),
         (N_intake_kgheadday * (1 - N_retention)) * 365,
         (N_intake_kgheadday - N_retention) * 365
       ),
 
-      direct_N2O_kgyear = population * N_excreted_kgheadday * allocation * EF3 * (44 / 28)
+      direct_N2O_kgyear = population * N_excreted_kgheadyear * allocation * EF3 * (44 / 28)
     ) %>%
 
-    # --- 4. Final Formatting ---
+    # --- 5. Final Formatting ---
     dplyr::select(
       dplyr::all_of(join_keys),
-      system_base, system_variant, climate_moisture, climate_zone,
-      N_intake_kgheadday, N_retention, N_excreted_kgheadday, EF3, population, direct_N2O_kgyear
+      system_base, system_variant, climate_moisture, climate_zone, system_climate,
+      system_subclimate, allocation,
+      N_intake_kgheadday, N_retention, N_excreted_kgheadyear, EF3, population, direct_N2O_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 
-  # --- 5. Save Output ---
+  # --- 6. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_direct_manure.csv")

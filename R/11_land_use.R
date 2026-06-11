@@ -57,7 +57,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # --- 3. Operational Data Loading (DMI, Diets, Population) ---
   DMI_df <- calculate_DMI(saveoutput = FALSE) %>%
-    dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
+    dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
   diet_profiles <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE) %>%
     dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
@@ -70,7 +70,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # --- 4. Impact Calculation ---
   results <- DMI_df %>%
-    dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex")) %>%
+    dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::inner_join(diet_ingredients, by = c("diet_tag", "region", "subregion", "class_flex")) %>%
     dplyr::left_join(fao_yields, by = "ingredient") %>%
     dplyr::mutate(
@@ -94,11 +94,11 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
     tidyr::drop_na(animal_tag) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex, animal_type, animal_subtype) %>%
+    dplyr::group_by(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, ingredient_type) %>%
     dplyr::summarise(
       population             = dplyr::first(population),
       validated_DMI_kg       = dplyr::first(DMI_kgday),
-      total_consumption_kg   = sum(annual_cons_kg, na.rm = TRUE),
+      total_consumption_kg   = sum(annual_cons_kg * population, na.rm = TRUE),
       land_use_per_animal_m2 = sum(land_use_m2, na.rm = TRUE),
       total_land_use_m2      = sum(land_use_m2 * population, na.rm = TRUE),
       .groups = "drop"

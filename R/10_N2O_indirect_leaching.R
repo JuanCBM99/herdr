@@ -65,7 +65,7 @@ calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput 
   # --- 2. Master Dataset Construction & Joins ---
 
   results <- direct_N2O_df %>%
-    dplyr::select(dplyr::all_of(join_keys), N_excreted_kgheadday) %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted_kgheadyear) %>%
     dplyr::distinct() %>%
 
     dplyr::left_join(
@@ -96,11 +96,11 @@ calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput 
     # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
       dplyr::across(
-        c(population, N_excreted_kgheadday, allocation, frac_leach, EF5),
+        c(population, N_excreted_kgheadyear, allocation, frac_leach, EF5),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      N_leaching_kg_year = population * N_excreted_kgheadday * allocation * frac_leach,
+      N_leaching_kg_year = population * N_excreted_kgheadyear * allocation * frac_leach,
 
       N2O_leach_kgyear = EF5 * N_leaching_kg_year * (44 / 28)
     ) %>%
@@ -109,7 +109,7 @@ calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput 
     dplyr::select(
       dplyr::all_of(join_keys),
       system_base, system_variant,
-      N_excreted_kgheadday, frac_leach, EF5,
+      N_excreted_kgheadyear, frac_leach, EF5,
       N_leaching_kg_year, N2O_leach_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))

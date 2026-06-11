@@ -37,7 +37,7 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
   expect_s3_class(results, "data.frame")
 
   # Check for mandatory IPCC columns for Nitrogen reporting
-  required_cols <- c("N_intake_kgheadday", "N_retention", "N_excreted_kgheadday",
+  required_cols <- c("N_intake_kgheadday", "N_retention", "N_excreted_kgheadyear",
                      "EF3", "direct_N2O_kgyear")
   expect_true(all(required_cols %in% colnames(results)))
 
@@ -58,7 +58,7 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
 
     # Unit check: direct_N2O_kgyear includes the molecular weight conversion (44/28)
     # If N_excreted and EF3 are > 0, emissions must be > 0
-    sample_active <- results %>% filter(N_excreted_kgheadday > 0 & EF3 > 0) %>% head(1)
+    sample_active <- results %>% filter(N_excreted_kgheadyear > 0 & EF3 > 0) %>% head(1)
     if(nrow(sample_active) > 0) {
       expect_gt(sample_active$direct_N2O_kgyear, 0)
     }
