@@ -20,23 +20,23 @@ livestock based on a detailed **Energy Balance** model. It accounts for
 energy requirements for maintenance, growth, lactation, pregnancy, work,
 and wool production.
 
-### Methane ($CH_{4}$) Emissions
+### Methane ($`CH_4`$) Emissions
 
 - **Enteric fermentation:** Emissions produced during the digestive
-  process based on Gross Energy intake and diet digestibility ($Y_{m}$).
-- **Manure management:** Emissions derived from Volatile Solids ($VS$)
+  process based on Gross Energy intake and diet digestibility ($`Y_m`$).
+- **Manure management:** Emissions derived from Volatile Solids ($`VS`$)
   decay, adjusting for specific management systems (e.g., liquid
   lagoons, solid storage, pasture, composting).
 
-### Nitrous Oxide ($N_{2}O$) Emissions
+### Nitrous Oxide ($`N_2O`$) Emissions
 
 - **Direct:** Emissions from manure storage and treatment systems.
-- **Indirect:** Emissions via nitrogen volatilization ($NH_{3}$,
-  $NO_{x}$) and leaching into water systems.
+- **Indirect:** Emissions via nitrogen volatilization ($`NH_3`$,
+  $`NO_x`$) and leaching into water systems.
 
 ### Land Use
 
-- Calculates the **land area ($m^{2}$)** required to produce the feed
+- Calculates the **land area ($`m^2`$)** required to produce the feed
   based on economic allocation, linking animal intake directly to crop
   yields using FAOSTAT and BC3 databases.
 
@@ -65,7 +65,7 @@ LIVESTOCK AND MANURE MANAGEMENT”*
 
 - **Diet-Driven:** Diet composition is the primary driver of the
   results, determining key parameters like the Methane Conversion Factor
-  ($Y_{m}$) and Nitrogen Excretion ($N_{ex}$).
+  ($`Y_m`$) and Nitrogen Excretion ($`N_{ex}`$).
 - **Automatic Validation:** Before calculating, `herdr` automatically
   checks the consistency of input data, ensuring that biologically
   implausible values (e.g., impossible intake relative to weight) are

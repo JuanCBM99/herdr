@@ -9,6 +9,7 @@ systems based on **IPCC Tier 2** methodologies.
 ## 🚀 Quick Start (run in \<1 min)
 
 ``` r
+
 # Install
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")

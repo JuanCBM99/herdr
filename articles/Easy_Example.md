@@ -67,9 +67,9 @@ Open `livestock_definitions.csv`. This file links your animal to the
 IPCC equations. Use the **exact descriptions** from
 `ipcc_coefficients.csv`.
 
-| animal_tag          | region | diet_tag          | c_pregnancy        | milk_yield | fat_content |
-|:--------------------|:-------|:------------------|:-------------------|:-----------|:------------|
-| mature_dairy_cattle | spain  | diet_dairy_mature | cattle and buffalo | 8894.38    | 3.73        |
+| animal_tag | region | diet_tag | c_pregnancy | milk_yield | fat_content |
+|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | diet_dairy_mature | cattle and buffalo | 8894.38 | 3.73 |
 
 ------------------------------------------------------------------------
 
@@ -91,10 +91,10 @@ Open `weights.csv`. Ensure the keys match the census exactly.
 2.  If you have more than one system for the exactly same animal,
     **duplicate the row** and split the allocation.
 
-| animal_tag          | region | subregion | class_flex | system_base   | management_months | system_climate | system_subclimate | climate_zone | system_variant           | climate_moisture | animal_type | animal_subtype | allocation |
-|:--------------------|:-------|:----------|:-----------|:--------------|:------------------|:---------------|:------------------|:-------------|:-------------------------|:-----------------|:------------|:---------------|:-----------|
-| mature_dairy_cattle | spain  |           |            | liquid_slurry | 3                 | cool           | temperate         | wet          | with_natural_crust_cover | wet              | cattle      | dairy          | 0.343      |
-| mature_dairy_cattle | spain  |           |            | solid_storage |                   | temperate      |                   |              |                          | dry              | cattle      | dairy          | 0.069      |
+| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | animal_type | animal_subtype | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain |  |  | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | cattle | dairy | 0.343 |
+| mature_dairy_cattle | spain |  |  | solid_storage |  | temperate |  |  |  | dry | cattle | dairy | 0.069 |
 
 ------------------------------------------------------------------------
 
@@ -103,6 +103,7 @@ Open `weights.csv`. Ensure the keys match the census exactly.
 Once your CSVs are updated, run the following in R:
 
 ``` r
+
 library(herdr)
 
 results <- generate_impact_assessment(

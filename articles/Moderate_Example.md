@@ -57,11 +57,11 @@ to **100%**.
 
 **Example for Spain South (Concentrate portion):**
 
-| diet_tag          | region | subregion | ingredient             | ingredient_share | ingredient_type |
-|:------------------|:-------|:----------|:-----------------------|:-----------------|:----------------|
-| diet_dairy_mature | spain  | south     | corn_national          | 44.85            | concentrate     |
-| diet_dairy_mature | spain  | south     | soybean_meal_44_cp     | 17.12            | concentrate     |
-| diet_dairy_mature | spain  | south     | rapeseed_meal_00_33_cp | 28.71            | concentrate     |
+| diet_tag | region | subregion | ingredient | ingredient_share | ingredient_type |
+|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | south | corn_national | 44.85 | concentrate |
+| diet_dairy_mature | spain | south | soybean_meal_44_cp | 17.12 | concentrate |
+| diet_dairy_mature | spain | south | rapeseed_meal_00_33_cp | 28.71 | concentrate |
 
 ------------------------------------------------------------------------
 
@@ -70,10 +70,10 @@ to **100%**.
 Open `livestock_definitions.csv`. This file links your animal tags to
 the IPCC physiological equations.
 
-| animal_tag          | region | subregion | diet_tag          | c_pregnancy        | milk_yield | fat_content | animal_type |
-|:--------------------|:-------|:----------|:------------------|:-------------------|:-----------|:------------|:------------|
-| mature_dairy_cattle | spain  | north     | diet_dairy_mature | cattle and buffalo | 8295.0     | 3.73        | cattle      |
-| mature_dairy_cattle | spain  | south     | diet_dairy_mature | cattle and buffalo | 9044.0     | 3.73        | cattle      |
+| animal_tag | region | subregion | diet_tag | c_pregnancy | milk_yield | fat_content | animal_type |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | diet_dairy_mature | cattle and buffalo | 8295.0 | 3.73 | cattle |
+| mature_dairy_cattle | spain | south | diet_dairy_mature | cattle and buffalo | 9044.0 | 3.73 | cattle |
 
 ------------------------------------------------------------------------
 
@@ -94,12 +94,12 @@ weights are used to validate your dry matter intake (DMI) limits.
 You can define multiple manure systems for the same animal by splitting
 the `allocation` (the sum per animal/region must be 1.0).
 
-| animal_tag          | region | subregion | system_base      | management_months | system_climate | allocation |
-|:--------------------|:-------|:----------|:-----------------|:------------------|:---------------|:-----------|
-| mature_dairy_cattle | spain  | north     | anaerobic_lagoon |                   | cool           | 0.0537     |
-| mature_dairy_cattle | spain  | north     | liquid_slurry    | 3                 | cool           | 0.3432     |
-| mature_dairy_cattle | spain  | north     | solid_storage    |                   | cool           | 0.3551     |
-| mature_dairy_cattle | spain  | south     | solid_storage    |                   | cool           | 0.3551     |
+| animal_tag | region | subregion | system_base | management_months | system_climate | allocation |
+|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | anaerobic_lagoon |  | cool | 0.0537 |
+| mature_dairy_cattle | spain | north | liquid_slurry | 3 | cool | 0.3432 |
+| mature_dairy_cattle | spain | north | solid_storage |  | cool | 0.3551 |
+| mature_dairy_cattle | spain | south | solid_storage |  | cool | 0.3551 |
 
 ------------------------------------------------------------------------
 
@@ -110,6 +110,7 @@ The package will automatically perform biological validations (like
 checking if your cow is eating more than 5.5% of its body weight).
 
 ``` r
+
 library(herdr)
 
 results <- generate_impact_assessment(

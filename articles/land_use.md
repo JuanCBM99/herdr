@@ -7,7 +7,7 @@
 The
 [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
 function in the **herdr** package provides an estimation of the total
-land area (in $m^{2}$) required to produce the feed consumed by a given
+land area (in $`m^2`$) required to produce the feed consumed by a given
 livestock population.
 
 This assessment is critical for understanding the environmental
@@ -25,21 +25,27 @@ productivity through a three-step calculation for each feed ingredient.
 #### 1. Inverse of Crop Yield
 
 First, we calculate the land required per unit of feed:
-$$LandPerKg_{i} = \frac{1}{Yield_{i}}$$*This expresses hectares required
-per kilogram of feed (ha/kg).*
+``` math
+LandPerKg_{i} = \frac{1}{Yield_{i}}
+```
+*This expresses hectares required per kilogram of feed (ha/kg).*
 
 #### 2. Economic Allocation Adjustment
 
 This value is adjusted by an allocation factor to account for the share
 of land attributed to co-products (e.g., grain vs. straw):
-$$AdjustedLandPerKg_{i} = \frac{1}{Yield_{i}} \times Allocation_{i}$$
+``` math
+AdjustedLandPerKg_{i} = \frac{1}{Yield_{i}} \times Allocation_{i}
+```
 
 #### 3. Total Land Use
 
 Finally, the total land use is obtained by multiplying the annual feed
 consumption by the adjusted land requirement and converting hectares to
 square meters:
-$$LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times Allocation_{i} \right) \times 10,000$$
+``` math
+LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times Allocation_{i} \right) \times 10,000
+```
 
 **Where:**
 
@@ -49,7 +55,7 @@ $$LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times A
 - **Allocation**: Economic or physical factor (0 to 1) to account for
   co-products.
 - **10,000**: Conversion factor from hectares (ha) to square meters
-  ($m^{2}$).
+  ($`m^2`$).
 
 ------------------------------------------------------------------------
 
@@ -109,6 +115,7 @@ find valid country names, check the `fao_crop_yields.csv` file in the
 package.
 
 ``` r
+
 # Example: Calculating land use for a study based on Spanish productivity
 results <- calculate_land_use(crop_yield_country = "Spain")
 ```

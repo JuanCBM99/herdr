@@ -19,6 +19,7 @@ First, you need to install `herdr` from GitHub. Open your R console and
 run:
 
 ``` r
+
 # Install 'remotes' if you haven't already
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
@@ -44,6 +45,7 @@ Once inside your new project, load the library and generate the folder
 structure:
 
 ``` r
+
 library(herdr)
 
 # This creates 'user_data/' and 'Examples/' folders
@@ -81,6 +83,7 @@ Execute the main function. It will scan your `user_data/`, perform the
 calculations, and save the results in `output/`.
 
 ``` r
+
 results <- generate_impact_assessment(
   automatic_cycle = FALSE, 
   saveoutput = TRUE
@@ -208,7 +211,8 @@ For every `animal_tag` defined in your census, you must now assign its
   birth fraction.
   - *How it works:* The model sees the description (e.g.,
     `cattle and buffalo`) and automatically fetches the mathematical
-    constants ($C_{a}$, $C_{fi}$, etc.) needed for the energy equations.
+    constants ($`C_a`$, $`C_{fi}`$, etc.) needed for the energy
+    equations.
 
 #### 2. Body Metrics (`livestock_weights.csv`)
 
@@ -251,10 +255,10 @@ The goal is to characterize the management systems used for each
 livestock group. This data allows the model to derive two primary
 environmental impacts:
 
-- **Methane ($CH_{4}$):** Driven by the conditions of the storage
+- **Methane ($`CH_4`$):** Driven by the conditions of the storage
   (determined by system type, temperature, and duration).
-- **Nitrous Oxide ($N_{2}O$):** Driven by the Nitrogen excretion
-  ($N_{ex}$) and the specific emission factors of each system.
+- **Nitrous Oxide ($`N_2O`$):** Driven by the Nitrogen excretion
+  ($`N_{ex}`$) and the specific emission factors of each system.
 
 ------------------------------------------------------------------------
 

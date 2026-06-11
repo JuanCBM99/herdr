@@ -46,23 +46,23 @@ forage/concentrate ratios and specific ingredients for each life stage.
 
 #### A. Diet Profiles (`diet_profiles.csv`)
 
-| diet_tag          | region | subregion | class_flex      | forage_share | concentrate_share | milk_share | milk_replacer_share |
-|:------------------|:-------|:----------|:----------------|:-------------|:------------------|:-----------|:--------------------|
-| diet_dairy_mature | spain  | north     | dry_phase       | 70           | 30                | 0          | 0                   |
-| diet_dairy_mature | spain  | north     | lactation_phase | 55           | 45                | 0          | 0                   |
-| diet_dairy_mature | spain  | south     | dry_phase       | 54           | 46                | 0          | 0                   |
-| diet_dairy_mature | spain  | south     | lactation_phase | 50           | 50                | 0          | 0                   |
+| diet_tag | region | subregion | class_flex | forage_share | concentrate_share | milk_share | milk_replacer_share |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | north | dry_phase | 70 | 30 | 0 | 0 |
+| diet_dairy_mature | spain | north | lactation_phase | 55 | 45 | 0 | 0 |
+| diet_dairy_mature | spain | south | dry_phase | 54 | 46 | 0 | 0 |
+| diet_dairy_mature | spain | south | lactation_phase | 50 | 50 | 0 | 0 |
 
 #### B. Ingredient Breakdown (`diet_ingredients.csv`)
 
 Ingredients must be assigned precisely to the `subregion` and
 `class_flex`. *Example for the South/Lactation profile:*
 
-| diet_tag          | region | subregion | class_flex      | ingredient         | ingredient_share | ingredient_type |
-|:------------------|:-------|:----------|:----------------|:-------------------|:-----------------|:----------------|
-| diet_dairy_mature | spain  | south     | lactation_phase | corn_national      | 44.85            | concentrate     |
-| diet_dairy_mature | spain  | south     | lactation_phase | soybean_meal_44_cp | 17.12            | concentrate     |
-| diet_dairy_mature | spain  | south     | lactation_phase | corn_silage_25_30  | 55.00            | forage          |
+| diet_tag | region | subregion | class_flex | ingredient | ingredient_share | ingredient_type |
+|:---|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | south | lactation_phase | corn_national | 44.85 | concentrate |
+| diet_dairy_mature | spain | south | lactation_phase | soybean_meal_44_cp | 17.12 | concentrate |
+| diet_dairy_mature | spain | south | lactation_phase | corn_silage_25_30 | 55.00 | forage |
 
 ------------------------------------------------------------------------
 
@@ -71,26 +71,26 @@ Ingredients must be assigned precisely to the `subregion` and
 This is the most technical file. It determines the energy requirements
 (IPCC Tier 2). Note the difference in `milk_yield` and `cfi`.
 
-| animal_tag          | region | subregion | class_flex      | cfi                          | ca    | c       | milk_yield | fat_content | c_pregnancy        |
-|:--------------------|:-------|:----------|:----------------|:-----------------------------|:------|:--------|:-----------|:------------|:-------------------|
-| mature_dairy_cattle | spain  | north     | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 8295       | 3.73        | cattle and buffalo |
-| mature_dairy_cattle | spain  | north     | dry_phase       | cattle/buffalo               | stall | females | 0          | 0           | cattle and buffalo |
-| mature_dairy_cattle | spain  | south     | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 9044       | 3.73        | cattle and buffalo |
-| mature_dairy_cattle | spain  | north     | dry_phase       | cattle/buffalo               | stall | females | 0          | 0           | cattle and buffalo |
+| animal_tag | region | subregion | class_flex | cfi | ca | c | milk_yield | fat_content | c_pregnancy |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 8295 | 3.73 | cattle and buffalo |
+| mature_dairy_cattle | spain | north | dry_phase | cattle/buffalo | stall | females | 0 | 0 | cattle and buffalo |
+| mature_dairy_cattle | spain | south | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 9044 | 3.73 | cattle and buffalo |
+| mature_dairy_cattle | spain | north | dry_phase | cattle/buffalo | stall | females | 0 | 0 | cattle and buffalo |
 
 ------------------------------------------------------------------------
 
 ### Step 4: Body Weights (`livestock_weights.csv`)
 
 Accurate weights are essential to calculate Maintenance Energy
-($NE_{m}$) and validate the maximum physical capacity of the animal
-($DMI$ as $\%$ of Body Weight).
+($`NE_m`$) and validate the maximum physical capacity of the animal
+($`DMI`$ as $`\%`$ of Body Weight).
 
-| animal_tag          | region | subregion | class_flex      | adult_weight | weight_gain | average_weight |
-|:--------------------|:-------|:----------|:----------------|:-------------|:------------|:---------------|
-| mature_dairy_cattle | spain  | north     | dry_phase       | 675          | 0           | 675            |
-| mature_dairy_cattle | spain  | north     | lactation_phase | 675          | 0           | 675            |
-| mature_dairy_cattle | spain  | south     | lactation_phase | 675          | 0           | 675            |
+| animal_tag | region | subregion | class_flex | adult_weight | weight_gain | average_weight |
+|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | dry_phase | 675 | 0 | 675 |
+| mature_dairy_cattle | spain | north | lactation_phase | 675 | 0 | 675 |
+| mature_dairy_cattle | spain | south | lactation_phase | 675 | 0 | 675 |
 
 ------------------------------------------------------------------------
 
@@ -99,12 +99,12 @@ Accurate weights are essential to calculate Maintenance Energy
 You can define management systems with high granularity, specifying the
 climate zone and variants for methane conversion factors.
 
-| animal_tag          | region | subregion | class_flex      | system_base      | management_months | system_climate | system_subclimate | climate_zone | system_variant           | climate_zone | allocation |
-|:--------------------|:-------|:----------|:----------------|:-----------------|:------------------|:---------------|:------------------|:-------------|:-------------------------|:-------------|:-----------|
-| mature_dairy_cattle | spain  | north     | lactation_phase | anaerobic_lagoon |                   | cool           | temperate         | zone_wet     | uncovered                | wet          | 0.0537     |
-| mature_dairy_cattle | spain  | north     | lactation_phase | liquid_slurry    | 3                 | cool           | temperate         | zone_wet     | with_natural_crust_cover | wet          | 0.3432     |
-| mature_dairy_cattle | spain  | south     | dry_phase       | solid_storage    |                   | warm           | temperate         |              |                          | dry          | 0.0694     |
-| mature_dairy_cattle | spain  | south     | dry_phase       | deep_bedding     | \>1               | warm           | temperate         | zone_dry     | no_mixing                | dry          | 0.0131     |
+| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_zone | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | lactation_phase | anaerobic_lagoon |  | cool | temperate | zone_wet | uncovered | wet | 0.0537 |
+| mature_dairy_cattle | spain | north | lactation_phase | liquid_slurry | 3 | cool | temperate | zone_wet | with_natural_crust_cover | wet | 0.3432 |
+| mature_dairy_cattle | spain | south | dry_phase | solid_storage |  | warm | temperate |  |  | dry | 0.0694 |
+| mature_dairy_cattle | spain | south | dry_phase | deep_bedding | \>1 | warm | temperate | zone_dry | no_mixing | dry | 0.0131 |
 
 ------------------------------------------------------------------------
 
@@ -114,6 +114,7 @@ When running the analysis, `herdr` will process each row as a unique
 “animal-state-region” combination before aggregating the results.
 
 ``` r
+
 library(herdr)
 
 # The model calculates impact for each phase separately

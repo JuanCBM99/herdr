@@ -53,14 +53,14 @@ Consult this to find the correct names for your ingredients to use in
   %), `de` (Digestible Energy %), `ndf` (Neutral detergent fiber) % and
   ge (Gross energy MJ/kg).
 - **Why it matters:** `de` (Digestible Energy) is the main driver for
-  the Methane Conversion Factor ($Y_{m}$).
+  the Methane Conversion Factor ($`Y_m`$).
 
 ### 🧬 `ipcc_coefficients.csv` — Metabolic Constants
 
 Consult this to find the `description` you need to copy into your
 `livestock_definitions.csv`.
 
-- **Key Columns:** `description`, `coefficient` ($C_{a}$, $C_{fi}$,
+- **Key Columns:** `description`, `coefficient` ($`C_a`$, $`C_{fi}`$,
   etc.), and `value`.
 - **Why it matters:** It contains the Tier 2 constants that define
   energy needs for maintenance, pregnancy, and lactation.
@@ -103,7 +103,7 @@ database.
 
 - **Key Columns**: `Area`, `Item`, `Year`, `Value (kg DM/ha)`.
 - **Why it matters**: Sets the international standard for calculating
-  the land footprint ($m^{2}$) of concentrate feeds and commercial
+  the land footprint ($`m^2`$) of concentrate feeds and commercial
   crops.
 
 ------------------------------------------------------------------------
@@ -112,12 +112,12 @@ database.
 
 Use this table to know where to look when filling out your data:
 
-| If you want to…             | Consult this library:      | To fill this input file:                                                           |
-|:----------------------------|:---------------------------|:-----------------------------------------------------------------------------------|
-| **Identify an animal type** | `ipcc_coefficients.csv`    | `livestock_definitions.csv`                                                        |
-| **Pick a feed ingredient**  | `feed_characteristics.csv` | `diet_ingredients.csv`                                                             |
-| **Choose a manure system**  | `ipcc_mm.csv`              | `manure_management.csv`                                                            |
-| **Add a custom crop**       |                            | `feed_characteristics`, `forage_yields.csv`, `mapping.csv` & `fao_crop_yields.csv` |
+| If you want to… | Consult this library: | To fill this input file: |
+|:---|:---|:---|
+| **Identify an animal type** | `ipcc_coefficients.csv` | `livestock_definitions.csv` |
+| **Pick a feed ingredient** | `feed_characteristics.csv` | `diet_ingredients.csv` |
+| **Choose a manure system** | `ipcc_mm.csv` | `manure_management.csv` |
+| **Add a custom crop** |  | `feed_characteristics`, `forage_yields.csv`, `mapping.csv` & `fao_crop_yields.csv` |
 
 ------------------------------------------------------------------------
 
