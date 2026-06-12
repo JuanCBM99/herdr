@@ -1,7 +1,8 @@
 # Calculate Dry Matter Intake (DMI)
 
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand
-(GE/ED).
+(GE/ED) for ruminants and metabolizable energy parameters (FEDNA) for
+poultry.
 
 ## Usage
 

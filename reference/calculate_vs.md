@@ -1,7 +1,8 @@
 # Calculate Volatile Solids (VS) for Animals
 
 Computes volatile solids (VS) based on Gross Energy (GE), Digestible
-Energy (DE), and Ash content using IPCC Tier 2 methodology.
+Energy (DE), and Ash content using IPCC Tier 2 methodology for
+ruminants, and DMI/Energy ratios for poultry.
 
 ## Usage
 
