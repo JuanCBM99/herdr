@@ -41,7 +41,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
         animal_type == "goat"  ~ 5.5,
         animal_type == "cattle" & animal_tag == "mature_dairy_cattle" ~ dplyr::case_when(
           DE_pct >= 70 & NDF_pct <= 35 ~ 5.7,
-          DE_pct >= 70 & NDF_pct > 35  ~ 6.0,
+          DE_pct >= 70 & NDF_pct > 35  ~ 5.5,
           DE_pct >= 63 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
           DE_pct <= 62 & NDF_pct > 38  ~ 6.5,
           TRUE ~ 6.5

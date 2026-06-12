@@ -25,7 +25,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   CH4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
-    dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_Ggyear / 1e6, na.rm = TRUE), .groups = "drop")
+    dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_kgyear / 1e6, na.rm = TRUE), .groups = "drop")
 
   N2O_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%

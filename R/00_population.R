@@ -10,7 +10,6 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   message("\U0001f7e2 Calculating Total Population...")
 
-  # --- 1. Load Data ---
   census_raw <- readr::read_csv("user_data/livestock_census.csv",
                                 col_types = readr::cols(subregion = "c", class_flex = "c"),
                                 show_col_types = FALSE)
@@ -19,15 +18,17 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
                                  col_types = readr::cols(subregion = "c", class_flex = "c"),
                                  show_col_types = FALSE)
 
+  monogastric <- readr::read_csv("user_data/monogastric_definitions.csv",
+                                 col_types = readr::cols(subregion = "c", class_flex = "c"),
+                                 show_col_types = FALSE)
+
   rate_parameters <- readr::read_csv("user_data/reproduction_parameters.csv",
                                      show_col_types = FALSE)
 
-  # --- 2. Quick Integrity Check ---
   if (any(census_raw$population < 0, na.rm = TRUE)) {
     stop("Critical Error: Negative population values found in 'livestock_census.csv'.")
   }
 
-  # --- 3. Automatic Cycle Validation ---
   if (automatic_cycle) {
     required_bases <- c("mature_dairy_cattle", "mature_beef_cattle", "mature_beef_bull",
                         "mature_sheep_female_dairy", "mature_sheep_female_meat",
@@ -43,10 +44,11 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     }
   }
 
-  # --- 4. Processing ---
+  unified_definitions <- dplyr::bind_rows(definitions, monogastric)
+
   census_base <- census_raw %>%
     dplyr::left_join(
-      definitions %>% dplyr::select(animal_tag, region, subregion, class_flex, animal_type),
+      unified_definitions %>% dplyr::select(animal_tag, region, subregion, class_flex, animal_type),
       by = c("animal_tag", "region", "subregion", "class_flex")
     )
 
@@ -56,25 +58,28 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     message(" -> Mode: Automatic. Processing Species Helpers...")
     results_list <- list()
 
-    # Cattle
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
       message("\U0001f403 Calculating populations for CATTLE...")
       results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions)
     }
 
-    # Sheep
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
       message("\U0001f411 Calculating populations for SHEEP...")
       results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters)
     }
 
-    # Goat
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
       message("\U0001f410 Calculating populations for GOAT...")
       results_list$goat <- calculate_population_goat(df_goat, rate_parameters)
+    }
+
+    df_poultry <- census_base %>% dplyr::filter(tolower(animal_type) == "poultry")
+    if (nrow(df_poultry) > 0) {
+      message("\U0001f426 Carrying over poultry baseline population census...")
+      results_list$poultry <- df_poultry
     }
 
     if (length(results_list) == 0) return(tibble::tibble())
@@ -83,11 +88,10 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
       dplyr::bind_rows()
   }
 
-  # --- 5. Final Assembly ---
   final_result <- final_pop_raw %>%
     dplyr::select(-dplyr::any_of(c("animal_type", "animal_subtype"))) %>%
     dplyr::left_join(
-      definitions %>% dplyr::select(animal_tag, animal_type, animal_subtype) %>% dplyr::distinct(),
+      unified_definitions %>% dplyr::select(animal_tag, animal_type, animal_subtype) %>% dplyr::distinct(),
       by = "animal_tag"
     ) %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population) %>%

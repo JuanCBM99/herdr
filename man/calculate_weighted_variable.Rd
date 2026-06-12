@@ -11,5 +11,5 @@ calculate_weighted_variable(saveoutput = TRUE)
 }
 \description{
 Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)
-by mapping ingredients to diets and diets to animals.
+by mapping ingredients to diets and diets to animals, combining ruminant and poultry definitions.
 }

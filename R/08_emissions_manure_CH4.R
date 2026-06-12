@@ -105,14 +105,14 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
       ),
 
       EF_kgyear = (VS_kgday * 365) * (B0 * 0.67 * MCF_pct/100 * allocation),
-      total_CH4_mm_Ggyear = (EF_kgyear * population)
+      total_CH4_mm_kgyear = (EF_kgyear * population)
     ) %>%
 
     # --- 5. Selection and Rounding ---
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
       system_base, system_variant, VS_kgday, B0_m3kg = B0, MCF_pct, allocation,
-      EF_kgyear, population, total_CH4_mm_Ggyear
+      EF_kgyear, population, total_CH4_mm_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 6)))
 
