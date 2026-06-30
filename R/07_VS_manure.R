@@ -47,6 +47,8 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
         animal_type == "swine" & ED_kcalkg > 0 ~
           (DMI_kgday * (1 - (swine_DE_kcal_kg / ED_kcalkg) + 0.02) * (1 - (ASH_pct / 100))),
 
+        animal_type == "swine" & ED_kcalkg <= 0 ~ 0,
+
         # Ruminants (Default): IPCC Tier 2 Formula
         # Converts remaining energy (fecal + urinary loss) into mass using the 18.45 MJ/kg DM conversion factor
         TRUE ~ ((GE_MJday * (1 - DE_pct/100)) + (urinary_energy * GE_MJday)) * ((1 - ASH_pct/100) / 18.45)

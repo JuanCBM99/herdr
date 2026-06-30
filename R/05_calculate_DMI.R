@@ -12,7 +12,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
   ge_req    <- calculate_ge(saveoutput = FALSE)
   diet_char <- calculate_weighted_variable(saveoutput = FALSE)
   weights   <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  poultry_eng  <- calculate_monogastric_energy(saveoutput = FALSE)
+  mono  <- calculate_monogastric_energy(saveoutput = FALSE)
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 
@@ -28,7 +28,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
       by = join_keys
     ) %>%
     dplyr::left_join(
-      poultry_eng %>%
+      mono %>%
       dplyr::mutate(dplyr::across(dplyr::all_of(join_keys), ~ as.character(.))) %>%
         dplyr::select(dplyr::all_of(join_keys), ME_total_kcal_day),
       by = join_keys
@@ -44,6 +44,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
         animal_type == "poultry" & poultry_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / poultry_ME_kcal_kg,
         animal_type == "swine" & swine_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / swine_ME_kcal_kg,
         animal_type == "poultry" & poultry_ME_kcal_kg <= 0 ~ 0,
+        animal_type == "swine" & swine_ME_kcal_kg <= 0 ~ 0,
         # For ruminants: GE (MJ) to kcal conversion factor is 239.005 (1 MJ = 239.005 kcal)
         ED_kcalkg > 0 ~ GE_MJday / ED_kcalkg * 239.005,
         TRUE ~ 0
@@ -57,9 +58,9 @@ calculate_DMI <- function(saveoutput = TRUE) {
   # --- 4. Upper Bound Biological Threshold Checks ---
   warn_high <- results %>%
     dplyr::filter(
-      (animal_type == "Cattle" & DMI_bw_pct > 4.4) |
-        (animal_type == "Sheep"  & DMI_bw_pct > 5.5) |
-        (animal_type == "Goat"   & DMI_bw_pct > 6.7)
+      (animal_type == "cattle" & DMI_bw_pct > 4.4) |
+        (animal_type == "sheep"  & DMI_bw_pct > 5.5) |
+        (animal_type == "goat"   & DMI_bw_pct > 6.7)
     )
 
   if (nrow(warn_high) > 0) {
