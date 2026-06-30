@@ -32,6 +32,8 @@
   : Calculate Gross Energy (GE)
 - [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
   : Calculate land use
+- [`calculate_monogastric_energy()`](https://juancbm99.github.io/herdr/reference/calculate_monogastric_energy.md)
+  : Calculate Monogastric Metabolizable Energy Requirements (FEDNA)
 - [`calculate_population()`](https://juancbm99.github.io/herdr/reference/calculate_population.md)
   : Calculate Total Animal Population
 - [`calculate_population_cattle()`](https://juancbm99.github.io/herdr/reference/calculate_population_cattle.md)
@@ -40,8 +42,6 @@
   : Calculates the full goat population structure (Internal Helper)
 - [`calculate_population_sheep()`](https://juancbm99.github.io/herdr/reference/calculate_population_sheep.md)
   : Calculates the full sheep population structure (Internal Helper)
-- [`calculate_poultry_energy()`](https://juancbm99.github.io/herdr/reference/calculate_poultry_energy.md)
-  : Calculate Poultry Metabolic Energy Requirements (FEDNA)
 - [`calculate_vs()`](https://juancbm99.github.io/herdr/reference/calculate_vs.md)
   : Calculate Volatile Solids (VS) for Animals
 - [`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
