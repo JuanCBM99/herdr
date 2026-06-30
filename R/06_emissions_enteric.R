@@ -14,6 +14,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   diet_vars <- calculate_weighted_variable(saveoutput = FALSE)
   ge_df     <- calculate_ge(saveoutput = FALSE)
   pop_df    <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  livestock_definitions    <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
 
   if (nrow(diet_vars) == 0) {
     message("\u26a0 No diet data found. Returning empty structure.")
@@ -33,24 +34,29 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
       pop_df %>%
         dplyr::select(dplyr::all_of(join_keys), population)) %>%
 
+    dplyr::left_join(
+      livestock_definitions %>%
+        dplyr::select(dplyr::all_of(join_keys), milk_yield_kg_year)) %>%
+
+
     # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2) ---
     dplyr::mutate(
       across(c(DE_pct, NDF_pct, GE_MJday, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       Ym_pct = dplyr::case_when(
         animal_type == "sheep" ~ 6.7,
         animal_type == "goat"  ~ 5.5,
-        animal_type == "cattle" & animal_tag == "mature_dairy_cattle" ~ dplyr::case_when(
-          DE_pct >= 70 & NDF_pct <= 35 ~ 5.7,
-          DE_pct >= 70 & NDF_pct > 35  ~ 5.5,
+        animal_type == "cattle" & animal_subtype == "dairy" & milk_yield_kg_year > 0  ~ dplyr::case_when(
+          DE_pct >= 70 & NDF_pct < 35 ~ 5.7,
+          DE_pct >= 70 & NDF_pct >= 35  ~ 6.0,
           DE_pct >= 63 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
           DE_pct <= 62 & NDF_pct > 38  ~ 6.5,
           TRUE ~ 6.5
         ),
-        animal_type == "cattle" & animal_tag != "mature_dairy_cattle" ~ dplyr::case_when(
+        animal_type == "cattle" ~ dplyr::case_when(
           DE_pct >= 75 ~ 3.0,
           DE_pct >= 72 ~ 4.0,
-          DE_pct >= 62 & DE_pct <= 71 ~ 6.3,
-          DE_pct < 62  ~ 7.0,
+          DE_pct > 62 & DE_pct < 72 ~ 6.3,
+          DE_pct <= 62  ~ 7.0,
           TRUE ~ 6.3
         ),
         TRUE ~ NA_real_
