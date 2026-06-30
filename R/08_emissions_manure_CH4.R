@@ -76,15 +76,15 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
         dplyr::select(region, subregion, animal_tag, class_flex,
                       system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, allocation),
-      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+                      climate_moisture, b_0, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
     dplyr::left_join(
       coefficients %>%
         dplyr::filter(tolower(coefficient) == "b_0") %>%
-        dplyr::select(animal_type, animal_subtype, B0 = value),
-      by = c("animal_type", "animal_subtype")
+        dplyr::select(description, B0 = value),
+      by = c("b_0" = "description")
     ) %>%
 
     dplyr::left_join(

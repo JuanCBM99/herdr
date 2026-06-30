@@ -13,14 +13,16 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
+  # --- 1. Load Dependencies and Model Components ---
   ge_data   <- calculate_ge(saveoutput = FALSE)
   dmi_data  <- calculate_DMI(saveoutput = FALSE)
   diet_char <- calculate_weighted_variable(saveoutput = FALSE)
 
+  # --- 2. Merge Assets and Clean Numeric Types ---
   results <- ge_data %>%
     dplyr::select(dplyr::all_of(join_keys), GE_MJday, DE_pct) %>%
     dplyr::left_join(
-      diet_char %>% dplyr::select(dplyr::all_of(join_keys), ASH_pct, ED_kcalkg, poultry_ME_kcal_kg),
+      diet_char %>% dplyr::select(dplyr::all_of(join_keys), ASH_pct, ED_kcalkg, poultry_ME_kcal_kg,  swine_DE_kcal_kg),
       by = join_keys
     ) %>%
     dplyr::left_join(
@@ -29,26 +31,36 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
     ) %>%
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, DE_pct, ASH_pct, ED_kcalkg, poultry_ME_kcal_kg, DMI_kgday),
+        c(GE_MJday, DE_pct, ASH_pct, ED_kcalkg, poultry_ME_kcal_kg, swine_DE_kcal_kg, DMI_kgday),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
+      # --- 3. Compute Volatile Solids (VS) via Category-Specific Methods ---
       VS_kgday = dplyr::case_when(
+        # Poultry: VS derived via DMI and the proportion of non-metabolizable organic matter
         animal_type == "poultry" & ED_kcalkg > 0 ~
           (DMI_kgday * (1 - (poultry_ME_kcal_kg / ED_kcalkg)) * (1 - (ASH_pct / 100))),
 
         animal_type == "poultry" & ED_kcalkg <= 0 ~ 0,
 
+        # Swine: VS derived via DMI, accounting for Digestible Energy and a 2% urinary loss adjustment
+        animal_type == "swine" & ED_kcalkg > 0 ~
+          (DMI_kgday * (1 - (swine_DE_kcal_kg / ED_kcalkg) + 0.02) * (1 - (ASH_pct / 100))),
+
+        # Ruminants (Default): IPCC Tier 2 Formula
+        # Converts remaining energy (fecal + urinary loss) into mass using the 18.45 MJ/kg DM conversion factor
         TRUE ~ ((GE_MJday * (1 - DE_pct/100)) + (urinary_energy * GE_MJday)) * ((1 - ASH_pct/100) / 18.45)
       )
     ) %>%
 
+    # --- 4. Select, Format and Round Outputs ---
     dplyr::select(
       dplyr::all_of(join_keys),
-      GE_MJday, DE_pct, ASH_pct, ED_kcalkg, poultry_ME_kcal_kg, DMI_kgday, VS_kgday
+      GE_MJday, DE_pct, ASH_pct, ED_kcalkg, poultry_ME_kcal_kg,  swine_DE_kcal_kg, DMI_kgday, VS_kgday
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
 
+  # --- 5. Export Execution ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/VS.csv")

@@ -78,8 +78,8 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
         dplyr::select(region, subregion, animal_tag, class_flex,
                       system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, allocation),
-      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+                      climate_moisture, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
     dplyr::left_join(
