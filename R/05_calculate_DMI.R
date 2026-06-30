@@ -20,7 +20,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
   results <- ge_req %>%
     dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, GE_MJday) %>%
     dplyr::left_join(
-      diet_char %>% dplyr::select(diet_tag, dplyr::all_of(join_keys), ED_kcalkg, poultry_ME_kcal_kg, swine_ME_kcal_kg),
+      diet_char %>% dplyr::select(diet_tag, dplyr::all_of(join_keys), GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_ME_kcal_kg),
       by = join_keys
     ) %>%
     dplyr::left_join(
@@ -35,7 +35,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
     ) %>%
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, ED_kcalkg, poultry_ME_kcal_kg, initial_weight_kg, final_weight_kg, ME_total_kcal_day),
+        c(GE_MJday, GE_feed_kcal_kg, poultry_ME_kcal_kg, initial_weight_kg, final_weight_kg, ME_total_kcal_day),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
@@ -46,7 +46,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
         animal_type == "poultry" & poultry_ME_kcal_kg <= 0 ~ 0,
         animal_type == "swine" & swine_ME_kcal_kg <= 0 ~ 0,
         # For ruminants: GE (MJ) to kcal conversion factor is 239.005 (1 MJ = 239.005 kcal)
-        ED_kcalkg > 0 ~ GE_MJday / ED_kcalkg * 239.005,
+        GE_feed_kcal_kg > 0 ~ GE_MJday / GE_feed_kcal_kg * 239.005,
         TRUE ~ 0
       ),
 
@@ -76,7 +76,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))) %>%
     dplyr::select(
       dplyr::all_of(join_keys), diet_tag, animal_type, animal_subtype,
-      GE_MJday, ED_kcalkg, poultry_ME_kcal_kg, swine_ME_kcal_kg, ME_total_kcal_day,
+      GE_MJday, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_ME_kcal_kg, ME_total_kcal_day,
       DMI_kgday, DMI_bw_pct
     )
 

@@ -39,7 +39,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::left_join(ingredients, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
     dplyr::mutate(
-      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_kcalkg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
                     ~ as.numeric(as.character(.)))
     ) %>%
     # Calculate absolute composition factor: (% ingredient within category * % category in diet) / 10000
@@ -55,7 +55,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
-      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_kcalkg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
                     ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
@@ -111,7 +111,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
-      DE_pct, CP_pct, NDF_pct, ASH_pct, ED_kcalkg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
+      DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
     )
 
   if (isTRUE(saveoutput)) {

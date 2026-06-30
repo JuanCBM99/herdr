@@ -1,4 +1,4 @@
-ingredient_type,ingredient,MS_pct,ASH_pct,CP_pct,EE_pct,NDF_pct,DE_pct,ED_kcalkg,swine_ME_kcal_kg,poultry_ME_kcal_kg
+ingredient_type,ingredient,MS_pct,ASH_pct,CP_pct,EE_pct,NDF_pct,DE_pct,GE_feed_kcal_kg,swine_ME_kcal_kg,poultry_ME_kcal_kg
 concentrate,broken_rice,87.2,1.15,8.6,1.15,2.87,NA,4282.8,4025.229358,3899.082569
 concentrate,oats,90.5,3.09,10.94,5.41,34.14,75.5,4471.1,2983.425414,2651.933702
 concentrate,oats_decorticated,88.5,3.16,15.82,7.8,11.53,NA,4675.06,3672.316384,3706.214689

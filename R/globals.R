@@ -19,7 +19,7 @@ if(getRversion() >= "2.15.1") {
     "W_metabolic",
 
     # --- Nutrition and Intake (DMI) ---
-    "GE_MJday", "ED_kcalkg", "DE_pct", "CP_pct", "NDF_pct", "ASH_pct",
+    "GE_MJday", "GE_feed_kcal_kg", "DE_pct", "CP_pct", "NDF_pct", "ASH_pct",
     "DMI_kgday", "DMI_bw_pct", "forage_share", "concentrate_share",
     "milk_share", "milk_replacer_share", "total_diet", "total_ing",
     "ingredient", "ingredient_share", "ingredient_type", "forage_pct",
