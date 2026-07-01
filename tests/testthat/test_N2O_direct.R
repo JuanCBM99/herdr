@@ -37,7 +37,7 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
   expect_s3_class(results, "data.frame")
 
   # Check for mandatory IPCC columns for Nitrogen reporting
-  required_cols <- c("N_intake_kgheadday", "N_retention", "N_excreted_kgheadyear",
+  required_cols <- c("N_intake_kgheadday", "N_retention_kg_day", "N_excreted_kgheadyear",
                      "EF3", "direct_N2O_kgyear")
   expect_true(all(required_cols %in% colnames(results)))
 

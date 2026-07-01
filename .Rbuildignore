@@ -22,3 +22,4 @@ exampleRepoCheatsheet.pdf
 ^user_data$
 ^\.positai$
 ^\.claude$
+^paper$
