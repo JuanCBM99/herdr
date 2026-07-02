@@ -1,18 +1,19 @@
-#' Calculate CH4 Emissions from Manure Management
+#' Calculate indirect N2O emissions from volatilization
 #'
-#' Computes CH4 emissions from manure based on Volatile Solids (VS),
-#' population, and management factors (B0, MCF, AWMS) using IPCC Eq 10.23.
+#' Computes indirect N2O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
-  message("\U0001f4be Calculating CH4 emissions from manure management...")
+  message("\U0001f4be Calculating indirect N2O emissions (volatilization)...")
 
   # --- 1. Data Loading ---
   user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
+
+  direct_N2O_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
   # --- 2. Validations (Asserts) ---
 
@@ -60,14 +61,15 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # --- 3. Processing and Joins ---
+  # --- 2. Master Dataset Construction & Joins ---
 
-  results <- calculate_vs(saveoutput = FALSE) %>%
-    dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
+  results <- direct_N2O_df %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted_kgheadyear) %>%
+    dplyr::distinct() %>%
 
+    # 2.1 Join Population Data
     dplyr::left_join(
-      calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
-        dplyr::select(dplyr::all_of(join_keys), population),
+      pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
     ) %>%
 
@@ -76,51 +78,46 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
         dplyr::select(region, subregion, animal_tag, class_flex,
                       system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, allocation),
-      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
-    ) %>%
-
-    dplyr::left_join(
-      coefficients %>%
-        dplyr::filter(tolower(coefficient) == "b_0") %>%
-        dplyr::select(animal_type, animal_subtype, B0 = value),
-      by = c("animal_type", "animal_subtype")
+                      climate_moisture, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
     dplyr::left_join(
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, MCF_pct),
+                      climate_moisture, animal_type, animal_subtype, frac_gas, EF4), #EF4 kg N2O-N/ (kg NH3-N + NOx-N volatilised)
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
     ) %>%
 
-    # --- 4. Calculations (IPCC Eq 10.23) ---
+    # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
       dplyr::across(
-        c(VS_kgday, population, allocation, B0, MCF_pct),
+        c(population, N_excreted_kgheadyear, allocation, frac_gas, EF4),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      EF_kgyear = (VS_kgday * 365) * (B0 * 0.67 * MCF_pct/100 * allocation),
-      total_CH4_mm_Ggyear = (EF_kgyear * population)
+      N_volatilization_kg_year = population * N_excreted_kgheadyear * allocation * frac_gas,
+
+      N2O_vol_kgyear = EF4 * N_volatilization_kg_year * (44 / 28)
     ) %>%
 
-    # --- 5. Selection and Rounding ---
+    # --- 4. Final Selection and Cleanup ---
     dplyr::select(
-      region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      system_base, system_variant, VS_kgday, B0_m3kg = B0, MCF_pct, allocation,
-      EF_kgyear, population, total_CH4_mm_Ggyear
+      dplyr::all_of(join_keys),
+      system_base, system_variant,
+      N_excreted_kgheadyear, frac_gas, EF4,
+      N_volatilization_kg_year, N2O_vol_kgyear
     ) %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 6)))
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 
-  # --- 6. Save Output ---
+  # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
-    readr::write_csv(results, "output/CH4_manure.csv")
-    message("\U0001f4be Saved methane results to output/CH4_manure.csv")
+    readr::write_csv(results, "output/N2O_indirect_volatilization.csv")
+    message("\U1F4BE Saved output to output/N2O_indirect_volatilization.csv")
   }
 
   return(results)

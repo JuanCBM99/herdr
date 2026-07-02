@@ -20,3 +20,6 @@ exampleRepoCheatsheet.pdf
 ^output$
 ^LICENSE\.md$
 ^user_data$
+^\.positai$
+^\.claude$
+^paper$

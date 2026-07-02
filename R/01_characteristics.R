@@ -1,7 +1,7 @@
 #' Calculate Weighted Nutritional Variables
 #'
 #' Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)
-#' by mapping ingredients to diets and diets to animals.
+#' by mapping ingredients to diets and diets to animals, combining ruminant and poultry definitions.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
@@ -9,15 +9,14 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
 
   message("\U0001f7e2 Calculating Weighted Nutritional Variables...")
 
-  # --- 1. Load Data ---
+  # --- 1. Load Data Assets ---
   diets           <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
   ingredients     <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE)
   characteristics <- readr::read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
   definitions     <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  monogastric     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
 
-  # --- 2. Data Integrity Assertions ---
-
-  # A. Check Diet Profiles sum to 100%
+  # --- 2. Consistency Validations (Shares must sum to 100%) ---
   diet_sum_check <- diets %>%
     dplyr::mutate(total_diet = forage_share + concentrate_share + milk_share + milk_replacer_share) %>%
     dplyr::filter(abs(total_diet - 100) > 0.1)
@@ -26,7 +25,6 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
                           msg = paste("Diet Profile Error: Shares do not sum to 100% in 'diet_profiles.csv' for:",
                                       paste(diet_sum_check$diet_tag, collapse = ", ")))
 
-  # B. Check Ingredient Shares within each category sum to 100%
   ing_sum_check <- ingredients %>%
     dplyr::group_by(diet_tag, region, subregion, class_flex, ingredient_type) %>%
     dplyr::summarise(total_ing = sum(ingredient_share, na.rm = TRUE), .groups = "drop") %>%
@@ -36,49 +34,46 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
                           msg = paste("Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for:",
                                       paste(unique(ing_sum_check$diet_tag), collapse = ", ")))
 
-
-
-  # --- 3. Build Diet Nutritional Profiles ---
-
+  # --- 3. Compute Weighted Nutritional Profiles ---
   diet_profiles <- diets %>%
     dplyr::left_join(ingredients, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
-    # --- PASO DE SEGURIDAD ---
     dplyr::mutate(
-      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg),
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
                     ~ as.numeric(as.character(.)))
     ) %>%
-    # -------------------------
-  dplyr::mutate(
-    weight_factor = (ingredient_share * dplyr::case_when(
-      ingredient_type == "forage"      ~ forage_share,
-      ingredient_type == "concentrate" ~ concentrate_share,
-      ingredient_type == "milk"        ~ milk_share,
-      ingredient_type == "replacer"    ~ milk_replacer_share,
-      TRUE ~ 0
-    )) / 10000
-  ) %>%
+    # Calculate absolute composition factor: (% ingredient within category * % category in diet) / 10000
+    dplyr::mutate(
+      weight_factor = (ingredient_share * dplyr::case_when(
+        ingredient_type == "forage"      ~ forage_share,
+        ingredient_type == "concentrate" ~ concentrate_share,
+        ingredient_type == "milk"        ~ milk_share,
+        ingredient_type == "replacer"    ~ milk_replacer_share,
+        TRUE ~ 0
+      )) / 10000
+    ) %>%
     dplyr::group_by(region, subregion, class_flex, diet_tag) %>%
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
-      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg),
+      dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
                     ~ sum(. * weight_factor, na.rm = TRUE)),
       .groups = "drop"
     )
 
-  # --- 4. Map Diets to Animals & Validate MATURE Animals ---
+  # --- 4. Consolidate Ruminant and Monogastric Mappings ---
+  unified_definitions <- dplyr::bind_rows(definitions, monogastric)
 
-  full_data <- definitions %>%
+  full_data <- unified_definitions %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag) %>%
     dplyr::left_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::filter(!is.na(region))
 
+  # --- 5. Biological & Nutritional Threshold Threshold Checks (Mature Animals Only) ---
   mature_check <- full_data %>%
     dplyr::filter(grepl("mature", animal_tag, ignore.case = TRUE))
 
   if (nrow(mature_check) > 0) {
 
-    # 1. Forage Alerts (< 30% or > 80%)
     warn_forage_low <- mature_check %>% dplyr::filter(forage_pct < 30)
     if (nrow(warn_forage_low) > 0) {
       warning(paste0("\u26A0 Warning (Forage): < 30% in: ", paste(unique(warn_forage_low$animal_tag), collapse = ", "),
@@ -91,7 +86,6 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
                      ". Likely to limit intake due to physical rumen fill (Ref: NRC 2001 / 1996)."))
     }
 
-    # 2. Crude Protein (CP) Alerts (< 7% or > 20%)
     warn_cp_low <- mature_check %>% dplyr::filter(CP_pct < 7)
     if (nrow(warn_cp_low) > 0) {
       warning(paste0("\u26A0 Warning (Protein): < 7% in: ", paste(unique(warn_cp_low$animal_tag), collapse = ", "),
@@ -104,7 +98,6 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
                      ". Excess causes high energy expenditure and reproductive/embryonic toxicity (Ref: NRC 2001)."))
     }
 
-    # 3. Ash Alert (> 10%)
     warn_ash <- mature_check %>% dplyr::filter(ASH_pct > 10)
     if (nrow(warn_ash) > 0) {
       warning(paste0("\u26A0 Warning (Ash): > 10% in: ", paste(unique(warn_ash$animal_tag), collapse = ", "),
@@ -113,15 +106,14 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
 
   }
 
-  # --- 4. Final Formatting ---
+  # --- 6. Formatting and File Export ---
   results <- full_data %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
-      DE_pct, CP_pct, NDF_pct, ASH_pct, ED_MJkg
+      DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
     )
 
-  # --- 7. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/weighted_nutritional_variables.csv")

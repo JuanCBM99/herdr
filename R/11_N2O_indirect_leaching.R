@@ -1,24 +1,19 @@
-#' Calculate direct N2O emissions from manure
+#' Calculate indirect N2O emissions from leaching
 #'
-#' Computes direct N2O emissions based on nitrogen excretion logic,
-#' emission factors, management system, and climate (IPCC Eq 10.25).
+#' Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
-  message("\U0001f4be Calculating direct N2O emissions from manure...")
+  message("\U0001f4be Calculating indirect N2O emissions (leaching)...")
 
   # --- 1. Data Loading ---
-  cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
-  weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
   user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
 
-  ge_df  <- calculate_ge(saveoutput = FALSE)
-  cp_df  <- calculate_weighted_variable(saveoutput = FALSE)
-  pop_df <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
-  neg_df <- calculate_NEg(saveoutput = FALSE)
+  direct_N2O_df <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE)
+  pop_df        <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
 
   # --- 2. Validations (Asserts) ---
 
@@ -64,37 +59,18 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     )
   }
 
+
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 2. Master Dataset Construction & Joins ---
 
-  results <- ge_df %>%
-    dplyr::select(dplyr::all_of(join_keys), GE_MJday) %>%
+  results <- direct_N2O_df %>%
+    dplyr::select(dplyr::all_of(join_keys), N_excreted_kgheadyear) %>%
+    dplyr::distinct() %>%
 
-    dplyr::left_join(
-      cp_df %>% dplyr::select(dplyr::all_of(join_keys), CP_pct),
-      by = join_keys
-    ) %>%
     dplyr::left_join(
       pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
-    ) %>%
-
-    dplyr::left_join(
-      cat_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct),
-      by = c("region", "subregion", "animal_tag", "class_flex")
-    ) %>%
-
-    dplyr::left_join(
-      weights_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg, productive_period_days),
-      by = c("region", "subregion", "animal_tag", "class_flex")
-    ) %>%
-    dplyr::left_join(
-      neg_df %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJday),
-      by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
     dplyr::left_join(
@@ -102,59 +78,47 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         dplyr::select(region, subregion, animal_tag, class_flex,
                       system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, allocation),
-      by = c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+                      climate_moisture, allocation),
+      by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
+    # 2.3 Join Leaching Fraction (frac_leach) and Factor (EF5) from Master Table
     dplyr::left_join(
       ipcc_master %>%
         dplyr::select(system_base, management_months, system_climate,
                       system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, EF3), #EF3 kg N2O-N/kg N
+                      climate_moisture, animal_type, animal_subtype, frac_leach, EF5), #EF5 kg N2O-N/kg N leached and runoff
       by = c("system_base", "management_months", "system_climate",
              "system_subclimate", "climate_zone", "system_variant",
              "climate_moisture", "animal_type", "animal_subtype")
     ) %>%
 
-    # --- 3. Calculations ---
+    # --- 3. Calculations (N Loss and N2O Conversion) ---
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, CP_pct, population, milk_yield_kg_year, fat_content_pct, initial_weight_kg, final_weight_kg, productive_period_days, NEg_MJday, allocation, EF3),
+        c(population, N_excreted_kgheadyear, allocation, frac_leach, EF5),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      milk_protein = 1.9 + 0.4 * fat_content_pct,
+      N_leaching_kg_year = population * N_excreted_kgheadyear * allocation * frac_leach,
 
-      N_retention = dplyr::case_when(
-        animal_type %in% c("sheep", "goat") ~ 0.1,
-        ((final_weight_kg - initial_weight_kg)/productive_period_days) > 0 & NEg_MJday > 0  ~ ((milk_yield_kg_year * milk_protein) / 6.38) +
-          ((((final_weight_kg - initial_weight_kg)/productive_period_days) * (268 - (7.03 * NEg_MJday / ((final_weight_kg - initial_weight_kg)/productive_period_days))) / 1000) / 6.25),
-        TRUE ~ 0
-      ),
-
-      N_intake_kgheadday   = (GE_MJday / 18.45) * (CP_pct / 100 / 6.25),
-      N_excreted_kgheadday = dplyr::if_else(
-        animal_type %in% c("sheep", "goat"),
-        (N_intake_kgheadday * (1 - N_retention)) * 365,
-        (N_intake_kgheadday - N_retention) * 365
-      ),
-
-      direct_N2O_kgyear = population * N_excreted_kgheadday * allocation * EF3 * (44 / 28)
+      N2O_leach_kgyear = EF5 * N_leaching_kg_year * (44 / 28)
     ) %>%
 
-    # --- 4. Final Formatting ---
+    # --- 4. Final Selection and Cleanup ---
     dplyr::select(
       dplyr::all_of(join_keys),
-      system_base, system_variant, climate_moisture, climate_zone,
-      N_intake_kgheadday, N_retention, N_excreted_kgheadday, EF3, population, direct_N2O_kgyear
+      system_base, system_variant,
+      N_excreted_kgheadyear, frac_leach, EF5,
+      N_leaching_kg_year, N2O_leach_kgyear
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
 
   # --- 5. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
-    readr::write_csv(results, "output/N2O_direct_manure.csv")
-    message("\U1F4BE Saved output to output/N2O_direct_manure.csv")
+    readr::write_csv(results, "output/N2O_indirect_leaching.csv")
+    message("\U1F4BE Saved output to output/N2O_indirect_leaching.csv")
   }
 
   return(results)

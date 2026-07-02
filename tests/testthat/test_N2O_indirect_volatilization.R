@@ -51,7 +51,7 @@ test_that("calculate_N2O_indirect_volatilization completes the N cycle using CSV
     expect_false(any(is.na(results$EF4)))
 
     # If there is nitrogen excretion, there must be some volatilization
-    sample_active <- results %>% filter(N_excreted_kgheadday > 0) %>% head(1)
+    sample_active <- results %>% filter(N_excreted_kgheadyear > 0) %>% head(1)
     if(nrow(sample_active) > 0) {
       expect_gt(sample_active$N_volatilization_kg_year, 0)
       expect_gt(sample_active$N2O_vol_kgyear, 0)

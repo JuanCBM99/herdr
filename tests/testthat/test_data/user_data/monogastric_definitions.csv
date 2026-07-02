@@ -1,0 +1,11 @@
+animal_tag,region,subregion,class_flex,diet_tag,cfi_maintenance,frac_fat_pct,frac_protein_pct,egg_mass_g_day,alpha,piglets_born,piglets_suckling,animal_type,animal_subtype
+broilers,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+replacement_meat_pullets,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+breeder_meat_hens,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+replacement_layer_pullets,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+laying_hens,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+free_range_laying_hens,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+fattening_pigs,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+replacement_sows,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+breeder_sows,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
+boars,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA
