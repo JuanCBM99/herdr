@@ -1,4 +1,4 @@
-# Dairy Cattle Environmental Impact
+# Basic Assessment: A Step-by-Step Guide
 
 ## Getting Started with a Basic Assessment
 
@@ -46,7 +46,7 @@ Open `feed_characteristics.csv` to see the list of available feed items.
 If you wish, you can add as many new ingredients as you want, always
 fulfilling all columns.
 
-#### B. Define the Profile (`diet.csv`)
+#### B. Define the Profile (`diet_profiles.csv`)
 
 | diet_tag          | region | forage | concentrate | milk | milk_replacer |
 |:------------------|:-------|:-------|:------------|:-----|:--------------|
@@ -75,26 +75,28 @@ IPCC equations. Use the **exact descriptions** from
 
 ### Step 4: Body Weights
 
-Open `weights.csv`. Ensure the keys match the census exactly.
+Open `livestock_weights.csv`. Ensure the keys match the census exactly.
 
-| animal_tag          | region | adult_weight | weight_gain | average_weight |
-|:--------------------|:-------|:-------------|:------------|:---------------|
-| mature_dairy_cattle | spain  | 675          | 0           | 675            |
+| animal_tag | region | adult_weight | productive_period | initial_weight | final_weight |
+|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | 675 | 365 | 675 | 675 |
 
 ------------------------------------------------------------------------
 
 ### Step 5: Manure Management (`manure_management.csv`)
 
 1.  Check `ipcc_mm.csv` for valid `management_system` and
-    `system_climate` names (You can also check the section X of this
-    documentation).
+    `system_climate` names (You can also check the section **[Manure
+    System
+    Guide](https://juancbm99.github.io/herdr/articles/Manure.md)** of
+    this documentation).
 2.  If you have more than one system for the exactly same animal,
     **duplicate the row** and split the allocation.
 
-| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | animal_type | animal_subtype | allocation |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain |  |  | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | cattle | dairy | 0.343 |
-| mature_dairy_cattle | spain |  |  | solid_storage |  | temperate |  |  |  | dry | cattle | dairy | 0.069 |
+| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
+| mature_dairy_cattle | spain |  |  | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | dairy_cattle_high_productivity | 0.3 |
+| mature_dairy_cattle | spain |  |  | solid_storage |  | temperate |  |  |  | dry | dairy_cattle_high_productivity | 0.7 |
 
 ------------------------------------------------------------------------
 
@@ -107,5 +109,5 @@ Once your CSVs are updated, run the following in R:
 library(herdr)
 
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE)
+  automatic_cycle = FALSE, crop_yield_country = "Spain")
 ```

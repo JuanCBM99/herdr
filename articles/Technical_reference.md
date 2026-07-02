@@ -18,11 +18,17 @@ step-by-step instructions.
 
 - **`livestock_census.csv`**: Defines the `animal_tag`, location
   (`region`), and the number of heads (`population`).
-- **`weights.csv`**: Defines the physical scale of the animals,
-  including `adult_weight`, `initial_weight`, `final_weight` and
-  `productive_period`.
-- **`livestock_definitions.csv`**: The bridge file. It links each
-  `animal_tag` to a `diet_tag` and an **IPCC Description**.
+- **`livestock_weights.csv`**: Defines the physical scale of the
+  animals, including `adult_weight`, `initial_weight`, `final_weight`,
+  `productive_period`, as well as additional parameters for breeder
+  swine..
+- **`livestock_definitions.csv`**: The bridge file for ruminant animals.
+  It links each `animal_tag` to a `diet_tag` and an **IPCC
+  Description**.
+- **`monogastric_definitions.csv`**: The bridge file for monogastric
+  animals. It links each `animal_tag` to a `diet_tag` and
+  species-specific parameters required for monogastric energy
+  calculations.
 
 ### 🍚 Nutrition & Diets
 
@@ -36,6 +42,15 @@ step-by-step instructions.
 - **`manure_management.csv`**: Defines how waste is handled, specifying
   the system, the climate, and the `allocation` (0 to 1).
 
+### Reproduction Parameters
+
+This file only needs to be modified if the population of all animal
+categories is unknown or if offspring and replacement rates need to be
+adjusted for a specific study.
+
+- **`reproduction_parameters.csv`**: Contains default offspring and
+  replacement rates used to estimate missing animal categories.
+
 ------------------------------------------------------------------------
 
 ## II. Reference Libraries (Consult Only)
@@ -46,14 +61,25 @@ the exact names for your inputs.
 
 ### 🧪 `feed_characteristics.csv` — Nutritional Values
 
-Consult this to find the correct names for your ingredients to use in
+Consult this library to find the correct ingredient names for use in
 `diet_ingredients.csv`.
 
-- **Key Columns:** `ingredient`, `ingredient_type`, `cp` (Crude Protein
-  %), `de` (Digestible Energy %), `ndf` (Neutral detergent fiber) % and
-  ge (Gross energy MJ/kg).
-- **Why it matters:** `de` (Digestible Energy) is the main driver for
-  the Methane Conversion Factor ($`Y_m`$).
+- **Key Columns:** `ingredient`, `ingredient_type`, `ASH_pct` (Ash, %
+  DM), `CP_pct` (Crude Protein, % DM), `EE_pct` (Ether Extract, % DM),
+  `NDF_pct` (Neutral Detergent Fiber, % DM), `DE_pct` (Digestible
+  Energy, %), `GE_feed_kcal_kg` (Gross Energy, kcal/kg DM),
+  `swine_ME_kcal_kg` (Metabolizable Energy for Swine, kcal/kg DM),
+  `swine_DE_kcal_kg` (Digestible Energy for Swine, kcal/kg DM), and
+  `poultry_ME_kcal_kg` (Metabolizable Energy for Poultry, kcal/kg DM).
+
+- **Important:** Most nutritional values are sourced from the **FEDNA
+  Tables (2019)**. The `DE_pct` values are obtained from **Feedipedia**,
+  while `GE_feed_kcal_kg` is calculated using the **NRC (1998) Ewan
+  equation**:
+
+``` math
+GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)
+```
 
 ### 🧬 `ipcc_coefficients.csv` — Metabolic Constants
 
@@ -63,7 +89,8 @@ Consult this to find the `description` you need to copy into your
 - **Key Columns:** `description`, `coefficient` ($`C_a`$, $`C_{fi}`$,
   etc.), and `value`.
 - **Why it matters:** It contains the Tier 2 constants that define
-  energy needs for maintenance, pregnancy, and lactation.
+  energy needs for maintenance, pregnancy, lactation and B0 (Maximum
+  Methane Producing Capacity) for manure management calculations.
 
 ### 💩 `ipcc_mm.csv` — Manure Reference
 

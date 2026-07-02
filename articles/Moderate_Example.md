@@ -82,10 +82,10 @@ the IPCC physiological equations.
 Open `livestock_weights.csv`. Ensure the keys match the census. These
 weights are used to validate your dry matter intake (DMI) limits.
 
-| animal_tag          | region | subregion | adult_weight | weight_gain | average_weight |
-|:--------------------|:-------|:----------|:-------------|:------------|:---------------|
-| mature_dairy_cattle | spain  | north     | 675          | 0           | 675            |
-| mature_dairy_cattle | spain  | south     | 675          | 0           | 675            |
+| animal_tag | region | subregion | adult_weight | productive_period | initial_weight | final_weight |
+|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | 675 | 365 | 675 | 675 |
+| mature_dairy_cattle | spain | south | 675 | 365 | 675 | 675 |
 
 ------------------------------------------------------------------------
 
@@ -94,12 +94,12 @@ weights are used to validate your dry matter intake (DMI) limits.
 You can define multiple manure systems for the same animal by splitting
 the `allocation` (the sum per animal/region must be 1.0).
 
-| animal_tag | region | subregion | system_base | management_months | system_climate | allocation |
-|:---|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | north | anaerobic_lagoon |  | cool | 0.0537 |
-| mature_dairy_cattle | spain | north | liquid_slurry | 3 | cool | 0.3432 |
-| mature_dairy_cattle | spain | north | solid_storage |  | cool | 0.3551 |
-| mature_dairy_cattle | spain | south | solid_storage |  | cool | 0.3551 |
+| animal_tag | region | subregion | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
+| mature_dairy_cattle | spain | north | anaerobic_lagoon | uncovered |  | cool | temperate | zone_wet | wet | 0.0537 |
+| mature_dairy_cattle | spain | north | liquid_slurry | with_natural_crust_cover | 3 | cool | temperate | zone_wet | wet | 0.3432 |
+| mature_dairy_cattle | spain | north | solid_storage |  |  | cool |  |  |  | 0.3551 |
+| mature_dairy_cattle | spain | south | solid_storage |  |  | cool |  |  |  | 0.3551 |
 
 ------------------------------------------------------------------------
 
@@ -114,5 +114,5 @@ checking if your cow is eating more than 5.5% of its body weight).
 library(herdr)
 
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE)
+  automatic_cycle = FALSE, crop_yield_country = "Spain")
 ```

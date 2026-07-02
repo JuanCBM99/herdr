@@ -4,8 +4,8 @@
 
 - [Dairy Cattle Spain: North/South in different Life
   Satages](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
-- [Dairy Cattle Environmental
-  Impact](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
+- [Basic Assessment: A Step-by-Step
+  Guide](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
 - [Introduction to
   herdr](https://juancbm99.github.io/herdr/articles/Introduction.md):
 - [Land Use Guide &

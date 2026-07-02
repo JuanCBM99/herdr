@@ -102,14 +102,20 @@ step-by-step instructions.</p>
 <code>animal_tag</code>, location (<code>region</code>), and the number
 of heads (<code>population</code>).</li>
 <li>
-<strong><code>weights.csv</code></strong>: Defines the physical
-scale of the animals, including <code>adult_weight</code>,
-<code>initial_weight</code>, <code>final_weight</code> and
-<code>productive_period</code>.</li>
+<strong><code>livestock_weights.csv</code></strong>: Defines the
+physical scale of the animals, including <code>adult_weight</code>,
+<code>initial_weight</code>, <code>final_weight</code>,
+<code>productive_period</code>, as well as additional parameters for
+breeder swine..</li>
 <li>
 <strong><code>livestock_definitions.csv</code></strong>: The bridge
-file. It links each <code>animal_tag</code> to a <code>diet_tag</code>
-and an <strong>IPCC Description</strong>.</li>
+file for ruminant animals. It links each <code>animal_tag</code> to a
+<code>diet_tag</code> and an <strong>IPCC Description</strong>.</li>
+<li>
+<strong><code>monogastric_definitions.csv</code></strong>: The
+bridge file for monogastric animals. It links each
+<code>animal_tag</code> to a <code>diet_tag</code> and species-specific
+parameters required for monogastric energy calculations.</li>
 </ul>
 </div>
 <div class="section level3">
@@ -134,6 +140,19 @@ the macro categories.</li>
 waste is handled, specifying the system, the climate, and the
 <code>allocation</code> (0 to 1).</li>
 </ul>
+</div>
+<div class="section level3">
+<h3 id="reproduction-parameters">Reproduction Parameters<a class="anchor" aria-label="anchor" href="#reproduction-parameters"></a>
+</h3>
+<p>This file only needs to be modified if the population of all animal
+categories is unknown or if offspring and replacement rates need to be
+adjusted for a specific study.</p>
+<ul>
+<li>
+<strong><code>reproduction_parameters.csv</code></strong>: Contains
+default offspring and replacement rates used to estimate missing animal
+categories.</li>
+</ul>
 <hr>
 </div>
 </div>
@@ -147,19 +166,27 @@ inputs.</p>
 <div class="section level3">
 <h3 id="feed_characteristics-csv-nutritional-values">🧪 <code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
 </h3>
-<p>Consult this to find the correct names for your ingredients to use in
+<p>Consult this library to find the correct ingredient names for use in
 <code>diet_ingredients.csv</code>.</p>
 <ul>
-<li>
-<strong>Key Columns:</strong> <code>ingredient</code>,
-<code>ingredient_type</code>, <code>cp</code> (Crude Protein %),
-<code>de</code> (Digestible Energy %), <code>ndf</code> (Neutral
-detergent fiber) % and ge (Gross energy MJ/kg).</li>
-<li>
-<strong>Why it matters:</strong> <code>de</code> (Digestible Energy)
-is the main driver for the Methane Conversion Factor
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math>).</li>
+<li><p><strong>Key Columns:</strong> <code>ingredient</code>,
+<code>ingredient_type</code>, <code>ASH_pct</code> (Ash, % DM),
+<code>CP_pct</code> (Crude Protein, % DM), <code>EE_pct</code> (Ether
+Extract, % DM), <code>NDF_pct</code> (Neutral Detergent Fiber, % DM),
+<code>DE_pct</code> (Digestible Energy, %), <code>GE_feed_kcal_kg</code>
+(Gross Energy, kcal/kg DM), <code>swine_ME_kcal_kg</code> (Metabolizable
+Energy for Swine, kcal/kg DM), <code>swine_DE_kcal_kg</code> (Digestible
+Energy for Swine, kcal/kg DM), and <code>poultry_ME_kcal_kg</code>
+(Metabolizable Energy for Poultry, kcal/kg DM).</p></li>
+<li><p><strong>Important:</strong> Most nutritional values are sourced
+from the <strong>FEDNA Tables (2019)</strong>. The <code>DE_pct</code>
+values are obtained from <strong>Feedipedia</strong>, while
+<code>GE_feed_kcal_kg</code> is calculated using the <strong>NRC (1998)
+Ewan equation</strong>:</p></li>
 </ul>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kcal/kg DM</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>4140</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>56</mn><mo>×</mo><mi>E</mi><mi>E</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>15</mn><mo>×</mo><mi>C</mi><mi>P</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>44</mn><mo>×</mo><mi>A</mi><mi>S</mi><mi>H</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
+GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)
+</annotation></semantics></math></p>
 </div>
 <div class="section level3">
 <h3 id="ipcc_coefficients-csv-metabolic-constants">🧬 <code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
@@ -175,7 +202,9 @@ into your <code>livestock_definitions.csv</code>.</p>
 etc.), and <code>value</code>.</li>
 <li>
 <strong>Why it matters:</strong> It contains the Tier 2 constants
-that define energy needs for maintenance, pregnancy, and lactation.</li>
+that define energy needs for maintenance, pregnancy, lactation and B0
+(Maximum Methane Producing Capacity) for manure management
+calculations.</li>
 </ul>
 </div>
 <div class="section level3">

@@ -10,6 +10,8 @@ on animal physiology and diet composition.
 - 🐂 **Cattle**
 - 🐐 **Goat**
 - 🐑 **Sheep**
+- 🐖 **Pigs**
+- 🐔 **Poultry**
 
 ------------------------------------------------------------------------
 
@@ -48,7 +50,7 @@ different geographic scales or management intensities in a single run.
 
 ------------------------------------------------------------------------
 
-## 🎯 Calculation Methodology (IPCC 2019)
+## 🎯 Calculation Methodology
 
 All emission calculations within `herdr` adhere to the **Tier 2**
 methods established by the Intergovernmental Panel on Climate Change
@@ -59,7 +61,14 @@ Guidelines for National Greenhouse Gas Inventories: \> *“Volume 4:
 Agriculture, Forestry and Other Land Use, Chapter 10: EMISSIONS FROM
 LIVESTOCK AND MANURE MANAGEMENT”*
 
-------------------------------------------------------------------------
+For **swine** and **poultry**, metabolizable energy requirements are
+calculated using the equations published by **FEDNA** and adopted by the
+**Spanish Ministry of Agriculture, Fisheries and Food (MAPA)** for
+national nitrogen balance and emission inventories.
+
+These equations are available in the MAPA documentation:
+<https://www.mapa.gob.es/es/ganaderia/temas/ganaderia-y-medio-ambiente/balance-de-nitrogeno-e-inventario-de-emisiones-de-gases>
+—
 
 ## 🥕 The Role of Diet & Validation
 

@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Dairy Cattle Environmental Impact • herdr</title>
+<title>Basic Assessment: A Step-by-Step Guide • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Dairy Cattle Environmental Impact">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Basic Assessment: A Step-by-Step Guide">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -72,7 +72,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Dairy Cattle Environmental Impact</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Basic Assessment: A Step-by-Step Guide</h1>
             
       
 
@@ -152,7 +152,7 @@ available feed items. If you wish, you can add as many new ingredients
 as you want, always fulfilling all columns.</p>
 </div>
 <div class="section level4">
-<h4 id="b--define-the-profile-diet-csv">B. Define the Profile (<code>diet.csv</code>)<a class="anchor" aria-label="anchor" href="#b--define-the-profile-diet-csv"></a>
+<h4 id="b--define-the-profile-diet_profiles-csv">B. Define the Profile (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#b--define-the-profile-diet_profiles-csv"></a>
 </h4>
 <table class="table">
 <thead><tr class="header">
@@ -221,21 +221,31 @@ descriptions</strong> from <code>ipcc_coefficients.csv</code>.</p>
 <div class="section level3">
 <h3 id="step-4-body-weights">Step 4: Body Weights<a class="anchor" aria-label="anchor" href="#step-4-body-weights"></a>
 </h3>
-<p>Open <code>weights.csv</code>. Ensure the keys match the census
-exactly.</p>
-<table class="table">
+<p>Open <code>livestock_weights.csv</code>. Ensure the keys match the
+census exactly.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">adult_weight</th>
-<th align="left">weight_gain</th>
-<th align="left">average_weight</th>
+<th align="left">productive_period</th>
+<th align="left">initial_weight</th>
+<th align="left">final_weight</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left">mature_dairy_cattle</td>
 <td align="left">spain</td>
 <td align="left">675</td>
-<td align="left">0</td>
+<td align="left">365</td>
+<td align="left">675</td>
 <td align="left">675</td>
 </tr></tbody>
 </table>
@@ -247,13 +257,13 @@ exactly.</p>
 <ol style="list-style-type: decimal">
 <li>Check <code>ipcc_mm.csv</code> for valid
 <code>management_system</code> and <code>system_climate</code> names
-(You can also check the section X of this documentation).</li>
+(You can also check the section <strong><a href="Manure.html">Manure
+System Guide</a></strong> of this documentation).</li>
 <li>If you have more than one system for the exactly same animal,
 <strong>duplicate the row</strong> and split the allocation.</li>
 </ol>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="7%">
 <col width="7%">
 <col width="7%">
 <col width="7%">
@@ -280,9 +290,8 @@ exactly.</p>
 <th align="left">climate_zone</th>
 <th align="left">system_variant</th>
 <th align="left">climate_moisture</th>
-<th align="left">animal_type</th>
-<th align="left">animal_subtype</th>
-<th align="left">allocation</th>
+<th align="left">b_0</th>
+<th align="right">allocation</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -297,9 +306,8 @@ exactly.</p>
 <td align="left">wet</td>
 <td align="left">with_natural_crust_cover</td>
 <td align="left">wet</td>
-<td align="left">cattle</td>
-<td align="left">dairy</td>
-<td align="left">0.343</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.3</td>
 </tr>
 <tr class="even">
 <td align="left">mature_dairy_cattle</td>
@@ -313,9 +321,8 @@ exactly.</p>
 <td align="left"></td>
 <td align="left"></td>
 <td align="left">dry</td>
-<td align="left">cattle</td>
-<td align="left">dairy</td>
-<td align="left">0.069</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.7</td>
 </tr>
 </tbody>
 </table>
@@ -329,7 +336,7 @@ exactly.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

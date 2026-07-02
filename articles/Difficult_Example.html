@@ -393,15 +393,16 @@ and validate the maximum physical capacity of the animal
 as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>%</mi><annotation encoding="application/x-tex">\%</annotation></semantics></math>
 of Body Weight).</p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
@@ -409,8 +410,9 @@ of Body Weight).</p>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
 <th align="left">adult_weight</th>
-<th align="left">weight_gain</th>
-<th align="left">average_weight</th>
+<th align="left">productive_period</th>
+<th align="left">initial_weight</th>
+<th align="left">final_weight</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -419,7 +421,8 @@ of Body Weight).</p>
 <td align="left">north</td>
 <td align="left">dry_phase</td>
 <td align="left">675</td>
-<td align="left">0</td>
+<td align="left">365</td>
+<td align="left">675</td>
 <td align="left">675</td>
 </tr>
 <tr class="even">
@@ -428,7 +431,8 @@ of Body Weight).</p>
 <td align="left">north</td>
 <td align="left">lactation_phase</td>
 <td align="left">675</td>
-<td align="left">0</td>
+<td align="left">365</td>
+<td align="left">675</td>
 <td align="left">675</td>
 </tr>
 <tr class="odd">
@@ -437,7 +441,8 @@ of Body Weight).</p>
 <td align="left">south</td>
 <td align="left">lactation_phase</td>
 <td align="left">675</td>
-<td align="left">0</td>
+<td align="left">365</td>
+<td align="left">675</td>
 <td align="left">675</td>
 </tr>
 </tbody>
@@ -450,20 +455,21 @@ of Body Weight).</p>
 </h3>
 <p>You can define management systems with high granularity, specifying
 the climate zone and variants for methane conversion factors.</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
@@ -471,13 +477,14 @@ the climate zone and variants for methane conversion factors.</p>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
 <th align="left">system_base</th>
+<th align="left">system_variant</th>
 <th align="left">management_months</th>
 <th align="left">system_climate</th>
 <th align="left">system_subclimate</th>
 <th align="left">climate_zone</th>
-<th align="left">system_variant</th>
-<th align="left">climate_zone</th>
-<th align="left">allocation</th>
+<th align="left">climate_moisture</th>
+<th align="left">b_0</th>
+<th align="right">allocation</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -486,13 +493,14 @@ the climate zone and variants for methane conversion factors.</p>
 <td align="left">north</td>
 <td align="left">lactation_phase</td>
 <td align="left">anaerobic_lagoon</td>
+<td align="left">uncovered</td>
 <td align="left"></td>
 <td align="left">cool</td>
 <td align="left">temperate</td>
 <td align="left">zone_wet</td>
-<td align="left">uncovered</td>
 <td align="left">wet</td>
-<td align="left">0.0537</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.0537</td>
 </tr>
 <tr class="even">
 <td align="left">mature_dairy_cattle</td>
@@ -500,13 +508,14 @@ the climate zone and variants for methane conversion factors.</p>
 <td align="left">north</td>
 <td align="left">lactation_phase</td>
 <td align="left">liquid_slurry</td>
+<td align="left">with_natural_crust_cover</td>
 <td align="left">3</td>
 <td align="left">cool</td>
 <td align="left">temperate</td>
 <td align="left">zone_wet</td>
-<td align="left">with_natural_crust_cover</td>
 <td align="left">wet</td>
-<td align="left">0.3432</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.3432</td>
 </tr>
 <tr class="odd">
 <td align="left">mature_dairy_cattle</td>
@@ -515,12 +524,13 @@ the climate zone and variants for methane conversion factors.</p>
 <td align="left">dry_phase</td>
 <td align="left">solid_storage</td>
 <td align="left"></td>
+<td align="left"></td>
 <td align="left">warm</td>
 <td align="left">temperate</td>
 <td align="left"></td>
-<td align="left"></td>
 <td align="left">dry</td>
-<td align="left">0.0694</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.0694</td>
 </tr>
 <tr class="even">
 <td align="left">mature_dairy_cattle</td>
@@ -528,13 +538,14 @@ the climate zone and variants for methane conversion factors.</p>
 <td align="left">south</td>
 <td align="left">dry_phase</td>
 <td align="left">deep_bedding</td>
+<td align="left">no_mixing</td>
 <td align="left">&gt;1</td>
 <td align="left">warm</td>
 <td align="left">temperate</td>
 <td align="left">zone_dry</td>
-<td align="left">no_mixing</td>
 <td align="left">dry</td>
-<td align="left">0.0131</td>
+<td align="left">dairy_cattle_high_productivity</td>
+<td align="right">0.0131</td>
 </tr>
 </tbody>
 </table>
@@ -550,7 +561,7 @@ results.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The model calculates impact for each phase separately</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span>automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span>automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

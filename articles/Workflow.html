@@ -165,6 +165,7 @@ perform the calculations, and save the results in
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
@@ -252,8 +253,8 @@ drives methane and nitrogen results.</p>
 <strong>Categories</strong>: Forage, Concentrate, Milk, and Milk
 Replacer.</li>
 <li>
-<strong>The 1.0 Rule</strong>: These four must sum to
-<strong>1.0</strong> (e.g., 0.7 Forage + 0.3 Concentrate).</li>
+<strong>The 100% Rule</strong>: These four must sum to
+<strong>100.0</strong> (e.g., 70 Forage + 30 Concentrate).</li>
 </ul>
 </div>
 <div class="section level4">
@@ -263,11 +264,11 @@ Replacer.</li>
 <ul>
 <li>
 <strong>The 100% Rule</strong>: Ingredients inside each category
-(like “Forage”) must sum to <strong>1.0</strong>.</li>
+(like “Forage”) must sum to <strong>100.0</strong>.</li>
 <li>
-<strong>Example:</strong> If your “Forage” macro is 0.70, your
-ingredient list for Forage (e.g., 0.5 Alfalfa + 0.5 Maize Silage) must
-sum to 1.0.</li>
+<strong>Example:</strong> If your “Forage” macro is 70, your
+ingredient list for Forage (e.g., 50.0 Alfalfa + 50.0 Maize Silage) must
+sum to 100.0.</li>
 <li>
 <strong>Source</strong>: Choose names from the existing library
 (<code>feed_characteristics.csv</code>) or add your own.</li>
@@ -327,30 +328,38 @@ your land use requirements will be significantly underestimated.</p>
 physical characteristics. The model uses this data to calculate energy
 requirements (IPCC Tier 2).</p>
 <div class="section level4">
-<h4 id="defining-traits-livestock_definitions-csv">1. Defining Traits (<code>livestock_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#defining-traits-livestock_definitions-csv"></a>
+<h4 id="defining-animal-traits-livestock_definitions-csv-monogastric_definitions-csv">1. Defining Animal Traits (<code>livestock_definitions.csv</code>
+&amp; <code>monogastric_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#defining-animal-traits-livestock_definitions-csv-monogastric_definitions-csv"></a>
 </h4>
 <p>For every <code>animal_tag</code> defined in your census, you must
-now assign its “labels” and its diet.</p>
+assign its biological parameters and associated diet.</p>
+<ul>
+<li><p><strong><code>diet_tag</code></strong>: Links each animal
+category to one of the diets created in Phase 2.</p></li>
+<li>
+<p><strong>Ruminants
+(<code>livestock_definitions.csv</code>)</strong>: Select the
+appropriate <strong>IPCC description</strong> from
+<code>ipcc_coefficients.csv</code>.</p>
 <ul>
 <li>
-<strong><code>diet_tag</code></strong>: Link the animal to one of
-the diets you created in Phase 2.</li>
-<li>
-<strong>IPCC coefficients</strong>: Assign the correct
-<strong>description</strong> (text) from the
-<code>ipcc_coefficients.csv</code> library. The exception occurs with
-sheep/goat where the c_pregnancy is calculated by pr and single/double
-birth fraction.
-<ul>
-<li>
-<em>How it works:</em> The model sees the description (e.g.,
-<code>cattle and buffalo</code>) and automatically fetches the
-mathematical constants
+<em>How it works:</em> The selected description (e.g.,
+<code>cattle and buffalo</code>) allows the model to automatically
+retrieve the corresponding Tier 2 coefficients
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">C_{fi}</annotation></semantics></math>,
-etc.) needed for the energy equations.</li>
+etc.) required for the energy equations. For sheep and goats, the
+pregnancy coefficient
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><annotation encoding="application/x-tex">C_{pregnancy}</annotation></semantics></math>)
+is calculated automatically from the pregnancy rate and the proportion
+of single and twin births.</li>
 </ul>
 </li>
+<li><p><strong>Monogastrics
+(<code>monogastric_definitions.csv</code>)</strong>: Fill in the
+species-specific biological parameters required by the FEDNA equations.
+Default values are provided for all coefficients, but they can be
+modified if more representative values are available.</p></li>
 </ul>
 </div>
 <div class="section level4">
@@ -358,45 +367,70 @@ etc.) needed for the energy equations.</li>
 </h4>
 <p>You must replicate the exact combinations of <code>animal_tag</code>,
 <code>region</code>, <code>subregion</code>, and <code>class_flex</code>
-used in your census and assign their weights.</p>
+used in your census and assign the corresponding body parameters.</p>
 <ul>
 <li>
-<strong><code>adult_weight</code></strong>: The mature weight of the
-adult animal.</li>
+<strong><code>adult_weight</code></strong>: Mature body weight of
+the adult animal (kg).</li>
 <li>
-<strong><code>inital_weight</code></strong>: Live weight of the
-animal at the start of the period (kg).</li>
+<strong><code>initial_weight</code></strong>: Live weight of the
+animal at the beginning of the production period (kg).</li>
 <li>
 <strong><code>final_weight</code></strong>: Live weight of the
-animal at the end of the period (kg).</li>
+animal at the end of the production period (kg).</li>
 <li>
 <strong><code>productive_period</code></strong>: Duration of the
-productive period (days).</li>
+production period (days).</li>
 </ul>
-</div>
-<div class="section level4">
-<h4 id="how-to-proceed">💡 How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed"></a>
-</h4>
+<div class="section level5">
+<h5 id="additional-parameters-for-breeding-sows">Additional parameters for breeding sows<a class="anchor" aria-label="anchor" href="#additional-parameters-for-breeding-sows"></a>
+</h5>
+<p>The following variables are only required for breeding sows and are
+used to estimate gestation, lactation, and nitrogen retention:</p>
+<ul>
+<li>
+<strong><code>sows_gestation_days</code></strong>: Gestation length
+(days).</li>
+<li>
+<strong><code>sows_lactation_days</code></strong>: Lactation length
+(days).</li>
+<li>
+<strong><code>piglet_birth_weight_kg</code></strong>: Average birth
+weight of piglets (kg).</li>
+<li>
+<strong><code>piglet_weaning_weight_kg</code></strong>: Average
+weaning weight of piglets (kg).</li>
+<li>
+<strong><code>sow_reserve_gain_kg</code></strong>: Body reserve gain
+of the sow during gestation (kg).</li>
+</ul>
+<p>💡 <strong>How to Proceed</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Tag Consistency</strong>: Start by copying the
+<strong>Tag Consistency:</strong> Start by copying the
 <code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
-and <code>class_flex</code> columns from your <code>census.csv</code>.
-They must be identical.</li>
+and <code>class_flex</code> columns from your
+<code>livestock_census.csv</code>. They must be identical.</li>
 <li>
-<strong>Add New Tags</strong>: If you added custom animals in Phase
-1, make sure they are included here too.</li>
+<strong>Add New Tags:</strong> If you created custom animal
+categories in Phase 1, include them here as well.</li>
 <li>
-<strong>Assign Diets</strong>: Decide which <code>diet_tag</code>
-applies to each category in <code>livestock_definitions.csv</code>
-.</li>
+<strong>Assign Body Metrics:</strong> Complete the weight and
+production-period variables for every animal category. If applicable,
+also fill in the sow-specific parameters.</li>
 <li>
-<strong>Check the Library</strong>: Open
-<code>ipcc_coefficients.csv</code>, find the description that best fits
-your animal, and copy that exact text into
+<strong>Assign Diets:</strong> Select the appropriate
+<code>diet_tag</code> for each category in
+<code>livestock_definitions.csv</code> or
+<code>monogastric_definitions.csv</code>.</li>
+<li>
+<strong>Select IPCC Coefficients:</strong> Open
+<code>ipcc_coefficients.csv</code>, identify the description that best
+matches your animal category, and copy that exact value into
 <code>livestock_definitions.csv</code>.</li>
 </ol>
 <hr>
+</div>
 </div>
 </div>
 <div class="section level3">
@@ -429,7 +463,7 @@ and the specific emission factors of each system.</li>
 <hr>
 </div>
 <div class="section level4">
-<h4 id="how-to-proceed-1">🛠️ How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed-1"></a>
+<h4 id="how-to-proceed">🛠️ How to Proceed<a class="anchor" aria-label="anchor" href="#how-to-proceed"></a>
 </h4>
 <p>Follow these steps to fill your <code>manure_management.csv</code>
 file correctly:</p>
