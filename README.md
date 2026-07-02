@@ -7,85 +7,141 @@
 [![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml)
 [![Tutorial](https://img.shields.io/badge/Video-Tutorial-red?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk)
 [![Minimal-R](https://img.shields.io/badge/Made%20with-R-276DC3.svg)](https://www.r-project.org/)
----
-
-# 🌟 herdr: GHG & LU Calculator 
-
-An R package to calculate Greenhouse Gas emissions (CH₄, N₂O) and Land Use (LU) in livestock systems, based on the IPCC Tier 2 methodology.
 
 ---
 
-## 📺 Video Tutorial
+# 🌱 herdr: Greenhouse Gas Emissions & Land Use Assessment for Livestock
 
-If you prefer a visual guide, watch this official tutorial covering installation, data setup, and running your first assessment:
+**herdr** is an R package for estimating **greenhouse gas (GHG) emissions** and **land use** from livestock production systems using **IPCC Tier 2** methodologies.
 
-[Watch the herdr Tutorial on YouTube](https://youtu.be/wmGIQ3g-ZFk)
+The package currently supports:
 
----
+- 🐄 Cattle
+- 🐑 Sheep
+- 🐐 Goats
+- 🐖 Swine
+- 🐔 Poultry
 
-## 🖥️ Prerequisites: Installing R and RStudio
+It provides estimates of:
 
-If you do not have R and RStudio installed, follow these steps:
-
-### 1. Install R
-
-1. Go to the [R Project website](https://www.r-project.org/) and download the latest version for your operating system (Windows, macOS, Linux).  
-2. Run the installer and follow the on-screen instructions.
-
-### 2. Install RStudio
-
-1. Go to the [RStudio website](https://www.rstudio.com/products/rstudio/download/) and download the free RStudio Desktop version.  
-2. Install RStudio using the downloaded installer.
+- Enteric methane (CH₄)
+- Methane from manure management (CH₄)
+- Direct and indirect nitrous oxide emissions (N₂O)
+- Feed-related land use (m²)
 
 ---
 
-## 🚀 Quick start
+# 📺 Video Tutorial
 
-herdr is a development package and can be installed directly from GitHub using `remotes`:
+A complete walkthrough covering installation, project setup, input files, and running your first assessment is available on YouTube:
+
+👉 https://youtu.be/wmGIQ3g-ZFk
+
+---
+
+# 💻 Prerequisites
+
+Before installing **herdr**, install both **R** and **RStudio**.
+
+### Install R
+
+Download the latest version from:
+
+https://cran.r-project.org/
+
+### Install RStudio
+
+Download the free RStudio Desktop edition from:
+
+https://posit.co/download/rstudio-desktop/
+
+---
+
+# 🚀 Installation
+
+Install the development version directly from GitHub.
 
 ```r
-# Install (if needed)
-if (!requireNamespace("remotes", quietly = TRUE)) install.packages("remotes")
+if (!requireNamespace("remotes", quietly = TRUE))
+  install.packages("remotes")
+
 remotes::install_github("JuanCBM99/herdr")
 
 library(herdr)
-
-# Initialize project (creates user_data folder)
-herdr_init()
-
-# Copy example CSVs to user_data/ (overwrite existing)
-file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
-
-# Run a full impact assessment
-results <- generate_impact_assessment()
-results
 ```
 
 ---
 
-This runs a full cattle system example, generating CH₄, N₂O, and Land Use outputs.
+# ⚡ Quick Start
 
-## ✨✨ Key Features
+Initialize a new project:
 
-IPCC Tier 2 Methodology: Robust calculations for enteric emissions, manure management, and indirect N₂O emissions.
+```r
+herdr_init()
+```
 
-Land Use Assessment: Integrated calculation of land requirements (m²/year) associated with different livestock management systems and based on economic allocation.
+Copy one of the bundled examples into your `user_data/` folder:
 
-Nutritional Precision: Integrated Dry Matter Intake (DMI) estimation and nutritional alerts for Cattle, Sheep, and Goats.
+```r
+file.copy(
+  list.files(
+    "Examples/Level1_Spain_Dairy_Cattle_2015",
+    full.names = TRUE
+  ),
+  "user_data",
+  overwrite = TRUE
+)
+```
 
-Modular and Flexible: Allows detailed input of population census, diet profiles, and management systems at the farm or subregion level.
+Run the complete assessment:
 
-Consolidated Output: Generates a single report summarizing impacts (CH₄, N₂O, and LU).
+```r
+results <- generate_impact_assessment(crop_yield_country = "Spain")
+
+results
+```
+
+Output files will automatically be written to the `output/` directory.
 
 ---
 
-## 📚 Documentation & Reference
+# ✨ Main Features
 
-[Package Documentation Website]: Includes workflow guides, some comprehensive examples and the theoretical basis (IPCC Tier 2).
+- **IPCC Tier 2 implementation** following the 2019 Refinement.
+- **Support for ruminants and monogastric species.**
+- **FEDNA-based energy equations** for swine and poultry.
+- **Automatic calculation** of:
+  - Gross Energy (GE)
+  - Dry Matter Intake (DMI)
+  - Volatile Solids (VS)
+  - Nitrogen intake, retention and excretion
+- **Enteric CH₄** estimation.
+- **Manure CH₄** estimation.
+- **Direct and indirect N₂O** emissions.
+- **Feed-related land use** using FAOSTAT and forage yield databases.
+- **Modular workflow**, allowing individual calculations or complete assessments.
+- **CSV-based inputs**, making the package transparent and easy to modify.
 
-Website URL: https://juancbm99.github.io/herdr/
+---
 
-## 🤝 Contributions
+# 📚 Documentation
 
-Contributions are welcome! If you find a bug or have suggestions for improvement, please open an issue or submit a pull request.
+Complete documentation, theoretical background, workflow guides and examples are available at:
 
+**https://juancbm99.github.io/herdr/**
+
+---
+
+# 📖 Methodology
+
+The package follows the **2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories**, Volume 4 (AFOLU), Chapter 10: *Emissions from Livestock and Manure Management*.
+
+Energy requirement equations for **swine** and **poultry** are implemented following the FEDNA methodology published by the Spanish Ministry of Agriculture.
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+If you encounter a bug or have suggestions for improvements, please open an issue or submit a pull request.

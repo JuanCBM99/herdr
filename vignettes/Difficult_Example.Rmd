@@ -69,24 +69,23 @@ This is the most technical file. It determines the energy requirements (IPCC Tie
 ## Step 4: Body Weights (`livestock_weights.csv`)
 Accurate weights are essential to calculate Maintenance Energy ($NE_m$) and validate the maximum physical capacity of the animal ($DMI$ as $\%$ of Body Weight).
 
-| animal_tag | region | subregion | class_flex | adult_weight | weight_gain | average_weight |
-|:---|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | north | dry_phase       | 675 | 0 | 675 |
-| mature_dairy_cattle | spain | north | lactation_phase | 675 | 0 | 675 |
-| mature_dairy_cattle | spain | south | lactation_phase | 675 | 0 | 675 |
+| animal_tag | region | subregion | class_flex | adult_weight | productive_period | initial_weight | final_weight |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| mature_dairy_cattle | spain | north | dry_phase       | 675 |  365 | 675 | 675 |
+| mature_dairy_cattle | spain | north | lactation_phase | 675 |  365 | 675 | 675 |
+| mature_dairy_cattle | spain | south | lactation_phase | 675 |  365 | 675 | 675 |
 
 ---
 
 ## Step 5: Advanced Manure Management (`manure_management.csv`)
 You can define management systems with high granularity, specifying the climate zone and variants for methane conversion factors.
 
-| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_zone | allocation |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | north | lactation_phase | anaerobic_lagoon |    | cool | temperate | zone_wet | uncovered                | wet | 0.0537 |
-| mature_dairy_cattle | spain | north | lactation_phase | liquid_slurry    | 3  | cool | temperate | zone_wet | with_natural_crust_cover | wet | 0.3432 |
-| mature_dairy_cattle | spain | south | dry_phase       | solid_storage    |    | warm | temperate |          |                          | dry | 0.0694 |
-| mature_dairy_cattle | spain | south | dry_phase       | deep_bedding     | >1 | warm | temperate | zone_dry | no_mixing                | dry | 0.0131 |
-
+| animal_tag | region | subregion | class_flex | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
+| mature_dairy_cattle | spain | north | lactation_phase | anaerobic_lagoon | uncovered |  | cool | temperate | zone_wet | wet | dairy_cattle_high_productivity | 0.0537 |
+| mature_dairy_cattle | spain | north | lactation_phase | liquid_slurry | with_natural_crust_cover | 3 | cool | temperate | zone_wet | wet | dairy_cattle_high_productivity | 0.3432 |
+| mature_dairy_cattle | spain | south | dry_phase | solid_storage |  |  | warm | temperate |  | dry | dairy_cattle_high_productivity | 0.0694 |
+| mature_dairy_cattle | spain | south | dry_phase | deep_bedding | no_mixing | >1 | warm | temperate | zone_dry | dry | dairy_cattle_high_productivity | 0.0131 |
 ---
 
 ## Step 6: Final Execution
@@ -96,6 +95,6 @@ When running the analysis, `herdr` will process each row as a unique "animal-sta
 library(herdr)
 
 # The model calculates impact for each phase separately
-results <- generate_impact_assessment(automatic_cycle = FALSE)
+results <- generate_impact_assessment(automatic_cycle = FALSE, crop_yield_country = "Spain")
 
 ```
