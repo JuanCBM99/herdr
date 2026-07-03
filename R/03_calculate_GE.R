@@ -61,7 +61,7 @@ calculate_ge <- function(saveoutput = TRUE) {
     # 5. Final Selection
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
-      NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEpregnancy_MJday, GE_MJday, DE_pct, REM, REG
+      NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEwork_MJday, NEpregnancy_MJday, NEwool_MJday, GE_MJday, DE_pct, REM, REG
     ) %>%
     dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
 

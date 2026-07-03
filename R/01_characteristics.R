@@ -48,7 +48,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
         ingredient_type == "forage"      ~ forage_share,
         ingredient_type == "concentrate" ~ concentrate_share,
         ingredient_type == "milk"        ~ milk_share,
-        ingredient_type == "replacer"    ~ milk_replacer_share,
+        ingredient_type == "milk_replacer"    ~ milk_replacer_share,
         TRUE ~ 0
       )) / 10000
     ) %>%

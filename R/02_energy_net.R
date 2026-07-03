@@ -168,7 +168,7 @@ calculate_NEl <- function(saveoutput = TRUE) {
 
     # --- 3. Final Selection ---
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEl_MJday) %>%
-    dplyr::mutate(NEl = round(NEl_MJday, 3))
+    dplyr::mutate(NEl_MJday = round(NEl_MJday, 3))
 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
@@ -204,7 +204,7 @@ calculate_NE_work <- function(saveoutput = TRUE) {
 
       across(c(work_hours, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
 
-      NEwork_MJday = work_hours * NEm_MJday
+      NEwork_MJday = 0.10 * work_hours * NEm_MJday
     ) %>%
 
     # --- 3. Final Selection and Cleanup ---
