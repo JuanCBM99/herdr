@@ -14,9 +14,9 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 1. Load Dependencies and Model Components ---
-  ge_data   <- calculate_ge(saveoutput = FALSE)
-  dmi_data  <- calculate_DMI(saveoutput = FALSE)
-  diet_char <- calculate_weighted_variable(saveoutput = FALSE)
+  ge_data   <- suppressMessages(calculate_ge(saveoutput = FALSE))
+  dmi_data  <- suppressMessages(calculate_DMI(saveoutput = FALSE))
+  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
 
   # --- 2. Merge Assets and Clean Numeric Types ---
   results <- ge_data %>%

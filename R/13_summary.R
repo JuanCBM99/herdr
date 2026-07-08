@@ -15,7 +15,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
                                        animal = NULL, type = NULL, class_flex = NULL, crop_yield_country,
                                        saveoutput = TRUE, group_by_identification = TRUE) {
 
-  message("\U0001f4be Starting impact assessment summary...")
+  message("\U0001f7e2 Starting impact assessment summary...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # 1. Pipeline calls and unit standardization (Gg)

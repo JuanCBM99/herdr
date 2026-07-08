@@ -71,6 +71,7 @@ Execute the main function. It will scan your `user_data/`, perform the calculati
 ```r
 results <- generate_impact_assessment(
   automatic_cycle = FALSE, 
+  crop_yield_country = "Spain",
   saveoutput = TRUE
 )
 ```
@@ -110,13 +111,13 @@ This phase calculates the **Gross Energy (GE)**, which drives methane and nitrog
 Set the general balance of the diet using a `diet_tag`:
 
 * **Categories**: Forage, Concentrate, Milk, and Milk Replacer.
-* **The 1.0 Rule**: These four must sum to **1.0** (e.g., 0.7 Forage + 0.3 Concentrate).
+* **The 100% Rule**: These four must sum to **100.0** (e.g., 70 Forage + 30 Concentrate).
 
 ### 2. Micro Ingredients (`diet_ingredients.csv`)
 List exactly what is inside each diet_tag.
 
-* **The 100% Rule**: Ingredients inside each category (like "Forage") must sum to **1.0**. 
-* **Example:** If your "Forage" macro is 0.70, your ingredient list for Forage (e.g., 0.5 Alfalfa + 0.5 Maize Silage) must sum to 1.0.
+* **The 100% Rule**: Ingredients inside each category (like "Forage") must sum to **100.0**. 
+* **Example:** If your "Forage" macro is 70, your ingredient list for Forage (e.g., 50.0 Alfalfa + 50.0 Maize Silage) must sum to 100.0.
 * **Source**: Choose names from the existing library (`feed_characteristics.csv`) or add your own.
 
 ### 🟢 Adding a New Ingredient
@@ -141,28 +142,43 @@ If you add a new ingredient name, you **must** add it to these two files:
 
 This phase connects your animals to their diet and defines their physical characteristics. The model uses this data to calculate energy requirements (IPCC Tier 2).
 
-### 1. Defining Traits (`livestock_definitions.csv`)
-For every `animal_tag` defined in your census, you must now assign its "labels" and its diet.
+### 1. Defining Animal Traits (`livestock_definitions.csv` & `monogastric_definitions.csv`)
 
-* **`diet_tag`**: Link the animal to one of the diets you created in Phase 2.
-* **IPCC coefficients**: Assign the correct **description** (text) from the `ipcc_coefficients.csv` library. The exception occurs with sheep/goat where the c_pregnancy is calculated by pr and single/double birth fraction.
-    * *How it works:* The model sees the description (e.g., `cattle and buffalo`) and automatically fetches the mathematical constants ($C_a$, $C_{fi}$, etc.) needed for the energy equations.
+For every `animal_tag` defined in your census, you must assign its biological parameters and associated diet.
+
+* **`diet_tag`**: Links each animal category to one of the diets created in Phase 2.
+
+* **Ruminants (`livestock_definitions.csv`)**: Select the appropriate **IPCC description** from `ipcc_coefficients.csv`.
+  * *How it works:* The selected description (e.g., `cattle and buffalo`) allows the model to automatically retrieve the corresponding Tier 2 coefficients ($C_a$, $C_{fi}$, etc.) required for the energy equations. For sheep and goats, the pregnancy coefficient ($C_{pregnancy}$) is calculated automatically from the pregnancy rate and the proportion of single and twin births.
+
+* **Monogastrics (`monogastric_definitions.csv`)**: Fill in the species-specific biological parameters required by the FEDNA equations. Default values are provided for all coefficients, but they can be modified if more representative values are available.
 
 ### 2. Body Metrics (`livestock_weights.csv`)
-You must replicate the exact combinations of `animal_tag`, `region`, `subregion`, and `class_flex` used in your census and assign their weights.
 
-  * **`adult_weight`**: The mature weight of the adult animal.
-  * **`inital_weight`**: Live weight of the animal at the start of the period (kg).
-  * **`final_weight`**: Live weight of the animal at the end of the period (kg).
-  * **`productive_period`**: Duration of the productive period (days).
+You must replicate the exact combinations of `animal_tag`, `region`, `subregion`, and `class_flex` used in your census and assign the corresponding body parameters.
 
+* **`adult_weight`**: Mature body weight of the adult animal (kg).
+* **`initial_weight`**: Live weight of the animal at the beginning of the production period (kg).
+* **`final_weight`**: Live weight of the animal at the end of the production period (kg).
+* **`productive_period`**: Duration of the production period (days).
 
-### 💡 How to Proceed
+#### Additional parameters for breeding sows
 
-1.  **Tag Consistency**: Start by copying the `animal_tag`, `region`, `subregion`, and `class_flex` columns from your `census.csv`. They must be identical.
-2.  **Add New Tags**: If you added custom animals in Phase 1, make sure they are included here too.
-3.  **Assign Diets**: Decide which `diet_tag` applies to each category in `livestock_definitions.csv` .
-4.  **Check the Library**: Open `ipcc_coefficients.csv`, find the description that best fits your animal, and copy that exact text into `livestock_definitions.csv`.
+The following variables are only required for breeding sows and are used to estimate gestation, lactation, and nitrogen retention:
+
+* **`sows_gestation_days`**: Gestation length (days).
+* **`sows_lactation_days`**: Lactation length (days).
+* **`piglet_birth_weight_kg`**: Average birth weight of piglets (kg).
+* **`piglet_weaning_weight_kg`**: Average weaning weight of piglets (kg).
+* **`sow_reserve_gain_kg`**: Body reserve gain of the sow during gestation (kg).
+
+💡 **How to Proceed**
+
+1. **Tag Consistency:** Start by copying the `animal_tag`, `region`, `subregion`, and `class_flex` columns from your `livestock_census.csv`. They must be identical.
+2. **Add New Tags:** If you created custom animal categories in Phase 1, include them here as well.
+3. **Assign Body Metrics:** Complete the weight and production-period variables for every animal category. If applicable, also fill in the sow-specific parameters.
+4. **Assign Diets:** Select the appropriate `diet_tag` for each category in `livestock_definitions.csv` or `monogastric_definitions.csv`.
+5. **Select IPCC Coefficients:** Open `ipcc_coefficients.csv`, identify the description that best matches your animal category, and copy that exact value into `livestock_definitions.csv`.
 
 ---
 

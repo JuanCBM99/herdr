@@ -7,7 +7,7 @@
 #' @export
 calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
-  message("\U0001f4be Calculating CH4 emissions from manure management...")
+  message("\U0001f7e2 Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Loading ---
   user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
@@ -61,12 +61,11 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 3. Processing and Joins ---
-
-  results <- calculate_vs(saveoutput = FALSE) %>%
+  results <- suppressMessages(calculate_vs(saveoutput = FALSE)) %>%
     dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
 
     dplyr::left_join(
-      calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)) %>%
         dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
     ) %>%

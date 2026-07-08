@@ -9,10 +9,10 @@ calculate_DMI <- function(saveoutput = TRUE) {
   message("\U0001f37d Calculating Dry Matter Intake (DMI)...")
 
   # --- 1. Load Dependencies and Inputs ---
-  ge_req    <- calculate_ge(saveoutput = FALSE)
-  diet_char <- calculate_weighted_variable(saveoutput = FALSE)
+  ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE))
+  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
   weights   <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  mono  <- calculate_monogastric_energy(saveoutput = FALSE)
+  mono  <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE))
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 
@@ -35,7 +35,7 @@ calculate_DMI <- function(saveoutput = TRUE) {
     ) %>%
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, GE_feed_kcal_kg, poultry_ME_kcal_kg, initial_weight_kg, final_weight_kg, ME_total_kcal_day),
+        c(GE_MJday, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_ME_kcal_kg, initial_weight_kg, final_weight_kg, ME_total_kcal_day),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 

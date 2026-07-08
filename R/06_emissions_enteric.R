@@ -11,10 +11,10 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   message("\U0001f7e2 Calculating enteric fermentation emissions...")
 
   # --- 1. Data Loading and Propagation ---
-  diet_vars <- calculate_weighted_variable(saveoutput = FALSE)
-  ge_df     <- calculate_ge(saveoutput = FALSE)
-  pop_df    <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
-  livestock_definitions    <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
+  ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE))
+  pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
+  livestock_definitions <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
 
   if (nrow(diet_vars) == 0) {
     message("\u26a0 No diet data found. Returning empty structure.")
@@ -27,16 +27,19 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   results <- diet_vars %>%
 
     dplyr::left_join(
-      ge_df %>%
-        dplyr::select(dplyr::all_of(join_keys), GE_MJday)) %>%
+      ge_df %>% dplyr::select(dplyr::all_of(join_keys), GE_MJday),
+      by = join_keys
+    ) %>%
 
     dplyr::left_join(
-      pop_df %>%
-        dplyr::select(dplyr::all_of(join_keys), population)) %>%
+      pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
+      by = join_keys
+    ) %>%
 
     dplyr::left_join(
-      livestock_definitions %>%
-        dplyr::select(dplyr::all_of(join_keys), milk_yield_kg_year)) %>%
+      livestock_definitions %>% dplyr::select(dplyr::all_of(join_keys), milk_yield_kg_year),
+      by = join_keys
+    ) %>%
 
 
     # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2) ---
@@ -59,7 +62,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
           DE_pct <= 62  ~ 7.0,
           TRUE ~ 6.3
         ),
-        TRUE ~ NA_real_
+        TRUE ~ 0
       ),
 
       EF_kgheadyear = (GE_MJday * (Ym_pct / 100) * 365) / 55.65,

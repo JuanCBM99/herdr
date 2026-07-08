@@ -7,7 +7,7 @@
 #' @export
 calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
 
-  message("\U0001f4be Calculating direct N2O emissions from manure...")
+  message("\U0001f7e2 Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
   cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
@@ -16,11 +16,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   mono_csv     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
 
-  ge_df  <- calculate_ge(saveoutput = FALSE)
-  cp_df  <- calculate_weighted_variable(saveoutput = FALSE)
-  pop_df <- calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)
-  neg_df <- calculate_NEg(saveoutput = FALSE)
-  dmi_df <- calculate_DMI(saveoutput = FALSE)
+  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE))
+  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
+  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
+  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE))
+  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE))
 
   # --- 2. Validations (Asserts) ---
 

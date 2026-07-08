@@ -9,7 +9,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
                                crop_yield_country,
                                saveoutput = TRUE) {
 
-  message("\U0001f4be Calculating land use based on validated DMI and Combined Yields...")
+  message("\U0001f7e2 Calculating land use based on validated DMI and Combined Yields...")
 
   # --- 1. Load Reference Data ---
   fao_raw      <- readr::read_csv("user_data/fao_crop_yields.csv", show_col_types = FALSE)
@@ -61,7 +61,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
 
   # --- 3. Operational Data Loading ---
-  DMI_df <- calculate_DMI(saveoutput = FALSE) %>%
+  DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE)) %>%
     dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
   diet_profiles <- readr::read_csv(
@@ -94,10 +94,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   }
 
 
-  population_df <- calculate_population(
+  population_df <- suppressMessages(calculate_population(
     automatic_cycle = automatic_cycle,
     saveoutput = FALSE
-  ) %>%
+  )) %>%
     dplyr::distinct(
       animal_tag, region, subregion, class_flex,
       .keep_all = TRUE
