@@ -1,5 +1,5 @@
 pandoc: 3.8.3
-pkgdown: 2.2.0
+pkgdown: 2.2.1
 pkgdown_sha: ~
 articles:
   Difficult_Example: Difficult_Example.html
@@ -11,7 +11,7 @@ articles:
   Technical_reference: Technical_reference.html
   Theoretical_basis: Theoretical_basis.html
   Workflow: Workflow.html
-last_built: 2026-07-03T14:11Z
+last_built: 2026-07-08T10:02Z
 urls:
   reference: https://juancbm99.github.io/herdr/reference
   article: https://juancbm99.github.io/herdr/articles
