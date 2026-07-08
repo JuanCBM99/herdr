@@ -9,25 +9,26 @@ tags:
 - agriculture
 - IPCC
 date: "03 July 2026"
-output: word_document
 authors:
 - name: Juan Carlos Báez
   orcid: "0000-0002-7067-265X"
   affiliation: 1
 - name: Jon Sampedro
   orcid: "0000-0002-2277-1530"
-  affiliation: 1
+  affiliation: "1, 2"
 - name: Guillermo Pardo
   orcid: "0000-0002-7961-8457"
   affiliation: 1
 - name: Agustín del Prado
   orcid: "0000-0003-3895-4478"
-  affiliation: 1
+  affiliation: "1, 2"
 bibliography: paper.bib
 affiliations:
 - name: "Basque Centre for Climate Change (BC3), Edificio Sede 1-1, Parque Científico
     de UPV/EHU, Barrio Sarriena s/n, 48940 Leioa, Spain"
   index: 1
+- name: "Ikerbasque – Basque Foundation for Science, 48009 Bilbao, Spain"
+  index: 2
 ---
 
 # Summary
