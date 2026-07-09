@@ -89,7 +89,7 @@ The architecture of `herdr` follows a **functional and modular pipeline** design
 
 - **Decoupled Input/Output:** Using a standardized directory structure (`user_data/` for inputs and `output/` for results), makes the package maintain a clean separation between raw research data and computational results. The reliance on CSV files for internal IPCC coefficients and user definitions ensures the tool is accessible to users without deep database management knowledge.
 
-![Overview of the herdr tool](figure2.png)
+![Overview of the herdr tool](figure2.png){ width=80% }
 
 # Research impact assessment
 
