@@ -9,26 +9,29 @@ tags:
 - agriculture
 - IPCC
 date: "03 July 2026"
+output:
+  pdf_document: default
+  word_document: default
+bibliography: paper.bib
+affiliations:
+- name: "Basque Centre for Climate Change (BC3), Edificio Sede 1-1, Parque Científico
+    de UPV/EHU, Barrio Sarriena s/n, 48940 Leioa, Spain"
+  index: 1
+- name: Ikerbasque – Basque Foundation for Science, 48009 Bilbao, Spain
+  index: 2
 authors:
 - name: Juan Carlos Báez
   orcid: "0000-0002-7067-265X"
   affiliation: 1
 - name: Jon Sampedro
   orcid: "0000-0002-2277-1530"
-  affiliation: "1, 2"
+  affiliation: 1, 2
 - name: Guillermo Pardo
   orcid: "0000-0002-7961-8457"
   affiliation: 1
 - name: Agustín del Prado
   orcid: "0000-0003-3895-4478"
-  affiliation: "1, 2"
-bibliography: paper.bib
-affiliations:
-- name: "Basque Centre for Climate Change (BC3), Edificio Sede 1-1, Parque Científico
-    de UPV/EHU, Barrio Sarriena s/n, 48940 Leioa, Spain"
-  index: 1
-- name: "Ikerbasque – Basque Foundation for Science, 48009 Bilbao, Spain"
-  index: 2
+  affiliation: 1, 2
 ---
 
 # Summary
@@ -86,7 +89,7 @@ The architecture of `herdr` follows a **functional and modular pipeline** design
 
 - **Decoupled Input/Output:** Using a standardized directory structure (`user_data/` for inputs and `output/` for results), makes the package maintain a clean separation between raw research data and computational results. The reliance on CSV files for internal IPCC coefficients and user definitions ensures the tool is accessible to users without deep database management knowledge.
 
-![Overview of the herdr tool](figure2.png)
+![Overview of the herdr tool](figure2.png){ width=80% }
 
 # Research impact assessment
 
