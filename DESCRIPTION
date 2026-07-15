@@ -40,7 +40,11 @@ Imports:
     readr,
     assertthat,
     magrittr,
-    utils
+    utils,
+    shiny,
+    bslib,
+    rhandsontable,
+    shinycssloaders
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
