@@ -50,3 +50,5 @@
   : Summarize CH4, N2O Emissions, and Land Use
 - [`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
   : Initialize herdr project folders and example data
+- [`run_herdr_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)
+  : Launch the herdr Interactive Application
