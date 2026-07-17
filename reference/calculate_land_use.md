@@ -10,7 +10,7 @@ calculate_land_use(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
   farm_country = "Spain",
-  year = 2024
+  year = 2022
 )
 ```
 
