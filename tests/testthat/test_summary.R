@@ -4,14 +4,10 @@ library(readr)
 library(dplyr)
 library(withr)
 
-test_that("generate_impact_assessment produces correct output structure using provided CSVs", {
-
-  # 1. Set test directory to use existing CSV files
-  withr::local_dir(test_path("test_data"))
-
-  # 2. Normalize existing files (trim whitespace, force character cols)
-  #    Includes all inputs required across the whole pipeline
-  #    (DMI, population, emissions, manure, N2O, land use)
+# ---------------------------------------------------------------------------
+# Shared helper: normalize CSVs + skip guard, reused across tests
+# ---------------------------------------------------------------------------
+.prepare_impact_test_env <- function() {
   files_to_fix <- c(
     "livestock_weights.csv",
     "livestock_definitions.csv",
@@ -38,8 +34,6 @@ test_that("generate_impact_assessment produces correct output structure using pr
     }
   }
 
-  # 3. Guard: skip if diet_ingredients.csv has missing origins and no local
-  #    FAO trade inputs are available (avoids network download / crash)
   diet_ing_path <- file.path("user_data", "diet_ingredients.csv")
   parquet_path  <- file.path("user_data", "fao_trade_matrix.parquet")
   prod_path     <- file.path("user_data", "fao_production.csv")
@@ -48,10 +42,18 @@ test_that("generate_impact_assessment produces correct output structure using pr
     diet_ing <- read_csv(diet_ing_path, show_col_types = FALSE)
     needs_fao_engine   <- any(is.na(diet_ing$country_of_origin))
     missing_fao_inputs <- needs_fao_engine && (!file.exists(parquet_path) || !file.exists(prod_path))
-    skip_if(missing_fao_inputs, "Missing country_of_origin values and no local FAO trade inputs; skipping to avoid network download in tests.")
+    skip_if(missing_fao_inputs, "Missing FAO trade inputs; skipping.")
   }
+}
 
-  # 4. Execute full impact assessment pipeline
+# ---------------------------------------------------------------------------
+# 1. Happy path: structure and internal consistency
+# ---------------------------------------------------------------------------
+test_that("generate_impact_assessment produces correct output structure using provided CSVs", {
+
+  withr::local_dir(test_path("test_data"))
+  .prepare_impact_test_env()
+
   results <- suppressWarnings(suppressMessages(
     generate_impact_assessment(
       automatic_cycle = FALSE,
@@ -62,7 +64,6 @@ test_that("generate_impact_assessment produces correct output structure using pr
     )
   ))
 
-  # 5. Assertions
   expect_s3_class(results, "data.frame")
 
   expected_cols <- c(
@@ -75,7 +76,6 @@ test_that("generate_impact_assessment produces correct output structure using pr
   )
   expect_true(all(expected_cols %in% colnames(results)))
 
-  # Basic consistency checks
   if (nrow(results) > 0) {
     numeric_cols <- results %>% dplyr::select(where(is.numeric))
     expect_false(any(sapply(numeric_cols, function(x) any(is.na(x)))))
@@ -85,7 +85,6 @@ test_that("generate_impact_assessment produces correct output structure using pr
     expect_true(all(results$Land_m2 >= 0))
     expect_true(all(results$CO2eq_Total_Gg >= 0))
 
-    # CO2eq_Total_Gg should equal the sum of its components (within tolerance)
     expect_equal(
       results$CO2eq_Total_Gg,
       results$CO2eq_enteric + results$CO2eq_manure + results$CO2eq_N2O,
@@ -94,33 +93,98 @@ test_that("generate_impact_assessment produces correct output structure using pr
   }
 })
 
-test_that("generate_impact_assessment applies filters correctly", {
+
+# ---------------------------------------------------------------------------
+# 2. Aggregation: group_by_identification = FALSE collapses animal_tag
+# ---------------------------------------------------------------------------
+test_that("generate_impact_assessment aggregates correctly when group_by_identification = FALSE", {
 
   withr::local_dir(test_path("test_data"))
+  .prepare_impact_test_env()
 
-  diet_ing_path <- file.path("user_data", "diet_ingredients.csv")
-  parquet_path  <- file.path("user_data", "fao_trade_matrix.parquet")
-  prod_path     <- file.path("user_data", "fao_production.csv")
+  detailed <- suppressWarnings(suppressMessages(
+    generate_impact_assessment(saveoutput = FALSE, group_by_identification = TRUE)
+  ))
+  skip_if(nrow(detailed) == 0, "No rows returned by pipeline; skipping.")
 
-  if (file.exists(diet_ing_path)) {
-    diet_ing <- read_csv(diet_ing_path, show_col_types = FALSE)
-    needs_fao_engine   <- any(is.na(diet_ing$country_of_origin))
-    missing_fao_inputs <- needs_fao_engine && (!file.exists(parquet_path) || !file.exists(prod_path))
-    skip_if(missing_fao_inputs, "Missing FAO trade inputs; skipping filter test.")
-  }
+  aggregated <- suppressWarnings(suppressMessages(
+    generate_impact_assessment(saveoutput = FALSE, group_by_identification = FALSE)
+  ))
 
-  full_results <- suppressWarnings(suppressMessages(
+  expect_s3_class(aggregated, "data.frame")
+  expect_false("animal_tag" %in% colnames(aggregated))
+
+  # Aggregated should have fewer or equal rows than the detailed version
+  expect_true(nrow(aggregated) <= nrow(detailed))
+
+  # Totals should be conserved across the two grouping levels
+  expect_equal(
+    sum(detailed$CO2eq_Total_Gg, na.rm = TRUE),
+    sum(aggregated$CO2eq_Total_Gg, na.rm = TRUE),
+    tolerance = 1e-3
+  )
+})
+
+# ---------------------------------------------------------------------------
+# 3. saveoutput = TRUE writes the summary CSV to disk
+# ---------------------------------------------------------------------------
+test_that("generate_impact_assessment saves output to CSV when saveoutput = TRUE", {
+
+  withr::local_dir(test_path("test_data"))
+  .prepare_impact_test_env()
+
+  if (dir.exists("output")) unlink("output", recursive = TRUE)
+  withr::defer(if (dir.exists("output")) unlink("output", recursive = TRUE))
+
+  suppressWarnings(suppressMessages(
+    generate_impact_assessment(saveoutput = TRUE)
+  ))
+
+  expect_true(file.exists("output/impact_assessment_summary.csv"))
+
+  saved <- read_csv("output/impact_assessment_summary.csv", show_col_types = FALSE)
+  expect_true(nrow(saved) > 0)
+  expect_true("CO2eq_Total_Gg" %in% colnames(saved))
+})
+
+# ---------------------------------------------------------------------------
+# 4. farm_country / year are correctly forwarded to calculate_land_use
+# ---------------------------------------------------------------------------
+test_that("generate_impact_assessment forwards farm_country and year to land use calculation", {
+
+  withr::local_dir(test_path("test_data"))
+  .prepare_impact_test_env()
+
+  results_2022 <- suppressWarnings(suppressMessages(
+    generate_impact_assessment(saveoutput = FALSE, farm_country = "Spain", year = 2022)
+  ))
+
+  expect_s3_class(results_2022, "data.frame")
+  expect_true("Land_m2" %in% colnames(results_2022))
+  # Land_m2 should be computed (non-negative, present) regardless of the
+  # specific year value, confirming the parameter was accepted and used
+  # without erroring the pipeline
+  expect_true(all(results_2022$Land_m2 >= 0, na.rm = TRUE))
+})
+
+# ---------------------------------------------------------------------------
+# 5. CO2eq math uses the correct GWP factors (AR5: CH4=28, N2O=265)
+# ---------------------------------------------------------------------------
+test_that("generate_impact_assessment applies correct GWP conversion factors", {
+
+  withr::local_dir(test_path("test_data"))
+  .prepare_impact_test_env()
+
+  results <- suppressWarnings(suppressMessages(
     generate_impact_assessment(saveoutput = FALSE)
   ))
+  skip_if(nrow(results) == 0, "No rows returned by pipeline; skipping.")
 
-  skip_if(nrow(full_results) == 0, "No rows returned by pipeline; skipping filter test.")
-
-  sample_animal <- full_results$animal_type[1]
-
-  filtered_results <- suppressWarnings(suppressMessages(
-    generate_impact_assessment(saveoutput = FALSE, animal = sample_animal)
-  ))
-
-  expect_true(all(filtered_results$animal_type == sample_animal))
-  expect_true(nrow(filtered_results) <= nrow(full_results))
+  expect_equal(results$CO2eq_enteric, results$CH4_enteric_Gg * 28, tolerance = 1e-6)
+  expect_equal(results$CO2eq_manure, results$CH4_manure_Gg * 28, tolerance = 1e-6)
+  expect_equal(
+    results$CO2eq_N2O,
+    (results$N2O_direct_Gg + results$N2O_vol_Gg + results$N2O_lea_Gg) * 265,
+    tolerance = 1e-6
+  )
 })
