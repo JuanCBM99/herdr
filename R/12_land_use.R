@@ -84,7 +84,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
     # 3A. Local production capacity
-    df_prod <- readr::read_csv("user_data/produccion.csv", show_col_types = FALSE)
+    df_prod <- readr::read_csv("user_data/fao_production.csv", show_col_types = FALSE)
     prod_country_col <- if("Reporter Countries" %in% names(df_prod)) "Reporter Countries" else "Area"
 
     clean_prod <- df_prod %>%
