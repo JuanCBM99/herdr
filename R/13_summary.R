@@ -6,14 +6,16 @@
 #' @param animal Livestock type (animal_type).
 #' @param type Livestock subtype (animal_subtype).
 #' @param class_flex Management class (e.g., 'grazing', 'stall').
-#' @param crop_yield_country Character. FAO Area to use for crop yields.
 #' @param saveoutput If TRUE saves to output folder.
 #' @param group_by_identification If TRUE returns by animal_tag.
+#' @param farm_country Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".
+#' @param year Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.
 #' @export
 generate_impact_assessment <- function(automatic_cycle = FALSE,
                                        region = NULL, subregion = NULL,
-                                       animal = NULL, type = NULL, class_flex = NULL, crop_yield_country,
-                                       saveoutput = TRUE, group_by_identification = TRUE) {
+                                       animal = NULL, type = NULL, class_flex = NULL,
+                                       saveoutput = TRUE, group_by_identification = TRUE,
+                                       farm_country = "Spain", year = 2024) {
 
   message("\U0001f7e2 Starting impact assessment summary...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
@@ -39,7 +41,13 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  land_u  <- calculate_land_use(automatic_cycle = automatic_cycle, crop_yield_country, saveoutput = FALSE) %>%
+  # Here we pass the country and year parameters to calculate_land_use
+  land_u  <- calculate_land_use(
+    automatic_cycle = automatic_cycle,
+    saveoutput = FALSE,
+    farm_country = farm_country,
+    year = year
+  ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(Land_m2 = sum(total_land_use_m2, na.rm = TRUE), .groups = "drop")
 

@@ -32,3 +32,13 @@ mature_goat_female_dairy,,,,,,,,,,,,
 mature_goat_female_meat,,,,,,,,,,,,
 random_goat,france,,,anaerobic_lagoon,uncovered,,warm,tropical,zone_dry,dry,goat_high_productivity,0.5
 random_goat,france,,,deep_bedding,no_mixing,>1,warm,tropical,zone_dry,dry,goat_high_productivity,0.5
+broilers,,,,,,,,,,,,
+replacement_meat_pullets,,,,,,,,,,,,
+breeder_meat_hens,,,,,,,,,,,,
+replacement_layer_pullets,,,,,,,,,,,,
+laying_hens,,,,,,,,,,,,
+free_range_laying_hens,,,,,,,,,,,,
+fattening_pigs,,,,,,,,,,,,
+replacement_sows,,,,,,,,,,,,
+breeder_sows,,,,,,,,,,,,
+boars,,,,,,,,,,,,

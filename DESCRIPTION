@@ -1,6 +1,6 @@
 Package: herdr
 Title: herdr
-Version: 1.0.1
+Version: 1.0.2
 Authors@R: c(
     person("Juan Carlos", "Baez", 
            email = "juancarlos.baez@bc3research.org", 
@@ -40,13 +40,18 @@ Imports:
     readr,
     assertthat,
     magrittr,
-    utils
+    utils,
+    shiny,
+    bslib,
+    rhandsontable,
+    shinycssloaders
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
     pkgdown,
     withr,
-    knitr
+    knitr,
+    arrow
 VignetteBuilder: 
      knitr
 Config/testthat/edition: 3

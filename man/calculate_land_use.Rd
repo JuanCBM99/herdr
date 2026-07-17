@@ -6,17 +6,20 @@
 \usage{
 calculate_land_use(
   automatic_cycle = FALSE,
-  crop_yield_country,
-  saveoutput = TRUE
+  saveoutput = TRUE,
+  farm_country = "Spain",
+  year = 2022
 )
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
-\item{crop_yield_country}{Character. FAO Area to use for crop yields.}
-
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{farm_country}{Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".}
+
+\item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.}
 }
 \description{
-Computes total land use (m2) per animal based on validated DMI.
+Computes total land use (m2) per animal based on validated DMI and specific origin countries.
 }
