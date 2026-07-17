@@ -9,7 +9,7 @@
 calculate_land_use <- function(automatic_cycle = FALSE,
                                saveoutput = TRUE,
                                farm_country = "Spain",
-                               year = 2024) {
+                               year = 2022) {
 
   message("\U0001f7e2 Calculating land use...")
 
@@ -60,13 +60,31 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # If there are any NA values in origin, we trigger our FAO engine
   if (any(is.na(diet_ingredients_raw$country_of_origin))) {
+
+    # SHIELD: If the Parquet file is missing, auto-download it from GitHub Releases
+    path_parquet <- "user_data/fao_trade_matrix.parquet"
+    if (!file.exists(path_parquet)) {
+      message("\u23f3 FAO trade matrix not found locally.")
+      message("Downloading background database (187 MB)... This will only happen once.")
+
+      # URL pointing to the latest release assets
+      url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_trade_matrix.parquet"
+
+      tryCatch({
+        download.file(url_release, destfile = path_parquet, mode = "wb")
+        message("\u2705 Download completed successfully.")
+      }, error = function(e) {
+        stop("Error downloading the trade matrix. Please check your internet connection: ", e$message)
+      })
+    }
+
     message(paste0("\u23f3 Missing countries of origin found. Computing dynamic FAO background data for ", farm_country, " (", year, ")..."))
 
     year_col  <- paste0("Y", year)
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
     # 3A. Local production capacity
-    df_prod <- readr::read_csv("user_data/fao_production.csv", show_col_types = FALSE)
+    df_prod <- readr::read_csv("user_data/produccion.csv", show_col_types = FALSE)
     prod_country_col <- if("Reporter Countries" %in% names(df_prod)) "Reporter Countries" else "Area"
 
     clean_prod <- df_prod %>%
@@ -75,7 +93,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::summarise(Production = sum(Value, na.rm = TRUE), .groups = "drop")
 
     # 3B. Extract trade records from Parquet (Only the target year is read)
-    df_trade <- arrow::open_dataset("user_data/fao_trade_matrix.parquet") %>%
+    df_trade <- arrow::open_dataset(path_parquet) %>%
       dplyr::select(`Reporter Countries`, `Partner Countries`, Item, Element, dplyr::all_of(year_col)) %>%
       dplyr::filter(`Reporter Countries` == farm_country, Item %in% fao_items) %>%
       dplyr::collect() %>%
