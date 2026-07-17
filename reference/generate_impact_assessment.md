@@ -12,9 +12,10 @@ generate_impact_assessment(
   animal = NULL,
   type = NULL,
   class_flex = NULL,
-  crop_yield_country,
   saveoutput = TRUE,
-  group_by_identification = TRUE
+  group_by_identification = TRUE,
+  farm_country = "Spain",
+  year = 2024
 )
 ```
 
@@ -45,10 +46,6 @@ generate_impact_assessment(
 
   Management class (e.g., 'grazing', 'stall').
 
-- crop_yield_country:
-
-  Character. FAO Area to use for crop yields.
-
 - saveoutput:
 
   If TRUE saves to output folder.
@@ -56,3 +53,13 @@ generate_impact_assessment(
 - group_by_identification:
 
   If TRUE returns by animal_tag.
+
+- farm_country:
+
+  Character. The country of the farm/study (e.g., "Spain"). Default is
+  "Spain".
+
+- year:
+
+  Numeric. The reference year for FAO trade data calculation if origins
+  are missing. Default is 2022.

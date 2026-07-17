@@ -60,9 +60,10 @@
 <span>  animal <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  type <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  class_flex <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  <span class="va">crop_yield_country</span>,</span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  group_by_identification <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  group_by_identification <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2024</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -94,16 +95,20 @@
 <dd><p>Management class (e.g., 'grazing', 'stall').</p></dd>
 
 
-<dt id="arg-crop-yield-country">crop_yield_country<a class="anchor" aria-label="anchor" href="#arg-crop-yield-country"></a></dt>
-<dd><p>Character. FAO Area to use for crop yields.</p></dd>
-
-
 <dt id="arg-saveoutput">saveoutput<a class="anchor" aria-label="anchor" href="#arg-saveoutput"></a></dt>
 <dd><p>If TRUE saves to output folder.</p></dd>
 
 
 <dt id="arg-group-by-identification">group_by_identification<a class="anchor" aria-label="anchor" href="#arg-group-by-identification"></a></dt>
 <dd><p>If TRUE returns by animal_tag.</p></dd>
+
+
+<dt id="arg-farm-country">farm_country<a class="anchor" aria-label="anchor" href="#arg-farm-country"></a></dt>
+<dd><p>Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".</p></dd>
+
+
+<dt id="arg-year">year<a class="anchor" aria-label="anchor" href="#arg-year"></a></dt>
+<dd><p>Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.</p></dd>
 
 </dl></div>
 
