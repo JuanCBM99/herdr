@@ -56,3 +56,6 @@ inst/doc
 /docs/
 
 .positai
+
+#GitHub
+*.parquet

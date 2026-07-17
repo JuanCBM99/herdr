@@ -10,19 +10,19 @@ library(readr)
 # ==========================================
 
 tables_info <- list(
-  census    = list(file = "livestock_census.csv",          fixed = 0, icon = "clipboard-list", label = "Census", help = "Enter the total head count for each animal category in your herd."),
-  diet_prof = list(file = "diet_profiles.csv",             fixed = 4, icon = "utensils",       label = "Diet Profiles", help = "Percentage of each ingredient making up the diet for different animal tags."),
-  diet_ingr = list(file = "diet_ingredients.csv",          fixed = 4, icon = "wheat-awn",      label = "Ingredients", help = "Nutritional characteristics of each feed ingredient (e.g., dry matter, crude protein)."),
-  def       = list(file = "livestock_definitions.csv",     fixed = 4, icon = "id-card",        label = "Definitions", help = "Define physiological traits (e.g., adult weight, daily gain) for each animal type."),
+  census    = list(file = "livestock_census.csv",         fixed = 0, icon = "clipboard-list", label = "Census", help = "Enter the total head count for each animal category in your herd."),
+  diet_prof = list(file = "diet_profiles.csv",             fixed = 4, icon = "utensils",       label = "Diet Profiles", help = "Percentage of forage, concentrate, milk and/milk replacer making up the diet"),
+  diet_ingr = list(file = "diet_ingredients.csv",          fixed = 4, icon = "wheat-awn",      label = "Ingredients", help = "Percentage of each ingredient making up the diet for different animal tags."),
+  def       = list(file = "livestock_definitions.csv",     fixed = 4, icon = "id-card",        label = "Definitions", help = "Define physiological traits for ruminants using IPCC coefficients and available data."),
   mono      = list(file = "monogastric_definitions.csv",   fixed = 4, icon = "drumstick-bite", label = "Monogastrics", help = "Specific parameters and performance metrics for poultry and swine."),
   weights   = list(file = "livestock_weights.csv",         fixed = 4, icon = "weight-hanging", label = "Weights", help = "Specify the initial and final weights for growing and finishing phases."),
-  manure    = list(file = "manure_management.csv",         fixed = 4, icon = "recycle",        label = "Manure", help = "Percentage of manure managed in different systems. Must sum to 100% per row."),
+  manure    = list(file = "manure_management.csv",         fixed = 4, icon = "recycle",        label = "Manure", help = "Percentage of manure managed in different systems. Must sum 1 per animal_tag."),
   repro     = list(file = "reproduction_parameters.csv",   fixed = 0, icon = "dna",            label = "Reproduction", help = "Reproductive rates, herd replacement rates, and mortality percentages."),
-  feed_char = list(file = "feed_characteristics.csv",      fixed = 1, icon = "flask",          label = "Feed Char.", help = "IPCC default values for feed digestibility and energy. Edit only with local data."),
+  feed_char = list(file = "feed_characteristics.csv",      fixed = 1, icon = "flask",          label = "Feed Char.", help = "Nutritional characteristics of each feed ingredient (e.g., dry matter, crude protein)."),
   forage    = list(file = "forage_yields.csv",             fixed = 1, icon = "seedling",       label = "Forage Yields", help = "Default crop and forage yields based on the selected region."),
   ipcc_coef = list(file = "ipcc_coefficients.csv",         fixed = 2, icon = "square-root-variable", label = "IPCC Coefficients", help = "IPCC constants for enteric fermentation and manure equations."),
-  ipcc_mm   = list(file = "ipcc_mm.csv",                   fixed = 2, icon = "warehouse",      label = "IPCC Manure Mgt.", help = "Methane conversion factors (MCF) for various manure management systems."),
-  mapping   = list(file = "mapping.csv",                   fixed = 1, icon = "diagram-project",label = "Mapping", help = "Internal mapping connecting animal categories to IPCC definitions.")
+  ipcc_mm   = list(file = "ipcc_mm.csv",                    fixed = 2, icon = "warehouse",      label = "IPCC Manure Mgt.", help = "Methane conversion factors (MCF), emission factors (EF) and fractions for various manure management systems."),
+  mapping   = list(file = "mapping.csv",                    fixed = 1, icon = "diagram-project",label = "Mapping", help = "Internal mapping.")
 )
 
 dynamic_dropdowns <- list(
@@ -229,7 +229,7 @@ ui_advanced_tabs <- lapply(advanced_ids, function(id) {
 })
 
 ui <- page_sidebar(
-  fillable = TRUE, theme = herdr_theme, window_title = "herdr — Livestock Emissions Calculator",
+  fillable = TRUE, theme = herdr_theme, window_title = "herdr \u2014 Livestock Emissions Calculator",
   tags$head(tags$style(HTML(herdr_css))),
   tags$head(tags$script(HTML("
     Shiny.addCustomMessageHandler('herdr_button_state', function(msg) {
@@ -240,17 +240,17 @@ ui <- page_sidebar(
       else { btn.innerHTML = btn.dataset.herdrLabel; btn.disabled = false; btn.classList.remove('btn-loading'); }
     });
 
-    /* ⚡ EL PORTERO DE DISCOTECA: BLOQUEADOR DE SCROLL INFALIBLE ⚡ */
+    /* \u26A1 EL PORTERO DE DISCOTECA: BLOQUEADOR DE SCROLL INFALIBLE \u26A1 */
     function stopScrollChaining(e) {
-      // 1. ¿Estamos encima de la lista del desplegable?
+      // 1. \u00bfEstamos encima de la lista del desplegable?
       var isListbox = e.target.closest('.handsontable.listbox');
       if (isListbox) {
-        // CORTAMOS LA PROPAGACIÓN. La tabla principal nunca se enterará del scroll.
+        // CORTAMOS LA PROPAGACI\u00d3N. La tabla principal nunca se enterar\u00e1 del scroll.
         e.stopPropagation();
         return;
       }
 
-      // 2. ¿Estamos encima de la tabla principal?
+      // 2. \u00bfEstamos encima de la tabla principal?
       var isTable = e.target.closest('.handsontable');
       if (isTable) {
         var holder = e.target.closest('.wtHolder');
@@ -288,8 +288,17 @@ ui <- page_sidebar(
     ),
     div(class = "step-card wheat",
         div(class = "step-head", span("2", class = "step-tag"), h5("Configuration", class = "step-title")),
-        tooltip(selectInput("fao_country", tagList("Crop yield country", icon("circle-info", class = "ms-1 text-muted")), choices = c("Loading..." = "")), "Baseline country for FAO references."),
-        tooltip(checkboxInput("auto_cycle", tagList("Use automatic herd cycle", icon("circle-info", class = "ms-1 text-muted")), value = FALSE), "Unlocks the Reproduction table if unchecked.")
+        tooltip(checkboxInput("auto_cycle", tagList("Use automatic herd cycle", icon("circle-info", class = "ms-1 text-muted")), value = FALSE), "Unlocks the Reproduction table if unchecked."),
+
+        hr(style = "margin: 0.8rem 0; border-color: var(--herdr-border);"),
+
+        # Country Selector con el nuevo Tooltip de ayuda
+        tooltip(
+          selectInput("farm_country", tagList("Farm Country / Area:", icon("circle-info", class = "ms-1 text-muted")), choices = c("Loading countries..." = "")),
+          "If a feed's origin is empty (NA) in your Ingredients table, herdr automatically calculates its true origin using FAO trade/production data for this country."
+        ),
+
+        numericInput("year", "FAO Reference Year:", value = 2022, min = 1961, max = 2026, step = 1)
     ),
     div(class = "step-card wheat",
         div(class = "step-head", span("3", class = "step-tag"), h5("Calculate", class = "step-title")),
@@ -326,11 +335,30 @@ ui <- page_sidebar(
 server <- function(input, output, session) {
 
   if (!dir.exists("user_data")) herdr::herdr_init()
-  fao_file <- "user_data/fao_crop_yields.csv"
-  if (file.exists(fao_file)) updateSelectInput(session, "fao_country", choices = sort(unique(read_csv(fao_file, show_col_types = FALSE)$Area)), selected = "Spain")
 
   example_paths <- system.file("Examples", package = "herdr")
   updateSelectInput(session, "data_source", choices = c("My current data" = "current", if (example_paths != "") list.dirs(example_paths, full.names = FALSE, recursive = FALSE) else c()))
+
+  # Load the unique countries dynamically from fao_crop_yields.csv
+  observe({
+    path_yields <- "user_data/fao_crop_yields.csv"
+    if (file.exists(path_yields)) {
+      tryCatch({
+        df_yields <- readr::read_csv(path_yields, col_select = Area, show_col_types = FALSE)
+        paises <- sort(unique(na.omit(df_yields$Area)))
+
+        # We pre-select "Spain" if it exists in the list, otherwise default to first element
+        selected_country <- if ("Spain" %in% paises) "Spain" else paises[1]
+
+        updateSelectInput(session, "farm_country", choices = paises, selected = selected_country)
+      }, error = function(e) {
+        updateSelectInput(session, "farm_country", choices = c("Spain", "France", "Germany", "United States of America"))
+      })
+    } else {
+      # Fallback defaults in case the file hasn't been created yet
+      updateSelectInput(session, "farm_country", choices = c("Spain", "France", "Germany", "United States of America"))
+    }
+  })
 
   rv <- reactiveValues()
   dirty <- reactiveValues()
@@ -453,9 +481,9 @@ server <- function(input, output, session) {
       if (!(id %in% actives)) return(NULL)
       idx <- which(actives == id)
       if (idx < length(actives)) {
-        div(class = "d-flex justify-content-end", actionButton(paste0("btn_next_", id), paste("Next Step:", tables_info[[actives[idx + 1]]]$label, "➔"), class = "btn-next-step"))
+        div(class = "d-flex justify-content-end", actionButton(paste0("btn_next_", id), paste("Next Step:", tables_info[[actives[idx + 1]]]$label, "\u2794"), class = "btn-next-step"))
       } else {
-        div(class = "d-flex justify-content-end", actionButton(paste0("btn_next_", id), "Ready? Click 'Run herdr Model' ➔", class = "btn-next-step", onclick = "document.getElementById('calculate').click();"))
+        div(class = "d-flex justify-content-end", actionButton(paste0("btn_next_", id), "Ready? Click 'Run herdr Model' \u2794", class = "btn-next-step", onclick = "document.getElementById('calculate').click();"))
       }
     })
     observeEvent(input[[paste0("btn_next_", id)]], {
@@ -510,7 +538,12 @@ server <- function(input, output, session) {
       mensajes_mostrados <- c()
       result <- tryCatch({
         withCallingHandlers(
-          expr = generate_impact_assessment(automatic_cycle = input$auto_cycle, crop_yield_country = input$fao_country, saveoutput = FALSE),
+          expr = generate_impact_assessment(
+            automatic_cycle = input$auto_cycle,
+            saveoutput = FALSE,
+            farm_country = input$farm_country,
+            year = input$year
+          ),
           warning = function(w) {
             if (!(w$message %in% mensajes_mostrados)) { showNotification(paste("\u26A0", w$message), type = "warning", duration = 12); mensajes_mostrados <<- c(mensajes_mostrados, w$message) }
           }
