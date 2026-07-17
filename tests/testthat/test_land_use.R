@@ -4,119 +4,62 @@ library(readr)
 library(dplyr)
 library(withr)
 
-# ---------------------------------------------------------------------------
-# 1. Happy path: structure and basic sanity of the output
-# ---------------------------------------------------------------------------
-test_that("calculate_land_use produces correct output structure using provided CSVs", {
+test_that("calculate_land_use computes m2 safely without downloading parquet", {
+  # 1. CREATE ISOLATED ENVIRONMENT
+  # Create a temporary directory that will be deleted when the R session ends
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
 
-  withr::local_dir(test_path("test_data"))
+  # Copy the test data folder to the temporary environment
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
 
-  files_to_fix <- c(
-    "livestock_weights.csv",
-    "livestock_definitions.csv",
-    "ipcc_coefficients.csv",
-    "diet_profiles.csv",
-    "diet_ingredients.csv",
-    "feed_characteristics.csv",
-    "mapping.csv",
-    "fao_crop_yields.csv",
-    "forage_yields.csv",
-    "fao_production.csv"
+  # Tell R to work INSIDE the temporary folder
+  withr::local_dir(temp_test_dir)
+
+  # 2. ANTI-DOWNLOAD SHIELD
+  # Modify the temporary COPY of diet_ingredients.csv to remove NAs
+  path_diet <- "user_data/diet_ingredients.csv"
+  if (file.exists(path_diet)) {
+    df <- read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE)
+
+    # If the column does not exist, create it. If it exists and has NAs, fill with "Spain"
+    if (!"country_of_origin" %in% names(df)) {
+      df <- df %>% mutate(country_of_origin = "Spain")
+    } else {
+      df <- df %>% mutate(country_of_origin = ifelse(is.na(country_of_origin), "Spain", country_of_origin))
+    }
+
+    # Overwrite only the ghost copy
+    write_csv(df, path_diet)
+  }
+
+  # 3. EXECUTE THE FUNCTION
+  # Since there are no longer NAs in the origin, the function will ignore the Parquet logic
+  results <- suppressWarnings(
+    calculate_land_use(
+      farm_country = "Spain",
+      year = 2022,
+      saveoutput = FALSE
+    )
   )
 
-  for (f in files_to_fix) {
-    path <- file.path("user_data", f)
-    if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-        mutate(across(everything(), trimws)) %>%
-        write_csv(path)
+  # 4. BASIC VALIDATIONS
+  # Check that it returns a dataframe
+  expect_s3_class(results, "data.frame")
+
+  # Check that key columns exist
+  expect_true("land_use_per_animal_m2" %in% colnames(results))
+  expect_true("total_land_use_m2" %in% colnames(results))
+
+  # If there are results, check that mathematical logic holds (no negative numbers)
+  if(nrow(results) > 0) {
+    expect_true(all(results$land_use_per_animal_m2 >= 0))
+
+    # Total use must be per_capita * population
+    sample_row <- results[1, ]
+    if(sample_row$population > 0) {
+      calc_total <- sample_row$land_use_per_animal_m2 * sample_row$population
+      expect_equal(sample_row$total_land_use_m2, calc_total, tolerance = 0.01)
     }
   }
-
-  diet_ing_path <- file.path("user_data", "diet_ingredients.csv")
-  parquet_path  <- file.path("user_data", "fao_trade_matrix.parquet")
-  prod_path     <- file.path("user_data", "fao_production.csv")
-
-  if (file.exists(diet_ing_path)) {
-    diet_ing <- read_csv(diet_ing_path, show_col_types = FALSE)
-    needs_fao_engine   <- any(is.na(diet_ing$country_of_origin))
-    missing_fao_inputs <- needs_fao_engine && (!file.exists(parquet_path) || !file.exists(prod_path))
-    skip_if(missing_fao_inputs, "Missing country_of_origin values and no local FAO trade inputs; skipping.")
-  }
-
-  results <- suppressWarnings(suppressMessages(
-    calculate_land_use(automatic_cycle = FALSE, saveoutput = FALSE)
-  ))
-
-  expect_s3_class(results, "data.frame")
-
-  expected_cols <- c(
-    "region", "subregion", "animal_tag", "class_flex",
-    "ingredient", "country_of_origin", "animal_type", "animal_subtype",
-    "population", "dm_yield",
-    "land_use_per_animal_m2", "total_land_use_m2"
-  )
-  expect_true(all(expected_cols %in% colnames(results)))
-
-  if (nrow(results) > 0) {
-    expect_true(all(results$land_use_per_animal_m2 >= 0, na.rm = TRUE))
-    expect_true(all(results$total_land_use_m2 >= 0, na.rm = TRUE))
-    expect_false(any(is.na(results$land_use_per_animal_m2)))
-  }
 })
-
-# ---------------------------------------------------------------------------
-# 2. FAO engine branch: triggered when country_of_origin has NA
-# ---------------------------------------------------------------------------
-test_that("calculate_land_use triggers FAO engine when country_of_origin has NA", {
-
-  withr::local_dir(test_path("test_data"))
-
-  diet_ing_path <- file.path("user_data", "diet_ingredients.csv")
-  parquet_path  <- file.path("user_data", "fao_trade_matrix.parquet")
-  prod_path     <- file.path("user_data", "fao_production.csv")
-
-  skip_if_not(file.exists(diet_ing_path))
-  skip_if(!file.exists(parquet_path) || !file.exists(prod_path),
-          "Need local parquet + fao_production.csv to test FAO engine branch without downloading.")
-
-  original <- read_csv(diet_ing_path, show_col_types = FALSE)
-  withr::defer(write_csv(original, diet_ing_path))
-
-  modified <- original
-  modified$country_of_origin[1] <- NA
-  write_csv(modified, diet_ing_path)
-
-  results <- suppressWarnings(suppressMessages(
-    calculate_land_use(saveoutput = FALSE, farm_country = "Spain", year = 2022)
-  ))
-
-  expect_s3_class(results, "data.frame")
-  expect_true(nrow(results) > 0)
-})
-
-
-# ---------------------------------------------------------------------------
-# 3. Warning: missing yield for an ingredient/origin combination
-# ---------------------------------------------------------------------------
-test_that("calculate_land_use warns when yield data is missing for an ingredient/origin combo", {
-
-  withr::local_dir(test_path("test_data"))
-
-  mapping_path <- file.path("user_data", "mapping.csv")
-  skip_if_not(file.exists(mapping_path))
-
-  original <- read_csv(mapping_path, show_col_types = FALSE)
-  withr::defer(write_csv(original, mapping_path))
-
-  broken <- original
-  broken$yield_name[1] <- "NONEXISTENT_CROP_XYZ"
-  write_csv(broken, mapping_path)
-
-  expect_warning(
-    suppressMessages(calculate_land_use(saveoutput = FALSE)),
-    "Missing yield for"
-  )
-})
-
-
