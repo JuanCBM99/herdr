@@ -63,6 +63,8 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
     # SHIELD: If the Parquet file is missing, auto-download it from GitHub Releases
     path_parquet <- "user_data/fao_trade_matrix.parquet"
+
+    # nocov start
     if (!file.exists(path_parquet)) {
       message("\u23f3 FAO trade matrix not found locally.")
       message("Downloading background database (187 MB)... This will only happen once.")
@@ -77,6 +79,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
         stop("Error downloading the trade matrix. Please check your internet connection: ", e$message)
       })
     }
+    # nocov end
 
     message(paste0("\u23f3 Missing countries of origin found. Computing dynamic FAO background data for ", farm_country, " (", year, ")..."))
 

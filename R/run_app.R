@@ -5,6 +5,7 @@
 #' This allows you to run impact assessments offline keeping your data private.
 #'
 #' @export
+# nocov start
 run_herdr_app <- function() {
   # 1. Buscamos el archivo app.R dentro del paquete instalado
   app_file <- system.file("app", "app.R", package = "herdr")
@@ -23,3 +24,4 @@ run_herdr_app <- function() {
   # 3. Lanzamos el objeto
   shiny::runApp(app_obj, display.mode = "normal")
 }
+# nocov end
