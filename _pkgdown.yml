@@ -16,9 +16,13 @@ navbar:
     - text: "Introduction"
       icon: fas fa-book-open
       href: articles/Introduction.html
-    - text: "Workflow: Step-by-Step"
+    - text: "Workflows"
       icon: fas fa-route
-      href: articles/Workflow.html
+      menu:
+        - text: "R Workflow"
+          href: articles/Workflow.html
+        - text: "App Workflow"
+          href: articles/app.html
     - text: "Guides"
       icon: fas fa-map-signs
       menu:

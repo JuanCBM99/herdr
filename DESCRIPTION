@@ -44,14 +44,14 @@ Imports:
     shiny,
     bslib,
     rhandsontable,
-    shinycssloaders
+    shinycssloaders,
+    arrow
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
     pkgdown,
     withr,
     knitr,
-    arrow
 VignetteBuilder: 
      knitr
 Config/testthat/edition: 3

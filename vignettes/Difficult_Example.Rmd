@@ -1,8 +1,8 @@
 ---
-title: "Dairy Cattle Spain: North/South in different Life Satages"
+title: "Dairy Cattle Spain: North/South in different Life Stages"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Dairy Cattle Spain: North/South in different Life Satages}
+  %\VignetteIndexEntry{Dairy Cattle Spain: North/South in different Life Stages}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -16,7 +16,7 @@ In this guide, we tackle a high-complexity scenario for **Mature Dairy Cattle**.
 ### 📂 Folder Structure
 * **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `livestock_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
 * **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
-* **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+* **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
 ---
 
@@ -36,7 +36,7 @@ The census file links the population to a specific subregion and a physiological
 The `class_flex` column allows you to define different forage/concentrate ratios and specific ingredients for each life stage.
 
 ### A. Diet Profiles (`diet_profiles.csv`)
-| diet_tag | region | subregion | class_flex | forage_share | concentrate_share | milk_share | milk_replacer_share |
+| diet_tag | region | subregion | class_flex | forage | concentrate | milk | milk_replacer |
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | diet_dairy_mature | spain | north | dry_phase | 70 | 30 | 0 | 0 |
 | diet_dairy_mature | spain | north | lactation_phase | 55 | 45 | 0 | 0 |
@@ -47,23 +47,26 @@ The `class_flex` column allows you to define different forage/concentrate ratios
 Ingredients must be assigned precisely to the `subregion` and `class_flex`.
 *Example for the South/Lactation profile:*
 
-| diet_tag | region | subregion | class_flex | ingredient | ingredient_share | ingredient_type |
-|:---|:---|:---|:---|:---|:---|:---|
-| diet_dairy_mature | spain | south | lactation_phase | corn_national | 44.85 | concentrate |
-| diet_dairy_mature | spain | south | lactation_phase | soybean_meal_44_cp | 17.12 | concentrate |
-| diet_dairy_mature | spain | south | lactation_phase | corn_silage_25_30 | 55.00 | forage |
+| diet_tag | region | subregion | class_flex | feed_category | ingredient | percentage | origin_country |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | south | lactation_phase | concentrate | corn_national | 44.85 | Spain |
+| diet_dairy_mature | spain | south | lactation_phase | concentrate | soybean_meal_44_cp | 17.12 | NA |
+| diet_dairy_mature | spain | south | lactation_phase | forage | corn_silage_25_30 | 55.00 | Spain |
+
+*(Note: Missing origins set as `NA` will be automatically resolved by the dynamic FAO background allocation engine).*
 
 ---
 
 ## Step 3: Physiological Definitions (`livestock_definitions.csv`)
-This is the most technical file. It determines the energy requirements (IPCC Tier 2). Note the difference in `milk_yield` and `cfi`.
+This is the most technical file. It determines the energy requirements (IPCC Tier 2). Note the difference in `milk_yield` and `cfi` between phases.
 
 | animal_tag | region | subregion | class_flex | cfi | ca | c | milk_yield | fat_content | c_pregnancy |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
 | mature_dairy_cattle | spain | north | lactation_phase | cattle_buffalo [lactating] | stall | females | 8295 | 3.73 | cattle and buffalo |
 | mature_dairy_cattle | spain | north | dry_phase       | cattle/buffalo             | stall | females | 0    | 0    | cattle and buffalo |
 | mature_dairy_cattle | spain | south | lactation_phase | cattle_buffalo [lactating] | stall | females | 9044 | 3.73 | cattle and buffalo |
-| mature_dairy_cattle | spain | north | dry_phase       | cattle/buffalo             | stall | females | 0    | 0    | cattle and buffalo |
+| mature_dairy_cattle | spain | south | dry_phase       | cattle/buffalo             | stall | females | 0    | 0    | cattle and buffalo |
+
 ---
 
 ## Step 4: Body Weights (`livestock_weights.csv`)
@@ -73,6 +76,7 @@ Accurate weights are essential to calculate Maintenance Energy ($NE_m$) and vali
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | mature_dairy_cattle | spain | north | dry_phase       | 675 |  365 | 675 | 675 |
 | mature_dairy_cattle | spain | north | lactation_phase | 675 |  365 | 675 | 675 |
+| mature_dairy_cattle | spain | south | dry_phase       | 675 |  365 | 675 | 675 |
 | mature_dairy_cattle | spain | south | lactation_phase | 675 |  365 | 675 | 675 |
 
 ---
@@ -86,6 +90,7 @@ You can define management systems with high granularity, specifying the climate 
 | mature_dairy_cattle | spain | north | lactation_phase | liquid_slurry | with_natural_crust_cover | 3 | cool | temperate | zone_wet | wet | dairy_cattle_high_productivity | 0.3432 |
 | mature_dairy_cattle | spain | south | dry_phase | solid_storage |  |  | warm | temperate |  | dry | dairy_cattle_high_productivity | 0.0694 |
 | mature_dairy_cattle | spain | south | dry_phase | deep_bedding | no_mixing | >1 | warm | temperate | zone_dry | dry | dairy_cattle_high_productivity | 0.0131 |
+
 ---
 
 ## Step 6: Final Execution
@@ -95,6 +100,9 @@ When running the analysis, `herdr` will process each row as a unique "animal-sta
 library(herdr)
 
 # The model calculates impact for each phase separately
-results <- generate_impact_assessment(automatic_cycle = FALSE, crop_yield_country = "Spain")
-
+results <- generate_impact_assessment(
+  automatic_cycle = FALSE, 
+  farm_country = "Spain",
+  year = 2015
+)
 ```
