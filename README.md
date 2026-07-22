@@ -1,7 +1,5 @@
 ------------------------------------------------------------------------
 
-editor_options: markdown: wrap: 72 ---
-
 # herdr <img src="man/figures/logo.png" align="right" height="139"/>
 
 [![Project Status: Active](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active) [![R-CMD-check](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/build.yaml) [![docs](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/docs.yaml) [![codecov](https://codecov.io/gh/JuanCBM99/herdr/branch/dev/graph/badge.svg?token=GMIP6FM869)](https://codecov.io/gh/JuanCBM99/herdr) [![test-coverage](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/JuanCBM99/herdr/actions/workflows/test-coverage.yaml) [![Tutorial](https://img.shields.io/badge/Video-Tutorial-red?logo=youtube&logoColor=white)](https://www.youtube.com/watch?v=wmGIQ3g-ZFk) [![Made with R](https://img.shields.io/badge/Made%20with-R-276DC3.svg)](https://www.r-project.org/)
@@ -34,7 +32,7 @@ It provides estimates of:
 You don't need to be a programmer or have R installed to use **herdr**. A fully interactive web application allows users to estimate greenhouse gas emissions, calculate feed-related land use, modify diets, and export results directly from a web browser.
 
 👉 **Launch the herdr Web Interface:**\
-[**https://juancbm99.shinyapps.io/herdr/**](https://juancbm99.shinyapps.io/herdr/){.uri}
+[**https://juancbm99.shinyapps.io/herdr/**](https://juancbm99.shinyapps.io/herdr/)
 
 > **Note:** The web application performs all calculations in the background and does not require any software installation or local datasets.
 
