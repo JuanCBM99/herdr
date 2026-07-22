@@ -36,7 +36,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
+<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
@@ -81,11 +87,16 @@
 
     
     
-<p><strong>herdr</strong> operates on a data-driven approach. To ensure
-the model works correctly, files are divided into two categories:
-<strong>User Inputs</strong> (files you fill in <code>user_data/</code>)
-and <strong>Reference Libraries</strong> (internal files you
-consult).</p>
+<p><code>herdr</code> operates on a data-driven approach. To ensure the
+model works correctly, files are divided into two categories:</p>
+<ul>
+<li>
+<strong>User Inputs</strong> — files you fill in under
+<code>user_data/</code>.</li>
+<li>
+<strong>Reference Libraries</strong> — internal files you consult
+(but do not normally edit).</li>
+</ul>
 <hr>
 <div class="section level2">
 <h2 id="i--user-input-files-user_data">I. User Input Files (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-files-user_data"></a>
@@ -94,65 +105,121 @@ consult).</p>
 analysis. Follow the <a href="Workflow.html">Workflow Guide</a> for
 step-by-step instructions.</p>
 <div class="section level3">
-<h3 id="population-metrics">🐄 Population &amp; Metrics<a class="anchor" aria-label="anchor" href="#population-metrics"></a>
+<h3 id="population-metrics">Population &amp; Metrics<a class="anchor" aria-label="anchor" href="#population-metrics"></a>
 </h3>
-<ul>
-<li>
-<strong><code>livestock_census.csv</code></strong>: Defines the
-<code>animal_tag</code>, location (<code>region</code>), and the number
-of heads (<code>population</code>).</li>
-<li>
-<strong><code>livestock_weights.csv</code></strong>: Defines the
-physical scale of the animals, including <code>adult_weight</code>,
-<code>initial_weight</code>, <code>final_weight</code>,
-<code>productive_period</code>, as well as additional parameters for
-breeder swine..</li>
-<li>
-<strong><code>livestock_definitions.csv</code></strong>: The bridge
-file for ruminant animals. It links each <code>animal_tag</code> to a
-<code>diet_tag</code> and an <strong>IPCC Description</strong>.</li>
-<li>
-<strong><code>monogastric_definitions.csv</code></strong>: The
-bridge file for monogastric animals. It links each
-<code>animal_tag</code> to a <code>diet_tag</code> and species-specific
-parameters required for monogastric energy calculations.</li>
-</ul>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">File</th>
+<th align="left">Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>livestock_census.csv</code></td>
+<td align="left">Defines the <code>animal_tag</code>, location
+(<code>region</code>), and the number of heads
+(<code>population</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>livestock_weights.csv</code></td>
+<td align="left">Defines the physical scale of the animals:
+<code>adult_weight</code>, <code>initial_weight</code>,
+<code>final_weight</code>, <code>productive_period</code>, plus
+additional parameters for breeder swine.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>livestock_definitions.csv</code></td>
+<td align="left">Bridge file for <strong>ruminant</strong> animals.
+Links each <code>animal_tag</code> to a <code>diet_tag</code> and an
+IPCC description.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>monogastric_definitions.csv</code></td>
+<td align="left">Bridge file for <strong>monogastric</strong> animals.
+Links each <code>animal_tag</code> to a <code>diet_tag</code> and the
+species-specific parameters required for monogastric energy
+calculations.</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
-<h3 id="nutrition-diets">🍚 Nutrition &amp; Diets<a class="anchor" aria-label="anchor" href="#nutrition-diets"></a>
+<h3 id="nutrition-diets">Nutrition &amp; Diets<a class="anchor" aria-label="anchor" href="#nutrition-diets"></a>
 </h3>
-<ul>
-<li>
-<strong><code>diet_profiles.csv</code></strong>: Sets the high-level
-balance between Forage, Concentrate, Milk, and Milk Replacer.</li>
-<li>
-<strong><code>diet_ingredients.csv</code></strong>: The
-micro-breakdown of exactly which ingredients (from the library) make up
-the macro categories.</li>
-</ul>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">File</th>
+<th align="left">Purpose</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>diet_profiles.csv</code></td>
+<td align="left">Sets the high-level percentage balance between
+<code>forage</code>, <code>concentrate</code>, <code>milk</code>, and
+<code>milk_replacer</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>diet_ingredients.csv</code></td>
+<td align="left">Micro-breakdown of exactly which ingredients (from the
+reference library) make up each macro category.</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Note on <code>origin_country</code>:</strong> if you don’t
+know where a feed ingredient comes from, leave the
+<code>origin_country</code> column as <code>NA</code>. The package will
+automatically resolve it using international trade data (see <a href="#fao_trade_matrix"><code>fao_trade_matrix.parquet</code></a>
+below).</p>
+</blockquote>
 </div>
 <div class="section level3">
-<h3 id="manure-management">💩 Manure Management<a class="anchor" aria-label="anchor" href="#manure-management"></a>
+<h3 id="manure-management">Manure Management<a class="anchor" aria-label="anchor" href="#manure-management"></a>
 </h3>
-<ul>
-<li>
-<strong><code>manure_management.csv</code></strong>: Defines how
-waste is handled, specifying the system, the climate, and the
-<code>allocation</code> (0 to 1).</li>
-</ul>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">File</th>
+<th align="left">Purpose</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left"><code>manure_management.csv</code></td>
+<td align="left">Defines how waste is handled: system, climate, and
+<code>allocation</code> (0 to 1).</td>
+</tr></tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="reproduction-parameters">Reproduction Parameters<a class="anchor" aria-label="anchor" href="#reproduction-parameters"></a>
 </h3>
-<p>This file only needs to be modified if the population of all animal
-categories is unknown or if offspring and replacement rates need to be
-adjusted for a specific study.</p>
-<ul>
-<li>
-<strong><code>reproduction_parameters.csv</code></strong>: Contains
-default offspring and replacement rates used to estimate missing animal
-categories.</li>
-</ul>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">File</th>
+<th align="left">Purpose</th>
+</tr></thead>
+<tbody><tr class="odd">
+<td align="left"><code>reproduction_parameters.csv</code></td>
+<td align="left">Default offspring and replacement rates, used to
+estimate missing animal categories under the automatic herd cycle.</td>
+</tr></tbody>
+</table>
+<p>Only needs editing if the population of some animal categories is
+unknown, or if offspring/replacement rates need adjusting for a specific
+study.</p>
 <hr>
 </div>
 </div>
@@ -160,111 +227,179 @@ categories.</li>
 <h2 id="ii--reference-libraries-consult-only">II. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#ii--reference-libraries-consult-only"></a>
 </h2>
 <p>These files are the “brain” of the package. You should
-<strong>not</strong> edit them unless you are an advanced user, but you
-must <strong>consult them</strong> to copy the exact names for your
-inputs.</p>
+<strong>not</strong> edit them unless you are an advanced user — but you
+must <strong>consult them</strong> to copy the exact names required in
+your input files.</p>
 <div class="section level3">
-<h3 id="feed_characteristics-csv-nutritional-values">🧪 <code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
+<h3 id="feed_characteristics-csv-nutritional-values">
+<code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
 </h3>
-<p>Consult this library to find the correct ingredient names for use in
+<p>Consult this library to find the correct ingredient names for
 <code>diet_ingredients.csv</code>.</p>
-<ul>
-<li><p><strong>Key Columns:</strong> <code>ingredient</code>,
-<code>ingredient_type</code>, <code>ASH_pct</code> (Ash, % DM),
-<code>CP_pct</code> (Crude Protein, % DM), <code>EE_pct</code> (Ether
-Extract, % DM), <code>NDF_pct</code> (Neutral Detergent Fiber, % DM),
-<code>DE_pct</code> (Digestible Energy, %), <code>GE_feed_kcal_kg</code>
-(Gross Energy, kcal/kg DM), <code>swine_ME_kcal_kg</code> (Metabolizable
-Energy for Swine, kcal/kg DM), <code>swine_DE_kcal_kg</code> (Digestible
-Energy for Swine, kcal/kg DM), and <code>poultry_ME_kcal_kg</code>
-(Metabolizable Energy for Poultry, kcal/kg DM).</p></li>
-<li><p><strong>Important:</strong> Most nutritional values are sourced
-from the <strong>FEDNA Tables (2019)</strong>. The <code>DE_pct</code>
-values are obtained from <strong>Feedipedia</strong>, while
-<code>GE_feed_kcal_kg</code> is calculated using the <strong>NRC (1998)
-Ewan equation</strong>:</p></li>
-</ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kcal/kg DM</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>4140</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>56</mn><mo>×</mo><mi>E</mi><mi>E</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>15</mn><mo>×</mo><mi>C</mi><mi>P</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>44</mn><mo>×</mo><mi>A</mi><mi>S</mi><mi>H</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">
-GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)
-</annotation></semantics></math></p>
+<p><strong>Key columns:</strong></p>
+<table class="table">
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="left">Meaning</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>ingredient</code></td>
+<td align="left">Ingredient name</td>
+</tr>
+<tr class="even">
+<td align="left"><code>feed_category</code></td>
+<td align="left">Feed category</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>ASH_pct</code></td>
+<td align="left">Ash, % DM</td>
+</tr>
+<tr class="even">
+<td align="left"><code>CP_pct</code></td>
+<td align="left">Crude Protein, % DM</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>EE_pct</code></td>
+<td align="left">Ether Extract, % DM</td>
+</tr>
+<tr class="even">
+<td align="left"><code>NDF_pct</code></td>
+<td align="left">Neutral Detergent Fiber, % DM</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>DE_pct</code></td>
+<td align="left">Digestible Energy, %</td>
+</tr>
+<tr class="even">
+<td align="left"><code>GE_feed_kcal_kg</code></td>
+<td align="left">Gross Energy, kcal/kg DM</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>swine_ME_kcal_kg</code></td>
+<td align="left">Metabolizable Energy for swine, kcal/kg DM</td>
+</tr>
+<tr class="even">
+<td align="left"><code>swine_DE_kcal_kg</code></td>
+<td align="left">Digestible Energy for swine, kcal/kg DM</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>poultry_ME_kcal_kg</code></td>
+<td align="left">Metabolizable Energy for poultry, kcal/kg DM</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Sources:</strong> most nutritional values come from the
+<strong>FEDNA Tables (2019)</strong>. <code>DE_pct</code> values are
+taken from <strong>Feedipedia</strong>. <code>GE_feed_kcal_kg</code> is
+calculated using the <strong>NRC (1998) Ewan equation</strong>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kcal/kg DM</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>4140</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>56</mn><mo>×</mo><mi>E</mi><mi>E</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>15</mn><mo>×</mo><mi>C</mi><mi>P</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>44</mn><mo>×</mo><mi>A</mi><mi>S</mi><mi>H</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)</annotation></semantics></math></p>
+<p>where <code>EE%</code>, <code>CP%</code>, and <code>ASH%</code>
+correspond to the <code>EE_pct</code>, <code>CP_pct</code>, and
+<code>ASH_pct</code> columns above.</p>
 </div>
 <div class="section level3">
-<h3 id="ipcc_coefficients-csv-metabolic-constants">🧬 <code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
+<h3 id="ipcc_coefficients-csv-metabolic-constants">
+<code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
 </h3>
 <p>Consult this to find the <code>description</code> you need to copy
-into your <code>livestock_definitions.csv</code>.</p>
+into <code>livestock_definitions.csv</code>.</p>
 <ul>
 <li>
-<strong>Key Columns:</strong> <code>description</code>,
+<strong>Key columns:</strong> <code>description</code>,
 <code>coefficient</code>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">C_{fi}</annotation></semantics></math>,
-etc.), and <code>value</code>.</li>
+etc.), <code>value</code>.</li>
 <li>
-<strong>Why it matters:</strong> It contains the Tier 2 constants
-that define energy needs for maintenance, pregnancy, lactation and B0
+<strong>Why it matters:</strong> contains the Tier 2 constants that
+define energy needs for maintenance, pregnancy, and lactation, as well
+as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>
 (Maximum Methane Producing Capacity) for manure management
 calculations.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="ipcc_mm-csv-manure-reference">💩 <code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
+<h3 id="ipcc_mm-csv-manure-reference">
+<code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
 </h3>
-<p>The master list for Phase 4. It contains every valid combination of
-manure systems.</p>
+<p>The master list for the manure management phase. Contains every valid
+combination of manure systems.</p>
 <ul>
 <li>
-<strong>Key Columns:</strong> <code>system_base</code>,
-<code>system_variant</code>, <code>climate_zone</code>, and
+<strong>Key columns:</strong> <code>system_base</code>,
+<code>system_variant</code>, <code>climate_zone</code>,
 <code>management_months</code>.</li>
 <li>
-<strong>Why it matters:</strong> Your entry in
+<strong>Why it matters:</strong> your entry in
 <code>manure_management.csv</code> must match a row here exactly, or the
-model will return zero emissions.</li>
+model will return zero emissions for that cohort.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="mapping-csv-database-connector">🗺️ <code>mapping.csv</code> — Database Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-database-connector"></a>
+<h3 id="mapping-csv-database-connector">
+<code>mapping.csv</code> — Database Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-database-connector"></a>
 </h3>
-<p>The “bridge” that links your diet names to the agricultural yield
-databases.</p>
-<ul>
-<li><p><strong>Key Columns</strong>: <code>ingredient</code>,
-<code>yield_name</code>,<code>allocation (0-1 factor)</code>.</p></li>
-<li><p><strong>Why it matters</strong>: Tells the model which crop
-productivity to use and how much of that land footprint is attributed to
-the animal (e.g., grain vs. straw allocation).</p></li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="forage_yields-csv-grass-silage-data-bc3">🌾 <code>forage_yields.csv</code> — Grass &amp; Silage Data
-(BC3)<a class="anchor" aria-label="anchor" href="#forage_yields-csv-grass-silage-data-bc3"></a>
-</h3>
-<p>Provisional database for forages supplemented by BC3 researchers.</p>
+<p>The bridge that links your diet ingredient names to the agricultural
+yield databases.</p>
 <ul>
 <li>
-<strong>Key Columns</strong>: <code>Area (Country)</code>,
+<strong>Key columns:</strong> <code>ingredient</code>,
+<code>yield_name</code>, <code>allocation</code> (0–1 factor).</li>
+<li>
+<strong>Why it matters:</strong> tells the model which crop
+productivity to use, and how much of that land footprint is attributed
+to the animal (e.g., grain vs. straw allocation).</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="forage_yields-csv-grass-silage-data-bc3">
+<code>forage_yields.csv</code> — Grass &amp; Silage Data (BC3)<a class="anchor" aria-label="anchor" href="#forage_yields-csv-grass-silage-data-bc3"></a>
+</h3>
+<p>Provisional database for forages, supplemented by BC3
+researchers.</p>
+<ul>
+<li>
+<strong>Key columns:</strong> <code>Area (Country)</code>,
 <code>Item (Crop name)</code>, <code>Value (kg DM/ha)</code>.</li>
 <li>
-<strong>Why it matters</strong>: Provides essential yield data for
-grazing and forage-based systems where official FAOSTAT records are
+<strong>Why it matters:</strong> provides essential yield data for
+grazing and forage-based systems, where official FAOSTAT records are
 often incomplete or missing.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="fao_crop_yields-csv-official-statutory-yields">📈 <code>fao_crop_yields.csv</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crop_yields-csv-official-statutory-yields"></a>
+<h3 id="fao_crop_yields-csv-official-statutory-yields">
+<code>fao_crop_yields.csv</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crop_yields-csv-official-statutory-yields"></a>
 </h3>
-<p>Direct yield data for grains and pulses from the FAOSTAT (2024)
-database.</p>
+<p>Direct yield data for grains and pulses from FAOSTAT (2024).</p>
 <ul>
 <li>
-<strong>Key Columns</strong>: <code>Area</code>, <code>Item</code>,
+<strong>Key columns:</strong> <code>Area</code>, <code>Item</code>,
 <code>Year</code>, <code>Value (kg DM/ha)</code>.</li>
 <li>
-<strong>Why it matters</strong>: Sets the international standard for
-calculating the land footprint
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>)
-of concentrate feeds and commercial crops.</li>
+<strong>Why it matters:</strong> sets the international standard for
+calculating the land footprint (m²) of concentrate feeds and commercial
+crops.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="fao_trade_matrix">
+<code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
+(Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_trade_matrix"></a>
+</h3>
+<p>Unlike the other libraries, this file is <strong>not</strong> tracked
+in the repository, due to its size (~187 MB).</p>
+<ul>
+<li>
+<strong>How it works:</strong> automatically downloaded from GitHub
+Releases the first time <code>herdr</code> encounters an <code>NA</code>
+in the <code>origin_country</code> column of your diets.</li>
+<li>
+<strong>Why it matters:</strong> powers the hybrid background
+allocation engine, using FAO production and trade data to estimate
+missing feed origins under a 70% self-sufficiency rule.</li>
 </ul>
 <hr>
 </div>
@@ -281,44 +416,43 @@ of concentrate feeds and commercial crops.</li>
 </colgroup>
 <thead><tr class="header">
 <th align="left">If you want to…</th>
-<th align="left">Consult this library:</th>
-<th align="left">To fill this input file:</th>
+<th align="left">Consult this library</th>
+<th align="left">To fill this input file</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Identify an animal type</strong></td>
+<td align="left">Identify an animal type</td>
 <td align="left"><code>ipcc_coefficients.csv</code></td>
 <td align="left"><code>livestock_definitions.csv</code></td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Pick a feed ingredient</strong></td>
+<td align="left">Pick a feed ingredient</td>
 <td align="left"><code>feed_characteristics.csv</code></td>
 <td align="left"><code>diet_ingredients.csv</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><strong>Choose a manure system</strong></td>
+<td align="left">Choose a manure system</td>
 <td align="left"><code>ipcc_mm.csv</code></td>
 <td align="left"><code>manure_management.csv</code></td>
 </tr>
 <tr class="even">
-<td align="left"><strong>Add a custom crop</strong></td>
-<td align="left"></td>
+<td align="left">Add a custom crop</td>
 <td align="left">
-<code>feed_characteristics</code>,
-<code>forage_yields.csv</code>, <code>mapping.csv</code> &amp;
-<code>fao_crop_yields.csv</code>
+<code>mapping.csv</code>,
+<code>forage_yields.csv</code>, <code>fao_crop_yields.csv</code>
 </td>
+<td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
-<div class="section level3">
-<h3 id="tip">💡 Tip<a class="anchor" aria-label="anchor" href="#tip"></a>
-</h3>
-<p>The model is case-sensitive and does not like spaces. Always use
+</div>
+<div class="section level2">
+<h2 id="tip">Tip<a class="anchor" aria-label="anchor" href="#tip"></a>
+</h2>
+<p>The model is case-sensitive and does not tolerate spaces. Always use
 <strong>lowercase</strong> and <strong>underscores</strong> (e.g.,
 <code>maize_silage</code> instead of <code>Maize Silage</code>).</p>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

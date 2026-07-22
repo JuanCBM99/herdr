@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Land Use Guide &amp; Disclaimers • herdr</title>
+<title>Land Use Methodology • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Land Use Guide &amp; Disclaimers">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Land Use Methodology">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -36,7 +36,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
+<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
@@ -72,7 +78,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Land Use Guide &amp; Disclaimers</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Land Use Methodology</h1>
             
       
 
@@ -82,151 +88,202 @@
     
     
 <div class="section level2">
-<h2 id="land-use-methodology-and-data-disclaimers">Land Use Methodology and Data Disclaimers<a class="anchor" aria-label="anchor" href="#land-use-methodology-and-data-disclaimers"></a>
+<h2 id="land-use-methodology">Land Use Methodology<a class="anchor" aria-label="anchor" href="#land-use-methodology"></a>
 </h2>
 <div class="section level3">
-<h3 id="i--introduction">I. Introduction<a class="anchor" aria-label="anchor" href="#i--introduction"></a>
+<h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
-<p>The <code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code> function in the
-<strong>herdr</strong> package provides an estimation of the total land
-area (in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>)
-required to produce the feed consumed by a given livestock
-population.</p>
-<p>This assessment is critical for understanding the environmental
-footprint and spatial efficiency of different production systems,
-allowing users to compare the “land cost” of different dietary
-strategies.</p>
+<p>In addition to greenhouse gas emissions, <code>herdr</code> estimates
+the <strong>feed-related land use</strong> associated with livestock
+production.</p>
+<p>Land use is calculated as the agricultural area required to produce
+the feed consumed by a livestock population. The model combines feed
+intake, crop and forage productivity, allocation factors, and
+international trade information to estimate the total land requirement
+of each diet.</p>
+<p>Results are expressed in <strong>square metres (m²)</strong> and are
+calculated on a dry matter (DM) basis.</p>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="calculation-methodology">Calculation methodology<a class="anchor" aria-label="anchor" href="#calculation-methodology"></a>
+</h2>
+<p>Land use is calculated independently for every feed ingredient using
+three sequential steps.</p>
+<div class="section level3">
+<h3 id="step-1--land-requirement-per-kilogram-of-feed">Step 1. Land requirement per kilogram of feed<a class="anchor" aria-label="anchor" href="#step-1--land-requirement-per-kilogram-of-feed"></a>
+</h3>
+<p>The inverse of crop yield represents the land area required to
+produce one kilogram of dry matter.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">LandPerKg_i = \frac{1}{Yield_i}</annotation></semantics></math></p>
+<p>where <strong>Yield</strong> is expressed in kilograms of dry matter
+per hectare (kg DM/ha).</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="ii--methodology">II. Methodology<a class="anchor" aria-label="anchor" href="#ii--methodology"></a>
+<h3 id="step-2--allocation-adjustment">Step 2. Allocation adjustment<a class="anchor" aria-label="anchor" href="#step-2--allocation-adjustment"></a>
 </h3>
-<p>The model integrates animal nutritional requirements with crop
-productivity through a three-step calculation for each feed
-ingredient.</p>
-<div class="section level4">
-<h4 id="inverse-of-crop-yield">1. Inverse of Crop Yield<a class="anchor" aria-label="anchor" href="#inverse-of-crop-yield"></a>
-</h4>
-<p>First, we calculate the land required per unit of feed:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">LandPerKg_{i} = \frac{1}{Yield_{i}}</annotation></semantics></math><em>This expresses hectares required per kilogram of feed
-(ha/kg).</em></p>
+<p>Some crops generate multiple products (for example grain and straw).
+To avoid assigning the entire land area to a single product, the land
+requirement is multiplied by an allocation factor.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = \frac{1}{Yield_i} \times Allocation_i</annotation></semantics></math></p>
+<p>The allocation factor ranges between 0 and 1 and is defined in
+<code>mapping.csv</code>.</p>
+<hr>
 </div>
-<div class="section level4">
-<h4 id="economic-allocation-adjustment">2. Economic Allocation Adjustment<a class="anchor" aria-label="anchor" href="#economic-allocation-adjustment"></a>
-</h4>
-<p>This value is adjusted by an allocation factor to account for the
-share of land attributed to co-products (e.g., grain vs. straw):
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_{i} = \frac{1}{Yield_{i}} \times Allocation_{i}</annotation></semantics></math></p>
-</div>
-<div class="section level4">
-<h4 id="total-land-use">3. Total Land Use<a class="anchor" aria-label="anchor" href="#total-land-use"></a>
-</h4>
-<p>Finally, the total land use is obtained by multiplying the annual
-feed consumption by the adjusted land requirement and converting
-hectares to square meters:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mn>10</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times Allocation_{i} \right) \times 10,000</annotation></semantics></math></p>
-<p><strong>Where:</strong></p>
+<div class="section level3">
+<h3 id="step-3--total-land-use">Step 3. Total land use<a class="anchor" aria-label="anchor" href="#step-3--total-land-use"></a>
+</h3>
+<p>Annual feed consumption is multiplied by the adjusted land
+requirement and converted from hectares to square metres.</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mn>10</mn><mspace width="0.167em"></mspace><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUse_i = AnnualConsumption_i \times \left( \frac{1}{Yield_i} \times Allocation_i \right) \times 10\,000</annotation></semantics></math></p>
+<p>where</p>
 <ul>
 <li>
-<strong>AnnualConsumption</strong>: Total kg of dry matter (DM)
-consumed by the population per year.</li>
+<strong>AnnualConsumption</strong> is annual dry matter intake (kg
+DM/year),</li>
 <li>
-<strong>Yield</strong>: Productivity of the crop in kg DM per
-hectare (kg/ha).</li>
+<strong>Yield</strong> is crop productivity (kg DM/ha),</li>
 <li>
-<strong>Allocation</strong>: Economic or physical factor (0 to 1) to
-account for co-products.</li>
+<strong>Allocation</strong> is the economic allocation factor,</li>
 <li>
-<strong>10,000</strong>: Conversion factor from hectares (ha) to
-square meters
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mi>m</mi><mn>2</mn></msup><annotation encoding="application/x-tex">m^2</annotation></semantics></math>).</li>
+<strong>10,000</strong> converts hectares into square metres.</li>
 </ul>
+<p>The total land use reported by <code>herdr</code> is obtained by
+summing the contribution of every ingredient included in the diet.</p>
 <hr>
 </div>
 </div>
+<div class="section level2">
+<h2 id="yield-databases">Yield databases<a class="anchor" aria-label="anchor" href="#yield-databases"></a>
+</h2>
+<p><code>herdr</code> combines two complementary yield databases.</p>
 <div class="section level3">
-<h3 id="iii--country-specific-yield-assumption">III. Country-Specific Yield Assumption<a class="anchor" aria-label="anchor" href="#iii--country-specific-yield-assumption"></a>
+<h3 id="crop-yields">Crop yields<a class="anchor" aria-label="anchor" href="#crop-yields"></a>
 </h3>
-<p>The package uses a comprehensive FAO-based global database. However,
-for the calculation, the user must specify a <strong>single
-country</strong> via the <code>crop_yield_country</code> argument.</p>
-<blockquote>
-<p>⚠️ <strong>Important Limitation:</strong> It is not possible to
-assign different countries of origin to individual ingredients within a
-single run. For example, you cannot specify that barley comes from
-Ukraine while maize comes from Spain. All ingredients will use the
-yields of the single selected country.</p>
-</blockquote>
-<hr>
+<p>Crop productivity is obtained from official <strong>FAOSTAT</strong>
+statistics.</p>
+<p>These data include major feed crops such as cereals, oilseeds and
+legumes and are expressed as country-level average yields.</p>
 </div>
 <div class="section level3">
-<h3 id="iv--data-sources-and-disclaimers">IV. Data Sources and Disclaimers<a class="anchor" aria-label="anchor" href="#iv--data-sources-and-disclaimers"></a>
+<h3 id="forage-yields">Forage yields<a class="anchor" aria-label="anchor" href="#forage-yields"></a>
 </h3>
-<p>The accuracy of land use estimation depends heavily on the underlying
-yield databases:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Official Crop Yields (FAOSTAT 2024)</strong>: Yields for
-major crops (barley, maize, soya, etc.) represent standardized,
-country-level average yields reported by national authorities.</li>
-<li>
-<strong>Non-Official Forage Yields</strong>: Forage data (grasses,
-alfalfa, silage) often lacks official global statistics.
-<strong>herdr</strong> includes compiled non-official values to provide
-broader coverage.</li>
-</ol>
-<p><em>Users conducting high-precision analyses should cross-reference
-these values with local data sources where possible.</em></p>
+<p>Official global statistics for forage productivity are often
+unavailable.</p>
+<p>For this reason, <code>herdr</code> includes a curated forage yield
+database compiled from multiple literature sources and technical reports
+to provide broad geographical coverage.</p>
+<p>Users performing high-resolution regional studies are encouraged to
+replace these values with local data whenever available.</p>
 <hr>
 </div>
-<div class="section level3">
-<h3 id="v--the-mapping-system">V. The Mapping System<a class="anchor" aria-label="anchor" href="#v--the-mapping-system"></a>
-</h3>
-<p>The <code>mapping.csv</code> file acts as a “translator” between your
-diets and the yield databases:</p>
+</div>
+<div class="section level2">
+<h2 id="ingredient-mapping">Ingredient mapping<a class="anchor" aria-label="anchor" href="#ingredient-mapping"></a>
+</h2>
+<p>Land-use calculations rely on the file <code>mapping.csv</code>,
+which links feed ingredients with the corresponding yield database.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">ingredient</th>
 <th align="left">yield_name</th>
-<th align="left">allocation</th>
+<th align="right">allocation</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">grass_fresh</td>
 <td align="left">Grass</td>
-<td align="left">1.0</td>
+<td align="right">1.0</td>
 </tr>
 <tr class="even">
 <td align="left">barley_grain</td>
 <td align="left">Barley</td>
-<td align="left">0.8</td>
+<td align="right">0.80</td>
 </tr>
 </tbody>
 </table>
+<p>The columns have the following meaning:</p>
 <ul>
 <li>
-<strong>ingredient</strong>: The name used in your
-<code>diet_ingredients.csv</code>.</li>
+<strong>ingredient</strong> — ingredient name used in
+<code>diet_ingredients.csv</code>;</li>
 <li>
-<strong>yield_name</strong>: The exact key used to match the FAO or
-forage yield databases.</li>
+<strong>yield_name</strong> — corresponding crop or forage name in
+the yield databases;</li>
 <li>
-<strong>allocation</strong>: The economic share (0 to 1) of land
-impact attributed to the feed.</li>
+<strong>allocation</strong> — proportion of land attributed to that
+ingredient.</li>
+</ul>
+<p>Every ingredient included in a diet must have a corresponding entry
+in <code>mapping.csv</code>.</p>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="feed-origin-and-dynamic-background-allocation">Feed origin and dynamic background allocation<a class="anchor" aria-label="anchor" href="#feed-origin-and-dynamic-background-allocation"></a>
+</h2>
+<p>Land-use calculations require the user to specify the country where
+the farm is located and the assessment year.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>, </span>
+<span>  year <span class="op">=</span> <span class="fl">2022</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>The origin of the feed ingredients dictates which crop yields are
+applied. Users can explicitly define the origin of each ingredient in
+their input files. However, when the exact origin is unknown (left as
+NA), herdr employs a dynamic background allocation engine.</p>
+<p>This hybrid engine utilizes FAO production and trade data to
+calculate missing feed origins based on a 70% self-sufficiency rule. It
+estimates the proportion of the ingredient that is produced domestically
+versus the proportion that is imported, automatically distributing the
+land footprint across the respective trade partner countries.</p>
+<p>⚠️ Important Data Note: To perform these dynamic calculations without
+bloating the package size, herdr relies on an external high-resolution
+FAO trade matrix. The first time you run a calculation that requires
+background origin allocation, the package will automatically download
+the fao_trade_matrix.parquet file (approx. 187 MB) to your local
+environment.</p>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="assumptions-and-limitations">Assumptions and limitations<a class="anchor" aria-label="anchor" href="#assumptions-and-limitations"></a>
+</h2>
+<p>Several assumptions should be considered when interpreting land-use
+estimates.</p>
+<ul>
+<li>All calculations are performed on a <strong>dry matter (DM)</strong>
+basis.</li>
+<li>Crop yields represent <strong>country-average productivity</strong>
+rather than farm-specific values.</li>
+<li>Forage yields are compiled from multiple published sources and may
+not represent local management conditions.</li>
+<li>Allocation factors should reflect the accounting approach adopted by
+the user.</li>
+<li>The background allocation engine relies on a <strong>70%
+self-sufficiency assumption</strong> together with historical
+<strong>FAO trade matrices</strong>, representing macro-economic trade
+flows rather than farm-level supply chains.</li>
+<li>Results should be interpreted as estimates of the land required to
+produce feed, not as direct measurements of occupied agricultural
+land.</li>
 </ul>
 <hr>
 </div>
-<div class="section level3">
-<h3 id="vi--technical-implementation">VI. Technical Implementation<a class="anchor" aria-label="anchor" href="#vi--technical-implementation"></a>
-</h3>
-<p>You can call the function directly or as part of the full assessment.
-To find valid country names, check the <code>fao_crop_yields.csv</code>
-file in the package.</p>
-<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Example: Calculating land use for a study based on Spanish productivity</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span>crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
-</div>
+<div class="section level2">
+<h2 id="running-the-calculation">Running the calculation<a class="anchor" aria-label="anchor" href="#running-the-calculation"></a>
+</h2>
+<p>Land use can be estimated independently using the standalone
+function:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2022</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<p>Alternatively, land-use calculations are performed automatically when
+running the complete assessment through
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

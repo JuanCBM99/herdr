@@ -2,14 +2,16 @@
 
 ### All vignettes
 
+- [Using the herdr App: A Step-by-Step
+  Workflow](https://juancbm99.github.io/herdr/articles/app.md):
 - [Dairy Cattle Spain: North/South in different Life
-  Satages](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
+  Stages](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
 - [Basic Assessment: A Step-by-Step
   Guide](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
 - [Introduction to
   herdr](https://juancbm99.github.io/herdr/articles/Introduction.md):
-- [Land Use Guide &
-  Disclaimers](https://juancbm99.github.io/herdr/articles/land_use.md):
+- [Land Use
+  Methodology](https://juancbm99.github.io/herdr/articles/land_use.md):
 - [Manure System
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md):
 - [Dairy Cattle Spain:

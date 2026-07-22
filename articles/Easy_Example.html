@@ -36,7 +36,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
+<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
@@ -111,7 +117,8 @@ requirements and environmental impact.</p>
 <strong>Reference Files (Expert use only):</strong>
 <code>feed_characteristics.csv</code>, <code>forage_yields.csv</code>,
 <code>mapping.csv</code>, <code>fao_crop_yields.csv</code>,
-<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>.</li>
+<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
+<code>fao_production.csv</code>.</li>
 </ul>
 <hr>
 </div>
@@ -177,10 +184,61 @@ as you want, always fulfilling all columns.</p>
 <h4 id="c--ingredient-breakdown-diet_ingredients-csv">C. Ingredient Breakdown (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#c--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
 <p>Put the same <code>diet_tag</code> and <code>region</code> as many
-times as ingredients the diet has. * <strong>Important:</strong> The %
-for ingredients must sum 100% <em>within their category</em> (e.g., if
-you have 50% Barley and 50% Corn, they sum to 100% of the “Concentrate”
-portion).</p>
+times as ingredients the diet has.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">diet_tag</th>
+<th align="left">region</th>
+<th align="left">feed_category</th>
+<th align="left">ingredient</th>
+<th align="left">percentage</th>
+<th align="left">origin_country</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">diet_dairy_mature</td>
+<td align="left">spain</td>
+<td align="left">forage</td>
+<td align="left">corn_silage</td>
+<td align="left">100</td>
+<td align="left">Spain</td>
+</tr>
+<tr class="even">
+<td align="left">diet_dairy_mature</td>
+<td align="left">spain</td>
+<td align="left">concentrate</td>
+<td align="left">barley_grain</td>
+<td align="left">50</td>
+<td align="left">NA</td>
+</tr>
+<tr class="odd">
+<td align="left">diet_dairy_mature</td>
+<td align="left">spain</td>
+<td align="left">concentrate</td>
+<td align="left">soybean_meal</td>
+<td align="left">50</td>
+<td align="left">NA</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li>
+<strong>Important:</strong> The percentage for ingredients must sum
+100% <em>within their category</em> (e.g., if you have 50% Barley and
+50% Soy, they sum to 100% of the “Concentrate” portion).</li>
+<li>
+<strong>Missing Origins:</strong> If you don’t know where a feed
+comes from, leave <code>origin_country</code> as <code>NA</code>. The
+package will automatically allocate it using FAO trade data!</li>
+</ul>
 <hr>
 </div>
 </div>
@@ -262,27 +320,23 @@ System Guide</a></strong> of this documentation).</li>
 <li>If you have more than one system for the exactly same animal,
 <strong>duplicate the row</strong> and split the allocation.</li>
 </ol>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
+<col width="9%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="left">system_base</th>
 <th align="left">management_months</th>
 <th align="left">system_climate</th>
@@ -297,8 +351,6 @@ System Guide</a></strong> of this documentation).</li>
 <tr class="odd">
 <td align="left">mature_dairy_cattle</td>
 <td align="left">spain</td>
-<td align="left"></td>
-<td align="left"></td>
 <td align="left">liquid_slurry</td>
 <td align="left">3</td>
 <td align="left">cool</td>
@@ -312,8 +364,6 @@ System Guide</a></strong> of this documentation).</li>
 <tr class="even">
 <td align="left">mature_dairy_cattle</td>
 <td align="left">spain</td>
-<td align="left"></td>
-<td align="left"></td>
 <td align="left">solid_storage</td>
 <td align="left"></td>
 <td align="left">temperate</td>
@@ -329,14 +379,17 @@ System Guide</a></strong> of this documentation).</li>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-7-running-the-analysis">Step 7: Running the Analysis<a class="anchor" aria-label="anchor" href="#step-7-running-the-analysis"></a>
+<h3 id="step-6-running-the-analysis">Step 6: Running the Analysis<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis"></a>
 </h3>
 <p>Once your CSVs are updated, run the following in R:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

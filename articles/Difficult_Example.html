@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Dairy Cattle Spain: North/South in different Life Satages • herdr</title>
+<title>Dairy Cattle Spain: North/South in different Life Stages • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Dairy Cattle Spain: North/South in different Life Satages">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Dairy Cattle Spain: North/South in different Life Stages">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -36,7 +36,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
+<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
@@ -72,7 +78,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Dairy Cattle Spain: North/South in different Life Satages</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Dairy Cattle Spain: North/South in different Life Stages</h1>
             
       
 
@@ -114,7 +120,8 @@ the <strong>Dry Phase</strong>.</p>
 <strong>Reference Files (Expert use only):</strong>
 <code>feed_characteristics.csv</code>, <code>forage_yields.csv</code>,
 <code>mapping.csv</code>, <code>fao_crop_yields.csv</code>,
-<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>.</li>
+<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
+<code>fao_production.csv</code>.</li>
 </ul>
 <hr>
 </div>
@@ -191,10 +198,10 @@ stage.</p>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
-<th align="left">forage_share</th>
-<th align="left">concentrate_share</th>
-<th align="left">milk_share</th>
-<th align="left">milk_replacer_share</th>
+<th align="left">forage</th>
+<th align="left">concentrate</th>
+<th align="left">milk</th>
+<th align="left">milk_replacer</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -246,24 +253,26 @@ stage.</p>
 <p>Ingredients must be assigned precisely to the <code>subregion</code>
 and <code>class_flex</code>. <em>Example for the South/Lactation
 profile:</em></p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
+<th align="left">feed_category</th>
 <th align="left">ingredient</th>
-<th align="left">ingredient_share</th>
-<th align="left">ingredient_type</th>
+<th align="left">percentage</th>
+<th align="left">origin_country</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -271,30 +280,36 @@ profile:</em></p>
 <td align="left">spain</td>
 <td align="left">south</td>
 <td align="left">lactation_phase</td>
+<td align="left">concentrate</td>
 <td align="left">corn_national</td>
 <td align="left">44.85</td>
-<td align="left">concentrate</td>
+<td align="left">Spain</td>
 </tr>
 <tr class="even">
 <td align="left">diet_dairy_mature</td>
 <td align="left">spain</td>
 <td align="left">south</td>
 <td align="left">lactation_phase</td>
+<td align="left">concentrate</td>
 <td align="left">soybean_meal_44_cp</td>
 <td align="left">17.12</td>
-<td align="left">concentrate</td>
+<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">diet_dairy_mature</td>
 <td align="left">spain</td>
 <td align="left">south</td>
 <td align="left">lactation_phase</td>
+<td align="left">forage</td>
 <td align="left">corn_silage_25_30</td>
 <td align="left">55.00</td>
-<td align="left">forage</td>
+<td align="left">Spain</td>
 </tr>
 </tbody>
 </table>
+<p><em>(Note: Missing origins set as <code>NA</code> will be
+automatically resolved by the dynamic FAO background allocation
+engine).</em></p>
 <hr>
 </div>
 </div>
@@ -304,7 +319,7 @@ profile:</em></p>
 </h3>
 <p>This is the most technical file. It determines the energy
 requirements (IPCC Tier 2). Note the difference in
-<code>milk_yield</code> and <code>cfi</code>.</p>
+<code>milk_yield</code> and <code>cfi</code> between phases.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="10%">
@@ -370,7 +385,7 @@ requirements (IPCC Tier 2). Note the difference in
 <tr class="even">
 <td align="left">mature_dairy_cattle</td>
 <td align="left">spain</td>
-<td align="left">north</td>
+<td align="left">south</td>
 <td align="left">dry_phase</td>
 <td align="left">cattle/buffalo</td>
 <td align="left">stall</td>
@@ -436,6 +451,16 @@ of Body Weight).</p>
 <td align="left">675</td>
 </tr>
 <tr class="odd">
+<td align="left">mature_dairy_cattle</td>
+<td align="left">spain</td>
+<td align="left">south</td>
+<td align="left">dry_phase</td>
+<td align="left">675</td>
+<td align="left">365</td>
+<td align="left">675</td>
+<td align="left">675</td>
+</tr>
+<tr class="even">
 <td align="left">mature_dairy_cattle</td>
 <td align="left">spain</td>
 <td align="left">south</td>
@@ -561,7 +586,11 @@ results.</p>
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The model calculates impact for each phase separately</span></span>
-<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span>automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

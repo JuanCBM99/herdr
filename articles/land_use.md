@@ -1,121 +1,191 @@
-# Land Use Guide & Disclaimers
+# Land Use Methodology
 
-## Land Use Methodology and Data Disclaimers
+## Land Use Methodology
 
-### I. Introduction
+### Introduction
 
-The
-[`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
-function in the **herdr** package provides an estimation of the total
-land area (in $`m^2`$) required to produce the feed consumed by a given
-livestock population.
+In addition to greenhouse gas emissions, `herdr` estimates the
+**feed-related land use** associated with livestock production.
 
-This assessment is critical for understanding the environmental
-footprint and spatial efficiency of different production systems,
-allowing users to compare the “land cost” of different dietary
-strategies.
+Land use is calculated as the agricultural area required to produce the
+feed consumed by a livestock population. The model combines feed intake,
+crop and forage productivity, allocation factors, and international
+trade information to estimate the total land requirement of each diet.
+
+Results are expressed in **square metres (m²)** and are calculated on a
+dry matter (DM) basis.
 
 ------------------------------------------------------------------------
 
-### II. Methodology
+## Calculation methodology
 
-The model integrates animal nutritional requirements with crop
-productivity through a three-step calculation for each feed ingredient.
+Land use is calculated independently for every feed ingredient using
+three sequential steps.
 
-#### 1. Inverse of Crop Yield
+### Step 1. Land requirement per kilogram of feed
 
-First, we calculate the land required per unit of feed:
+The inverse of crop yield represents the land area required to produce
+one kilogram of dry matter.
+
 ``` math
-LandPerKg_{i} = \frac{1}{Yield_{i}}
-```
-*This expresses hectares required per kilogram of feed (ha/kg).*
-
-#### 2. Economic Allocation Adjustment
-
-This value is adjusted by an allocation factor to account for the share
-of land attributed to co-products (e.g., grain vs. straw):
-``` math
-AdjustedLandPerKg_{i} = \frac{1}{Yield_{i}} \times Allocation_{i}
+LandPerKg_i = \frac{1}{Yield_i}
 ```
 
-#### 3. Total Land Use
+where **Yield** is expressed in kilograms of dry matter per hectare (kg
+DM/ha).
 
-Finally, the total land use is obtained by multiplying the annual feed
-consumption by the adjusted land requirement and converting hectares to
-square meters:
+------------------------------------------------------------------------
+
+### Step 2. Allocation adjustment
+
+Some crops generate multiple products (for example grain and straw). To
+avoid assigning the entire land area to a single product, the land
+requirement is multiplied by an allocation factor.
+
 ``` math
-LandUse_{i} = AnnualConsumption_{i} \times \left( \frac{1}{Yield_{i}} \times Allocation_{i} \right) \times 10,000
+AdjustedLandPerKg_i = \frac{1}{Yield_i} \times Allocation_i
 ```
 
-**Where:**
-
-- **AnnualConsumption**: Total kg of dry matter (DM) consumed by the
-  population per year.
-- **Yield**: Productivity of the crop in kg DM per hectare (kg/ha).
-- **Allocation**: Economic or physical factor (0 to 1) to account for
-  co-products.
-- **10,000**: Conversion factor from hectares (ha) to square meters
-  ($`m^2`$).
+The allocation factor ranges between 0 and 1 and is defined in
+`mapping.csv`.
 
 ------------------------------------------------------------------------
 
-### III. Country-Specific Yield Assumption
+### Step 3. Total land use
 
-The package uses a comprehensive FAO-based global database. However, for
-the calculation, the user must specify a **single country** via the
-`crop_yield_country` argument.
+Annual feed consumption is multiplied by the adjusted land requirement
+and converted from hectares to square metres.
 
-> ⚠️ **Important Limitation:** It is not possible to assign different
-> countries of origin to individual ingredients within a single run. For
-> example, you cannot specify that barley comes from Ukraine while maize
-> comes from Spain. All ingredients will use the yields of the single
-> selected country.
+``` math
+LandUse_i = AnnualConsumption_i \times \left( \frac{1}{Yield_i} \times Allocation_i \right) \times 10\,000
+```
 
-------------------------------------------------------------------------
+where
 
-### IV. Data Sources and Disclaimers
+- **AnnualConsumption** is annual dry matter intake (kg DM/year),
+- **Yield** is crop productivity (kg DM/ha),
+- **Allocation** is the economic allocation factor,
+- **10,000** converts hectares into square metres.
 
-The accuracy of land use estimation depends heavily on the underlying
-yield databases:
-
-1.  **Official Crop Yields (FAOSTAT 2024)**: Yields for major crops
-    (barley, maize, soya, etc.) represent standardized, country-level
-    average yields reported by national authorities.
-2.  **Non-Official Forage Yields**: Forage data (grasses, alfalfa,
-    silage) often lacks official global statistics. **herdr** includes
-    compiled non-official values to provide broader coverage.
-
-*Users conducting high-precision analyses should cross-reference these
-values with local data sources where possible.*
+The total land use reported by `herdr` is obtained by summing the
+contribution of every ingredient included in the diet.
 
 ------------------------------------------------------------------------
 
-### V. The Mapping System
+## Yield databases
 
-The `mapping.csv` file acts as a “translator” between your diets and the
-yield databases:
+`herdr` combines two complementary yield databases.
+
+### Crop yields
+
+Crop productivity is obtained from official **FAOSTAT** statistics.
+
+These data include major feed crops such as cereals, oilseeds and
+legumes and are expressed as country-level average yields.
+
+### Forage yields
+
+Official global statistics for forage productivity are often
+unavailable.
+
+For this reason, `herdr` includes a curated forage yield database
+compiled from multiple literature sources and technical reports to
+provide broad geographical coverage.
+
+Users performing high-resolution regional studies are encouraged to
+replace these values with local data whenever available.
+
+------------------------------------------------------------------------
+
+## Ingredient mapping
+
+Land-use calculations rely on the file `mapping.csv`, which links feed
+ingredients with the corresponding yield database.
 
 | ingredient   | yield_name | allocation |
-|:-------------|:-----------|:-----------|
-| grass_fresh  | Grass      | 1.0        |
-| barley_grain | Barley     | 0.8        |
+|:-------------|:-----------|-----------:|
+| grass_fresh  | Grass      |        1.0 |
+| barley_grain | Barley     |       0.80 |
 
-- **ingredient**: The name used in your `diet_ingredients.csv`.
-- **yield_name**: The exact key used to match the FAO or forage yield
-  databases.
-- **allocation**: The economic share (0 to 1) of land impact attributed
-  to the feed.
+The columns have the following meaning:
+
+- **ingredient** — ingredient name used in `diet_ingredients.csv`;
+- **yield_name** — corresponding crop or forage name in the yield
+  databases;
+- **allocation** — proportion of land attributed to that ingredient.
+
+Every ingredient included in a diet must have a corresponding entry in
+`mapping.csv`.
 
 ------------------------------------------------------------------------
 
-### VI. Technical Implementation
+## Feed origin and dynamic background allocation
 
-You can call the function directly or as part of the full assessment. To
-find valid country names, check the `fao_crop_yields.csv` file in the
-package.
+Land-use calculations require the user to specify the country where the
+farm is located and the assessment year.
 
 ``` r
 
-# Example: Calculating land use for a study based on Spanish productivity
-results <- calculate_land_use(crop_yield_country = "Spain")
+results <- calculate_land_use(
+  farm_country = "Spain", 
+  year = 2022
+)
 ```
+
+The origin of the feed ingredients dictates which crop yields are
+applied. Users can explicitly define the origin of each ingredient in
+their input files. However, when the exact origin is unknown (left as
+NA), herdr employs a dynamic background allocation engine.
+
+This hybrid engine utilizes FAO production and trade data to calculate
+missing feed origins based on a 70% self-sufficiency rule. It estimates
+the proportion of the ingredient that is produced domestically versus
+the proportion that is imported, automatically distributing the land
+footprint across the respective trade partner countries.
+
+⚠️ Important Data Note: To perform these dynamic calculations without
+bloating the package size, herdr relies on an external high-resolution
+FAO trade matrix. The first time you run a calculation that requires
+background origin allocation, the package will automatically download
+the fao_trade_matrix.parquet file (approx. 187 MB) to your local
+environment.
+
+------------------------------------------------------------------------
+
+## Assumptions and limitations
+
+Several assumptions should be considered when interpreting land-use
+estimates.
+
+- All calculations are performed on a **dry matter (DM)** basis.
+- Crop yields represent **country-average productivity** rather than
+  farm-specific values.
+- Forage yields are compiled from multiple published sources and may not
+  represent local management conditions.
+- Allocation factors should reflect the accounting approach adopted by
+  the user.
+- The background allocation engine relies on a **70% self-sufficiency
+  assumption** together with historical **FAO trade matrices**,
+  representing macro-economic trade flows rather than farm-level supply
+  chains.
+- Results should be interpreted as estimates of the land required to
+  produce feed, not as direct measurements of occupied agricultural
+  land.
+
+------------------------------------------------------------------------
+
+## Running the calculation
+
+Land use can be estimated independently using the standalone function:
+
+``` r
+
+results <- calculate_land_use(
+  farm_country = "Spain",
+  year = 2022
+)
+```
+
+Alternatively, land-use calculations are performed automatically when
+running the complete assessment through
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md).

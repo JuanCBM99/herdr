@@ -1,4 +1,4 @@
-# Dairy Cattle Spain: North/South in different Life Satages
+# Dairy Cattle Spain: North/South in different Life Stages
 
 ## Advanced Assessment: Managing Complexity with `class_flex`
 
@@ -20,7 +20,7 @@ distinguish between the **Lactation Phase** and the **Dry Phase**.
   `reproduction_parameters.csv`
 - **Reference Files (Expert use only):** `feed_characteristics.csv`,
   `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
-  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
 ------------------------------------------------------------------------
 
@@ -46,7 +46,7 @@ forage/concentrate ratios and specific ingredients for each life stage.
 
 #### A. Diet Profiles (`diet_profiles.csv`)
 
-| diet_tag | region | subregion | class_flex | forage_share | concentrate_share | milk_share | milk_replacer_share |
+| diet_tag | region | subregion | class_flex | forage | concentrate | milk | milk_replacer |
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | diet_dairy_mature | spain | north | dry_phase | 70 | 30 | 0 | 0 |
 | diet_dairy_mature | spain | north | lactation_phase | 55 | 45 | 0 | 0 |
@@ -58,25 +58,29 @@ forage/concentrate ratios and specific ingredients for each life stage.
 Ingredients must be assigned precisely to the `subregion` and
 `class_flex`. *Example for the South/Lactation profile:*
 
-| diet_tag | region | subregion | class_flex | ingredient | ingredient_share | ingredient_type |
-|:---|:---|:---|:---|:---|:---|:---|
-| diet_dairy_mature | spain | south | lactation_phase | corn_national | 44.85 | concentrate |
-| diet_dairy_mature | spain | south | lactation_phase | soybean_meal_44_cp | 17.12 | concentrate |
-| diet_dairy_mature | spain | south | lactation_phase | corn_silage_25_30 | 55.00 | forage |
+| diet_tag | region | subregion | class_flex | feed_category | ingredient | percentage | origin_country |
+|:---|:---|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | south | lactation_phase | concentrate | corn_national | 44.85 | Spain |
+| diet_dairy_mature | spain | south | lactation_phase | concentrate | soybean_meal_44_cp | 17.12 | NA |
+| diet_dairy_mature | spain | south | lactation_phase | forage | corn_silage_25_30 | 55.00 | Spain |
+
+*(Note: Missing origins set as `NA` will be automatically resolved by
+the dynamic FAO background allocation engine).*
 
 ------------------------------------------------------------------------
 
 ### Step 3: Physiological Definitions (`livestock_definitions.csv`)
 
 This is the most technical file. It determines the energy requirements
-(IPCC Tier 2). Note the difference in `milk_yield` and `cfi`.
+(IPCC Tier 2). Note the difference in `milk_yield` and `cfi` between
+phases.
 
 | animal_tag | region | subregion | class_flex | cfi | ca | c | milk_yield | fat_content | c_pregnancy |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|
 | mature_dairy_cattle | spain | north | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 8295 | 3.73 | cattle and buffalo |
 | mature_dairy_cattle | spain | north | dry_phase | cattle/buffalo | stall | females | 0 | 0 | cattle and buffalo |
 | mature_dairy_cattle | spain | south | lactation_phase | cattle_buffalo \[lactating\] | stall | females | 9044 | 3.73 | cattle and buffalo |
-| mature_dairy_cattle | spain | north | dry_phase | cattle/buffalo | stall | females | 0 | 0 | cattle and buffalo |
+| mature_dairy_cattle | spain | south | dry_phase | cattle/buffalo | stall | females | 0 | 0 | cattle and buffalo |
 
 ------------------------------------------------------------------------
 
@@ -90,6 +94,7 @@ Accurate weights are essential to calculate Maintenance Energy
 |:---|:---|:---|:---|:---|:---|:---|:---|
 | mature_dairy_cattle | spain | north | dry_phase | 675 | 365 | 675 | 675 |
 | mature_dairy_cattle | spain | north | lactation_phase | 675 | 365 | 675 | 675 |
+| mature_dairy_cattle | spain | south | dry_phase | 675 | 365 | 675 | 675 |
 | mature_dairy_cattle | spain | south | lactation_phase | 675 | 365 | 675 | 675 |
 
 ------------------------------------------------------------------------
@@ -118,5 +123,9 @@ When running the analysis, `herdr` will process each row as a unique
 library(herdr)
 
 # The model calculates impact for each phase separately
-results <- generate_impact_assessment(automatic_cycle = FALSE, crop_yield_country = "Spain")
+results <- generate_impact_assessment(
+  automatic_cycle = FALSE, 
+  farm_country = "Spain",
+  year = 2015
+)
 ```

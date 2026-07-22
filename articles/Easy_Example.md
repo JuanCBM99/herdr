@@ -20,7 +20,7 @@ impact.
   `reproduction_parameters.csv`
 - **Reference Files (Expert use only):** `feed_characteristics.csv`,
   `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
-  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
 ------------------------------------------------------------------------
 
@@ -55,9 +55,20 @@ fulfilling all columns.
 #### C. Ingredient Breakdown (`diet_ingredients.csv`)
 
 Put the same `diet_tag` and `region` as many times as ingredients the
-diet has. \* **Important:** The % for ingredients must sum 100% *within
-their category* (e.g., if you have 50% Barley and 50% Corn, they sum to
-100% of the “Concentrate” portion).
+diet has.
+
+| diet_tag          | region | feed_category | ingredient   | percentage | origin_country |
+|:------------------|:-------|:--------------|:-------------|:-----------|:---------------|
+| diet_dairy_mature | spain  | forage        | corn_silage  | 100        | Spain          |
+| diet_dairy_mature | spain  | concentrate   | barley_grain | 50         | NA             |
+| diet_dairy_mature | spain  | concentrate   | soybean_meal | 50         | NA             |
+
+- **Important:** The percentage for ingredients must sum 100% *within
+  their category* (e.g., if you have 50% Barley and 50% Soy, they sum to
+  100% of the “Concentrate” portion).
+- **Missing Origins:** If you don’t know where a feed comes from, leave
+  `origin_country` as `NA`. The package will automatically allocate it
+  using FAO trade data!
 
 ------------------------------------------------------------------------
 
@@ -93,14 +104,14 @@ Open `livestock_weights.csv`. Ensure the keys match the census exactly.
 2.  If you have more than one system for the exactly same animal,
     **duplicate the row** and split the allocation.
 
-| animal_tag | region | subregion | class_flex | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | b_0 | allocation |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
-| mature_dairy_cattle | spain |  |  | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | dairy_cattle_high_productivity | 0.3 |
-| mature_dairy_cattle | spain |  |  | solid_storage |  | temperate |  |  |  | dry | dairy_cattle_high_productivity | 0.7 |
+| animal_tag | region | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
+| mature_dairy_cattle | spain | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | dairy_cattle_high_productivity | 0.3 |
+| mature_dairy_cattle | spain | solid_storage |  | temperate |  |  |  | dry | dairy_cattle_high_productivity | 0.7 |
 
 ------------------------------------------------------------------------
 
-### Step 7: Running the Analysis
+### Step 6: Running the Analysis
 
 Once your CSVs are updated, run the following in R:
 
@@ -109,5 +120,8 @@ Once your CSVs are updated, run the following in R:
 library(herdr)
 
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE, crop_yield_country = "Spain")
+  automatic_cycle = FALSE, 
+  farm_country = "Spain",
+  year = 2015
+)
 ```

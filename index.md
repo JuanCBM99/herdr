@@ -25,7 +25,7 @@ herdr_init()
 file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
 
 # Run model
-results <- generate_impact_assessment(crop_yield_country = "Spain")
+results <- generate_impact_assessment(automatic_cycle = FALSE, farm_country = "Spain", year = 2015)
 ```
 
 This runs a complete example of a cattle production system and returns

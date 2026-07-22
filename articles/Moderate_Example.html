@@ -36,7 +36,13 @@
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
 <li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Workflow.html"><span class="fa fas fa-route"></span> Workflow: Step-by-Step</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
+<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  </ul>
+</li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
@@ -82,7 +88,7 @@
     
     
 <div class="section level2">
-<h2 id="basic-assessment-a-step-by-step-guide">Basic Assessment: A Step-by-Step Guide<a class="anchor" aria-label="anchor" href="#basic-assessment-a-step-by-step-guide"></a>
+<h2 id="moderate-assessment-northsouth-regional-split">Moderate Assessment: North/South Regional Split<a class="anchor" aria-label="anchor" href="#moderate-assessment-northsouth-regional-split"></a>
 </h2>
 <p>This guide will walk you through a <strong>Moderate
 Assessment</strong> for <strong>Mature Dairy Cattle in Spain
@@ -111,7 +117,8 @@ the <code>user_data/</code> folder of your project.</p>
 <strong>Reference Files (Expert use only):</strong>
 <code>feed_characteristics.csv</code>, <code>forage_yields.csv</code>,
 <code>mapping.csv</code>, <code>fao_crop_yields.csv</code>,
-<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>.</li>
+<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
+<code>fao_production.csv</code>.</li>
 </ul>
 <hr>
 </div>
@@ -156,24 +163,16 @@ differences in forage availability between the North and South.</p>
 <div class="section level4">
 <h4 id="a--define-the-profile-diet_profiles-csv">A. Define the Profile (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#a--define-the-profile-diet_profiles-csv"></a>
 </h4>
-<p>Note that the <code>forage_share</code> is higher in the North (55%)
-compared to the South (50%).</p>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-</colgroup>
+<p>Note that the forage proportion is higher in the North (55%) compared
+to the South (50%).</p>
+<table class="table">
 <thead><tr class="header">
 <th align="left">diet_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
-<th align="left">forage_share</th>
-<th align="left">concentrate_share</th>
-<th align="left">milk_share</th>
+<th align="left">forage</th>
+<th align="left">concentrate</th>
+<th align="left">milk</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -198,53 +197,66 @@ compared to the South (50%).</p>
 <div class="section level4">
 <h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient Breakdown (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
-<p>For each category (forage/concentrate), the
-<code>ingredient_share</code> must sum to <strong>100%</strong>.</p>
+<p>For each category (forage/concentrate), the <code>percentage</code>
+must sum to <strong>100%</strong>.</p>
 <p><strong>Example for Spain South (Concentrate portion):</strong></p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
+<th align="left">feed_category</th>
 <th align="left">ingredient</th>
-<th align="left">ingredient_share</th>
-<th align="left">ingredient_type</th>
+<th align="left">percentage</th>
+<th align="left">origin_country</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
 <td align="left">diet_dairy_mature</td>
 <td align="left">spain</td>
 <td align="left">south</td>
+<td align="left">concentrate</td>
 <td align="left">corn_national</td>
 <td align="left">44.85</td>
-<td align="left">concentrate</td>
+<td align="left">Spain</td>
 </tr>
 <tr class="even">
 <td align="left">diet_dairy_mature</td>
 <td align="left">spain</td>
 <td align="left">south</td>
+<td align="left">concentrate</td>
 <td align="left">soybean_meal_44_cp</td>
 <td align="left">17.12</td>
-<td align="left">concentrate</td>
+<td align="left">NA</td>
 </tr>
 <tr class="odd">
 <td align="left">diet_dairy_mature</td>
 <td align="left">spain</td>
 <td align="left">south</td>
+<td align="left">concentrate</td>
 <td align="left">rapeseed_meal_00_33_cp</td>
 <td align="left">28.71</td>
-<td align="left">concentrate</td>
+<td align="left">NA</td>
 </tr>
 </tbody>
 </table>
+<ul>
+<li>
+<strong>Missing Origins:</strong> Notice that
+<code>origin_country</code> for soybean and rapeseed meals is set to
+<code>NA</code>. The package will automatically resolve their origins
+using the FAO dynamic background allocation engine based on a 70%
+self-sufficiency rule.</li>
+</ul>
 <hr>
 </div>
 </div>
@@ -443,12 +455,15 @@ splitting the <code>allocation</code> (the sum per animal/region must be
 <p>Once your CSVs are updated in the <code>user_data/</code> folder, run
 the analysis. The package will automatically perform biological
 validations (like checking if your cow is eating more than 5.5% of its
-body weight).</p>
+body weight) and assign trade impacts.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, crop_yield_country <span class="op">=</span> <span class="st">"Spain"</span><span class="op">)</span></span></code></pre></div>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

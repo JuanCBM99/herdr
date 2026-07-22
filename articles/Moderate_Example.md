@@ -1,6 +1,6 @@
 # Dairy Cattle Spain: North/South
 
-## Basic Assessment: A Step-by-Step Guide
+## Moderate Assessment: North/South Regional Split
 
 This guide will walk you through a **Moderate Assessment** for **Mature
 Dairy Cattle in Spain (2015)** using the multi-regional structure (North
@@ -19,7 +19,7 @@ and South).
   `reproduction_parameters.csv`
 - **Reference Files (Expert use only):** `feed_characteristics.csv`,
   `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`,
-  `ipcc_coefficients.csv`, `ipcc_mm.csv`.
+  `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
 ------------------------------------------------------------------------
 
@@ -42,26 +42,31 @@ differences in forage availability between the North and South.
 
 #### A. Define the Profile (`diet_profiles.csv`)
 
-Note that the `forage_share` is higher in the North (55%) compared to
+Note that the forage proportion is higher in the North (55%) compared to
 the South (50%).
 
-| diet_tag          | region | subregion | forage_share | concentrate_share | milk_share |
-|:------------------|:-------|:----------|:-------------|:------------------|:-----------|
-| diet_dairy_mature | spain  | north     | 55           | 45                | 0          |
-| diet_dairy_mature | spain  | south     | 50           | 50                | 0          |
+| diet_tag          | region | subregion | forage | concentrate | milk |
+|:------------------|:-------|:----------|:-------|:------------|:-----|
+| diet_dairy_mature | spain  | north     | 55     | 45          | 0    |
+| diet_dairy_mature | spain  | south     | 50     | 50          | 0    |
 
 #### B. Ingredient Breakdown (`diet_ingredients.csv`)
 
-For each category (forage/concentrate), the `ingredient_share` must sum
-to **100%**.
+For each category (forage/concentrate), the `percentage` must sum to
+**100%**.
 
 **Example for Spain South (Concentrate portion):**
 
-| diet_tag | region | subregion | ingredient | ingredient_share | ingredient_type |
-|:---|:---|:---|:---|:---|:---|
-| diet_dairy_mature | spain | south | corn_national | 44.85 | concentrate |
-| diet_dairy_mature | spain | south | soybean_meal_44_cp | 17.12 | concentrate |
-| diet_dairy_mature | spain | south | rapeseed_meal_00_33_cp | 28.71 | concentrate |
+| diet_tag | region | subregion | feed_category | ingredient | percentage | origin_country |
+|:---|:---|:---|:---|:---|:---|:---|
+| diet_dairy_mature | spain | south | concentrate | corn_national | 44.85 | Spain |
+| diet_dairy_mature | spain | south | concentrate | soybean_meal_44_cp | 17.12 | NA |
+| diet_dairy_mature | spain | south | concentrate | rapeseed_meal_00_33_cp | 28.71 | NA |
+
+- **Missing Origins:** Notice that `origin_country` for soybean and
+  rapeseed meals is set to `NA`. The package will automatically resolve
+  their origins using the FAO dynamic background allocation engine based
+  on a 70% self-sufficiency rule.
 
 ------------------------------------------------------------------------
 
@@ -107,12 +112,16 @@ the `allocation` (the sum per animal/region must be 1.0).
 
 Once your CSVs are updated in the `user_data/` folder, run the analysis.
 The package will automatically perform biological validations (like
-checking if your cow is eating more than 5.5% of its body weight).
+checking if your cow is eating more than 5.5% of its body weight) and
+assign trade impacts.
 
 ``` r
 
 library(herdr)
 
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE, crop_yield_country = "Spain")
+  automatic_cycle = FALSE, 
+  farm_country = "Spain",
+  year = 2015
+)
 ```
