@@ -15,12 +15,12 @@
 ## Citation
 
 Baez J, Sampedro J, Pardo G, del Prado A (2026). *herdr: herdr*. R
-package version 1.0.2, <https://juancbm99.github.io/herdr>.
+package version 1.0.3, <https://juancbm99.github.io/herdr>.
 
     @Manual{,
       title = {herdr: herdr},
       author = {Juan Carlos Baez and Jon Sampedro and Guillermo Pardo and Agustín {del Prado}},
       year = {2026},
-      note = {R package version 1.0.2},
+      note = {R package version 1.0.3},
       url = {https://juancbm99.github.io/herdr},
     }
