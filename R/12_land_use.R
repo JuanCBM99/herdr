@@ -13,15 +13,26 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   message("\U0001f7e2 Calculating land use...")
 
-  # --- 1. Load reference data (Your local paths) ---
-  fao_raw      <- readr::read_csv("user_data/fao_crop_yields.csv", show_col_types = FALSE)
-  forage_raw   <- readr::read_csv("user_data/forage_yields.csv", show_col_types = FALSE)
+  year_col <- paste0("Y", year)
+
+  # --- 1. Load reference data ---
+  fao_raw <- arrow::open_dataset("user_data/fao_crops.parquet") %>%
+    dplyr::filter(Element == "Yield") %>%
+    dplyr::select(Area, Item, dplyr::all_of(year_col)) %>%
+    dplyr::collect() %>%
+    dplyr::rename(Value = dplyr::all_of(year_col)) %>%
+    dplyr::mutate(Year = as.numeric(year))
+
+  forage_raw <- arrow::read_parquet("user_data/fao_forages.parquet") %>%
+    dplyr::rename(Value = Yield) %>%
+    dplyr::mutate(Year = as.numeric(year))
+
   name_mapping <- readr::read_csv("user_data/mapping.csv", show_col_types = FALSE)
 
   # --- 2. Process yields by country ---
   yields_combined <- dplyr::bind_rows(
     fao_raw %>% dplyr::select(Area, Item, Year, Value),
-    forage_raw %>% dplyr::select(Area, Item = ingredient, Year, Value)
+    forage_raw %>% dplyr::select(Area, Item, Year, Value)
   )
 
   fao_yields <- name_mapping %>%
@@ -54,26 +65,31 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   diet_profiles <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE) %>%
     dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
 
-  # Read your main local diet file
-  diet_ingredients_raw <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE) %>%
-    dplyr::distinct(diet_tag, region, subregion, class_flex, ingredient, country_of_origin, .keep_all = TRUE)
+  diet_ingredients_raw <- readr::read_csv(
+    "user_data/diet_ingredients.csv",
+    col_types = readr::cols(
+      custom_yield_kg_ha = readr::col_character(),
+      .default = readr::col_guess()
+    ),
+    show_col_types = FALSE
+  ) %>%
+    dplyr::mutate(
+      custom_yield_kg_ha = as.numeric(gsub(",", ".", custom_yield_kg_ha)),
+      country_of_origin = dplyr::if_else(!is.na(custom_yield_kg_ha), "Custom Data", country_of_origin)
+    )
 
-  # If there are any NA values in origin, we trigger our FAO engine
   if (any(is.na(diet_ingredients_raw$country_of_origin))) {
 
-    # SHIELD: If the Parquet file is missing, auto-download it from GitHub Releases
-    path_parquet <- "user_data/fao_trade_matrix.parquet"
+    path_parquet_trade <- "user_data/fao_trade_matrix.parquet"
 
     # nocov start
-    if (!file.exists(path_parquet)) {
+    if (!file.exists(path_parquet_trade)) {
       message("\u23f3 FAO trade matrix not found locally.")
       message("Downloading background database (187 MB)... This will only happen once.")
-
-      # URL pointing to the latest release assets
       url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_trade_matrix.parquet"
 
       tryCatch({
-        download.file(url_release, destfile = path_parquet, mode = "wb")
+        download.file(url_release, destfile = path_parquet_trade, mode = "wb")
         message("\u2705 Download completed successfully.")
       }, error = function(e) {
         stop("Error downloading the trade matrix. Please check your internet connection: ", e$message)
@@ -83,20 +99,17 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
     message(paste0("\u23f3 Missing countries of origin found. Computing dynamic FAO background data for ", farm_country, " (", year, ")..."))
 
-    year_col  <- paste0("Y", year)
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
-    # 3A. Local production capacity
-    df_prod <- readr::read_csv("user_data/fao_production.csv", show_col_types = FALSE)
-    prod_country_col <- if("Reporter Countries" %in% names(df_prod)) "Reporter Countries" else "Area"
-
-    clean_prod <- df_prod %>%
-      dplyr::filter(.data[[prod_country_col]] == farm_country, Year == year, Item %in% fao_items) %>%
+    clean_prod <- arrow::open_dataset("user_data/fao_crops.parquet") %>%
+      dplyr::filter(Area == farm_country, Item %in% fao_items, Element == "Production") %>%
+      dplyr::select(Item, dplyr::all_of(year_col)) %>%
+      dplyr::collect() %>%
+      dplyr::rename(Value = dplyr::all_of(year_col)) %>%
       dplyr::group_by(Item) %>%
       dplyr::summarise(Production = sum(Value, na.rm = TRUE), .groups = "drop")
 
-    # 3B. Extract trade records from Parquet (Only the target year is read)
-    df_trade <- arrow::open_dataset(path_parquet) %>%
+    df_trade <- arrow::open_dataset(path_parquet_trade) %>%
       dplyr::select(`Reporter Countries`, `Partner Countries`, Item, Element, dplyr::all_of(year_col)) %>%
       dplyr::filter(`Reporter Countries` == farm_country, Item %in% fao_items) %>%
       dplyr::collect() %>%
@@ -117,7 +130,6 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::ungroup() %>%
       dplyr::select(Item, Top_Partner = `Partner Countries`, Total_Import)
 
-    # 3C. Calculate Self-Sufficiency Ratio (70% Rule)
     fao_dictionary <- clean_prod %>%
       dplyr::full_join(clean_imp, by = "Item") %>%
       dplyr::full_join(clean_exp, by = "Item") %>%
@@ -130,14 +142,12 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       ) %>%
       dplyr::select(Item, Calculated_Origin)
 
-    # 3D. Map back to herdr ingredients
     final_dictionary <- name_mapping %>%
       dplyr::filter(!is.na(yield_name)) %>%
       dplyr::left_join(fao_dictionary, by = c("yield_name" = "Item")) %>%
       dplyr::mutate(Calculated_Origin = tidyr::replace_na(Calculated_Origin, farm_country)) %>%
       dplyr::select(ingredient, Calculated_Origin)
 
-    # 3E. Overwrite NAs with calculated data using coalesce
     diet_ingredients <- diet_ingredients_raw %>%
       dplyr::left_join(final_dictionary, by = "ingredient") %>%
       dplyr::mutate(
@@ -165,9 +175,12 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   results <- DMI_df %>%
     dplyr::inner_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::inner_join(diet_ingredients, by = c("diet_tag", "region", "subregion", "class_flex")) %>%
-    dplyr::left_join(fao_yields, by = c("ingredient", "country_of_origin"))
+    dplyr::left_join(fao_yields, by = c("ingredient", "country_of_origin")) %>%
+    dplyr::mutate(
+      dm_yield = dplyr::coalesce(custom_yield_kg_ha, dm_yield),
+      ha_per_kg = dplyr::if_else(dm_yield > 0, 1 / dm_yield, 0)
+    )
 
-  # Check for missing yields
   missing_yields <- results %>% dplyr::filter(is.na(dm_yield)) %>% dplyr::select(ingredient, country_of_origin) %>% dplyr::distinct()
   if (nrow(missing_yields) > 0) {
     warning("\u26A0 Missing yield for: ", paste0(missing_yields$ingredient, "(", missing_yields$country_of_origin, ")", collapse = ", "))

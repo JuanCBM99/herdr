@@ -4,6 +4,7 @@ library(herdr)
 library(rhandsontable)
 library(dplyr)
 library(readr)
+library(arrow)
 
 # ============================================================================
 # 1. CONFIGURATION
@@ -55,11 +56,6 @@ tables_info <- list(
     label = "Feed Char.",
     help  = "Nutritional characteristics of each feed ingredient (e.g., dry matter, crude protein)."
   ),
-  forage = list(
-    file  = "forage_yields.csv", fixed = 1, icon = "seedling",
-    label = "Forage Yields",
-    help  = "Default crop and forage yields based on the selected region."
-  ),
   ipcc_coef = list(
     file  = "ipcc_coefficients.csv", fixed = 2, icon = "square-root-variable",
     label = "IPCC Coefficients",
@@ -104,7 +100,7 @@ MANURE_CASCADE_COLUMNS <- c(
 )
 
 standard_ids <- c("census", "diet_prof", "diet_ingr", "def", "mono", "weights", "manure", "repro")
-advanced_ids <- c("feed_char", "forage", "ipcc_coef", "ipcc_mm", "mapping")
+advanced_ids <- c("feed_char", "ipcc_coef", "ipcc_mm", "mapping")
 
 KPI_LABELS <- c(
   "total_emissions" = "Total Emissions (Gg CO2e)",
@@ -399,7 +395,7 @@ ui <- page_sidebar(
         checkboxInput("auto_cycle", "Use automatic herd cycle", value = FALSE),
         hr(),
         selectInput("farm_country", "Farm Country / Area:", choices = c("Loading..." = "")),
-        numericInput("year", "FAO Reference Year:", value = 2022, min = 1961, max = 2026, step = 1)
+        numericInput("year", "FAO Reference Year:", value = 2022, step = 1)
     ),
     div(class = "step-card wheat",
         div(class = "step-head", span("3", class = "step-tag"), h5("Calculate", class = "step-title m-0")),
@@ -437,15 +433,32 @@ server <- function(input, output, session) {
   updateSelectInput(session, "data_source", choices = c("My current data" = "current", if (example_paths != "") list.dirs(example_paths, full.names = FALSE, recursive = FALSE) else c()))
 
   observe({
-    yields_path <- "user_data/fao_crop_yields.csv"
-    if (!file.exists(yields_path)) {
-      updateSelectInput(session, "farm_country", choices = c("Spain", "France", "Germany", "United States of America"))
-      return()
+    req(ui_trigger() > 0)
+
+    # Actualizado para leer los datos del Parquet en lugar del CSV borrado
+    parquet_path <- "user_data/fao_crops.parquet"
+    fallback_countries <- c("Spain", "France", "Germany", "United States of America")
+
+    if (!file.exists(parquet_path)) {
+      updateSelectInput(session, "farm_country", choices = fallback_countries)
+      return(invisible(NULL))
     }
+
     try({
-      df <- readr::read_csv(yields_path, col_select = Area, show_col_types = FALSE)
-      countries <- sort(unique(na.omit(df$Area)))
-      updateSelectInput(session, "farm_country", choices = countries, selected = if ("Spain" %in% countries) "Spain" else countries[1])
+      df_area <- arrow::read_parquet(parquet_path, col_select = c("Area"))
+      countries <- sort(unique(na.omit(df_area$Area)))
+      selected_country <- if ("Spain" %in% countries) "Spain" else countries[1]
+      updateSelectInput(session, "farm_country", choices = countries, selected = selected_country)
+
+      # Extraer dinámicamente los años del Parquet (columnas que empiezan por Y)
+      ds <- arrow::open_dataset(parquet_path)
+      cols <- names(ds)
+      year_cols <- grep("^Y[0-9]{4}$", cols, value = TRUE)
+
+      if (length(year_cols) > 0) {
+        years <- as.numeric(gsub("Y", "", year_cols))
+        updateNumericInput(session, "year", min = min(years), max = max(years))
+      }
     })
   })
 
@@ -460,6 +473,12 @@ server <- function(input, output, session) {
     for (id in names(tables_info)) {
       path <- file.path("user_data", tables_info[[id]]$file)
       loaded <- read_clean(path)
+
+      # SEGURO: Crear custom_yield_kg_ha en la tabla diet_ingr si no existe
+      if (id == "diet_ingr" && !"custom_yield_kg_ha" %in% names(loaded)) {
+        loaded$custom_yield_kg_ha <- NA_character_
+      }
+
       rv[[id]] <- if (reset) loaded[0, ] else loaded
       dirty[[id]] <- FALSE
     }
@@ -496,7 +515,13 @@ server <- function(input, output, session) {
         id <- map[[filename]]
         dest <- file.path("user_data", filename)
         file.copy(input$upload_csvs$datapath[i], dest, overwrite = TRUE)
-        rv[[id]] <- read_clean(dest)
+
+        temp_df <- read_clean(dest)
+        if (id == "diet_ingr" && !"custom_yield_kg_ha" %in% names(temp_df)) {
+          temp_df$custom_yield_kg_ha <- NA_character_
+        }
+
+        rv[[id]] <- temp_df
         dirty[[id]] <- FALSE
         count <- count + 1
       }
@@ -541,6 +566,12 @@ server <- function(input, output, session) {
         tbl <- hot_cols(tbl, columnSorting = TRUE, fixedColumnsLeft = if(tables_info[[id]]$fixed > 0) tables_info[[id]]$fixed else NULL)
         tbl <- apply_dynamic_dropdowns(tbl, id, rv)
         if (id == "manure") tbl <- apply_manure_cascade_dropdowns(tbl, rv$ipcc_mm, df)
+
+        # NUEVO: Forzar formato numérico bonito en custom_yield_kg_ha
+        if (id == "diet_ingr" && "custom_yield_kg_ha" %in% names(df)) {
+          tbl <- hot_col(tbl, col = "custom_yield_kg_ha", type = "numeric", format = "0.0", allowInvalid = FALSE)
+        }
+
         tbl
       })
     })
@@ -556,7 +587,6 @@ server <- function(input, output, session) {
     output[[paste0("validation_alert_", id)]] <- renderUI(render_validation_alert(id))
   })
 
-  # 🔥 CÁLCULO DE RESULTADOS ARREGLADO (CATCH WARNINGS CORRECTAMENTE) 🔥
   observeEvent(input$calculate, {
     nav_select("main_tabs", "results_tab")
     session$sendCustomMessage("herdr_button_state", list(id = "calculate", loading = TRUE, text = "Running..."))
@@ -570,7 +600,6 @@ server <- function(input, output, session) {
       shown_warnings <- c()
 
       res <- tryCatch({
-        # withCallingHandlers intercepta el warning, hace su magia, y DEJA QUE LA FUNCIÓN SIGA.
         withCallingHandlers(
           expr = generate_impact_assessment(
             automatic_cycle = input$auto_cycle,
@@ -583,7 +612,7 @@ server <- function(input, output, session) {
               showNotification(paste("\u26A0", w$message), type = "warning", duration = 8)
               shown_warnings <<- c(shown_warnings, w$message)
             }
-            invokeRestart("muffleWarning") # Esto silencia la consola, pero ya no rompe nada
+            invokeRestart("muffleWarning")
           }
         )
       }, error = function(e) {

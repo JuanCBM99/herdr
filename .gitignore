@@ -58,4 +58,4 @@ inst/doc
 .positai
 
 #GitHub
-*.parquet
+*fao_trade_matrix.parquet
