@@ -22,7 +22,7 @@ step-by-step instructions.
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
 | `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
-| `livestock_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. |
+| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. |
 | `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
 
 ### Nutrition & Diets
@@ -96,7 +96,7 @@ where `EE%`, `CP%`, and `ASH%` correspond to the `EE_pct`, `CP_pct`, and
 ### `ipcc_coefficients.csv` — Metabolic Constants
 
 Consult this to find the `description` you need to copy into
-`livestock_definitions.csv`.
+`ruminant_definitions.csv`.
 
 - **Key columns:** `description`, `coefficient` ($`C_a`$, $`C_{fi}`$,
   etc.), `value`.
@@ -165,7 +165,7 @@ Use this table to know where to look when filling out your data:
 
 | If you want to… | Consult this library | To fill this input file |
 |:---|:---|:---|
-| Identify an animal type | `ipcc_coefficients.csv` | `livestock_definitions.csv` |
+| Identify an animal type | `ipcc_coefficients.csv` | `ruminant_definitions.csv` |
 | Pick a feed ingredient | `feed_characteristics.csv` | `diet_ingredients.csv` |
 | Choose a manure system | `ipcc_mm.csv` | `manure_management.csv` |
 | Add a custom crop | `mapping.csv`, `forage_yields.csv`, `fao_crop_yields.csv` | `feed_characteristics.csv` |

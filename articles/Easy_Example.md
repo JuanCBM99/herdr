@@ -14,7 +14,7 @@ impact.
 
 - **User Files (Update these):** `livestock_census.csv`,
   `diet_profiles.csv`, `diet_ingredients.csv`,
-  `livestock_definitions.csv`, `livestock_weights.csv`,
+  `ruminant_definitions.csv`, `livestock_weights.csv`,
   `manure_management.csv`.
 - **In case of usage of the automatic cycle:**
   `reproduction_parameters.csv`
@@ -74,9 +74,8 @@ diet has.
 
 ### Step 3: Animal Categories and Coefficients
 
-Open `livestock_definitions.csv`. This file links your animal to the
-IPCC equations. Use the **exact descriptions** from
-`ipcc_coefficients.csv`.
+Open `ruminant_definitions.csv`. This file links your animal to the IPCC
+equations. Use the **exact descriptions** from `ipcc_coefficients.csv`.
 
 | animal_tag | region | diet_tag | c_pregnancy | milk_yield | fat_content |
 |:---|:---|:---|:---|:---|:---|

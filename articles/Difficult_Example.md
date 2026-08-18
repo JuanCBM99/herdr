@@ -14,7 +14,7 @@ distinguish between the **Lactation Phase** and the **Dry Phase**.
 
 - **User Files (Update these):** `livestock_census.csv`,
   `diet_profiles.csv`, `diet_ingredients.csv`,
-  `livestock_definitions.csv`, `livestock_weights.csv`,
+  `ruminant_definitions.csv`, `livestock_weights.csv`,
   `manure_management.csv`.
 - **In case of usage of the automatic cycle:**
   `reproduction_parameters.csv`
@@ -69,7 +69,7 @@ the dynamic FAO background allocation engine).*
 
 ------------------------------------------------------------------------
 
-### Step 3: Physiological Definitions (`livestock_definitions.csv`)
+### Step 3: Physiological Definitions (`ruminant_definitions.csv`)
 
 This is the most technical file. It determines the energy requirements
 (IPCC Tier 2). Note the difference in `milk_yield` and `cfi` between

@@ -154,7 +154,7 @@ When introducing a new custom ingredient, you must also update:
 
 Animal characteristics are specified using:
 
-- `livestock_definitions.csv`
+- `ruminant_definitions.csv`
 - `monogastric_definitions.csv`
 - `livestock_weights.csv`
 

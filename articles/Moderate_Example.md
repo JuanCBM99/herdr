@@ -13,7 +13,7 @@ and South).
 
 - **User Files (Update these):** `livestock_census.csv`,
   `diet_profiles.csv`, `diet_ingredients.csv`,
-  `livestock_definitions.csv`, `livestock_weights.csv`,
+  `ruminant_definitions.csv`, `livestock_weights.csv`,
   `manure_management.csv`.
 - **In case of usage of the automatic cycle:**
   `reproduction_parameters.csv`
@@ -72,8 +72,8 @@ For each category (forage/concentrate), the `percentage` must sum to
 
 ### Step 3: Animal Categories and Coefficients
 
-Open `livestock_definitions.csv`. This file links your animal tags to
-the IPCC physiological equations.
+Open `ruminant_definitions.csv`. This file links your animal tags to the
+IPCC physiological equations.
 
 | animal_tag | region | subregion | diet_tag | c_pregnancy | milk_yield | fat_content | animal_type |
 |:---|:---|:---|:---|:---|:---|:---|:---|
