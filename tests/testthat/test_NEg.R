@@ -13,9 +13,9 @@ test_that("calculate_NEg computes growth energy without NAs using test data", {
     mutate(across(everything(), trimws)) %>%
     write_csv("user_data/livestock_weights.csv")
 
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     mutate(across(everything(), trimws)) %>%
-    write_csv("user_data/livestock_definitions.csv")
+    write_csv("user_data/ruminant_definitions.csv")
 
   read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     mutate(across(everything(), trimws)) %>%

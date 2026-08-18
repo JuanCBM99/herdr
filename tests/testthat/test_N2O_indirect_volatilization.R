@@ -11,7 +11,7 @@ test_that("calculate_N2O_indirect_volatilization completes the N cycle using CSV
   # 2. Normalize input CSVs
   # This ensures that keys for joining (animal_type, systems, etc.) are clean
   files_to_fix <- c(
-    "livestock_definitions.csv", "livestock_weights.csv",
+    "ruminant_definitions.csv", "livestock_weights.csv",
     "livestock_census.csv", "manure_management.csv",
     "ipcc_mm.csv", "diet_profiles.csv",
     "diet_ingredients.csv", "feed_characteristics.csv",

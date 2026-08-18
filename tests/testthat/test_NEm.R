@@ -11,8 +11,8 @@ test_that("calculate_NEm computes metabolic energy correctly with test data", {
   # Fix column types to avoid logical vs character errors
   read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/livestock_weights.csv")
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_definitions.csv")
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/ruminant_definitions.csv")
   read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/ipcc_coefficients.csv")
 

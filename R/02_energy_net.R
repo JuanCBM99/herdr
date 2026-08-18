@@ -6,7 +6,7 @@ calculate_NEm <- function(saveoutput = TRUE) {
 
   # --- 1. Data Loading from user_data ---
   weights <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
 
   # --- 2. Calculation Pipeline ---
@@ -43,7 +43,7 @@ calculate_NEa <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Activity (NEa)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
 
   # Fetch NEm as base (contains geography and base energy)
@@ -91,7 +91,7 @@ calculate_NEg <- function(saveoutput = TRUE) {
                              col_types = readr::cols(subregion = "c", class_flex = "c"),
                              show_col_types = FALSE)
 
-  categories <- readr::read_csv("user_data/livestock_definitions.csv",
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv",
                                 col_types = readr::cols(subregion = "c", class_flex = "c", c = "c", a = "c", b = "c"),
                                 show_col_types = FALSE)
 
@@ -148,7 +148,7 @@ calculate_NEl <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Lactation (NEl)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   weights <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE) %>%
     dplyr::select(region, subregion, animal_tag, class_flex) %>% dplyr::distinct()
 
@@ -187,7 +187,7 @@ calculate_NE_work <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
 
   nem_df <- calculate_NEm(saveoutput = FALSE)
 
@@ -231,7 +231,7 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Wool (NE_wool)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   weights <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE) %>%
     dplyr::select(region, subregion, animal_tag, class_flex) %>% dplyr::distinct()
 
@@ -261,7 +261,7 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
   nem_df <- calculate_NEm(saveoutput = FALSE)
 

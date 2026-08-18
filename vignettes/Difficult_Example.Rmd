@@ -14,7 +14,7 @@ In this guide, we tackle a high-complexity scenario for **Mature Dairy Cattle**.
 > **Note on File Locations:** All files are located in the `user_data/` folder.
 
 ### 📂 Folder Structure
-* **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `livestock_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
+* **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `ruminant_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
 * **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
 * **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
@@ -57,7 +57,7 @@ Ingredients must be assigned precisely to the `subregion` and `class_flex`.
 
 ---
 
-## Step 3: Physiological Definitions (`livestock_definitions.csv`)
+## Step 3: Physiological Definitions (`ruminant_definitions.csv`)
 This is the most technical file. It determines the energy requirements (IPCC Tier 2). Note the difference in `milk_yield` and `cfi` between phases.
 
 | animal_tag | region | subregion | class_flex | cfi | ca | c | milk_yield | fat_content | c_pregnancy |

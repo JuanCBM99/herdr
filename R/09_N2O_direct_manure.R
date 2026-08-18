@@ -10,7 +10,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   message("\U0001f7e2 Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  cat_csv      <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
   user_manure  <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)

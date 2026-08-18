@@ -13,7 +13,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE) {
   diets           <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
   ingredients     <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE)
   characteristics <- readr::read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
-  definitions     <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  definitions     <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   monogastric     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
 
   # --- 2. Consistency Validations (Shares must sum to 100%) ---

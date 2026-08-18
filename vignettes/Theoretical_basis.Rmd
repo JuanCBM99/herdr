@@ -78,8 +78,8 @@ Energy required for milk production based on volume and fat content.
 | Variable | Description | Source in the Package |
 |:----------|:-------------|:---------------------|
 | $NE_l$    | Net energy for lactation (MJ/day) | Calculated |
-| $Milk$    | Average daily milk yield (kg/day) | `livestock_definitions.csv` |
-| $Fat$     | Milk fat content percentage (%) | `livestock_definitions.csv` |
+| $Milk$    | Average daily milk yield (kg/day) | `ruminant_definitions.csv` |
+| $Fat$     | Milk fat content percentage (%) | `ruminant_definitions.csv` |
 | $EV_{milk}$| Energy required to produce 1 kg of milk (MJ/kg) | `ipcc_coefficients.csv` |
 
 ---
@@ -92,8 +92,8 @@ Energy required for milk production based on volume and fat content.
 
 | Variable | Description | Source in the Package |
 |:----------|:-------------|:---------------------|
-| $Hours$   | Number of hours worked per day (draft animals) | `livestock_definitions.csv` |
-| $Pr_{wool}$| Annual wool production (kg/year) | `livestock_definitions.csv` |
+| $Hours$   | Number of hours worked per day (draft animals) | `ruminant_definitions.csv` |
+| $Pr_{wool}$| Annual wool production (kg/year) | `ruminant_definitions.csv` |
 | $EV_{wool}$| Energy per kg of wool (IPCC default 24 MJ/kg) | Constant |
 | $C_{pregnancy}$| Pregnancy energy coefficient | `ipcc_coefficients.csv` |
 
@@ -345,9 +345,9 @@ $$N_{retention} = \frac{Milk \times (Milk_{protein}/100)}{6.38} + \frac{WG \left
 | Variable | Description | Source in Package |
 |:---|:---|:---|
 | $N_{retention}$ | Daily nitrogen retained (kg N/head/day) | Calculated |
-| $Milk$ | Daily milk yield (kg/day) | `livestock_definitions.csv` |
+| $Milk$ | Daily milk yield (kg/day) | `ruminant_definitions.csv` |
 | $Milk_{protein}$ | Estimated milk protein concentration (%) | Calculated |
-| $Fat_{content}$ | Milk fat content (%) | `livestock_definitions.csv` |
+| $Fat_{content}$ | Milk fat content (%) | `ruminant_definitions.csv` |
 | $WG$ | Daily body weight gain (kg/day) | Calculated |
 | $NE_g$ | Net energy for growth (MJ/day) | Calculated |
 

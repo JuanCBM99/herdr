@@ -1,0 +1,32 @@
+animal_tag,region,subregion,class_flex,diet_tag,cfi,ca,c,a,b,milk_yield_kg_year,fat_content_pct,wool_yield_kg_year,work_hours,pr,single birth fraction,double birth fraction,c_pregnancy,animal_type,animal_subtype
+feedlot_calves_male,NA,NA,NA,diet_feedlot_calves,cattle/buffalo,stall,bulls,NA,NA,0,0,0,NA,0,0,0,NA,cattle,feedlot
+feedlot_calves_female,NA,NA,NA,diet_feedlot_calves,cattle/buffalo,stall,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,feedlot
+beef_calves_male,NA,NA,NA,diet_beef_calves_slaughter,cattle/buffalo,pasture,bulls,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+beef_calves_female,NA,NA,NA,diet_beef_calves_slaughter,cattle/buffalo,pasture,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+beef_calves_male_replacement,NA,NA,NA,diet_beef_calves_replacement,cattle/buffalo,pasture,bulls,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+beef_calves_female_replacement,NA,NA,NA,diet_beef_calves_replacement,cattle/buffalo,pasture,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+dairy_calves_female_replacement,NA,NA,NA,diet_dairy_calves_replacement,cattle/buffalo,stall,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,dairy
+beef_yearlings_male_replacement,NA,NA,NA,diet_beef_mature_yearlings,cattle/buffalo,pasture,bulls,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+beef_yearlings_female_replacement,NA,NA,NA,diet_beef_mature_yearlings,cattle/buffalo,pasture,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+dairy_yearlings_female_replacement,NA,NA,NA,diet_dairy_yearlings_replacement,cattle/buffalo,stall,females,NA,NA,0,0,0,NA,0,0,0,NA,cattle,dairy
+mature_beef_bull,NA,NA,NA,diet_beef_mature_yearlings,cattle_buffalo [bulls],pasture,bulls,NA,NA,0,0,0,NA,0,0,0,NA,cattle,beef
+mature_dairy_cattle,spain,NA,NA,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,NA,NA,8894.38,3.73,0,NA,0,0,0,cattle and buffalo,cattle,dairy
+mature_beef_cattle,NA,NA,NA,diet_beef_mature_yearlings,cattle/buffalo,pasture,females,NA,NA,0,0,0,NA,0,0,0,cattle and buffalo,cattle,beef
+lamb_female_dairy_replacement,NA,NA,NA,diet_lamb_dairy_female_replacement_pasture,sheep_lamb_to_1_year_a,grazing flat pasture,NA,a_average_f_m,b_average_f_m,0,0,0,NA,0,0,0,NA,sheep,dairy
+lamb_dairy_slaughter,NA,NA,NA,diet_lamb_dairy_slaughter,sheep_lamb_to_1_year_a,housed fattening lambs,NA,a_average_f_m,b_average_f_m,0,0,0,NA,0,0,0,NA,sheep,dairy
+lamb_female_meat_replacement,NA,NA,NA,diet_lamb_meat_female_replacement_pasture,sheep_lamb_to_1_year_a,grazing flat pasture,NA,a_average_f_m,b_average_f_m,0,0,0,NA,0,0,0,NA,sheep,meat
+lamb_meat_slaughter,NA,NA,NA,diet_lamb_meat_slaughter,sheep_lamb_to_1_year_a,housed fattening lambs,NA,a_average_f_m,b_average_f_m,0,0,0,NA,0,0,0,NA,sheep,meat
+lamb_male_dairy_replacement,NA,NA,NA,diet_lamb_dairy_male_replacement_pasture,sheep_lamb_to_1_year_m,grazing flat pasture,NA,a_intact males,b_intact males,0,0,0,NA,0,0,0,NA,sheep,dairy
+lamb_male_meat_replacement,NA,NA,NA,diet_lamb_meat_male_replacement_pasture,sheep_lamb_to_1_year_m,grazing flat pasture,NA,a_intact males,b_intact males,0,0,0,NA,0,0,0,NA,sheep,meat
+mature_sheep_female_dairy,NA,NA,NA,diet_mature_sheep_dairy_female_pasture,sheep_older_than_1_year_f,grazing flat pasture,NA,a_females,b_females,180,6.71,1.4,NA,1.27,0.73,0.27,NA,sheep,dairy
+mature_sheep_female_meat,NA,NA,NA,diet_mature_sheep_meat_female_pasture,sheep_older_than_1_year_f,grazing flat pasture,NA,a_females,b_females,30.21,3.45,1.99,NA,1,1,0,NA,sheep,meat
+mature_sheep_male_dairy,NA,NA,NA,diet_mature_sheep_dairy_male_pasture,sheep_older_than_1_year_m,grazing flat pasture,NA,a_intact males,b_intact males,0,0,2.6,NA,0,0,0,NA,sheep,dairy
+mature_sheep_male_meat,NA,NA,NA,diet_mature_sheep_meat_male_pasture,sheep_older_than_1_year_m,grazing flat pasture,NA,a_intact males,b_intact males,0,0,2.79,NA,0,0,0,NA,sheep,meat
+kid_goat_male_dairy_replacement,NA,NA,NA,diet_kid_goat_male_dairy_replacement_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,dairy
+kid_goat_male_meat_replacement,NA,NA,NA,diet_kid_goat_male_meat_replacement_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,meat
+mature_goat_male_dairy,NA,NA,NA,diet_mature_goat_male_dairy_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,dairy
+mature_goat_male_meat,NA,NA,NA,diet_mature_goat_male_meat_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,meat
+kid_goat_female_dairy_replacement,NA,NA,NA,diet_kid_goat_female_dairy_replacement_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,dairy
+kid_goat_female_meat_replacement,NA,NA,NA,diet_kid_goat_female_meat_replacement_pasture,goats,lowland goats,NA,a,b,0,0,0,NA,0,0,0,NA,goat,meat
+mature_goat_female_dairy,NA,NA,NA,diet_mature_goat_female_dairy_pasture,goats,lowland goats,NA,a,b,530,5.6,0,NA,2,0,1,NA,goat,dairy
+mature_goat_female_meat,NA,NA,NA,diet_mature_goat_female_meat_pasture,goats,lowland goats,NA,a,b,157.5,4.9,0,NA,1.58,0.42,0.58,NA,goat,meat

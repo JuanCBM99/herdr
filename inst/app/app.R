@@ -27,8 +27,8 @@ tables_info <- list(
     help  = "Percentage of each ingredient making up the diet for different animal tags."
   ),
   def = list(
-    file  = "livestock_definitions.csv", fixed = 4, icon = "id-card",
-    label = "Definitions",
+    file  = "ruminant_definitions.csv", fixed = 4, icon = "cow",
+    label = "Ruminants",
     help  = "Define physiological traits for ruminants using IPCC coefficients and available data."
   ),
   mono = list(
@@ -435,7 +435,6 @@ server <- function(input, output, session) {
   observe({
     req(ui_trigger() > 0)
 
-    # Actualizado para leer los datos del Parquet en lugar del CSV borrado
     parquet_path <- "user_data/fao_crops.parquet"
     fallback_countries <- c("Spain", "France", "Germany", "United States of America")
 
@@ -450,7 +449,6 @@ server <- function(input, output, session) {
       selected_country <- if ("Spain" %in% countries) "Spain" else countries[1]
       updateSelectInput(session, "farm_country", choices = countries, selected = selected_country)
 
-      # Extraer dinámicamente los años del Parquet (columnas que empiezan por Y)
       ds <- arrow::open_dataset(parquet_path)
       cols <- names(ds)
       year_cols <- grep("^Y[0-9]{4}$", cols, value = TRUE)
@@ -474,7 +472,6 @@ server <- function(input, output, session) {
       path <- file.path("user_data", tables_info[[id]]$file)
       loaded <- read_clean(path)
 
-      # SEGURO: Crear custom_yield_kg_ha en la tabla diet_ingr si no existe
       if (id == "diet_ingr" && !"custom_yield_kg_ha" %in% names(loaded)) {
         loaded$custom_yield_kg_ha <- NA_character_
       }
@@ -567,7 +564,6 @@ server <- function(input, output, session) {
         tbl <- apply_dynamic_dropdowns(tbl, id, rv)
         if (id == "manure") tbl <- apply_manure_cascade_dropdowns(tbl, rv$ipcc_mm, df)
 
-        # NUEVO: Forzar formato numérico bonito en custom_yield_kg_ha
         if (id == "diet_ingr" && "custom_yield_kg_ha" %in% names(df)) {
           tbl <- hot_col(tbl, col = "custom_yield_kg_ha", type = "numeric", format = "0.0", allowInvalid = FALSE)
         }

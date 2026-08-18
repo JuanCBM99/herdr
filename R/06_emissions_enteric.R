@@ -14,7 +14,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
   ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE))
   pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  livestock_definitions <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
+  livestock_definitions <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
 
   if (nrow(diet_vars) == 0) {
     message("\u26a0 No diet data found. Returning empty structure.")

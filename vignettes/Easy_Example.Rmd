@@ -14,7 +14,7 @@ This guide will walk you through a **Basic Assessment** for **Mature Dairy Cattl
 > **Note on File Locations:** All files are located in the `user_data/` folder.
 
 ### 📂 Folder Structure
-* **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `livestock_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
+* **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `ruminant_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
 * **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
 * **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
 
@@ -55,7 +55,7 @@ Put the same `diet_tag` and `region` as many times as ingredients the diet has.
 ---
 
 ## Step 3: Animal Categories and Coefficients
-Open `livestock_definitions.csv`. This file links your animal to the IPCC equations. Use the **exact descriptions** from `ipcc_coefficients.csv`.
+Open `ruminant_definitions.csv`. This file links your animal to the IPCC equations. Use the **exact descriptions** from `ipcc_coefficients.csv`.
 
 | animal_tag | region | diet_tag | c_pregnancy | milk_yield | fat_content |
 |:---|:---|:---|:---|:---|:---|

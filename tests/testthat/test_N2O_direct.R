@@ -11,7 +11,7 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
   # 2. Normalize and prepare input CSVs
   # N2O calculation requires almost all master files to be consistent
   files_to_fix <- c(
-    "livestock_definitions.csv", "livestock_weights.csv",
+    "ruminant_definitions.csv", "livestock_weights.csv",
     "livestock_census.csv", "manure_management.csv",
     "ipcc_mm.csv", "diet_profiles.csv",
     "diet_ingredients.csv", "feed_characteristics.csv",

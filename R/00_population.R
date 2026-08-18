@@ -14,7 +14,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
                                 col_types = readr::cols(subregion = "c", class_flex = "c"),
                                 show_col_types = FALSE)
 
-  definitions <- readr::read_csv("user_data/livestock_definitions.csv",
+  definitions <- readr::read_csv("user_data/ruminant_definitions.csv",
                                  col_types = readr::cols(subregion = "c", class_flex = "c"),
                                  show_col_types = FALSE)
 

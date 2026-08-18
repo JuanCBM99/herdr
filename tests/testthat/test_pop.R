@@ -10,7 +10,7 @@ test_that("calculate_population automatic cycle works with cleaned test data", {
 
   # Ensure your test_path("test_data/user_data/") directory contains:
   # - livestock_census.csv
-  # - livestock_definitions.csv
+  # - ruminant_definitions.csv
   # - monogastric_definitions.csv
   # - reproduction_parameters.csv
 

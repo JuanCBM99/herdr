@@ -11,7 +11,7 @@ test_that("calculate_DMI produces correct output structure using provided CSVs",
   # 2. Normalize existing files
   files_to_fix <- c(
     "livestock_weights.csv",
-    "livestock_definitions.csv",
+    "ruminant_definitions.csv",
     "ipcc_coefficients.csv",
     "diet_profiles.csv",
     "diet_ingredients.csv",

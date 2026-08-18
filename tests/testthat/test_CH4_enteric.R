@@ -7,7 +7,7 @@ library(withr)
 test_that("calculate_emissions_enteric computes methane emissions using CSV data", {
   withr::local_dir(test_path("test_data"))
 
-  results <- calculate_emissions_enteric(saveoutput = FALSE)
+  results <- suppressWarnings(calculate_emissions_enteric(saveoutput = FALSE))
 
   expect_s3_class(results, "data.frame")
 

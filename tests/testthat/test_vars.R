@@ -15,8 +15,8 @@ test_that("calculate_weighted_variable handles integrity errors and biological w
     write_csv("user_data/diet_ingredients.csv")
   read_csv("user_data/feed_characteristics.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/feed_characteristics.csv")
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_definitions.csv")
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/ruminant_definitions.csv")
 
   # Load base data for manipulation
   diet_path <- "user_data/diet_profiles.csv"
