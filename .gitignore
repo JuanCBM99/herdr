@@ -63,3 +63,9 @@ inst/doc
 #App
 credentials.sqlite
 user_accounts/
+
+# Tests
+tests/testthat/_problems/
+tests/testthat/Examples/
+tests/testthat/output/
+tests/testthat/test_data/output/

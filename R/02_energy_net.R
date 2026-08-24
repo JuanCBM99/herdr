@@ -42,34 +42,39 @@ calculate_NEm <- function(saveoutput = TRUE) {
 calculate_NEa <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Activity (NEa)...")
 
-  # --- 1. Data Loading from user_data ---
+  # --- 1. Data Loading ---
+  weights <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
   categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
-
-  # Fetch NEm as base (contains geography and base energy)
   nem_df <- calculate_NEm(saveoutput = FALSE)
 
-  # Prepare Ca coefficients table
   ca_table <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "ca") %>%
     dplyr::select(ca_tag = description, ca_value = value)
 
   # --- 2. Calculation Pipeline ---
-  results <- nem_df %>%
-    # Join with categories to get the activity tag (ca)
+  results <- weights %>%
     dplyr::left_join(
       categories %>%
         dplyr::select(animal_tag, region, subregion, class_flex, animal_type, animal_subtype, ca_tag = ca),
+      by = c("animal_tag", "region", "subregion", "class_flex")
+    ) %>%
+    dplyr::left_join(ca_table, by = "ca_tag") %>%
+    dplyr::left_join(
+      nem_df %>% dplyr::select(animal_tag, region, subregion, class_flex, animal_type, animal_subtype, NEm_MJday),
       by = c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype")
     ) %>%
-    # Join with IPCC coefficient value
-    dplyr::left_join(ca_table, by = "ca_tag") %>%
-    # Calculate NEa: Factor * NEm
     dplyr::mutate(
-      across(c(ca_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
-      NEa_MJday = ca_value * NEm_MJday
+      dplyr::across(c(initial_weight_kg, final_weight_kg, ca_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      avg_weight = (initial_weight_kg + final_weight_kg) / 2,
+      NEa_MJday = dplyr::case_when(
+        tolower(animal_type) %in% c("cattle", "buffalo") ~ ca_value * NEm_MJday,
+        tolower(animal_type) %in% c("sheep", "goat") ~ ca_value * avg_weight,
+        TRUE ~ 0
+      )
     ) %>%
-    # Final selection of columns
+
+    # --- 3. Final Selection ---
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, NEa_MJday) %>%
     dplyr::mutate(NEa_MJday = round(NEa_MJday, 3))
 
@@ -260,10 +265,16 @@ calculate_NE_wool <- function(saveoutput = TRUE) {
 calculate_NE_pregnancy <- function(saveoutput = TRUE) {
   message("\U0001f7e2 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
-  # --- 1. Data Loading from user_data ---
+  # --- 1. Data Loading ---
   categories <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
   coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
   nem_df <- calculate_NEm(saveoutput = FALSE)
+
+  required_cols <- c("c_pregnancy_cattle", "pr_sheep_goat", "pregnancy_rate")
+  missing_cols <- setdiff(required_cols, names(categories))
+  if (length(missing_cols) > 0) {
+    stop(paste("Error: Missing column(s) in 'user_data/ruminant_definitions.csv':", paste(missing_cols, collapse = ", ")))
+  }
 
   coeff_lookup <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
@@ -272,18 +283,29 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE) {
   # --- 2. Calculation Pipeline ---
   results <- nem_df %>%
     dplyr::left_join(
-      categories %>% dplyr::select(animal_tag, region, subregion, class_flex, animal_type, animal_subtype, c_pregnancy, pr),
+      categories %>% dplyr::select(
+        animal_tag, region, subregion, class_flex, animal_type, animal_subtype,
+        c_pregnancy_cattle, pr_sheep_goat, pregnancy_rate
+      ),
       by = c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype")
     ) %>%
-    dplyr::left_join(coeff_lookup, by = c("c_pregnancy" = "c_pregnancy_tag")) %>%
+    dplyr::left_join(coeff_lookup, by = c("c_pregnancy_cattle" = "c_pregnancy_tag")) %>%
     dplyr::mutate(
-      across(c(pr, c_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      pregnancy_rate = tidyr::replace_na(suppressWarnings(as.numeric(pregnancy_rate)), 0),
+      pr_sheep_goat = tidyr::replace_na(suppressWarnings(as.numeric(pr_sheep_goat)), 0),
+      c_value = tidyr::replace_na(suppressWarnings(as.numeric(c_value)), 0),
+      NEm_MJday = tidyr::replace_na(suppressWarnings(as.numeric(NEm_MJday)), 0),
+
       C_preg_factor = dplyr::case_when(
-        tolower(animal_type) == "cattle" ~ c_value,
-        tolower(animal_type) %in% c("sheep", "goat") ~ (0.126 * pmax(pr - 1, 0)) + (0.077 * (1 - pmax(pr - 1, 0))),
+        tolower(animal_type) %in% c("cattle", "buffalo") ~ c_value,
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 1.0 ~ 0.077,
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat > 1.0 & pr_sheep_goat < 2.0 ~ {
+          (0.126 * (pr_sheep_goat - 1)) + (0.077 * (1 - (pr_sheep_goat - 1)))
+        },
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat >= 2.0 ~ 0.150,
         TRUE ~ 0
       ),
-      NEpregnancy_MJday = C_preg_factor * NEm_MJday
+      NEpregnancy_MJday = C_preg_factor * NEm_MJday * pregnancy_rate
     ) %>%
 
     # --- 3. Final Selection ---
