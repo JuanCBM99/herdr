@@ -31,31 +31,21 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # --- 2. Process yields by country ---
   yields_combined <- dplyr::bind_rows(
-    fao_raw %>% dplyr::select(Area, Item, Year, Value),
-    forage_raw %>% dplyr::select(Area, Item, Year, Value)
-  )
+    fao_raw %>% dplyr::select(Area, Item, Value),
+    forage_raw %>% dplyr::select(Area, Item, Value)
+  ) %>%
+    dplyr::filter(!is.na(Value), !is.na(Area)) %>%
+    dplyr::distinct(Area, Item, .keep_all = TRUE)
 
   fao_yields <- name_mapping %>%
-    dplyr::left_join(yields_combined, by = c("yield_name" = "Item")) %>%
-    tidyr::complete(tidyr::nesting(ingredient, yield_name, agribalyse_name, allocation), Area, Year) %>%
-    dplyr::filter(!is.na(ingredient) | !is.na(Value)) %>%
-    dplyr::group_by(Area, Year, yield_name) %>%
-    dplyr::mutate(
-      avg = mean(Value, na.rm = TRUE),
-      dm_yield = dplyr::coalesce(Value, ifelse(is.nan(avg), NA, avg))
-    ) %>%
-    dplyr::ungroup() %>%
-    dplyr::filter(!is.na(Area), !is.na(dm_yield)) %>%
-    dplyr::group_by(ingredient, Area) %>%
-    dplyr::filter(Year == max(Year, na.rm = TRUE)) %>%
-    dplyr::slice(1) %>%
-    dplyr::ungroup() %>%
+    dplyr::filter(!is.na(yield_name)) %>%
+    dplyr::inner_join(yields_combined, by = c("yield_name" = "Item")) %>%
     dplyr::transmute(
       ingredient,
       country_of_origin = Area,
-      dm_yield,
+      dm_yield = Value,
       ha_per_kg = dplyr::if_else(dm_yield > 0, 1 / dm_yield, 0),
-      economic_allocation = as.numeric(allocation)
+      economic_allocation = as.numeric(economic_allocation)
     )
 
   # --- 3. Load operational data & Handle Hybrid Country Origins ---

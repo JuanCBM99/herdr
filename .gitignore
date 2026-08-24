@@ -59,3 +59,7 @@ inst/doc
 
 #GitHub
 *fao_trade_matrix.parquet
+
+#App
+credentials.sqlite
+user_accounts/

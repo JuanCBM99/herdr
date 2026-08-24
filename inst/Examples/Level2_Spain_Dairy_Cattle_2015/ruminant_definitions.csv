@@ -1,3 +1,3 @@
-﻿animal_tag,region,subregion,class_flex,diet_tag,cfi,ca,c,a,b,milk_yield_kg_year,fat_content_pct,wool_yield_kg_year,work_hours,pr,single birth fraction,double birth fraction,c_pregnancy,animal_type,animal_subtype
+﻿animal_tag,region,subregion,class_flex,diet_tag,cfi,ca,c,a,b,milk_yield_kg_year,fat_content_pct,wool_yield_kg_year,work_hours,pr,single_birth_fraction,double_birth_fraction,c_pregnancy,animal_type,animal_subtype
 mature_dairy_cattle,spain,north,,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,8295,3.73,0,0,0,0,0,cattle and buffalo,cattle,dairy
 mature_dairy_cattle,spain,south,,diet_dairy_mature,cattle_buffalo [lactating cows],stall,females,,,9044,3.73,0,0,0,0,0,cattle and buffalo,cattle,dairy

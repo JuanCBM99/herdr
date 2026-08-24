@@ -45,7 +45,9 @@ Imports:
     bslib,
     rhandsontable,
     shinycssloaders,
-    arrow
+    arrow,
+    ggplot2,
+    scales
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
