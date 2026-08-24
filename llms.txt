@@ -136,6 +136,9 @@ Simple guide that explains how to do a concrete example (3 included)
   : Summarize CH4, N2O Emissions, and Land Use
 - [`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
   : Initialize herdr project folders and example data
+- [`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
+  : Plot herdr results dynamically with custom grouping and premium
+  aesthetics
 - [`run_herdr_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)
   : Launch the herdr Interactive Application
 
