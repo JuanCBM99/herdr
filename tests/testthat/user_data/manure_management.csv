@@ -1,0 +1,11 @@
+﻿animal_tag,region,subregion,class_flex,system_base,system_variant,management_months,system_climate,system_subclimate,climate_zone,climate_moisture,b_0,allocation
+mature_dairy_cattle,spain,,,anaerobic_lagoon,uncovered,,cool,temperate,zone_moist,wet,dairy cattle_high_productivity,0.053702102
+mature_dairy_cattle,spain,,,liquid_slurry,with_natural_crust_cover,3,cool,temperate,zone_moist,wet,dairy cattle_high_productivity,0.343258113
+mature_dairy_cattle,spain,,,solid_storage,,,cool,,,wet,dairy cattle_high_productivity,0.3551964
+mature_dairy_cattle,spain,,,pit_storage,below_animal_confinements,3,cool,temperate,zone_moist,wet,dairy cattle_high_productivity,0.017417424
+mature_dairy_cattle,spain,,,deep_bedding,no_mixing,>1,cool,temperate,zone_moist,wet,dairy cattle_high_productivity,0.066907298
+mature_dairy_cattle,spain,,,anaerobic_lagoon,uncovered,,warm,temperate,zone_dry,dry,dairy cattle_high_productivity,0.010497898
+mature_dairy_cattle,spain,,,liquid_slurry,with_natural_crust_cover,3,warm,temperate,zone_dry,dry,dairy cattle_high_productivity,0.067101447
+mature_dairy_cattle,spain,,,solid_storage,,,temperate,,,dry,dairy cattle_high_productivity,0.06943519
+mature_dairy_cattle,spain,,,pit_storage,below_animal_confinements,3,warm,temperate,zone_dry,dry,dairy cattle_high_productivity,0.003404826
+mature_dairy_cattle,spain,,,deep_bedding,no_mixing,>1,warm,temperate,zone_dry,dry,dairy cattle_high_productivity,0.013079302

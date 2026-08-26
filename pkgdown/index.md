@@ -1,8 +1,23 @@
-# Welcome to herdr: GHG & LU Calculator 
+# Welcome to herdr: GHG & LU Calculator
 
 **herdr** is an R package designed to calculate **Greenhouse Gas
 (GHG) emissions** and **Land Use (LU)** associated with different
 livestock systems based on **IPCC Tier 2** methodologies.
+
+---
+
+## 🌐 Try it online — no installation required
+
+Don't want to install R right now? The full model is available as an interactive web app:
+
+<div style="text-align: center; margin: 25px 0;">
+  <a href="https://juancbm99.shinyapps.io/herdr/" target="_blank" style="display: inline-block; padding: 14px 28px; background-color: #2c7fb8; color: #ffffff; font-weight: bold; font-size: 1.1em; border-radius: 8px; text-decoration: none; box-shadow: 0px 6px 15px rgba(0,0,0,0.15);">
+    &#9654; Launch herdr App
+  </a>
+</div>
+
+
+The app uses the same calculation engine as the R package, so results are identical whichever way you run it. It's the fastest way to explore herdr, edit input tables, and visualize results without writing any code.
 
 ---
 
@@ -14,7 +29,6 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 remotes::install_github("JuanCBM99/herdr")
-
 library(herdr)
 
 # Initialize project
@@ -79,6 +93,7 @@ Step-by-step guide on how to perform a general use of the package.
 - [Go to Workflow Guide: Step-by-Step &rarr; ](articles/Workflow.html)
 
 ### 5. Examples
+
 Simple guide that explains how to do a concrete example (3 included)
 
 - [Go to Easy Example &rarr; ](articles/Easy_Example.html)

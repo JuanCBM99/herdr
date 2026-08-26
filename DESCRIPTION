@@ -47,7 +47,8 @@ Imports:
     shinycssloaders,
     arrow,
     ggplot2,
-    scales
+    scales,
+    zip
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

@@ -9,90 +9,116 @@ vignette: >
 
 # Getting Started with a Basic Assessment
 
-This guide will walk you through a **Basic Assessment** for **Mature Dairy Cattle in Spain (2015)**. We will use a single regional identifier to link your census data to nutritional requirements and environmental impact.
+This guide walks through a **Basic Assessment** for **mature dairy cattle in Spain (2015)**, using a single national-level identifier to link census data, nutrition, and environmental impact from start to finish.
 
-> **Note on File Locations:** All files are located in the `user_data/` folder.
+> 📂 **All files referenced below live in `user_data/`.**
 
-### 📂 Folder Structure
-* **User Files (Update these):** `livestock_census.csv`, `diet_profiles.csv`, `diet_ingredients.csv`, `ruminant_definitions.csv`, `livestock_weights.csv`, `manure_management.csv`.
-* **In case of usage of the automatic cycle:** `reproduction_parameters.csv`
-* **Reference Files (Expert use only):** `feed_characteristics.csv`, `forage_yields.csv`, `mapping.csv`, `fao_crop_yields.csv`, `ipcc_coefficients.csv`, `ipcc_mm.csv`, `fao_production.csv`.
+## What you'll edit
+
+| Category | Files |
+|:---|:---|
+| **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
+| **If using the automatic herd cycle** | `reproduction_parameters.csv` |
+| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `fao_forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
+
+Full details on every file above are in the [Technical Reference](Technical_reference.html) vignette.
 
 ---
 
-## Step 1: The Census
-Open `livestock_census.csv`. This is where you define who is on the farm. For this basic example, we focus on a national level.
+## Step 1 — The Census
+
+Open `livestock_census.csv`. This is where you define who is on the farm. For this basic example, we work at national level, so `subregion` and `class_flex` are left blank.
 
 | animal_tag | region | subregion | class_flex | population |
-|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | | | 848686 |
+|:---|:---|:---|:---|---:|
+| `mature_dairy_cattle` | `spain` |  |  | 848,686 |
 
 ---
 
-## Step 2: Designing the Diet
-The diet must be fulfilled manually based on nutritional reports (e.g., Informe Zootécnico 2015).
+## Step 2 — Designing the Diet
 
-### A. Check Ingredients
-Open `feed_characteristics.csv` to see the list of available feed items. If you wish, you can add as many new ingredients as you want, always fulfilling all columns.
+The diet is filled in manually based on nutritional reports (e.g. *Informe Zootécnico 2015*).
 
-### B. Define the Profile (`diet_profiles.csv`)
+### A. Check available ingredients
+
+Open `feed_characteristics.csv` to see the list of available feed items. You can also add new ingredients here, as long as every required column is filled in.
+
+### B. Define the profile — `diet_profiles.csv`
+
 | diet_tag | region | forage | concentrate | milk | milk_replacer |
-|:---|:---|:---|:---|:---|:---|
-| diet_dairy_mature | spain | 60 | 40 | 0 | 0 |
+|:---|:---|---:|---:|---:|---:|
+| `diet_dairy_mature` | `spain` | 60 | 40 | 0 | 0 |
 
-### C. Ingredient Breakdown (`diet_ingredients.csv`)
-Put the same `diet_tag` and `region` as many times as ingredients the diet has.
+### C. Ingredient breakdown — `diet_ingredients.csv`
 
-| diet_tag | region | feed_category | ingredient | percentage | origin_country |
-|:---|:---|:---|:---|:---|:---|
-| diet_dairy_mature | spain | forage | corn_silage | 100 | Spain |
-| diet_dairy_mature | spain | concentrate | barley_grain | 50 | NA |
-| diet_dairy_mature | spain | concentrate | soybean_meal | 50 | NA |
+Repeat the same `diet_tag` and `region` once per ingredient.
 
-* **Important:** The percentage for ingredients must sum 100% *within their category* (e.g., if you have 50% Barley and 50% Soy, they sum to 100% of the "Concentrate" portion).
-* **Missing Origins:** If you don't know where a feed comes from, leave `origin_country` as `NA`. The package will automatically allocate it using FAO trade data!
+| diet_tag | region | feed_category | ingredient | percentage | country_of_origin | custom_yield_kg_ha |
+|:---|:---|:---|:---|---:|:---|---:|
+| `diet_dairy_mature` | `spain` | forage | `corn_silage` | 100 | `spain` | `NA` |
+| `diet_dairy_mature` | `spain` | concentrate | `barley_grain` | 50 | `NA` | `NA` |
+| `diet_dairy_mature` | `spain` | concentrate | `soybean_meal` | 50 | `NA` | 5000 |
 
----
-
-## Step 3: Animal Categories and Coefficients
-Open `ruminant_definitions.csv`. This file links your animal to the IPCC equations. Use the **exact descriptions** from `ipcc_coefficients.csv`.
-
-| animal_tag | region | diet_tag | c_pregnancy | milk_yield | fat_content |
-|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | diet_dairy_mature | cattle and buffalo | 8894.38 | 3.73 |
+> ✅ **Percentages sum to 100% *within* each category** — here, 50% barley + 50% soybean meal make up 100% of the concentrate portion.
+>
+> 🌍 **Missing origins:** leave `country_of_origin` as `NA` when you don't know where a feed comes from. herdr resolves it automatically using FAO trade data — see [Land Use Methodology](land_use.html) for how.
+>
+> 🎯 **Overriding the yield:** `custom_yield_kg_ha` lets you skip the FAO/trade lookup entirely for a given ingredient. If you already know the real yield for your farm or region — e.g. `5000` kg/ha — enter it here and herdr uses that value directly for the land-use calculation, ignoring `country_of_origin` and any FAO database lookup for that row.
 
 ---
 
-## Step 4: Body Weights
-Open `livestock_weights.csv`. Ensure the keys match the census exactly.
+## Step 3 — Animal Categories and Coefficients
+
+Open `ruminant_definitions.csv`. This file links your animal to the IPCC Tier 2 equations — each of `cfi`, `ca`, `c`, and `c_pregnancy` is a separate lookup into `ipcc_coefficients.csv`, so use the **exact description** for each as it appears there.
+
+| animal_tag | region | diet_tag | cfi | ca | c | milk_yield | fat_content | c_pregnancy |
+|:---|:---|:---|:---|:---|:---|---:|---:|:---|
+| `mature_dairy_cattle` | `spain` | `diet_dairy_mature` | `cattle_buffalo [lactating]` | `stall` | `females` | 8,894.38 | 3.73 | `cattle and buffalo` |
+
+---
+
+## Step 4 — Body Weights
+
+Open `livestock_weights.csv`. Make sure the identifying keys match the census exactly.
 
 | animal_tag | region | adult_weight | productive_period | initial_weight | final_weight |
-|:---|:---|:---|:---|:---|:---|
-| mature_dairy_cattle | spain | 675 |  365 | 675 | 675 |
-
-
----
-
-## Step 5: Manure Management (`manure_management.csv`)
-1.  Check `ipcc_mm.csv` for valid `management_system` and `system_climate` names (You can also check the section **[Manure System Guide](Manure.html)** of this documentation).
-2.  If you have more than one system for the exactly same animal, **duplicate the row** and split the allocation.
-
-| animal_tag | region | system_base | management_months | system_climate | system_subclimate | climate_zone | system_variant | climate_moisture | b_0 | allocation |
-|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|
-| mature_dairy_cattle | spain | liquid_slurry | 3 | cool | temperate | wet | with_natural_crust_cover | wet | dairy_cattle_high_productivity | 0.3 |
-| mature_dairy_cattle | spain | solid_storage | | temperate | | | | dry | dairy_cattle_high_productivity | 0.7 |
+|:---|:---|---:|---:|---:|---:|
+| `mature_dairy_cattle` | `spain` | 675 | 365 | 675 | 675 |
 
 ---
 
-## Step 6: Running the Analysis
-Once your CSVs are updated, run the following in R:
+## Step 5 — Manure Management (`manure_management.csv`)
+
+1. Check `ipcc_mm.csv` for valid `system_base`, `system_variant`, and `climate_zone` combinations — or browse the [Manure System Guide](Manure.html) for the same information in narrative form.
+2. If a cohort splits its manure across more than one system, **duplicate the row** and divide the `allocation` between them so it sums to 1.0.
+
+| animal_tag | region | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
+| `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy_cattle_high_productivity` | 0.3 |
+| `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.7 |
+
+> ℹ️ `solid_storage` is a Standard system (see the [Manure System Guide](Manure.html)) — it doesn't need `management_months`, `system_variant`, `system_subclimate`, or `climate_zone`, so those columns are left blank.
+
+---
+
+## Step 6 — Running the Analysis
+
+Once every CSV above is complete, run the assessment from R:
 
 ```r
 library(herdr)
 
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE, 
+  automatic_cycle = FALSE,
   farm_country = "Spain",
   year = 2015
 )
 ```
+
+---
+
+## Next steps
+
+- [General Workflow](Workflow.html) — the full step-by-step guide this example is based on.
+- [Technical Reference](Technical_reference.html) — every file and column explained in detail.
+- [Moderate Example](Moderate_Example.html) / [Hard Example](Difficult_Example.html) — build on this with multi-region herds and mixed manure systems.
