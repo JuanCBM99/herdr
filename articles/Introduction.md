@@ -15,65 +15,85 @@ Unlike many emission calculators, `herdr` integrates animal physiology,
 diet composition, manure management, and feed production into a single
 modelling framework. The package can therefore estimate both greenhouse
 gas emissions and the agricultural land required to sustain livestock
-diets.
+diets in a single, internally consistent workflow — rather than
+requiring separate tools for emissions and land-use accounting.
 
-Although designed primarily for research applications, the package can
-also support teaching, scenario analysis, inventory development, and
+Although designed primarily for research applications, `herdr` can also
+support teaching, scenario analysis, inventory development, and
 decision-support studies.
 
-------------------------------------------------------------------------
+## Quick start
+
+Load the package, initialize the user data directory, and launch the
+interactive interface:
+
+``` r
+
+library(herdr)
+
+herdr_init()
+run_herdr_app()
+```
+
+[`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
+sets up a local working directory with the input templates and reference
+databases the package needs.
+[`run_herdr_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)
+launches the graphical interface described in [Interactive user
+interface](#interactive-user-interface); every calculation is also
+available directly from R for users who prefer a scripted workflow.
 
 ## Supported livestock species
 
-`herdr` currently supports the following production systems:
+`herdr` currently supports the following livestock production systems:
 
-- 🐄 Cattle
-- 🐑 Sheep
-- 🐐 Goats
-- 🐖 Swine
-- 🐔 Poultry
+- 🐄 **Cattle**
+- 🐑 **Sheep**
+- 🐐 **Goats**
+- 🐖 **Swine**
+- 🐔 **Poultry**
 
 Additional species may be incorporated in future releases.
-
-------------------------------------------------------------------------
 
 ## Overall workflow
 
 The package follows a modular workflow in which calculations are
-performed sequentially.
+performed sequentially:
 
-    Livestock census
-            │
-            ▼
-     Animal definitions
-            │
-            ▼
-     Diet composition
-            │
-            ▼
-     Energy requirements
-            │
-            ▼
-     Nutrient balance
-            │
-            ▼
-     Greenhouse gas emissions
-            │
-            ▼
-     Feed-related land use
-            │
-            ▼
-     Integrated assessment
+``` text
+Livestock census
+       │
+       ▼
+Animal definitions
+       │
+       ▼
+Diet composition
+       │
+       ▼
+Energy requirements
+       │
+       ▼
+Nutrient balance
+       │
+       ▼
+Greenhouse gas emissions
+       │
+       ▼
+Feed-related land use
+       │
+       ▼
+Integrated assessment
+```
 
-Each stage can be executed independently using individual functions or
+Each stage can be executed independently using individual functions, or
 combined into a complete assessment using
 [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md).
 
 This modular structure allows users to inspect intermediate
-calculations, validate assumptions, or integrate `herdr` into larger
-modelling workflows.
-
-------------------------------------------------------------------------
+calculations, validate assumptions, perform sensitivity analyses, or
+integrate `herdr` into larger modelling workflows. See the [General
+Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md)
+vignette for a step-by-step walkthrough of each stage.
 
 ## Environmental indicators
 
@@ -100,6 +120,10 @@ Nitrous oxide calculations include:
 - Indirect emissions from nitrogen volatilization.
 - Indirect emissions from nitrogen leaching and runoff.
 
+For a full breakdown of supported manure systems and how they map to
+IPCC categories, see the [Manure Management
+Guide](https://juancbm99.github.io/herdr/articles/Manure.md) vignette.
+
 ### Feed-related land use
 
 Land-use calculations link feed consumption with crop and forage
@@ -107,71 +131,86 @@ productivity.
 
 The model combines:
 
-- feed intake
-- forage yield databases
-- FAOSTAT crop yields
-- international trade information
-- allocation factors
+- Feed intake.
+- Forage yield databases.
+- FAOSTAT crop production & yields.
+- FAOSTAT trade information.
+- Economic allocation factors.
 
-to estimate the land area required to produce each ingredient consumed
-by the animals.
+These data are used to estimate the land area required to produce each
+feed ingredient consumed by the animals. Details on the allocation
+methodology are covered in the [Land Use
+Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
+vignette.
 
-------------------------------------------------------------------------
+## Physiological and calculation methodology
 
-## Physiological calculations
+Emission estimates rely on a set of intermediate physiological and
+nutritional calculations.
 
-Emission estimates rely on a complete set of intermediate physiological
-calculations.
+Depending on the livestock species, `herdr` estimates:
 
-Depending on the livestock species, `herdr` automatically estimates:
+- Gross Energy intake (GE).
+- Digestible Energy (DE).
+- Metabolizable Energy (ME).
+- Net Energy requirements.
+- Dry Matter Intake (DMI).
+- Nitrogen intake.
+- Nitrogen retention.
+- Nitrogen excretion.
+- Volatile Solids (VS).
 
-- Gross Energy intake (GE)
-- Digestible Energy (DE)
-- Net Energy requirements
-- Dry Matter Intake (DMI)
-- Nitrogen intake
-- Nitrogen retention
-- Nitrogen excretion
-- Volatile Solids (VS)
-
-These variables form the basis of the IPCC Tier 2 equations implemented
+These variables form the basis of the emission equations implemented
 throughout the package.
 
-------------------------------------------------------------------------
+### Ruminants
 
-## Calculation methodology
+For cattle, sheep, and goats, energy requirements and associated
+physiological calculations follow the equations described in the IPCC
+2019 Refinement.
 
-Energy requirements for cattle, sheep and goats follow the equations
-described in the **IPCC 2019 Refinement**.
+The model considers the relevant Net Energy requirements, including
+maintenance, growth, lactation, pregnancy, wool production, and work
+where applicable.
 
-For swine and poultry, metabolizable energy requirements are calculated
-using the methodology published by **FEDNA** and adopted by the
-**Spanish Ministry of Agriculture, Fisheries and Food (MAPA)**.
+These calculations are subsequently used to estimate dry matter intake,
+nitrogen balances, volatile solids production, and greenhouse gas
+emissions.
 
-The package combines these energy calculations with IPCC emission
-equations to estimate methane and nitrous oxide emissions across
-different livestock systems.
+### Monogastrics
 
-------------------------------------------------------------------------
+For swine and poultry, energy and nutrient requirements are calculated
+using methodologies based on **FEDNA** and adopted by the **Spanish
+Ministry of Agriculture, Fisheries and Food (MAPA)**.
+
+The approach uses metabolizable and digestible energy systems together
+with nutrient retention and nitrogen balance calculations.
+
+These physiological calculations are then combined with the relevant
+emission equations to estimate methane and nitrous oxide emissions.
+
+Input parameters, units, and default values for both ruminant and
+monogastric species are documented in the [Theoretical Basis: IPCC Tier
+2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md)
+vignette.
 
 ## Data validation
 
-Before calculations begin, `herdr` performs a series of consistency
-checks across all input datasets.
+Before calculations begin, `herdr` performs consistency checks across
+the input datasets.
 
-These include verification of:
+These checks include verification of:
 
-- animal definitions
-- diet assignments
-- body weight information
-- manure management systems
-- duplicated or missing combinations
-- biologically implausible values
+- Animal definitions.
+- Diet assignments.
+- Body weight information.
+- Manure management systems.
+- Duplicated or missing combinations.
+- Diet composition and input consistency.
+- Biologically implausible values.
 
 The objective is to identify common input errors before environmental
 indicators are calculated.
-
-------------------------------------------------------------------------
 
 ## Interactive user interface
 
@@ -180,54 +219,32 @@ also includes an interactive graphical interface.
 
 The application allows users to:
 
-- edit all input tables
-- validate datasets
-- navigate through a guided workflow
-- run complete assessments
-- visualize summary indicators
-- export results
+- Edit input tables.
+- Validate datasets.
+- Navigate through a guided workflow.
+- Run complete assessments.
+- Export results.
 
-The graphical interface uses exactly the same calculation engine as the
-R functions, ensuring identical results regardless of how the model is
+The graphical interface uses the same calculation engine as the R
+functions, ensuring consistent results regardless of how the model is
 executed.
 
-------------------------------------------------------------------------
-
-## Modular design
-
-The package has been designed as a collection of independent calculation
-modules.
-
-Users may execute individual functions such as:
-
-- energy calculations,
-- dry matter intake,
-- methane emissions,
-- nitrogen excretion,
-- land use,
-
-or run the complete assessment using a single high-level function.
-
-This modular architecture simplifies debugging, facilitates sensitivity
-analyses, and allows individual components to be incorporated into
-external workflows.
-
-------------------------------------------------------------------------
-
 ## Next steps
-
-This vignette introduces the concepts and methodology implemented in
-`herdr`.
 
 The remaining vignettes provide detailed guidance on specific components
 of the package:
 
-- **General Workflow** — complete project setup and execution.
-- **Technical Reference** — description of every input file and
-  parameter.
-- **Manure Management Guide** — supported manure systems and
-  classifications.
-- **Land Use Methodology** — feed allocation and land-use calculations.
-
-Continue with the **General Workflow** vignette to prepare your first
-assessment.
+- [General
+  Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
+  complete project setup and execution with R.
+- [App Workflow](https://juancbm99.github.io/herdr/articles/app.md) —
+  complete project setup and execution with web interface.
+- [Theoretical Basis: IPCC Tier
+  2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) —
+  description of input files, parameters, and units.
+- [Manure Management
+  Guide](https://juancbm99.github.io/herdr/articles/Manure.md) —
+  supported manure systems and classifications.
+- [Land Use
+  Methodology](https://juancbm99.github.io/herdr/articles/land_use.md) —
+  feed allocation and land-use calculations.

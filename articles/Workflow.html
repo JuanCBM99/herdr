@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>General Workflow: Step-by-Step Guide • herdr</title>
+<title>General Workflow: Step-by-Step Scripting Guide • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="General Workflow: Step-by-Step Guide">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="General Workflow: Step-by-Step Scripting Guide">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -78,7 +79,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>General Workflow: Step-by-Step Guide</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>General Workflow: Step-by-Step Scripting Guide</h1>
             
       
 
@@ -88,248 +89,439 @@
     
     
 <div class="section level2">
-<h2 id="general-workflow">General Workflow<a class="anchor" aria-label="anchor" href="#general-workflow"></a>
+<h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This vignette explains how to prepare a complete <code>herdr</code>
-project, from creating a working directory to generating the final
-greenhouse gas and land-use assessment.</p>
-<p>The recommended workflow is:</p>
-<ol style="list-style-type: decimal">
-<li>Install the package.</li>
-<li>Create a new R project.</li>
-<li>Initialize the project structure.</li>
-<li>Prepare the input files.</li>
-<li>Run the assessment.</li>
-<li>Review and export the results.</li>
-</ol>
+<p>The <strong><code>herdr</code></strong> package provides a modular
+computational framework for estimating greenhouse gas (GHG) emissions,
+energy requirements, and agricultural land use across livestock
+production systems.</p>
+<p>This guide explains how to build a complete project in R from scratch
+using reproducible scripts and CSV templates. Whether you are running
+national inventories, farm-scale assessments, or research scenarios,
+following this structured workflow ensures full consistency across all
+calculation tiers.</p>
 <hr>
+</div>
+<div class="section level2">
+<h2 id="installation-environment-setup">1. Installation &amp; Environment Setup<a class="anchor" aria-label="anchor" href="#installation-environment-setup"></a>
+</h2>
 <div class="section level3">
-<h3 id="install-herdr">1. Install herdr<a class="anchor" aria-label="anchor" href="#install-herdr"></a>
+<h3 id="step-1-install-the-package">Step 1: Install the Package<a class="anchor" aria-label="anchor" href="#step-1-install-the-package"></a>
 </h3>
-<p>Install the latest development version directly from GitHub.</p>
+<p>You can install the development version of <code>herdr</code>
+directly from GitHub using <code>remotes</code>:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Install remotes if not already installed</span></span>
+<span><span class="kw">if</span> <span class="op">(</span><span class="op">!</span><span class="fu"><a href="https://rdrr.io/r/base/ns-load.html" class="external-link">requireNamespace</a></span><span class="op">(</span><span class="st">"remotes"</span>, quietly <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">)</span> <span class="op">{</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
 <span></span>
+<span><span class="co"># Install herdr from GitHub</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JuanCBM99/herdr"</span><span class="op">)</span></span>
 <span></span>
+<span><span class="co"># Load library</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="create-a-project">2. Create a Project<a class="anchor" aria-label="anchor" href="#create-a-project"></a>
+<h3 id="step-2-create-a-dedicated-r-project">Step 2: Create a Dedicated R Project<a class="anchor" aria-label="anchor" href="#step-2-create-a-dedicated-r-project"></a>
 </h3>
-<p>Create a new RStudio project.</p>
-<p>Working inside an <code>.Rproj</code> keeps every project
-self-contained and allows herdr to automatically locate all required
-folders and input files.</p>
-<pre><code>My_Project/</code></pre>
+<p>Working within an isolated R project (<code>.Rproj</code>) ensures
+relative file paths resolve cleanly and keeps your data organized:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Create and switch to a new project directory</span></span>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu">create_project</span><span class="op">(</span><span class="st">"My_Livestock_Project"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
-<h3 id="initialize-the-project">3. Initialize the Project<a class="anchor" aria-label="anchor" href="#initialize-the-project"></a>
+<h3 id="step-3-initialize-the-project-structure">Step 3: Initialize the Project Structure<a class="anchor" aria-label="anchor" href="#step-3-initialize-the-project-structure"></a>
 </h3>
-<p>Initialize the directory structure by running:</p>
+<p>Run <code><a href="../reference/herdr_init.html">herdr_init()</a></code> to generate the standard folder
+hierarchy and default templates:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/herdr_init.html">herdr_init</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>This creates the following directories:</p>
+<p>This function creates three primary directories:</p>
 <ul>
 <li>
-<code>user_data/</code>: Contains all editable CSV input files.</li>
+<strong><code>user_data/</code></strong>: The active working
+directory containing editable CSV templates and local reference
+databases (<code>fao_crops.parquet</code>,
+<code>fao_forages.parquet</code>).</li>
 <li>
-<code>Examples/</code>: Contains ready-to-use example datasets.</li>
+<strong><code>Examples/</code></strong>: Pre-configured baseline
+datasets (e.g., dairy cattle, beef cattle, swine, sheep) ready to use as
+templates.</li>
 <li>
-<code>output/</code>: Stores the generated results.</li>
+<strong><code>output/</code></strong>: Destination directory where
+results, emission inventories, and land-use summaries are saved.</li>
 </ul>
-</div>
-<div class="section level3">
-<h3 id="choose-how-to-prepare-your-data">4. Choose how to prepare your data<a class="anchor" aria-label="anchor" href="#choose-how-to-prepare-your-data"></a>
-</h3>
-<p>There are two possible workflows to input your data.</p>
-<div class="section level4">
-<h4 id="option-a-interactive-user-interface-recommended">Option A — Interactive User Interface (Recommended)<a class="anchor" aria-label="anchor" href="#option-a-interactive-user-interface-recommended"></a>
-</h4>
-<p>Launch the graphical web interface directly from your console:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">run_app</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>The interface allows you to:</p>
-<ul>
-<li>Edit every input table interactively.</li>
-<li>Validate your datasets in real-time.</li>
-<li>Navigate through the workflow step-by-step.</li>
-<li>Execute the model.</li>
-<li>Download the results.</li>
-</ul>
-<p>This option is highly recommended for first-time users.</p>
-</div>
-<div class="section level4">
-<h4 id="option-b-edit-the-csv-files-manually">Option B — Edit the CSV files manually<a class="anchor" aria-label="anchor" href="#option-b-edit-the-csv-files-manually"></a>
-</h4>
-<p>Alternatively, you can edit the CSV templates located inside the
-<code>user_data/</code> folder using Excel, LibreOffice, or any other
-spreadsheet software.</p>
+<hr>
 </div>
 </div>
-<div class="section level3">
-<h3 id="population-livestock_census-csv">5. Population (livestock_census.csv)<a class="anchor" aria-label="anchor" href="#population-livestock_census-csv"></a>
-</h3>
-<p>This file defines the livestock population included in the
-assessment. Each row corresponds to one animal cohort.</p>
-<p>The key identifiers are:</p>
-<ul>
-<li><code>animal_tag</code></li>
-<li><code>region</code></li>
-<li><code>subregion</code></li>
-<li><code>class_flex</code></li>
-</ul>
-<p>Together, these columns uniquely identify every production group
-throughout the project. The <code>population</code> column contains the
-number of animals represented by that row.</p>
-<div class="section level4">
-<h4 id="population-modes">Population modes<a class="anchor" aria-label="anchor" href="#population-modes"></a>
-</h4>
-<p>Two calculation modes are available:</p>
-<p><strong>Manual population</strong></p>
-<p>Every animal category is entered explicitly. Use
-<code>automatic_cycle = FALSE</code> when all populations are already
-known.</p>
-<p><strong>Automatic herd cycle</strong></p>
-<p>Only breeding animals are required. The package automatically
-estimates offspring and replacement animals using reproductive
-parameters. Use <code>automatic_cycle = TRUE</code>. (Note: This option
-currently supports the predefined livestock categories included with the
-package).</p>
-</div>
-</div>
-<div class="section level3">
-<h3 id="nutrition">6. Nutrition<a class="anchor" aria-label="anchor" href="#nutrition"></a>
-</h3>
-<p>Diet information is divided into two files.</p>
-<div class="section level4">
-<h4 id="diet-profiles-diet_profiles-csv">Diet profiles (diet_profiles.csv)<a class="anchor" aria-label="anchor" href="#diet-profiles-diet_profiles-csv"></a>
-</h4>
-<p>Defines the overall macronutrient distribution of the diet. The four
-proportions must sum to 100%:</p>
-<ul>
-<li>forage</li>
-<li>concentrate</li>
-<li>milk</li>
-<li>milk_replacer</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="diet-ingredients-diet_ingredients-csv">Diet ingredients (diet_ingredients.csv)<a class="anchor" aria-label="anchor" href="#diet-ingredients-diet_ingredients-csv"></a>
-</h4>
-<p>Defines the specific ingredients composing each feed category. Within
-every category, the ingredient percentage must also sum to 100%.</p>
-<p><strong>Dynamic Feed Origin:</strong></p>
-<p>You can specify the <code>origin_country</code> for each ingredient.
-If the origin is unknown, leave it as <code>NA</code>. herdr features a
-dynamic background allocation engine that will automatically estimate
-the origins of NA ingredients based on FAO trade matrices and a 70%
-self-sufficiency rule.</p>
-</div>
-<div class="section level4">
-<h4 id="adding-a-new-ingredient">Adding a new ingredient<a class="anchor" aria-label="anchor" href="#adding-a-new-ingredient"></a>
-</h4>
-<p>When introducing a new custom ingredient, you must also update:</p>
-<ul>
-<li>
-<code>feed_characteristics.csv</code> (for nutritional values)</li>
-<li>
-<code>mapping.csv</code> (for land-use allocation)</li>
-<li>
-<code>forage_yields.csv</code> or <code>fao_crop_yields.csv</code>
-(if appropriate)</li>
-</ul>
-</div>
-</div>
-<div class="section level3">
-<h3 id="animal-definitions">7. Animal Definitions<a class="anchor" aria-label="anchor" href="#animal-definitions"></a>
-</h3>
-<p>Animal characteristics are specified using:</p>
-<ul>
-<li><code>ruminant_definitions.csv</code></li>
-<li><code>monogastric_definitions.csv</code></li>
-<li><code>livestock_weights.csv</code></li>
-</ul>
-<p>These files connect each animal group to its physiological
-parameters, body weights, production periods, diet, and IPCC
-coefficients.</p>
-<p><strong>Important:</strong> Every combination of
-<code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
-and <code>class_flex</code> must exactly match those defined in the
-livestock census.</p>
-</div>
-<div class="section level3">
-<h3 id="manure-management-manure_management-csv">8. Manure Management (manure_management.csv)<a class="anchor" aria-label="anchor" href="#manure-management-manure_management-csv"></a>
-</h3>
-<p>This file defines how manure is managed for each livestock group.
-Each row specifies the manure management system, climate, storage
-conditions, and allocation.</p>
-<p>If manure is divided among several systems, duplicate the row and
-assign the corresponding allocation to each system. For every livestock
-cohort, the allocation values must sum to 1.0.</p>
-<p>(Detailed descriptions of every supported system are available in the
-Manure Management Guide vignette).</p>
-</div>
-<div class="section level3">
-<h3 id="run-the-assessment">9. Run the Assessment<a class="anchor" aria-label="anchor" href="#run-the-assessment"></a>
-</h3>
-<p>Once every input file has been completed, execute the main
-function:</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2022</span>,</span>
-<span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>The function automatically performs data validation, energy
-calculations, methane estimation, nitrogen and nitrous oxide estimation,
-land-use calculations, and result aggregation.</p>
+<div class="section level2">
+<h2 id="project-architecture-demographic-keys">2. Project Architecture &amp; Demographic Keys<a class="anchor" aria-label="anchor" href="#project-architecture-demographic-keys"></a>
+</h2>
+<p>All data tables in <code>herdr</code> are connected using
+<strong>four standardized cohort keys</strong>:</p>
+<pre class="text"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                PRIMARY COHORT KEYS                                     │
+├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
+│  animal_tag     │  region      │  subregion      │  class_flex                         │
+│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
+│  e.g., "dairy"  │  e.g., Spain │  e.g., Euskadi  │  e.g., "lactating", "dry", "starter"│
+└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘</code></pre>
 <blockquote>
-<p>⚠️ <strong>Important Data Note:</strong> If your diet contains
-ingredients with unknown origins (NA), the first time you run this
-function, herdr will automatically download the required FAO background
-dataset (approx. 187 MB in .parquet format) to your local environment.
-This is a one-time process.</p>
+<p>⚠️ <strong>Critical Rule:</strong> Every unique combination of
+<code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
+and <code>class_flex</code> declared in the census must match the
+definition, weight, diet, and manure tables exactly.</p>
 </blockquote>
+<hr>
 </div>
+<div class="section level2">
+<h2 id="preparing-input-tables-user_data">3. Preparing Input Tables (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#preparing-input-tables-user_data"></a>
+</h2>
+<p>You can edit the CSV templates located in <code>user_data/</code>
+using any spreadsheet software (Excel, LibreOffice) or programmatically
+within R.</p>
+<hr>
 <div class="section level3">
-<h3 id="results">10. Results<a class="anchor" aria-label="anchor" href="#results"></a>
+<h3 id="herd-census-livestock_census-csv">3.1. Herd Census (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#herd-census-livestock_census-csv"></a>
 </h3>
-<p>The returned object is a data frame containing all calculated
-indicators. Because we set <code>saveoutput = TRUE</code>, the results
-are also automatically written as CSV files to the <code>output/</code>
-folder.</p>
-</div>
-<div class="section level3">
-<h3 id="common-issues">Common Issues<a class="anchor" aria-label="anchor" href="#common-issues"></a>
-</h3>
-<p>Most execution errors are caused by inconsistencies among input
-files. Typical problems include:</p>
+<p>Defines the size and categories of your livestock population.</p>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="left">Description</th>
+<th align="left">Example</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>animal_tag</code></td>
+<td align="left">Unique cohort identifier</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>region</code></td>
+<td align="left">Broad geographical region</td>
+<td align="left"><code>spain</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>subregion</code></td>
+<td align="left">Farm identifier or administrative subdivision</td>
+<td align="left"><code>north</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>class_flex</code></td>
+<td align="left">Physiological status, breed, or life stage</td>
+<td align="left"><code>lactation_phase</code></td>
+</tr>
+<tr class="odd">
+<td align="left"><code>population</code></td>
+<td align="left">Number of live animals in this exact cohort</td>
+<td align="left"><code>448921.13</code></td>
+</tr>
+</tbody>
+</table>
+<div class="section level4">
+<h4 id="population-modes">Population Modes:<a class="anchor" aria-label="anchor" href="#population-modes"></a>
+</h4>
 <ul>
-<li>Missing animal definitions or missing diets.</li>
-<li>Duplicated identifiers.</li>
-<li>Allocations not summing to 1 (or percentages not summing to
-100).</li>
-<li>Unknown feed ingredients (not mapped properly).</li>
-<li>Missing body weights.</li>
+<li>
+<strong>Manual Mode (<code>automatic_cycle = FALSE</code>):</strong>
+Every single cohort and head count is explicitly declared.
+<em>Recommended</em>
+</li>
+<li>
+<strong>Automatic Herd Cycle
+(<code>automatic_cycle = TRUE</code>):</strong> Only adult breeding
+females are entered. The package uses reproduction parameters
+(<code>reproduction_parameters.csv</code>) to compute offspring,
+replacement heifers, and mortalities automatically. <em>Currently
+supported for ruminants only.</em>
+</li>
 </ul>
-<p>The package performs automatic validation before calculations begin
-and reports detected problems in the console to help you fix them.</p>
+<hr>
+</div>
 </div>
 <div class="section level3">
-<h3 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+<h3 id="body-weights-growth-livestock_weights-csv">3.2. Body Weights &amp; Growth
+(<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#body-weights-growth-livestock_weights-csv"></a>
 </h3>
-<p>After becoming familiar with the workflow, consult the remaining
-vignettes for more detailed information about individual components of
-the package:</p>
+<p>Defines the physical characteristics and production cycles required
+to compute maintenance energy
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math>)
+and feed intake boundaries:</p>
 <ul>
-<li>Technical Reference</li>
-<li>Land Use Methodology</li>
-<li>Manure Management Guide</li>
+<li>
+<code>initial_weight_kg</code>: Live weight at the beginning of the
+evaluated production phase.</li>
+<li>
+<code>final_weight_kg</code>: Live weight at the end of the
+period.</li>
+<li>
+<code>adult_weight_kg</code>: Average mature body weight of an adult
+animal (kg).</li>
+<li>
+<code>productive_period_days</code>: Total active feeding days per
+year (e.g., <code>365</code> for breeding cows, <code>120</code> for
+fattening pigs).</li>
+</ul>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="nutrition-feed-formulation">3.3. Nutrition &amp; Feed Formulation<a class="anchor" aria-label="anchor" href="#nutrition-feed-formulation"></a>
+</h3>
+<p>Feed intake and land use are parameterized through two complementary
+tables:</p>
+<div class="section level4">
+<h4 id="a--diet-profiles-diet_profiles-csv">A. Diet Profiles (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#a--diet-profiles-diet_profiles-csv"></a>
+</h4>
+<p>Specifies the macro-distribution of the ration. The four proportions
+must sum to <strong>100%</strong>:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">forage_share</mtext><mo>+</mo><mtext mathvariant="normal">concentrate_share</mtext><mo>+</mo><mtext mathvariant="normal">milk_share</mtext><mo>+</mo><mtext mathvariant="normal">milk_replacer_share</mtext><mo>=</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\text{forage\_share} + \text{concentrate\_share} + \text{milk\_share} + \text{milk\_replacer\_share} = 100\%</annotation></semantics></math></p>
+</div>
+<div class="section level4">
+<h4 id="b--diet-ingredients-diet_ingredients-csv">B. Diet Ingredients (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#b--diet-ingredients-diet_ingredients-csv"></a>
+</h4>
+<p>Defines the individual feedstuffs composing each category:</p>
+<ul>
+<li>
+<code>ingredient</code>: Specific name matching
+<code>feed_characteristics.csv</code> (e.g., <code>corn_silage</code>,
+<code>barley_grain</code>, <code>soybean_meal</code>).</li>
+<li>
+<code>ingredient_type</code>: Feed category (<code>forage</code>,
+<code>concentrate</code>, <code>milk</code>, or
+<code>milk_replacer</code>).</li>
+<li>
+<code>ingredient_share</code>: Proportion (%) within that specific
+category (must sum to <strong>100%</strong> per ingredient_type).</li>
+<li>
+<code>custom_yield_kg_ha</code>: <em>(Optional)</em> User-defined
+crop/forage yield (kg DM/ha). When filled, the model overrides national
+FAO averages and tags the origin as <code>"Custom Data"</code>.</li>
+<li>
+<code>country_of_origin</code>: <em>(Optional)</em> Cultivation
+country. If left blank (<code>NA</code>), <code>herdr</code> applies its
+dynamic FAO trade balance engine (70% self-sufficiency rule) to allocate
+origins automatically.</li>
+</ul>
+<hr>
+</div>
+</div>
+<div class="section level3">
+<h3 id="physiological-definitions">3.4. Physiological Definitions<a class="anchor" aria-label="anchor" href="#physiological-definitions"></a>
+</h3>
+<p>Connects cohorts with species-specific constants and production
+targets:</p>
+<ul>
+<li>
+<strong>Ruminants (<code>ruminant_definitions.csv</code>):</strong>
+Maintenance coefficient
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">c_{fi}</annotation></semantics></math>),
+feeding activity
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mi>a</mi></msub><annotation encoding="application/x-tex">c_a</annotation></semantics></math>),
+growth constants
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>a</mi><annotation encoding="application/x-tex">a</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>b</mi><annotation encoding="application/x-tex">b</annotation></semantics></math>),
+pregnancy coefficient
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>c</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><annotation encoding="application/x-tex">c_{pregnancy}</annotation></semantics></math>),
+annual milk yield (kg/year), milk fat percentage, and wool yield
+(kg/year).</li>
+<li>
+<strong>Monogastrics
+(<code>monogastric_definitions.csv</code>):</strong> Exponent
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>),
+protein and fat tissue retention fractions, sow gestation/lactation
+lengths, litter sizes, and egg mass output.</li>
+</ul>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="manure-management-manure_management-csv">3.5. Manure Management (<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#manure-management-manure_management-csv"></a>
+</h3>
+<p>Specifies waste storage pathways and regional environmental
+conditions:</p>
+<ul>
+<li>
+<code>system_base</code> &amp; <code>system_variant</code>: Storage
+or grazing system (e.g., <code>liquid_slurry</code>,
+<code>solid_storage</code>, <code>pasture_range_paddock</code>).</li>
+<li>
+<code>climate_zone</code> &amp; <code>climate_moisture</code>:
+Climate classification (e.g., <code>cool</code>, <code>temperate</code>,
+<code>warm</code>, <code>wet</code>, <code>dry</code>).</li>
+<li>
+<code>allocation</code>: Fraction of manure managed by the system
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>0.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> to </mtext><mspace width="0.333em"></mspace></mrow><mn>1.0</mn></mrow><annotation encoding="application/x-tex">0.0 \text{ to } 1.0</annotation></semantics></math>).
+If manure is split across multiple systems (e.g., housing vs. pasture),
+create multiple rows for that cohort ensuring total allocations sum to
+<strong>1.0</strong>.</li>
 </ul>
 </div>
+<div class="section level3">
+<h3 id="check-manure-management-guide-for-available-combinations-of-different-systems-and-climates-">Check <a href="Manure.html">Manure Management Guide</a> for
+available combinations of different systems and climates.<a class="anchor" aria-label="anchor" href="#check-manure-management-guide-for-available-combinations-of-different-systems-and-climates-"></a>
+</h3>
+</div>
+</div>
+<div class="section level2">
+<h2 id="running-the-environmental-assessment">4. Running the Environmental Assessment<a class="anchor" aria-label="anchor" href="#running-the-environmental-assessment"></a>
+</h2>
+<div class="section level3">
+<h3 id="full-integrated-assessment">4.1. Full Integrated Assessment<a class="anchor" aria-label="anchor" href="#full-integrated-assessment"></a>
+</h3>
+<p>To execute the entire modeling pipeline (energy balance, enteric
+fermentation, volatile solids, manure emissions, and land use) in a
+single command:</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2022</span>,</span>
+<span>  saveoutput      <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect the first rows of the results table</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<div class="section level4">
+<h4 id="argument-reference">Argument Reference:<a class="anchor" aria-label="anchor" href="#argument-reference"></a>
+</h4>
+<ul>
+<li>
+<code>automatic_cycle</code>: Set to <code>TRUE</code> to use
+reproductive cycle dynamics, or <code>FALSE</code> for manual
+populations (<em>Recommended</em>).</li>
+<li>
+<code>farm_country</code>: The reference country used to query crop
+yields and bilateral FAO trade matrices.</li>
+<li>
+<code>year</code>: The reference statistical year for FAO data
+queries (e.g., <code>2022</code>).</li>
+<li>
+<code>saveoutput</code>: If <code>TRUE</code>, writes individual
+module tables and summary reports directly to <code>output/</code>.</li>
+</ul>
+<hr>
+</div>
+</div>
+<div class="section level3">
+<h3 id="running-modular-functions-individually">4.2. Running Modular Functions Individually<a class="anchor" aria-label="anchor" href="#running-modular-functions-individually"></a>
+</h3>
+<p>You can also run specific computational modules independently for
+debugging, calibration, or sensitivity analyses:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1. Calculate Gross Energy intake (GE)</span></span>
+<span><span class="va">ge_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_ge.html">calculate_ge</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Calculate Dry Matter Intake (DMI)</span></span>
+<span><span class="va">dmi_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_dmi.html">calculate_DMI</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 3. Calculate Enteric Methane (CH4)</span></span>
+<span><span class="va">enteric_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_emissions_enteric.html">calculate_emissions_enteric</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 4. Calculate Feed-Related Land Use (m2)</span></span>
+<span><span class="va">land_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>, </span>
+<span>  year <span class="op">=</span> <span class="fl">2022</span>, </span>
+<span>  saveoutput <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="visualizing-exporting-results">5. Visualizing &amp; Exporting Results<a class="anchor" aria-label="anchor" href="#visualizing-exporting-results"></a>
+</h2>
+<div class="section level3">
+<h3 id="visualizing-cohort-emissions">Visualizing Cohort Emissions<a class="anchor" aria-label="anchor" href="#visualizing-cohort-emissions"></a>
+</h3>
+<p>Use <code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> to generate publication-ready
+ggplot2 charts grouped by demographic variables:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Generate stacked bar chart grouped by animal cohort and region</span></span>
+<span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span>  df         <span class="op">=</span> <span class="va">results</span>,</span>
+<span>  group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_tag"</span>, <span class="st">"region"</span><span class="op">)</span>,</span>
+<span>  func_name  <span class="op">=</span> <span class="st">"generate_impact_assessment"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Display chart</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Save chart to disk</span></span>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"output/emissions_chart.png"</span>, plot <span class="op">=</span> <span class="va">p</span>, width <span class="op">=</span> <span class="fl">10</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="common-issues-troubleshooting">6. Common Issues &amp; Troubleshooting<a class="anchor" aria-label="anchor" href="#common-issues-troubleshooting"></a>
+</h2>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Issue / Warning</th>
+<th align="left">Cause</th>
+<th align="left">Solution</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Missing Cohorts Warning</strong></td>
+<td align="left">An <code>animal_tag</code> in Census is missing in
+definitions or weights.</td>
+<td align="left">Ensure all four keys (<code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>, <code>class_flex</code>)
+match across all tables.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Shares do not sum to 100%</strong></td>
+<td align="left">Diet category or ingredient proportions do not sum to
+100.</td>
+<td align="left">Adjust <code>forage_share</code>,
+<code>concentrate_share</code>, etc. in <code>diet_profiles.csv</code>,
+or ingredient shares in <code>diet_ingredients.csv</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Manure allocation
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≠</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\neq 1.0</annotation></semantics></math></strong></td>
+<td align="left">Allocations for a cohort do not sum to 1.0.</td>
+<td align="left">Adjust <code>allocation</code> values in
+<code>manure_management.csv</code> so their sum equals exactly 1.0 per
+cohort.</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Unknown Ingredient</strong></td>
+<td align="left">An ingredient in diets is missing in reference
+libraries.</td>
+<td align="left">Add the ingredient to
+<code>feed_characteristics.csv</code> and <code>mapping.csv</code>.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level2">
+<h2 id="next-steps">Next Steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h2>
+<p>For mathematical details, parameter lookup tables, and scientific
+references, consult the companion guides:</p>
+<ul>
+<li><a href="Technical_reference.html">Technical Reference</a></li>
+<li><a href="Manure.html">Manure Management Guide</a></li>
+<li><a href="land_use.html">Land Use Methodology</a></li>
+<li><a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier
+2</a></li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

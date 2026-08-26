@@ -6,6 +6,20 @@ systems based on **IPCC Tier 2** methodologies.
 
 ------------------------------------------------------------------------
 
+## 🌐 Try it online — no installation required
+
+Don’t want to install R right now? The full model is available as an
+interactive web app:
+
+[▶ Launch herdr App](https://juancbm99.shinyapps.io/herdr/)
+
+The app uses the same calculation engine as the R package, so results
+are identical whichever way you run it. It’s the fastest way to explore
+herdr, edit input tables, and visualize results without writing any
+code.
+
+------------------------------------------------------------------------
+
 ## 🚀 Quick Start (run in \<1 min)
 
 ``` r
@@ -15,7 +29,6 @@ if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 remotes::install_github("JuanCBM99/herdr")
-
 library(herdr)
 
 # Initialize project

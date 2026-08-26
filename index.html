@@ -51,7 +51,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -84,6 +85,16 @@
 <p><strong>herdr</strong> is an R package designed to calculate <strong>Greenhouse Gas (GHG) emissions</strong> and <strong>Land Use (LU)</strong> associated with different livestock systems based on <strong>IPCC Tier 2</strong> methodologies.</p>
 <hr>
 <div class="section level2">
+<h2 id="globe_with_meridians-try-it-online--no-installation-required">🌐 Try it online — no installation required<a class="anchor" aria-label="anchor" href="#globe_with_meridians-try-it-online--no-installation-required"></a>
+</h2>
+<p>Don’t want to install R right now? The full model is available as an interactive web app:</p>
+<div style="text-align: center; margin: 25px 0;">
+<p><a href="https://juancbm99.shinyapps.io/herdr/" target="_blank" style="display: inline-block; padding: 14px 28px; background-color: #2c7fb8; color: #ffffff; font-weight: bold; font-size: 1.1em; border-radius: 8px; text-decoration: none; box-shadow: 0px 6px 15px rgba(0,0,0,0.15);" class="external-link"> ▶ Launch herdr App </a></p>
+</div>
+<p>The app uses the same calculation engine as the R package, so results are identical whichever way you run it. It’s the fastest way to explore herdr, edit input tables, and visualize results without writing any code.</p>
+<hr>
+</div>
+<div class="section level2">
 <h2 id="rocket-quick-start-run-in-1-min">🚀 Quick Start (run in &lt;1 min)<a class="anchor" aria-label="anchor" href="#rocket-quick-start-run-in-1-min"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
@@ -92,7 +103,6 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"remotes"</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html" class="external-link">install_github</a></span><span class="op">(</span><span class="st">"JuanCBM99/herdr"</span><span class="op">)</span></span>
-<span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Initialize project</span></span>

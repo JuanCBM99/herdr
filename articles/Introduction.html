@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -102,61 +103,83 @@ indicators.</p>
 animal physiology, diet composition, manure management, and feed
 production into a single modelling framework. The package can therefore
 estimate both greenhouse gas emissions and the agricultural land
-required to sustain livestock diets.</p>
-<p>Although designed primarily for research applications, the package
-can also support teaching, scenario analysis, inventory development, and
-decision-support studies.</p>
-<hr>
+required to sustain livestock diets in a single, internally consistent
+workflow — rather than requiring separate tools for emissions and
+land-use accounting.</p>
+<p>Although designed primarily for research applications,
+<code>herdr</code> can also support teaching, scenario analysis,
+inventory development, and decision-support studies.</p>
+</div>
+<div class="section level2">
+<h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
+</h2>
+<p>Load the package, initialize the user data directory, and launch the
+interactive interface:</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="../reference/herdr_init.html">herdr_init</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu"><a href="../reference/run_herdr_app.html">run_herdr_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><code><a href="../reference/herdr_init.html">herdr_init()</a></code> sets up a local working directory with the
+input templates and reference databases the package needs.
+<code><a href="../reference/run_herdr_app.html">run_herdr_app()</a></code> launches the graphical interface described
+in <a href="#interactive-user-interface">Interactive user interface</a>;
+every calculation is also available directly from R for users who prefer
+a scripted workflow.</p>
 </div>
 <div class="section level2">
 <h2 id="supported-livestock-species">Supported livestock species<a class="anchor" aria-label="anchor" href="#supported-livestock-species"></a>
 </h2>
-<p><code>herdr</code> currently supports the following production
-systems:</p>
+<p><code>herdr</code> currently supports the following livestock
+production systems:</p>
 <ul>
-<li>🐄 Cattle</li>
-<li>🐑 Sheep</li>
-<li>🐐 Goats</li>
-<li>🐖 Swine</li>
-<li>🐔 Poultry</li>
+<li>🐄 <strong>Cattle</strong>
+</li>
+<li>🐑 <strong>Sheep</strong>
+</li>
+<li>🐐 <strong>Goats</strong>
+</li>
+<li>🐖 <strong>Swine</strong>
+</li>
+<li>🐔 <strong>Poultry</strong>
+</li>
 </ul>
 <p>Additional species may be incorporated in future releases.</p>
-<hr>
 </div>
 <div class="section level2">
 <h2 id="overall-workflow">Overall workflow<a class="anchor" aria-label="anchor" href="#overall-workflow"></a>
 </h2>
 <p>The package follows a modular workflow in which calculations are
-performed sequentially.</p>
-<pre><code>Livestock census
-        │
-        ▼
- Animal definitions
-        │
-        ▼
- Diet composition
-        │
-        ▼
- Energy requirements
-        │
-        ▼
- Nutrient balance
-        │
-        ▼
- Greenhouse gas emissions
-        │
-        ▼
- Feed-related land use
-        │
-        ▼
- Integrated assessment</code></pre>
-<p>Each stage can be executed independently using individual functions
+performed sequentially:</p>
+<pre class="text"><code>Livestock census
+       │
+       ▼
+Animal definitions
+       │
+       ▼
+Diet composition
+       │
+       ▼
+Energy requirements
+       │
+       ▼
+Nutrient balance
+       │
+       ▼
+Greenhouse gas emissions
+       │
+       ▼
+Feed-related land use
+       │
+       ▼
+Integrated assessment</code></pre>
+<p>Each stage can be executed independently using individual functions,
 or combined into a complete assessment using
 <code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>.</p>
 <p>This modular structure allows users to inspect intermediate
-calculations, validate assumptions, or integrate <code>herdr</code> into
-larger modelling workflows.</p>
-<hr>
+calculations, validate assumptions, perform sensitivity analyses, or
+integrate <code>herdr</code> into larger modelling workflows. See the <a href="Workflow.html">General Workflow</a> vignette for a step-by-step
+walkthrough of each stage.</p>
 </div>
 <div class="section level2">
 <h2 id="environmental-indicators">Environmental indicators<a class="anchor" aria-label="anchor" href="#environmental-indicators"></a>
@@ -185,6 +208,9 @@ from volatile solids production and manure management systems.</p>
 <li>Indirect emissions from nitrogen volatilization.</li>
 <li>Indirect emissions from nitrogen leaching and runoff.</li>
 </ul>
+<p>For a full breakdown of supported manure systems and how they map to
+IPCC categories, see the <a href="Manure.html">Manure Management
+Guide</a> vignette.</p>
 </div>
 <div class="section level3">
 <h3 id="feed-related-land-use">Feed-related land use<a class="anchor" aria-label="anchor" href="#feed-related-land-use"></a>
@@ -193,69 +219,83 @@ from volatile solids production and manure management systems.</p>
 productivity.</p>
 <p>The model combines:</p>
 <ul>
-<li>feed intake</li>
-<li>forage yield databases</li>
-<li>FAOSTAT crop yields</li>
-<li>international trade information</li>
-<li>allocation factors</li>
+<li>Feed intake.</li>
+<li>Forage yield databases.</li>
+<li>FAOSTAT crop production &amp; yields.</li>
+<li>FAOSTAT trade information.</li>
+<li>Economic allocation factors.</li>
 </ul>
-<p>to estimate the land area required to produce each ingredient
-consumed by the animals.</p>
-<hr>
+<p>These data are used to estimate the land area required to produce
+each feed ingredient consumed by the animals. Details on the allocation
+methodology are covered in the <a href="land_use.html">Land Use
+Methodology</a> vignette.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="physiological-calculations">Physiological calculations<a class="anchor" aria-label="anchor" href="#physiological-calculations"></a>
+<h2 id="physiological-and-calculation-methodology">Physiological and calculation methodology<a class="anchor" aria-label="anchor" href="#physiological-and-calculation-methodology"></a>
 </h2>
-<p>Emission estimates rely on a complete set of intermediate
-physiological calculations.</p>
-<p>Depending on the livestock species, <code>herdr</code> automatically
-estimates:</p>
+<p>Emission estimates rely on a set of intermediate physiological and
+nutritional calculations.</p>
+<p>Depending on the livestock species, <code>herdr</code> estimates:</p>
 <ul>
-<li>Gross Energy intake (GE)</li>
-<li>Digestible Energy (DE)</li>
-<li>Net Energy requirements</li>
-<li>Dry Matter Intake (DMI)</li>
-<li>Nitrogen intake</li>
-<li>Nitrogen retention</li>
-<li>Nitrogen excretion</li>
-<li>Volatile Solids (VS)</li>
+<li>Gross Energy intake (GE).</li>
+<li>Digestible Energy (DE).</li>
+<li>Metabolizable Energy (ME).</li>
+<li>Net Energy requirements.</li>
+<li>Dry Matter Intake (DMI).</li>
+<li>Nitrogen intake.</li>
+<li>Nitrogen retention.</li>
+<li>Nitrogen excretion.</li>
+<li>Volatile Solids (VS).</li>
 </ul>
-<p>These variables form the basis of the IPCC Tier 2 equations
-implemented throughout the package.</p>
-<hr>
+<p>These variables form the basis of the emission equations implemented
+throughout the package.</p>
+<div class="section level3">
+<h3 id="ruminants">Ruminants<a class="anchor" aria-label="anchor" href="#ruminants"></a>
+</h3>
+<p>For cattle, sheep, and goats, energy requirements and associated
+physiological calculations follow the equations described in the IPCC
+2019 Refinement.</p>
+<p>The model considers the relevant Net Energy requirements, including
+maintenance, growth, lactation, pregnancy, wool production, and work
+where applicable.</p>
+<p>These calculations are subsequently used to estimate dry matter
+intake, nitrogen balances, volatile solids production, and greenhouse
+gas emissions.</p>
 </div>
-<div class="section level2">
-<h2 id="calculation-methodology">Calculation methodology<a class="anchor" aria-label="anchor" href="#calculation-methodology"></a>
-</h2>
-<p>Energy requirements for cattle, sheep and goats follow the equations
-described in the <strong>IPCC 2019 Refinement</strong>.</p>
-<p>For swine and poultry, metabolizable energy requirements are
-calculated using the methodology published by <strong>FEDNA</strong> and
+<div class="section level3">
+<h3 id="monogastrics">Monogastrics<a class="anchor" aria-label="anchor" href="#monogastrics"></a>
+</h3>
+<p>For swine and poultry, energy and nutrient requirements are
+calculated using methodologies based on <strong>FEDNA</strong> and
 adopted by the <strong>Spanish Ministry of Agriculture, Fisheries and
 Food (MAPA)</strong>.</p>
-<p>The package combines these energy calculations with IPCC emission
-equations to estimate methane and nitrous oxide emissions across
-different livestock systems.</p>
-<hr>
+<p>The approach uses metabolizable and digestible energy systems
+together with nutrient retention and nitrogen balance calculations.</p>
+<p>These physiological calculations are then combined with the relevant
+emission equations to estimate methane and nitrous oxide emissions.</p>
+<p>Input parameters, units, and default values for both ruminant and
+monogastric species are documented in the <a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier 2</a>
+vignette.</p>
+</div>
 </div>
 <div class="section level2">
 <h2 id="data-validation">Data validation<a class="anchor" aria-label="anchor" href="#data-validation"></a>
 </h2>
-<p>Before calculations begin, <code>herdr</code> performs a series of
-consistency checks across all input datasets.</p>
-<p>These include verification of:</p>
+<p>Before calculations begin, <code>herdr</code> performs consistency
+checks across the input datasets.</p>
+<p>These checks include verification of:</p>
 <ul>
-<li>animal definitions</li>
-<li>diet assignments</li>
-<li>body weight information</li>
-<li>manure management systems</li>
-<li>duplicated or missing combinations</li>
-<li>biologically implausible values</li>
+<li>Animal definitions.</li>
+<li>Diet assignments.</li>
+<li>Body weight information.</li>
+<li>Manure management systems.</li>
+<li>Duplicated or missing combinations.</li>
+<li>Diet composition and input consistency.</li>
+<li>Biologically implausible values.</li>
 </ul>
 <p>The objective is to identify common input errors before environmental
 indicators are calculated.</p>
-<hr>
 </div>
 <div class="section level2">
 <h2 id="interactive-user-interface">Interactive user interface<a class="anchor" aria-label="anchor" href="#interactive-user-interface"></a>
@@ -264,61 +304,38 @@ indicators are calculated.</p>
 <code>herdr</code> also includes an interactive graphical interface.</p>
 <p>The application allows users to:</p>
 <ul>
-<li>edit all input tables</li>
-<li>validate datasets</li>
-<li>navigate through a guided workflow</li>
-<li>run complete assessments</li>
-<li>visualize summary indicators</li>
-<li>export results</li>
+<li>Edit input tables.</li>
+<li>Validate datasets.</li>
+<li>Navigate through a guided workflow.</li>
+<li>Run complete assessments.</li>
+<li>Export results.</li>
 </ul>
-<p>The graphical interface uses exactly the same calculation engine as
-the R functions, ensuring identical results regardless of how the model
-is executed.</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="modular-design">Modular design<a class="anchor" aria-label="anchor" href="#modular-design"></a>
-</h2>
-<p>The package has been designed as a collection of independent
-calculation modules.</p>
-<p>Users may execute individual functions such as:</p>
-<ul>
-<li>energy calculations,</li>
-<li>dry matter intake,</li>
-<li>methane emissions,</li>
-<li>nitrogen excretion,</li>
-<li>land use,</li>
-</ul>
-<p>or run the complete assessment using a single high-level
-function.</p>
-<p>This modular architecture simplifies debugging, facilitates
-sensitivity analyses, and allows individual components to be
-incorporated into external workflows.</p>
-<hr>
+<p>The graphical interface uses the same calculation engine as the R
+functions, ensuring consistent results regardless of how the model is
+executed.</p>
 </div>
 <div class="section level2">
 <h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
-<p>This vignette introduces the concepts and methodology implemented in
-<code>herdr</code>.</p>
 <p>The remaining vignettes provide detailed guidance on specific
 components of the package:</p>
 <ul>
 <li>
-<strong>General Workflow</strong> — complete project setup and
-execution.</li>
+<a href="Workflow.html">General Workflow</a> — complete project
+setup and execution with R.</li>
 <li>
-<strong>Technical Reference</strong> — description of every input
-file and parameter.</li>
+<a href="app.html">App Workflow</a> — complete project setup and
+execution with web interface.</li>
 <li>
-<strong>Manure Management Guide</strong> — supported manure systems
-and classifications.</li>
+<a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier 2</a>
+— description of input files, parameters, and units.</li>
 <li>
-<strong>Land Use Methodology</strong> — feed allocation and land-use
-calculations.</li>
+<a href="Manure.html">Manure Management Guide</a> — supported manure
+systems and classifications.</li>
+<li>
+<a href="land_use.html">Land Use Methodology</a> — feed allocation
+and land-use calculations.</li>
 </ul>
-<p>Continue with the <strong>General Workflow</strong> vignette to
-prepare your first assessment.</p>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

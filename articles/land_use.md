@@ -5,187 +5,173 @@
 ### Introduction
 
 In addition to greenhouse gas emissions, `herdr` estimates the
-**feed-related land use** associated with livestock production.
+**feed-related agricultural land use footprint** associated with
+livestock operations, across both ruminant and monogastric systems.
 
-Land use is calculated as the agricultural area required to produce the
-feed consumed by a livestock population. The model combines feed intake,
-crop and forage productivity, allocation factors, and international
-trade information to estimate the total land requirement of each diet.
+Land use is defined as the physical agricultural area (in m²) required
+to produce the feed ration consumed by a herd. The engine combines
+animal dry matter intake (DMI), crop and forage yields, multi-output
+economic allocation, and — when an ingredient’s origin isn’t specified —
+dynamic international trade flows.
 
-Results are expressed in **square metres (m²)** and are calculated on a
-dry matter (DM) basis.
+This vignette is the detailed reference behind the shorter mentions of
+land use scattered through [Technical
+Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+and the [General
+Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md).
 
 ------------------------------------------------------------------------
 
-## Calculation methodology
+### Mathematical Formulation
 
-Land use is calculated independently for every feed ingredient using
-three sequential steps.
+Land footprint calculations follow four sequential steps for every
+ingredient $`i`$ in diet $`d`$.
 
-### Step 1. Land requirement per kilogram of feed
+#### 1. Land required per kilogram of feed
 
-The inverse of crop yield represents the land area required to produce
-one kilogram of dry matter.
+The baseline land required to produce one kilogram of dry matter is the
+inverse of the crop’s yield:
 
 ``` math
-LandPerKg_i = \frac{1}{Yield_i}
+LandPerKg_i = \begin{cases} \dfrac{1}{Yield_i} & \text{if } Yield_i > 0 \\ 0 & \text{otherwise} \end{cases}
 ```
 
-where **Yield** is expressed in kilograms of dry matter per hectare (kg
-DM/ha).
+where $`Yield_i`$ is expressed in kg DM/ha.
 
-------------------------------------------------------------------------
+#### 2. Economic allocation adjustment
 
-### Step 2. Allocation adjustment
-
-Some crops generate multiple products (for example grain and straw). To
-avoid assigning the entire land area to a single product, the land
-requirement is multiplied by an allocation factor.
+Many feed ingredients are co-products of a crop grown mainly for
+something else — soybean meal alongside soybean oil, or a cereal grain
+alongside its straw. Attributing the *entire* cultivated area to the
+feed ingredient would overstate its footprint, so `herdr` applies the
+`economic_allocation` factor from
+[`mapping.csv`](https://juancbm99.github.io/herdr/articles/Technical_reference.html#mapping.csv--database-connector)
+($`EconomicAllocation_i \in [0, 1]`$):
 
 ``` math
-AdjustedLandPerKg_i = \frac{1}{Yield_i} \times Allocation_i
+AdjustedLandPerKg_i = LandPerKg_i \times EconomicAllocation_i
 ```
 
-The allocation factor ranges between 0 and 1 and is defined in
-`mapping.csv`.
+#### 3. Annual ingredient intake
 
-------------------------------------------------------------------------
-
-### Step 3. Total land use
-
-Annual feed consumption is multiplied by the adjusted land requirement
-and converted from hectares to square metres.
+How much of ingredient $`i`$ a cohort consumes over a year depends on
+daily dry matter intake ($`DMI_{\text{kg/day}}`$), the feed category’s
+share of the diet ($`Share_{cat}`$, from `diet_profiles.csv`), and the
+ingredient’s share within that category ($`Share_i`$, from
+`diet_ingredients.csv`):
 
 ``` math
-LandUse_i = AnnualConsumption_i \times \left( \frac{1}{Yield_i} \times Allocation_i \right) \times 10\,000
+AnnualConsumption_i = (DMI_{\text{kg/day}} \times 365) \times \left(\frac{Share_{cat}}{100}\right) \times \left(\frac{Share_i}{100}\right)
 ```
 
-where
+$`Share_{cat}`$ corresponds to whichever of forage, concentrate, milk,
+or milk replacer the ingredient belongs to.
 
-- **AnnualConsumption** is annual dry matter intake (kg DM/year),
-- **Yield** is crop productivity (kg DM/ha),
-- **Allocation** is the economic allocation factor,
-- **10,000** converts hectares into square metres.
+#### 4. Cohort land footprint
 
-The total land use reported by `herdr` is obtained by summing the
-contribution of every ingredient included in the diet.
+The area is computed and converted from hectares to square metres (1 ha
+= 10,000 m²), then scaled up to the full cohort:
 
-------------------------------------------------------------------------
+``` math
+LandUsePerAnimal_i \; (\text{m}^2) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000
+```
 
-## Yield databases
-
-`herdr` combines two complementary yield databases.
-
-### Crop yields
-
-Crop productivity is obtained from official **FAOSTAT** statistics.
-
-These data include major feed crops such as cereals, oilseeds and
-legumes and are expressed as country-level average yields.
-
-### Forage yields
-
-Official global statistics for forage productivity are often
-unavailable.
-
-For this reason, `herdr` includes a curated forage yield database
-compiled from multiple literature sources and technical reports to
-provide broad geographical coverage.
-
-Users performing high-resolution regional studies are encouraged to
-replace these values with local data whenever available.
+``` math
+TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times Population
+```
 
 ------------------------------------------------------------------------
 
-## Ingredient mapping
+### Yield Resolution Hierarchy
 
-Land-use calculations rely on the file `mapping.csv`, which links feed
-ingredients with the corresponding yield database.
+`herdr` resolves $`Yield_i`$ through a three-tiered hierarchy, checked
+in order:
 
-| ingredient   | yield_name | allocation |
-|:-------------|:-----------|-----------:|
-| grass_fresh  | Grass      |        1.0 |
-| barley_grain | Barley     |       0.80 |
+1.  **User custom yields.** If `custom_yield_kg_ha` is filled in for
+    that ingredient in `diet_ingredients.csv`, herdr uses it directly
+    and labels the origin `"Custom Data"` — no database lookup happens
+    at all.
+2.  **FAOSTAT crop yields.** Otherwise, crop productivities are queried
+    from `fao_crops.parquet` for the relevant country and reporting
+    year.
+3.  **Curated forage database.** For forages and grasses not well
+    covered by FAOSTAT, yields come from `fao_forages.parquet`, compiled
+    from literature and technical sources.
 
-The columns have the following meaning:
-
-- **ingredient** — ingredient name used in `diet_ingredients.csv`;
-- **yield_name** — corresponding crop or forage name in the yield
-  databases;
-- **allocation** — proportion of land attributed to that ingredient.
-
-Every ingredient included in a diet must have a corresponding entry in
-`mapping.csv`.
+See [Adding a New
+Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)
+for a worked example of connecting a new ingredient to this hierarchy
+via `mapping.csv`.
 
 ------------------------------------------------------------------------
 
-## Feed origin and dynamic background allocation
+### Feed Origin & Dynamic Trade Allocation
 
-Land-use calculations require the user to specify the country where the
-farm is located and the assessment year.
+When `country_of_origin` is left as `NA` in `diet_ingredients.csv`,
+herdr estimates it from international trade flows rather than leaving it
+undefined.
+
+1.  **Apparent consumption** — how much of the crop the country actually
+    uses, regardless of who grew it:
+
+    ``` math
+    ApparentConsumption = \max(1, Production + TotalImports - TotalExports)
+    ```
+
+2.  **Self-Sufficiency Ratio (SSR)** — the share of that consumption the
+    country produces itself:
+
+    ``` math
+    SSR = \frac{Production}{ApparentConsumption}
+    ```
+
+3.  **Origin assignment rule:**
+
+    - If $`SSR \ge 0.70`$ (70% self-sufficient or more): the origin is
+      set to `farm_country` — the country is assumed to be growing
+      enough of the crop itself.
+    - If $`SSR < 0.70`$: the origin is set to the country’s **primary
+      source of imports** (`Top_Partner`) — the trade partner it imports
+      the most of that crop from.
+
+> **Note:** the trade matrix database (`fao_trade_matrix.parquet`, ~187
+> MB) is downloaded automatically from GitHub Releases the first time an
+> assessment needs trade resolution — see [Technical
+> Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.html#fao_trade_matrixparquet--dynamic-trade-background-auto-downloaded)
+> for details.
+
+------------------------------------------------------------------------
+
+### Execution
 
 ``` r
 
-results <- calculate_land_use(
-  farm_country = "Spain", 
-  year = 2022
+# Standalone run
+land_results <- calculate_land_use(
+  farm_country = "Spain",
+  year = 2022,
+  saveoutput = TRUE
 )
-```
 
-The origin of the feed ingredients dictates which crop yields are
-applied. Users can explicitly define the origin of each ingredient in
-their input files. However, when the exact origin is unknown (left as
-NA), herdr employs a dynamic background allocation engine.
-
-This hybrid engine utilizes FAO production and trade data to calculate
-missing feed origins based on a 70% self-sufficiency rule. It estimates
-the proportion of the ingredient that is produced domestically versus
-the proportion that is imported, automatically distributing the land
-footprint across the respective trade partner countries.
-
-⚠️ Important Data Note: To perform these dynamic calculations without
-bloating the package size, herdr relies on an external high-resolution
-FAO trade matrix. The first time you run a calculation that requires
-background origin allocation, the package will automatically download
-the fao_trade_matrix.parquet file (approx. 187 MB) to your local
-environment.
-
-------------------------------------------------------------------------
-
-## Assumptions and limitations
-
-Several assumptions should be considered when interpreting land-use
-estimates.
-
-- All calculations are performed on a **dry matter (DM)** basis.
-- Crop yields represent **country-average productivity** rather than
-  farm-specific values.
-- Forage yields are compiled from multiple published sources and may not
-  represent local management conditions.
-- Allocation factors should reflect the accounting approach adopted by
-  the user.
-- The background allocation engine relies on a **70% self-sufficiency
-  assumption** together with historical **FAO trade matrices**,
-  representing macro-economic trade flows rather than farm-level supply
-  chains.
-- Results should be interpreted as estimates of the land required to
-  produce feed, not as direct measurements of occupied agricultural
-  land.
-
-------------------------------------------------------------------------
-
-## Running the calculation
-
-Land use can be estimated independently using the standalone function:
-
-``` r
-
-results <- calculate_land_use(
+# Integrated execution via full assessment
+full_results <- generate_impact_assessment(
   farm_country = "Spain",
   year = 2022
 )
 ```
 
-Alternatively, land-use calculations are performed automatically when
-running the complete assessment through
-[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md).
+------------------------------------------------------------------------
+
+### Next steps
+
+- [Technical
+  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+  — full definitions for `mapping.csv`, `fao_crops.parquet`,
+  `fao_forages.parquet`, and `fao_trade_matrix.parquet`.
+- [Adding a New
+  Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)
+  — how `economic_allocation` and `yield_name` connect a new ingredient
+  to this methodology.
+- [General
+  Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
+  where land use fits into a full assessment.

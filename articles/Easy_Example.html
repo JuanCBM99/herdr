@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -90,197 +91,242 @@
 <div class="section level2">
 <h2 id="getting-started-with-a-basic-assessment">Getting Started with a Basic Assessment<a class="anchor" aria-label="anchor" href="#getting-started-with-a-basic-assessment"></a>
 </h2>
-<p>This guide will walk you through a <strong>Basic Assessment</strong>
-for <strong>Mature Dairy Cattle in Spain (2015)</strong>. We will use a
-single regional identifier to link your census data to nutritional
-requirements and environmental impact.</p>
+<p>This guide walks through a <strong>Basic Assessment</strong> for
+<strong>mature dairy cattle in Spain (2015)</strong>, using a single
+national-level identifier to link census data, nutrition, and
+environmental impact from start to finish.</p>
 <blockquote>
-<p><strong>Note on File Locations:</strong> All files are located in the
-<code>user_data/</code> folder.</p>
+<p>📂 <strong>All files referenced below live in
+<code>user_data/</code>.</strong></p>
 </blockquote>
-<div class="section level4">
-<h4 id="folder-structure">📂 Folder Structure<a class="anchor" aria-label="anchor" href="#folder-structure"></a>
-</h4>
-<ul>
-<li>
-<strong>User Files (Update these):</strong>
-<code>livestock_census.csv</code>, <code>diet_profiles.csv</code>,
-<code>diet_ingredients.csv</code>,
-<code>ruminant_definitions.csv</code>,
-<code>livestock_weights.csv</code>,
-<code>manure_management.csv</code>.</li>
-<li>
-<strong>In case of usage of the automatic cycle:</strong>
-<code>reproduction_parameters.csv</code>
-</li>
-<li>
-<strong>Reference Files (Expert use only):</strong>
-<code>feed_characteristics.csv</code>, <code>forage_yields.csv</code>,
-<code>mapping.csv</code>, <code>fao_crop_yields.csv</code>,
-<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
-<code>fao_production.csv</code>.</li>
-</ul>
+<div class="section level3">
+<h3 id="what-youll-edit">What you’ll edit<a class="anchor" aria-label="anchor" href="#what-youll-edit"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Category</th>
+<th align="left">Files</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<strong>User inputs</strong> <em>(fill these
+in)</em>
+</td>
+<td align="left">
+<code>livestock_census.csv</code> ·
+<code>diet_profiles.csv</code> · <code>diet_ingredients.csv</code> ·
+<code>ruminant_definitions.csv</code> ·
+<code>livestock_weights.csv</code> ·
+<code>manure_management.csv</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>If using the automatic herd cycle</strong></td>
+<td align="left"><code>reproduction_parameters.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left">
+<strong>Reference libraries</strong> <em>(consult
+only)</em>
+</td>
+<td align="left">
+<code>feed_characteristics.csv</code> ·
+<code>mapping.csv</code> · <code>fao_forages.parquet</code> ·
+<code>fao_crops.parquet</code> · <code>ipcc_coefficients.csv</code> ·
+<code>ipcc_mm.csv</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Full details on every file above are in the <a href="Technical_reference.html">Technical Reference</a> vignette.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-1-the-census">Step 1: The Census<a class="anchor" aria-label="anchor" href="#step-1-the-census"></a>
+<h3 id="step-1-the-census">Step 1 — The Census<a class="anchor" aria-label="anchor" href="#step-1-the-census"></a>
 </h3>
 <p>Open <code>livestock_census.csv</code>. This is where you define who
-is on the farm. For this basic example, we focus on a national
-level.</p>
+is on the farm. For this basic example, we work at national level, so
+<code>subregion</code> and <code>class_flex</code> are left blank.</p>
 <table class="table">
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
-<th align="left">population</th>
+<th align="right">population</th>
 </tr></thead>
 <tbody><tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
 <td align="left"></td>
 <td align="left"></td>
-<td align="left">848686</td>
+<td align="right">848,686</td>
 </tr></tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-2-designing-the-diet">Step 2: Designing the Diet<a class="anchor" aria-label="anchor" href="#step-2-designing-the-diet"></a>
+<h3 id="step-2-designing-the-diet">Step 2 — Designing the Diet<a class="anchor" aria-label="anchor" href="#step-2-designing-the-diet"></a>
 </h3>
-<p>The diet must be fulfilled manually based on nutritional reports
-(e.g., Informe Zootécnico 2015).</p>
+<p>The diet is filled in manually based on nutritional reports
+(e.g. <em>Informe Zootécnico 2015</em>).</p>
 <div class="section level4">
-<h4 id="a--check-ingredients">A. Check Ingredients<a class="anchor" aria-label="anchor" href="#a--check-ingredients"></a>
+<h4 id="a--check-available-ingredients">A. Check available ingredients<a class="anchor" aria-label="anchor" href="#a--check-available-ingredients"></a>
 </h4>
 <p>Open <code>feed_characteristics.csv</code> to see the list of
-available feed items. If you wish, you can add as many new ingredients
-as you want, always fulfilling all columns.</p>
+available feed items. You can also add new ingredients here, as long as
+every required column is filled in.</p>
 </div>
 <div class="section level4">
-<h4 id="b--define-the-profile-diet_profiles-csv">B. Define the Profile (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#b--define-the-profile-diet_profiles-csv"></a>
+<h4 id="b--define-the-profile-diet_profiles-csv">B. Define the profile — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#b--define-the-profile-diet_profiles-csv"></a>
 </h4>
 <table class="table">
 <thead><tr class="header">
 <th align="left">diet_tag</th>
 <th align="left">region</th>
-<th align="left">forage</th>
-<th align="left">concentrate</th>
-<th align="left">milk</th>
-<th align="left">milk_replacer</th>
+<th align="right">forage</th>
+<th align="right">concentrate</th>
+<th align="right">milk</th>
+<th align="right">milk_replacer</th>
 </tr></thead>
 <tbody><tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">60</td>
-<td align="left">40</td>
-<td align="left">0</td>
-<td align="left">0</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">60</td>
+<td align="right">40</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr></tbody>
 </table>
 </div>
 <div class="section level4">
-<h4 id="c--ingredient-breakdown-diet_ingredients-csv">C. Ingredient Breakdown (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#c--ingredient-breakdown-diet_ingredients-csv"></a>
+<h4 id="c--ingredient-breakdown-diet_ingredients-csv">C. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#c--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
-<p>Put the same <code>diet_tag</code> and <code>region</code> as many
-times as ingredients the diet has.</p>
+<p>Repeat the same <code>diet_tag</code> and <code>region</code> once
+per ingredient.</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
 <th align="left">region</th>
 <th align="left">feed_category</th>
 <th align="left">ingredient</th>
-<th align="left">percentage</th>
-<th align="left">origin_country</th>
+<th align="right">percentage</th>
+<th align="left">country_of_origin</th>
+<th align="right">custom_yield_kg_ha</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
 <td align="left">forage</td>
-<td align="left">corn_silage</td>
-<td align="left">100</td>
-<td align="left">Spain</td>
+<td align="left"><code>corn_silage</code></td>
+<td align="right">100</td>
+<td align="left"><code>spain</code></td>
+<td align="right"><code>NA</code></td>
 </tr>
 <tr class="even">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
 <td align="left">concentrate</td>
-<td align="left">barley_grain</td>
-<td align="left">50</td>
-<td align="left">NA</td>
+<td align="left"><code>barley_grain</code></td>
+<td align="right">50</td>
+<td align="left"><code>NA</code></td>
+<td align="right"><code>NA</code></td>
 </tr>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
 <td align="left">concentrate</td>
-<td align="left">soybean_meal</td>
-<td align="left">50</td>
-<td align="left">NA</td>
+<td align="left"><code>soybean_meal</code></td>
+<td align="right">50</td>
+<td align="left"><code>NA</code></td>
+<td align="right">5000</td>
 </tr>
 </tbody>
 </table>
-<ul>
-<li>
-<strong>Important:</strong> The percentage for ingredients must sum
-100% <em>within their category</em> (e.g., if you have 50% Barley and
-50% Soy, they sum to 100% of the “Concentrate” portion).</li>
-<li>
-<strong>Missing Origins:</strong> If you don’t know where a feed
-comes from, leave <code>origin_country</code> as <code>NA</code>. The
-package will automatically allocate it using FAO trade data!</li>
-</ul>
+<blockquote>
+<p>✅ <strong>Percentages sum to 100% <em>within</em> each
+category</strong> — here, 50% barley + 50% soybean meal make up 100% of
+the concentrate portion.</p>
+<p>🌍 <strong>Missing origins:</strong> leave
+<code>country_of_origin</code> as <code>NA</code> when you don’t know
+where a feed comes from. herdr resolves it automatically using FAO trade
+data — see <a href="land_use.html">Land Use Methodology</a> for how.</p>
+<p>🎯 <strong>Overriding the yield:</strong>
+<code>custom_yield_kg_ha</code> lets you skip the FAO/trade lookup
+entirely for a given ingredient. If you already know the real yield for
+your farm or region — e.g. <code>5000</code> kg/ha — enter it here and
+herdr uses that value directly for the land-use calculation, ignoring
+<code>country_of_origin</code> and any FAO database lookup for that
+row.</p>
+</blockquote>
 <hr>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-3-animal-categories-and-coefficients">Step 3: Animal Categories and Coefficients<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients"></a>
+<h3 id="step-3-animal-categories-and-coefficients">Step 3 — Animal Categories and Coefficients<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients"></a>
 </h3>
 <p>Open <code>ruminant_definitions.csv</code>. This file links your
-animal to the IPCC equations. Use the <strong>exact
-descriptions</strong> from <code>ipcc_coefficients.csv</code>.</p>
+animal to the IPCC Tier 2 equations — each of <code>cfi</code>,
+<code>ca</code>, <code>c</code>, and <code>c_pregnancy</code> is a
+separate lookup into <code>ipcc_coefficients.csv</code>, so use the
+<strong>exact description</strong> for each as it appears there.</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">diet_tag</th>
+<th align="left">cfi</th>
+<th align="left">ca</th>
+<th align="left">c</th>
+<th align="right">milk_yield</th>
+<th align="right">fat_content</th>
 <th align="left">c_pregnancy</th>
-<th align="left">milk_yield</th>
-<th align="left">fat_content</th>
 </tr></thead>
 <tbody><tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">diet_dairy_mature</td>
-<td align="left">cattle and buffalo</td>
-<td align="left">8894.38</td>
-<td align="left">3.73</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>cattle_buffalo [lactating]</code></td>
+<td align="left"><code>stall</code></td>
+<td align="left"><code>females</code></td>
+<td align="right">8,894.38</td>
+<td align="right">3.73</td>
+<td align="left"><code>cattle and buffalo</code></td>
 </tr></tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-4-body-weights">Step 4: Body Weights<a class="anchor" aria-label="anchor" href="#step-4-body-weights"></a>
+<h3 id="step-4-body-weights">Step 4 — Body Weights<a class="anchor" aria-label="anchor" href="#step-4-body-weights"></a>
 </h3>
-<p>Open <code>livestock_weights.csv</code>. Ensure the keys match the
-census exactly.</p>
+<p>Open <code>livestock_weights.csv</code>. Make sure the identifying
+keys match the census exactly.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="16%">
@@ -293,32 +339,33 @@ census exactly.</p>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
-<th align="left">adult_weight</th>
-<th align="left">productive_period</th>
-<th align="left">initial_weight</th>
-<th align="left">final_weight</th>
+<th align="right">adult_weight</th>
+<th align="right">productive_period</th>
+<th align="right">initial_weight</th>
+<th align="right">final_weight</th>
 </tr></thead>
 <tbody><tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">675</td>
-<td align="left">365</td>
-<td align="left">675</td>
-<td align="left">675</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">675</td>
+<td align="right">365</td>
+<td align="right">675</td>
+<td align="right">675</td>
 </tr></tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-5-manure-management-manure_management-csv">Step 5: Manure Management (<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#step-5-manure-management-manure_management-csv"></a>
+<h3 id="step-5-manure-management-manure_management-csv">Step 5 — Manure Management (<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#step-5-manure-management-manure_management-csv"></a>
 </h3>
 <ol style="list-style-type: decimal">
-<li>Check <code>ipcc_mm.csv</code> for valid
-<code>management_system</code> and <code>system_climate</code> names
-(You can also check the section <strong><a href="Manure.html">Manure
-System Guide</a></strong> of this documentation).</li>
-<li>If you have more than one system for the exactly same animal,
-<strong>duplicate the row</strong> and split the allocation.</li>
+<li>Check <code>ipcc_mm.csv</code> for valid <code>system_base</code>,
+<code>system_variant</code>, and <code>climate_zone</code> combinations
+— or browse the <a href="Manure.html">Manure System Guide</a> for the
+same information in narrative form.</li>
+<li>If a cohort splits its manure across more than one system,
+<strong>duplicate the row</strong> and divide the
+<code>allocation</code> between them so it sums to 1.0.</li>
 </ol>
 <table class="table">
 <colgroup>
@@ -338,58 +385,80 @@ System Guide</a></strong> of this documentation).</li>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">system_base</th>
-<th align="left">management_months</th>
+<th align="left">system_variant</th>
+<th align="right">management_months</th>
 <th align="left">system_climate</th>
 <th align="left">system_subclimate</th>
 <th align="left">climate_zone</th>
-<th align="left">system_variant</th>
 <th align="left">climate_moisture</th>
 <th align="left">b_0</th>
 <th align="right">allocation</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">liquid_slurry</td>
-<td align="left">3</td>
-<td align="left">cool</td>
-<td align="left">temperate</td>
-<td align="left">wet</td>
-<td align="left">with_natural_crust_cover</td>
-<td align="left">wet</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>liquid_slurry</code></td>
+<td align="left"><code>with_natural_crust_cover</code></td>
+<td align="right">3</td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left"><code>zone_dry</code></td>
+<td align="left"><code>dry</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.3</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">solid_storage</td>
-<td align="left"></td>
-<td align="left">temperate</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">dry</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>solid_storage</code></td>
+<td align="left">—</td>
+<td align="right">—</td>
+<td align="left"><code>warm</code></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><code>default</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.7</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>ℹ️ <code>solid_storage</code> is a Standard system (see the <a href="Manure.html">Manure System Guide</a>) — it doesn’t need
+<code>management_months</code>, <code>system_variant</code>,
+<code>system_subclimate</code>, or <code>climate_zone</code>, so those
+columns are left blank.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-6-running-the-analysis">Step 6: Running the Analysis<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis"></a>
+<h3 id="step-6-running-the-analysis">Step 6 — Running the Analysis<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis"></a>
 </h3>
-<p>Once your CSVs are updated, run the following in R:</p>
+<p>Once every CSV above is complete, run the assessment from R:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2015</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h3>
+<ul>
+<li>
+<a href="Workflow.html">General Workflow</a> — the full step-by-step
+guide this example is based on.</li>
+<li>
+<a href="Technical_reference.html">Technical Reference</a> — every
+file and column explained in detail.</li>
+<li>
+<a href="Moderate_Example.html">Moderate Example</a> / <a href="Difficult_Example.html">Hard Example</a> — build on this with
+multi-region herds and mixed manure systems.</li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

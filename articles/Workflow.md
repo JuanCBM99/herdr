@@ -1,233 +1,312 @@
-# General Workflow: Step-by-Step Guide
+# General Workflow: Step-by-Step Scripting Guide
 
-## General Workflow
+## Introduction
 
-This vignette explains how to prepare a complete `herdr` project, from
-creating a working directory to generating the final greenhouse gas and
-land-use assessment.
+The **`herdr`** package provides a modular computational framework for
+estimating greenhouse gas (GHG) emissions, energy requirements, and
+agricultural land use across livestock production systems.
 
-The recommended workflow is:
-
-1.  Install the package.
-2.  Create a new R project.
-3.  Initialize the project structure.
-4.  Prepare the input files.
-5.  Run the assessment.
-6.  Review and export the results.
+This guide explains how to build a complete project in R from scratch
+using reproducible scripts and CSV templates. Whether you are running
+national inventories, farm-scale assessments, or research scenarios,
+following this structured workflow ensures full consistency across all
+calculation tiers.
 
 ------------------------------------------------------------------------
 
-### 1. Install herdr
+## 1. Installation & Environment Setup
 
-Install the latest development version directly from GitHub.
+### Step 1: Install the Package
+
+You can install the development version of `herdr` directly from GitHub
+using `remotes`:
 
 ``` r
 
-if (!requireNamespace("remotes", quietly = TRUE))
+# Install remotes if not already installed
+if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
+}
 
+# Install herdr from GitHub
 remotes::install_github("JuanCBM99/herdr")
 
+# Load library
 library(herdr)
 ```
 
-### 2. Create a Project
+### Step 2: Create a Dedicated R Project
 
-Create a new RStudio project.
+Working within an isolated R project (`.Rproj`) ensures relative file
+paths resolve cleanly and keeps your data organized:
 
-Working inside an `.Rproj` keeps every project self-contained and allows
-herdr to automatically locate all required folders and input files.
+``` r
 
-    My_Project/
+# Create and switch to a new project directory
+usethis::create_project("My_Livestock_Project")
+```
 
-### 3. Initialize the Project
+### Step 3: Initialize the Project Structure
 
-Initialize the directory structure by running:
+Run
+[`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
+to generate the standard folder hierarchy and default templates:
 
 ``` r
 
 herdr_init()
 ```
 
-This creates the following directories:
+This function creates three primary directories:
 
-- `user_data/`: Contains all editable CSV input files.
-- `Examples/`: Contains ready-to-use example datasets.
-- `output/`: Stores the generated results.
+- **`user_data/`**: The active working directory containing editable CSV
+  templates and local reference databases (`fao_crops.parquet`,
+  `fao_forages.parquet`).
+- **`Examples/`**: Pre-configured baseline datasets (e.g., dairy cattle,
+  beef cattle, swine, sheep) ready to use as templates.
+- **`output/`**: Destination directory where results, emission
+  inventories, and land-use summaries are saved.
 
-### 4. Choose how to prepare your data
+------------------------------------------------------------------------
 
-There are two possible workflows to input your data.
+## 2. Project Architecture & Demographic Keys
 
-#### Option A — Interactive User Interface (Recommended)
+All data tables in `herdr` are connected using **four standardized
+cohort keys**:
 
-Launch the graphical web interface directly from your console:
-
-``` r
-
-run_app()
+``` text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                PRIMARY COHORT KEYS                                     │
+├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
+│  animal_tag     │  region      │  subregion      │  class_flex                         │
+│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
+│  e.g., "dairy"  │  e.g., Spain │  e.g., Euskadi  │  e.g., "lactating", "dry", "starter"│
+└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘
 ```
 
-The interface allows you to:
+> ⚠️ **Critical Rule:** Every unique combination of `animal_tag`,
+> `region`, `subregion`, and `class_flex` declared in the census must
+> match the definition, weight, diet, and manure tables exactly.
 
-- Edit every input table interactively.
-- Validate your datasets in real-time.
-- Navigate through the workflow step-by-step.
-- Execute the model.
-- Download the results.
+------------------------------------------------------------------------
 
-This option is highly recommended for first-time users.
+## 3. Preparing Input Tables (`user_data/`)
 
-#### Option B — Edit the CSV files manually
+You can edit the CSV templates located in `user_data/` using any
+spreadsheet software (Excel, LibreOffice) or programmatically within R.
 
-Alternatively, you can edit the CSV templates located inside the
-`user_data/` folder using Excel, LibreOffice, or any other spreadsheet
-software.
+------------------------------------------------------------------------
 
-### 5. Population (livestock_census.csv)
+### 3.1. Herd Census (`livestock_census.csv`)
 
-This file defines the livestock population included in the assessment.
-Each row corresponds to one animal cohort.
+Defines the size and categories of your livestock population.
 
-The key identifiers are:
+| Column | Description | Example |
+|:---|:---|:---|
+| `animal_tag` | Unique cohort identifier | `mature_dairy_cattle` |
+| `region` | Broad geographical region | `spain` |
+| `subregion` | Farm identifier or administrative subdivision | `north` |
+| `class_flex` | Physiological status, breed, or life stage | `lactation_phase` |
+| `population` | Number of live animals in this exact cohort | `448921.13` |
 
-- `animal_tag`
-- `region`
-- `subregion`
-- `class_flex`
+#### Population Modes:
 
-Together, these columns uniquely identify every production group
-throughout the project. The `population` column contains the number of
-animals represented by that row.
+- **Manual Mode (`automatic_cycle = FALSE`):** Every single cohort and
+  head count is explicitly declared. *Recommended*
+- **Automatic Herd Cycle (`automatic_cycle = TRUE`):** Only adult
+  breeding females are entered. The package uses reproduction parameters
+  (`reproduction_parameters.csv`) to compute offspring, replacement
+  heifers, and mortalities automatically. *Currently supported for
+  ruminants only.*
 
-#### Population modes
+------------------------------------------------------------------------
 
-Two calculation modes are available:
+### 3.2. Body Weights & Growth (`livestock_weights.csv`)
 
-**Manual population**
+Defines the physical characteristics and production cycles required to
+compute maintenance energy ($`NE_m`$) and feed intake boundaries:
 
-Every animal category is entered explicitly. Use
-`automatic_cycle = FALSE` when all populations are already known.
+- `initial_weight_kg`: Live weight at the beginning of the evaluated
+  production phase.
+- `final_weight_kg`: Live weight at the end of the period.
+- `adult_weight_kg`: Average mature body weight of an adult animal (kg).
+- `productive_period_days`: Total active feeding days per year (e.g.,
+  `365` for breeding cows, `120` for fattening pigs).
 
-**Automatic herd cycle**
+------------------------------------------------------------------------
 
-Only breeding animals are required. The package automatically estimates
-offspring and replacement animals using reproductive parameters. Use
-`automatic_cycle = TRUE`. (Note: This option currently supports the
-predefined livestock categories included with the package).
+### 3.3. Nutrition & Feed Formulation
 
-### 6. Nutrition
+Feed intake and land use are parameterized through two complementary
+tables:
 
-Diet information is divided into two files.
+#### A. Diet Profiles (`diet_profiles.csv`)
 
-#### Diet profiles (diet_profiles.csv)
+Specifies the macro-distribution of the ration. The four proportions
+must sum to **100%**:
 
-Defines the overall macronutrient distribution of the diet. The four
-proportions must sum to 100%:
+``` math
+\text{forage\_share} + \text{concentrate\_share} + \text{milk\_share} + \text{milk\_replacer\_share} = 100\%
+```
 
-- forage
-- concentrate
-- milk
-- milk_replacer
+#### B. Diet Ingredients (`diet_ingredients.csv`)
 
-#### Diet ingredients (diet_ingredients.csv)
+Defines the individual feedstuffs composing each category:
 
-Defines the specific ingredients composing each feed category. Within
-every category, the ingredient percentage must also sum to 100%.
+- `ingredient`: Specific name matching `feed_characteristics.csv` (e.g.,
+  `corn_silage`, `barley_grain`, `soybean_meal`).
+- `ingredient_type`: Feed category (`forage`, `concentrate`, `milk`, or
+  `milk_replacer`).
+- `ingredient_share`: Proportion (%) within that specific category (must
+  sum to **100%** per ingredient_type).
+- `custom_yield_kg_ha`: *(Optional)* User-defined crop/forage yield (kg
+  DM/ha). When filled, the model overrides national FAO averages and
+  tags the origin as `"Custom Data"`.
+- `country_of_origin`: *(Optional)* Cultivation country. If left blank
+  (`NA`), `herdr` applies its dynamic FAO trade balance engine (70%
+  self-sufficiency rule) to allocate origins automatically.
 
-**Dynamic Feed Origin:**
+------------------------------------------------------------------------
 
-You can specify the `origin_country` for each ingredient. If the origin
-is unknown, leave it as `NA`. herdr features a dynamic background
-allocation engine that will automatically estimate the origins of NA
-ingredients based on FAO trade matrices and a 70% self-sufficiency rule.
+### 3.4. Physiological Definitions
 
-#### Adding a new ingredient
+Connects cohorts with species-specific constants and production targets:
 
-When introducing a new custom ingredient, you must also update:
+- **Ruminants (`ruminant_definitions.csv`):** Maintenance coefficient
+  ($`c_{fi}`$), feeding activity ($`c_a`$), growth constants ($`C`$,
+  $`a`$, $`b`$), pregnancy coefficient ($`c_{pregnancy}`$), annual milk
+  yield (kg/year), milk fat percentage, and wool yield (kg/year).
+- **Monogastrics (`monogastric_definitions.csv`):** Exponent
+  ($`\alpha`$), protein and fat tissue retention fractions, sow
+  gestation/lactation lengths, litter sizes, and egg mass output.
 
-- `feed_characteristics.csv` (for nutritional values)
-- `mapping.csv` (for land-use allocation)
-- `forage_yields.csv` or `fao_crop_yields.csv` (if appropriate)
+------------------------------------------------------------------------
 
-### 7. Animal Definitions
+### 3.5. Manure Management (`manure_management.csv`)
 
-Animal characteristics are specified using:
+Specifies waste storage pathways and regional environmental conditions:
 
-- `ruminant_definitions.csv`
-- `monogastric_definitions.csv`
-- `livestock_weights.csv`
+- `system_base` & `system_variant`: Storage or grazing system (e.g.,
+  `liquid_slurry`, `solid_storage`, `pasture_range_paddock`).
+- `climate_zone` & `climate_moisture`: Climate classification (e.g.,
+  `cool`, `temperate`, `warm`, `wet`, `dry`).
+- `allocation`: Fraction of manure managed by the system
+  ($`0.0 \text{ to } 1.0`$). If manure is split across multiple systems
+  (e.g., housing vs. pasture), create multiple rows for that cohort
+  ensuring total allocations sum to **1.0**.
 
-These files connect each animal group to its physiological parameters,
-body weights, production periods, diet, and IPCC coefficients.
+### Check [Manure Management Guide](https://juancbm99.github.io/herdr/articles/Manure.md) for available combinations of different systems and climates.
 
-**Important:** Every combination of `animal_tag`, `region`, `subregion`,
-and `class_flex` must exactly match those defined in the livestock
-census.
+## 4. Running the Environmental Assessment
 
-### 8. Manure Management (manure_management.csv)
+### 4.1. Full Integrated Assessment
 
-This file defines how manure is managed for each livestock group. Each
-row specifies the manure management system, climate, storage conditions,
-and allocation.
-
-If manure is divided among several systems, duplicate the row and assign
-the corresponding allocation to each system. For every livestock cohort,
-the allocation values must sum to 1.0.
-
-(Detailed descriptions of every supported system are available in the
-Manure Management Guide vignette).
-
-### 9. Run the Assessment
-
-Once every input file has been completed, execute the main function:
+To execute the entire modeling pipeline (energy balance, enteric
+fermentation, volatile solids, manure emissions, and land use) in a
+single command:
 
 ``` r
+
+library(herdr)
 
 results <- generate_impact_assessment(
   automatic_cycle = FALSE,
-  farm_country = "Spain",
-  year = 2022,
-  saveoutput = TRUE
+  farm_country    = "Spain",
+  year            = 2022,
+  saveoutput      = TRUE
+)
+
+# Inspect the first rows of the results table
+head(results)
+```
+
+#### Argument Reference:
+
+- `automatic_cycle`: Set to `TRUE` to use reproductive cycle dynamics,
+  or `FALSE` for manual populations (*Recommended*).
+- `farm_country`: The reference country used to query crop yields and
+  bilateral FAO trade matrices.
+- `year`: The reference statistical year for FAO data queries (e.g.,
+  `2022`).
+- `saveoutput`: If `TRUE`, writes individual module tables and summary
+  reports directly to `output/`.
+
+------------------------------------------------------------------------
+
+### 4.2. Running Modular Functions Individually
+
+You can also run specific computational modules independently for
+debugging, calibration, or sensitivity analyses:
+
+``` r
+
+# 1. Calculate Gross Energy intake (GE)
+ge_results <- calculate_ge(saveoutput = FALSE)
+
+# 2. Calculate Dry Matter Intake (DMI)
+dmi_results <- calculate_DMI(saveoutput = FALSE)
+
+# 3. Calculate Enteric Methane (CH4)
+enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
+
+# 4. Calculate Feed-Related Land Use (m2)
+land_results <- calculate_land_use(
+  farm_country = "Spain", 
+  year = 2022, 
+  saveoutput = FALSE
 )
 ```
 
-The function automatically performs data validation, energy
-calculations, methane estimation, nitrogen and nitrous oxide estimation,
-land-use calculations, and result aggregation.
+------------------------------------------------------------------------
 
-> ⚠️ **Important Data Note:** If your diet contains ingredients with
-> unknown origins (NA), the first time you run this function, herdr will
-> automatically download the required FAO background dataset (approx.
-> 187 MB in .parquet format) to your local environment. This is a
-> one-time process.
+## 5. Visualizing & Exporting Results
 
-### 10. Results
+### Visualizing Cohort Emissions
 
-The returned object is a data frame containing all calculated
-indicators. Because we set `saveoutput = TRUE`, the results are also
-automatically written as CSV files to the `output/` folder.
+Use
+[`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
+to generate publication-ready ggplot2 charts grouped by demographic
+variables:
 
-### Common Issues
+``` r
 
-Most execution errors are caused by inconsistencies among input files.
-Typical problems include:
+# Generate stacked bar chart grouped by animal cohort and region
+p <- plot_herdr_results(
+  df         = results,
+  group_cols = c("animal_tag", "region"),
+  func_name  = "generate_impact_assessment"
+)
 
-- Missing animal definitions or missing diets.
-- Duplicated identifiers.
-- Allocations not summing to 1 (or percentages not summing to 100).
-- Unknown feed ingredients (not mapped properly).
-- Missing body weights.
+# Display chart
+print(p)
 
-The package performs automatic validation before calculations begin and
-reports detected problems in the console to help you fix them.
+# Save chart to disk
+ggplot2::ggsave("output/emissions_chart.png", plot = p, width = 10, height = 6, dpi = 300)
+```
 
-### Next steps
+------------------------------------------------------------------------
 
-After becoming familiar with the workflow, consult the remaining
-vignettes for more detailed information about individual components of
-the package:
+## 6. Common Issues & Troubleshooting
 
-- Technical Reference
-- Land Use Methodology
-- Manure Management Guide
+| Issue / Warning | Cause | Solution |
+|:---|:---|:---|
+| **Missing Cohorts Warning** | An `animal_tag` in Census is missing in definitions or weights. | Ensure all four keys (`animal_tag`, `region`, `subregion`, `class_flex`) match across all tables. |
+| **Shares do not sum to 100%** | Diet category or ingredient proportions do not sum to 100. | Adjust `forage_share`, `concentrate_share`, etc. in `diet_profiles.csv`, or ingredient shares in `diet_ingredients.csv`. |
+| **Manure allocation $`\neq 1.0`$** | Allocations for a cohort do not sum to 1.0. | Adjust `allocation` values in `manure_management.csv` so their sum equals exactly 1.0 per cohort. |
+| **Unknown Ingredient** | An ingredient in diets is missing in reference libraries. | Add the ingredient to `feed_characteristics.csv` and `mapping.csv`. |
+
+------------------------------------------------------------------------
+
+## Next Steps
+
+For mathematical details, parameter lookup tables, and scientific
+references, consult the companion guides:
+
+- [Technical
+  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+- [Manure Management
+  Guide](https://juancbm99.github.io/herdr/articles/Manure.md)
+- [Land Use
+  Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
+- [Theoretical Basis: IPCC Tier
+  2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md)

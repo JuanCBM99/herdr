@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -94,196 +95,181 @@
 <h3 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h3>
 <p>In addition to greenhouse gas emissions, <code>herdr</code> estimates
-the <strong>feed-related land use</strong> associated with livestock
-production.</p>
-<p>Land use is calculated as the agricultural area required to produce
-the feed consumed by a livestock population. The model combines feed
-intake, crop and forage productivity, allocation factors, and
-international trade information to estimate the total land requirement
-of each diet.</p>
-<p>Results are expressed in <strong>square metres (m²)</strong> and are
-calculated on a dry matter (DM) basis.</p>
-<hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="calculation-methodology">Calculation methodology<a class="anchor" aria-label="anchor" href="#calculation-methodology"></a>
-</h2>
-<p>Land use is calculated independently for every feed ingredient using
-three sequential steps.</p>
-<div class="section level3">
-<h3 id="step-1--land-requirement-per-kilogram-of-feed">Step 1. Land requirement per kilogram of feed<a class="anchor" aria-label="anchor" href="#step-1--land-requirement-per-kilogram-of-feed"></a>
-</h3>
-<p>The inverse of crop yield represents the land area required to
-produce one kilogram of dry matter.</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">LandPerKg_i = \frac{1}{Yield_i}</annotation></semantics></math></p>
-<p>where <strong>Yield</strong> is expressed in kilograms of dry matter
-per hectare (kg DM/ha).</p>
+the <strong>feed-related agricultural land use footprint</strong>
+associated with livestock operations, across both ruminant and
+monogastric systems.</p>
+<p>Land use is defined as the physical agricultural area (in m²)
+required to produce the feed ration consumed by a herd. The engine
+combines animal dry matter intake (DMI), crop and forage yields,
+multi-output economic allocation, and — when an ingredient’s origin
+isn’t specified — dynamic international trade flows.</p>
+<p>This vignette is the detailed reference behind the shorter mentions
+of land use scattered through <a href="Technical_reference.html">Technical Reference</a> and the <a href="Workflow.html">General Workflow</a>.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-2--allocation-adjustment">Step 2. Allocation adjustment<a class="anchor" aria-label="anchor" href="#step-2--allocation-adjustment"></a>
+<h3 id="mathematical-formulation">Mathematical Formulation<a class="anchor" aria-label="anchor" href="#mathematical-formulation"></a>
 </h3>
-<p>Some crops generate multiple products (for example grain and straw).
-To avoid assigning the entire land area to a single product, the land
-requirement is multiplied by an allocation factor.</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = \frac{1}{Yield_i} \times Allocation_i</annotation></semantics></math></p>
-<p>The allocation factor ranges between 0 and 1 and is defined in
+<p>Land footprint calculations follow four sequential steps for every
+ingredient
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+in diet
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>d</mi><annotation encoding="application/x-tex">d</annotation></semantics></math>.</p>
+<div class="section level4">
+<h4 id="land-required-per-kilogram-of-feed">1. Land required per kilogram of feed<a class="anchor" aria-label="anchor" href="#land-required-per-kilogram-of-feed"></a>
+</h4>
+<p>The baseline land required to produce one kilogram of dry matter is
+the inverse of the crop’s yield:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mstyle displaystyle="true"><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac></mstyle></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0</mn></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">otherwise</mtext></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">LandPerKg_i = \begin{cases} \dfrac{1}{Yield_i} &amp; \text{if } Yield_i &gt; 0 \\ 0 &amp; \text{otherwise} \end{cases}</annotation></semantics></math></p>
+<p>where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>
+is expressed in kg DM/ha.</p>
+</div>
+<div class="section level4">
+<h4 id="economic-allocation-adjustment">2. Economic allocation adjustment<a class="anchor" aria-label="anchor" href="#economic-allocation-adjustment"></a>
+</h4>
+<p>Many feed ingredients are co-products of a crop grown mainly for
+something else — soybean meal alongside soybean oil, or a cereal grain
+alongside its straw. Attributing the <em>entire</em> cultivated area to
+the feed ingredient would overstate its footprint, so <code>herdr</code>
+applies the <code>economic_allocation</code> factor from <a href="Technical_reference.html#mapping.csv--database-connector"><code>mapping.csv</code></a>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">EconomicAllocation_i \in [0, 1]</annotation></semantics></math>):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>×</mo><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = LandPerKg_i \times EconomicAllocation_i</annotation></semantics></math></p>
+</div>
+<div class="section level4">
+<h4 id="annual-ingredient-intake">3. Annual ingredient intake<a class="anchor" aria-label="anchor" href="#annual-ingredient-intake"></a>
+</h4>
+<p>How much of ingredient
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+a cohort consumes over a year depends on daily dry matter intake
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><msub><mi>I</mi><mtext mathvariant="normal">kg/day</mtext></msub></mrow><annotation encoding="application/x-tex">DMI_{\text{kg/day}}</annotation></semantics></math>),
+the feed category’s share of the diet
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Share_{cat}</annotation></semantics></math>,
+from <code>diet_profiles.csv</code>), and the ingredient’s share within
+that category
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Share_i</annotation></semantics></math>,
+from <code>diet_ingredients.csv</code>):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>D</mi><mi>M</mi><msub><mi>I</mi><mtext mathvariant="normal">kg/day</mtext></msub><mo>×</mo><mn>365</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">AnnualConsumption_i = (DMI_{\text{kg/day}} \times 365) \times \left(\frac{Share_{cat}}{100}\right) \times \left(\frac{Share_i}{100}\right)</annotation></semantics></math></p>
+<p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Share_{cat}</annotation></semantics></math>
+corresponds to whichever of forage, concentrate, milk, or milk replacer
+the ingredient belongs to.</p>
+</div>
+<div class="section level4">
+<h4 id="cohort-land-footprint">4. Cohort land footprint<a class="anchor" aria-label="anchor" href="#cohort-land-footprint"></a>
+</h4>
+<p>The area is computed and converted from hectares to square metres (1
+ha = 10,000 m²), then scaled up to the full cohort:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>×</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mn>10</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUsePerAnimal_i \; (\text{m}^2) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>×</mo><mi>P</mi><mi>o</mi><mi>p</mi><mi>u</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times Population</annotation></semantics></math></p>
+<hr>
+</div>
+</div>
+<div class="section level3">
+<h3 id="yield-resolution-hierarchy">Yield Resolution Hierarchy<a class="anchor" aria-label="anchor" href="#yield-resolution-hierarchy"></a>
+</h3>
+<p><code>herdr</code> resolves
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>
+through a three-tiered hierarchy, checked in order:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>User custom yields.</strong> If
+<code>custom_yield_kg_ha</code> is filled in for that ingredient in
+<code>diet_ingredients.csv</code>, herdr uses it directly and labels the
+origin <code>"Custom Data"</code> — no database lookup happens at
+all.</li>
+<li>
+<strong>FAOSTAT crop yields.</strong> Otherwise, crop productivities
+are queried from <code>fao_crops.parquet</code> for the relevant country
+and reporting year.</li>
+<li>
+<strong>Curated forage database.</strong> For forages and grasses
+not well covered by FAOSTAT, yields come from
+<code>fao_forages.parquet</code>, compiled from literature and technical
+sources.</li>
+</ol>
+<p>See <a href="Adding_Ingredient.html">Adding a New Ingredient</a> for
+a worked example of connecting a new ingredient to this hierarchy via
 <code>mapping.csv</code>.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-3--total-land-use">Step 3. Total land use<a class="anchor" aria-label="anchor" href="#step-3--total-land-use"></a>
+<h3 id="feed-origin-dynamic-trade-allocation">Feed Origin &amp; Dynamic Trade Allocation<a class="anchor" aria-label="anchor" href="#feed-origin-dynamic-trade-allocation"></a>
 </h3>
-<p>Annual feed consumption is multiplied by the adjusted land
-requirement and converted from hectares to square metres.</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mn>10</mn><mspace width="0.167em"></mspace><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUse_i = AnnualConsumption_i \times \left( \frac{1}{Yield_i} \times Allocation_i \right) \times 10\,000</annotation></semantics></math></p>
-<p>where</p>
+<p>When <code>country_of_origin</code> is left as <code>NA</code> in
+<code>diet_ingredients.csv</code>, herdr estimates it from international
+trade flows rather than leaving it undefined.</p>
+<ol style="list-style-type: decimal">
+<li>
+<p><strong>Apparent consumption</strong> — how much of the crop the
+country actually uses, regardless of who grew it:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>+</mo><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>I</mi><mi>m</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo>−</mo><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>E</mi><mi>x</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">ApparentConsumption = \max(1, Production + TotalImports - TotalExports)</annotation></semantics></math></p>
+</li>
+<li>
+<p><strong>Self-Sufficiency Ratio (SSR)</strong> — the share of that
+consumption the country produces itself:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>=</mo><mfrac><mrow><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">SSR = \frac{Production}{ApparentConsumption}</annotation></semantics></math></p>
+</li>
+<li>
+<p><strong>Origin assignment rule:</strong></p>
 <ul>
-<li>
-<strong>AnnualConsumption</strong> is annual dry matter intake (kg
-DM/year),</li>
-<li>
-<strong>Yield</strong> is crop productivity (kg DM/ha),</li>
-<li>
-<strong>Allocation</strong> is the economic allocation factor,</li>
-<li>
-<strong>10,000</strong> converts hectares into square metres.</li>
+<li>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>≥</mo><mn>0.70</mn></mrow><annotation encoding="application/x-tex">SSR \ge 0.70</annotation></semantics></math>
+(70% self-sufficient or more): the origin is set to
+<code>farm_country</code> — the country is assumed to be growing enough
+of the crop itself.</li>
+<li>If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>&lt;</mo><mn>0.70</mn></mrow><annotation encoding="application/x-tex">SSR &lt; 0.70</annotation></semantics></math>:
+the origin is set to the country’s <strong>primary source of
+imports</strong> (<code>Top_Partner</code>) — the trade partner it
+imports the most of that crop from.</li>
 </ul>
-<p>The total land use reported by <code>herdr</code> is obtained by
-summing the contribution of every ingredient included in the diet.</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>Note:</strong> the trade matrix database
+(<code>fao_trade_matrix.parquet</code>, ~187 MB) is downloaded
+automatically from GitHub Releases the first time an assessment needs
+trade resolution — see <a href="Technical_reference.html#fao_trade_matrixparquet--dynamic-trade-background-auto-downloaded">Technical
+Reference</a> for details.</p>
+</blockquote>
 <hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="yield-databases">Yield databases<a class="anchor" aria-label="anchor" href="#yield-databases"></a>
-</h2>
-<p><code>herdr</code> combines two complementary yield databases.</p>
-<div class="section level3">
-<h3 id="crop-yields">Crop yields<a class="anchor" aria-label="anchor" href="#crop-yields"></a>
-</h3>
-<p>Crop productivity is obtained from official <strong>FAOSTAT</strong>
-statistics.</p>
-<p>These data include major feed crops such as cereals, oilseeds and
-legumes and are expressed as country-level average yields.</p>
 </div>
 <div class="section level3">
-<h3 id="forage-yields">Forage yields<a class="anchor" aria-label="anchor" href="#forage-yields"></a>
+<h3 id="execution">Execution<a class="anchor" aria-label="anchor" href="#execution"></a>
 </h3>
-<p>Official global statistics for forage productivity are often
-unavailable.</p>
-<p>For this reason, <code>herdr</code> includes a curated forage yield
-database compiled from multiple literature sources and technical reports
-to provide broad geographical coverage.</p>
-<p>Users performing high-resolution regional studies are encouraged to
-replace these values with local data whenever available.</p>
-<hr>
-</div>
-</div>
-<div class="section level2">
-<h2 id="ingredient-mapping">Ingredient mapping<a class="anchor" aria-label="anchor" href="#ingredient-mapping"></a>
-</h2>
-<p>Land-use calculations rely on the file <code>mapping.csv</code>,
-which links feed ingredients with the corresponding yield database.</p>
-<table class="table">
-<thead><tr class="header">
-<th align="left">ingredient</th>
-<th align="left">yield_name</th>
-<th align="right">allocation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">grass_fresh</td>
-<td align="left">Grass</td>
-<td align="right">1.0</td>
-</tr>
-<tr class="even">
-<td align="left">barley_grain</td>
-<td align="left">Barley</td>
-<td align="right">0.80</td>
-</tr>
-</tbody>
-</table>
-<p>The columns have the following meaning:</p>
-<ul>
-<li>
-<strong>ingredient</strong> — ingredient name used in
-<code>diet_ingredients.csv</code>;</li>
-<li>
-<strong>yield_name</strong> — corresponding crop or forage name in
-the yield databases;</li>
-<li>
-<strong>allocation</strong> — proportion of land attributed to that
-ingredient.</li>
-</ul>
-<p>Every ingredient included in a diet must have a corresponding entry
-in <code>mapping.csv</code>.</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="feed-origin-and-dynamic-background-allocation">Feed origin and dynamic background allocation<a class="anchor" aria-label="anchor" href="#feed-origin-and-dynamic-background-allocation"></a>
-</h2>
-<p>Land-use calculations require the user to specify the country where
-the farm is located and the assessment year.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>, </span>
-<span>  year <span class="op">=</span> <span class="fl">2022</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>The origin of the feed ingredients dictates which crop yields are
-applied. Users can explicitly define the origin of each ingredient in
-their input files. However, when the exact origin is unknown (left as
-NA), herdr employs a dynamic background allocation engine.</p>
-<p>This hybrid engine utilizes FAO production and trade data to
-calculate missing feed origins based on a 70% self-sufficiency rule. It
-estimates the proportion of the ingredient that is produced domestically
-versus the proportion that is imported, automatically distributing the
-land footprint across the respective trade partner countries.</p>
-<p>⚠️ Important Data Note: To perform these dynamic calculations without
-bloating the package size, herdr relies on an external high-resolution
-FAO trade matrix. The first time you run a calculation that requires
-background origin allocation, the package will automatically download
-the fao_trade_matrix.parquet file (approx. 187 MB) to your local
-environment.</p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="assumptions-and-limitations">Assumptions and limitations<a class="anchor" aria-label="anchor" href="#assumptions-and-limitations"></a>
-</h2>
-<p>Several assumptions should be considered when interpreting land-use
-estimates.</p>
-<ul>
-<li>All calculations are performed on a <strong>dry matter (DM)</strong>
-basis.</li>
-<li>Crop yields represent <strong>country-average productivity</strong>
-rather than farm-specific values.</li>
-<li>Forage yields are compiled from multiple published sources and may
-not represent local management conditions.</li>
-<li>Allocation factors should reflect the accounting approach adopted by
-the user.</li>
-<li>The background allocation engine relies on a <strong>70%
-self-sufficiency assumption</strong> together with historical
-<strong>FAO trade matrices</strong>, representing macro-economic trade
-flows rather than farm-level supply chains.</li>
-<li>Results should be interpreted as estimates of the land required to
-produce feed, not as direct measurements of occupied agricultural
-land.</li>
-</ul>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="running-the-calculation">Running the calculation<a class="anchor" aria-label="anchor" href="#running-the-calculation"></a>
-</h2>
-<p>Land use can be estimated independently using the standalone
-function:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="co"># Standalone run</span></span>
+<span><span class="va">land_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
+<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year <span class="op">=</span> <span class="fl">2022</span>,</span>
+<span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Integrated execution via full assessment</span></span>
+<span><span class="va">full_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
 <span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2022</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>Alternatively, land-use calculations are performed automatically when
-running the complete assessment through
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h3>
+<ul>
+<li>
+<a href="Technical_reference.html">Technical Reference</a> — full
+definitions for <code>mapping.csv</code>,
+<code>fao_crops.parquet</code>, <code>fao_forages.parquet</code>, and
+<code>fao_trade_matrix.parquet</code>.</li>
+<li>
+<a href="Adding_Ingredient.html">Adding a New Ingredient</a> — how
+<code>economic_allocation</code> and <code>yield_name</code> connect a
+new ingredient to this methodology.</li>
+<li>
+<a href="Workflow.html">General Workflow</a> — where land use fits
+into a full assessment.</li>
+</ul>
+</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

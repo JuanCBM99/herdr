@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -91,96 +92,129 @@
 <h2 id="advanced-assessment-managing-complexity-with-class_flex">Advanced Assessment: Managing Complexity with
 <code>class_flex</code><a class="anchor" aria-label="anchor" href="#advanced-assessment-managing-complexity-with-class_flex"></a>
 </h2>
-<p>In this guide, we tackle a high-complexity scenario for
-<strong>Mature Dairy Cattle</strong>. We will split the population by
+<p>This guide tackles a high-complexity scenario for <strong>mature
+dairy cattle</strong>, splitting the population both by
 <strong>geography</strong> (North vs. South Spain) and by
-<strong>physiological state</strong> using the <code>class_flex</code>
-column to distinguish between the <strong>Lactation Phase</strong> and
-the <strong>Dry Phase</strong>.</p>
+<strong>physiological state</strong>, using the <code>class_flex</code>
+column to distinguish the <strong>lactation phase</strong> from the
+<strong>dry phase</strong>.</p>
 <blockquote>
-<p><strong>Note on File Locations:</strong> All files are located in the
-<code>user_data/</code> folder.</p>
+<p>📂 <strong>All files referenced below live in
+<code>user_data/</code>.</strong></p>
 </blockquote>
-<div class="section level4">
-<h4 id="folder-structure">📂 Folder Structure<a class="anchor" aria-label="anchor" href="#folder-structure"></a>
-</h4>
-<ul>
-<li>
-<strong>User Files (Update these):</strong>
-<code>livestock_census.csv</code>, <code>diet_profiles.csv</code>,
-<code>diet_ingredients.csv</code>,
-<code>ruminant_definitions.csv</code>,
-<code>livestock_weights.csv</code>,
-<code>manure_management.csv</code>.</li>
-<li>
-<strong>In case of usage of the automatic cycle:</strong>
-<code>reproduction_parameters.csv</code>
-</li>
-<li>
-<strong>Reference Files (Expert use only):</strong>
-<code>feed_characteristics.csv</code>, <code>forage_yields.csv</code>,
-<code>mapping.csv</code>, <code>fao_crop_yields.csv</code>,
-<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
-<code>fao_production.csv</code>.</li>
-</ul>
+<div class="section level3">
+<h3 id="what-youll-edit">What you’ll edit<a class="anchor" aria-label="anchor" href="#what-youll-edit"></a>
+</h3>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Category</th>
+<th align="left">Files</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<strong>User inputs</strong> <em>(fill these
+in)</em>
+</td>
+<td align="left">
+<code>livestock_census.csv</code> ·
+<code>diet_profiles.csv</code> · <code>diet_ingredients.csv</code> ·
+<code>ruminant_definitions.csv</code> ·
+<code>livestock_weights.csv</code> ·
+<code>manure_management.csv</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>If using the automatic herd cycle</strong></td>
+<td align="left"><code>reproduction_parameters.csv</code></td>
+</tr>
+<tr class="odd">
+<td align="left">
+<strong>Reference libraries</strong> <em>(consult
+only)</em>
+</td>
+<td align="left">
+<code>feed_characteristics.csv</code> ·
+<code>mapping.csv</code> · <code>fao_forages.parquet</code> ·
+<code>fao_crops.parquet</code> · <code>ipcc_coefficients.csv</code> ·
+<code>ipcc_mm.csv</code>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Full details on every file above are in the <a href="Technical_reference.html">Technical Reference</a> vignette. This
+guide builds directly on the <a href="Moderate_Example.html">Moderate
+Example</a> — start there first if you haven’t used
+<code>class_flex</code> before.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-1-multi-dimensional-census-livestock_census-csv">Step 1: Multi-Dimensional Census
+<h3 id="step-1-multi-dimensional-census-livestock_census-csv">Step 1 — Multi-Dimensional Census
 (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#step-1-multi-dimensional-census-livestock_census-csv"></a>
 </h3>
-<p>The census file links the population to a specific subregion and a
-physiological state. This is vital for accurate annual emission
-averages.</p>
+<p>The census links each population figure to a subregion
+<strong>and</strong> a physiological state — essential for accurate
+annual emission averages.</p>
 <table class="table">
+<colgroup>
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
-<th align="left">population</th>
+<th align="right">population</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">dry_phase</td>
-<td align="left">88065.87</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">88,065.87</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">448921.13</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">448,921.13</td>
 </tr>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">51118.64</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">51,118.64</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
-<td align="left">260580.36</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">260,580.36</td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-2-phase-specific-nutrition">Step 2: Phase-Specific Nutrition<a class="anchor" aria-label="anchor" href="#step-2-phase-specific-nutrition"></a>
+<h3 id="step-2-phase-specific-nutrition">Step 2 — Phase-Specific Nutrition<a class="anchor" aria-label="anchor" href="#step-2-phase-specific-nutrition"></a>
 </h3>
-<p>The <code>class_flex</code> column allows you to define different
-forage/concentrate ratios and specific ingredients for each life
+<p><code>class_flex</code> lets you define a different
+forage/concentrate ratio, and different ingredients, for each life
 stage.</p>
 <div class="section level4">
-<h4 id="a--diet-profiles-diet_profiles-csv">A. Diet Profiles (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#a--diet-profiles-diet_profiles-csv"></a>
+<h4 id="a--diet-profiles-diet_profiles-csv">A. Diet profiles — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#a--diet-profiles-diet_profiles-csv"></a>
 </h4>
 <table class="table">
 <colgroup>
@@ -198,71 +232,72 @@ stage.</p>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
-<th align="left">forage</th>
-<th align="left">concentrate</th>
-<th align="left">milk</th>
-<th align="left">milk_replacer</th>
+<th align="right">forage</th>
+<th align="right">concentrate</th>
+<th align="right">milk</th>
+<th align="right">milk_replacer</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">dry_phase</td>
-<td align="left">70</td>
-<td align="left">30</td>
-<td align="left">0</td>
-<td align="left">0</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">70</td>
+<td align="right">30</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">55</td>
-<td align="left">45</td>
-<td align="left">0</td>
-<td align="left">0</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">55</td>
+<td align="right">45</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">54</td>
-<td align="left">46</td>
-<td align="left">0</td>
-<td align="left">0</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">54</td>
+<td align="right">46</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
-<td align="left">50</td>
-<td align="left">50</td>
-<td align="left">0</td>
-<td align="left">0</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">50</td>
+<td align="right">50</td>
+<td align="right">0</td>
+<td align="right">0</td>
 </tr>
 </tbody>
 </table>
 </div>
 <div class="section level4">
-<h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient Breakdown (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
+<h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
-<p>Ingredients must be assigned precisely to the <code>subregion</code>
-and <code>class_flex</code>. <em>Example for the South/Lactation
-profile:</em></p>
-<table class="table">
+<p>Ingredients must be assigned precisely to their
+<code>subregion</code> and <code>class_flex</code>. Here’s the
+South/lactation profile:</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
@@ -271,55 +306,66 @@ profile:</em></p>
 <th align="left">class_flex</th>
 <th align="left">feed_category</th>
 <th align="left">ingredient</th>
-<th align="left">percentage</th>
-<th align="left">origin_country</th>
+<th align="right">percentage</th>
+<th align="left">country_of_origin</th>
+<th align="right">custom_yield_kg_ha</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
 <td align="left">concentrate</td>
-<td align="left">corn_national</td>
-<td align="left">44.85</td>
-<td align="left">Spain</td>
+<td align="left"><code>corn_national</code></td>
+<td align="right">44.85</td>
+<td align="left"><code>spain</code></td>
+<td align="right"><code>NA</code></td>
 </tr>
 <tr class="even">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
 <td align="left">concentrate</td>
-<td align="left">soybean_meal_44_cp</td>
-<td align="left">17.12</td>
-<td align="left">NA</td>
+<td align="left"><code>soybean_meal_44_cp</code></td>
+<td align="right">17.12</td>
+<td align="left"><code>NA</code></td>
+<td align="right"><code>NA</code></td>
 </tr>
 <tr class="odd">
-<td align="left">diet_dairy_mature</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
 <td align="left">forage</td>
-<td align="left">corn_silage_25_30</td>
-<td align="left">55.00</td>
-<td align="left">Spain</td>
+<td align="left"><code>corn_silage_25_30</code></td>
+<td align="right">55.00</td>
+<td align="left"><code>spain</code></td>
+<td align="right">12000</td>
 </tr>
 </tbody>
 </table>
-<p><em>(Note: Missing origins set as <code>NA</code> will be
-automatically resolved by the dynamic FAO background allocation
-engine).</em></p>
+<blockquote>
+<p>🌍 <strong>Missing origins:</strong> as before, an <code>NA</code> in
+<code>country_of_origin</code> is resolved automatically by the dynamic
+FAO background allocation engine — see <a href="land_use.html">Land Use
+Methodology</a> for how.</p>
+<p>🎯 <strong>Overriding the yield:</strong> the corn silage row sets
+<code>custom_yield_kg_ha</code> to <code>12000</code>, so herdr uses
+that farm-specific figure directly for the land-use footprint instead of
+a FAO/trade-based lookup.</p>
+</blockquote>
 <hr>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-3-physiological-definitions-ruminant_definitions-csv">Step 3: Physiological Definitions
+<h3 id="step-3-physiological-definitions-ruminant_definitions-csv">Step 3 — Physiological Definitions
 (<code>ruminant_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#step-3-physiological-definitions-ruminant_definitions-csv"></a>
 </h3>
-<p>This is the most technical file. It determines the energy
-requirements (IPCC Tier 2). Note the difference in
-<code>milk_yield</code> and <code>cfi</code> between phases.</p>
+<p>This is the most technical file — it determines energy requirements
+under IPCC Tier 2. Notice how <code>milk_yield</code> and
+<code>cfi</code> change between phases.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="10%">
@@ -341,73 +387,70 @@ requirements (IPCC Tier 2). Note the difference in
 <th align="left">cfi</th>
 <th align="left">ca</th>
 <th align="left">c</th>
-<th align="left">milk_yield</th>
-<th align="left">fat_content</th>
+<th align="right">milk_yield</th>
+<th align="right">fat_content</th>
 <th align="left">c_pregnancy</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">cattle_buffalo [lactating]</td>
-<td align="left">stall</td>
-<td align="left">females</td>
-<td align="left">8295</td>
-<td align="left">3.73</td>
-<td align="left">cattle and buffalo</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>cattle_buffalo [lactating]</code></td>
+<td align="left"><code>stall</code></td>
+<td align="left"><code>females</code></td>
+<td align="right">8,295</td>
+<td align="right">3.73</td>
+<td align="left"><code>cattle and buffalo</code></td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">dry_phase</td>
-<td align="left">cattle/buffalo</td>
-<td align="left">stall</td>
-<td align="left">females</td>
-<td align="left">0</td>
-<td align="left">0</td>
-<td align="left">cattle and buffalo</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>cattle/buffalo</code></td>
+<td align="left"><code>stall</code></td>
+<td align="left"><code>females</code></td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left"><code>cattle and buffalo</code></td>
 </tr>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
-<td align="left">cattle_buffalo [lactating]</td>
-<td align="left">stall</td>
-<td align="left">females</td>
-<td align="left">9044</td>
-<td align="left">3.73</td>
-<td align="left">cattle and buffalo</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>cattle_buffalo [lactating]</code></td>
+<td align="left"><code>stall</code></td>
+<td align="left"><code>females</code></td>
+<td align="right">9,044</td>
+<td align="right">3.73</td>
+<td align="left"><code>cattle and buffalo</code></td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">cattle/buffalo</td>
-<td align="left">stall</td>
-<td align="left">females</td>
-<td align="left">0</td>
-<td align="left">0</td>
-<td align="left">cattle and buffalo</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>cattle/buffalo</code></td>
+<td align="left"><code>stall</code></td>
+<td align="left"><code>females</code></td>
+<td align="right">0</td>
+<td align="right">0</td>
+<td align="left"><code>cattle and buffalo</code></td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-4-body-weights-livestock_weights-csv">Step 4: Body Weights (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-4-body-weights-livestock_weights-csv"></a>
+<h3 id="step-4-body-weights-livestock_weights-csv">Step 4 — Body Weights (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-4-body-weights-livestock_weights-csv"></a>
 </h3>
 <p>Accurate weights are essential to calculate Maintenance Energy
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math>)
-and validate the maximum physical capacity of the animal
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">DMI</annotation></semantics></math>
-as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>%</mi><annotation encoding="application/x-tex">\%</annotation></semantics></math>
-of Body Weight).</p>
+and to validate the animal’s maximum physical intake capacity (DMI as %
+of body weight).</p>
 <table class="table">
 <colgroup>
 <col width="12%">
@@ -424,62 +467,63 @@ of Body Weight).</p>
 <th align="left">region</th>
 <th align="left">subregion</th>
 <th align="left">class_flex</th>
-<th align="left">adult_weight</th>
-<th align="left">productive_period</th>
-<th align="left">initial_weight</th>
-<th align="left">final_weight</th>
+<th align="right">adult_weight</th>
+<th align="right">productive_period</th>
+<th align="right">initial_weight</th>
+<th align="right">final_weight</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">dry_phase</td>
-<td align="left">675</td>
-<td align="left">365</td>
-<td align="left">675</td>
-<td align="left">675</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">675</td>
+<td align="right">365</td>
+<td align="right">675</td>
+<td align="right">675</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">675</td>
-<td align="left">365</td>
-<td align="left">675</td>
-<td align="left">675</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">675</td>
+<td align="right">365</td>
+<td align="right">675</td>
+<td align="right">675</td>
 </tr>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">675</td>
-<td align="left">365</td>
-<td align="left">675</td>
-<td align="left">675</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="right">675</td>
+<td align="right">365</td>
+<td align="right">675</td>
+<td align="right">675</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">lactation_phase</td>
-<td align="left">675</td>
-<td align="left">365</td>
-<td align="left">675</td>
-<td align="left">675</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="right">675</td>
+<td align="right">365</td>
+<td align="right">675</td>
+<td align="right">675</td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-5-advanced-manure-management-manure_management-csv">Step 5: Advanced Manure Management
+<h3 id="step-5-advanced-manure-management-manure_management-csv">Step 5 — Advanced Manure Management
 (<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#step-5-advanced-manure-management-manure_management-csv"></a>
 </h3>
-<p>You can define management systems with high granularity, specifying
-the climate zone and variants for methane conversion factors.</p>
+<p>At this level of granularity you can specify climate zone and system
+variant per cohort, which determines the methane conversion factors
+used.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="7%">
@@ -503,7 +547,7 @@ the climate zone and variants for methane conversion factors.</p>
 <th align="left">class_flex</th>
 <th align="left">system_base</th>
 <th align="left">system_variant</th>
-<th align="left">management_months</th>
+<th align="right">management_months</th>
 <th align="left">system_climate</th>
 <th align="left">system_subclimate</th>
 <th align="left">climate_zone</th>
@@ -513,84 +557,108 @@ the climate zone and variants for methane conversion factors.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">anaerobic_lagoon</td>
-<td align="left">uncovered</td>
-<td align="left"></td>
-<td align="left">cool</td>
-<td align="left">temperate</td>
-<td align="left">zone_wet</td>
-<td align="left">wet</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>anaerobic_lagoon</code></td>
+<td align="left"><code>uncovered</code></td>
+<td align="right">—</td>
+<td align="left"><code>cool</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left"><code>zone_moist</code></td>
+<td align="left"><code>wet</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.0537</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">north</td>
-<td align="left">lactation_phase</td>
-<td align="left">liquid_slurry</td>
-<td align="left">with_natural_crust_cover</td>
-<td align="left">3</td>
-<td align="left">cool</td>
-<td align="left">temperate</td>
-<td align="left">zone_wet</td>
-<td align="left">wet</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>north</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>liquid_slurry</code></td>
+<td align="left"><code>with_natural_crust_cover</code></td>
+<td align="right">3</td>
+<td align="left"><code>cool</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left"><code>zone_moist</code></td>
+<td align="left"><code>wet</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.3432</td>
 </tr>
 <tr class="odd">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">solid_storage</td>
-<td align="left"></td>
-<td align="left"></td>
-<td align="left">warm</td>
-<td align="left">temperate</td>
-<td align="left"></td>
-<td align="left">dry</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>solid_storage</code></td>
+<td align="left">—</td>
+<td align="right">—</td>
+<td align="left"><code>warm</code></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><code>dry</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.0694</td>
 </tr>
 <tr class="even">
-<td align="left">mature_dairy_cattle</td>
-<td align="left">spain</td>
-<td align="left">south</td>
-<td align="left">dry_phase</td>
-<td align="left">deep_bedding</td>
-<td align="left">no_mixing</td>
-<td align="left">&gt;1</td>
-<td align="left">warm</td>
-<td align="left">temperate</td>
-<td align="left">zone_dry</td>
-<td align="left">dry</td>
-<td align="left">dairy_cattle_high_productivity</td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>deep_bedding</code></td>
+<td align="left"><code>no_mixing</code></td>
+<td align="right"><code>&gt;1</code></td>
+<td align="left"><code>warm</code></td>
+<td align="left"><code>temperate</code></td>
+<td align="left"><code>zone_dry</code></td>
+<td align="left"><code>dry</code></td>
+<td align="left"><code>dairy_cattle_high_productivity</code></td>
 <td align="right">0.0131</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>⚠️ <strong>Illustrative snippet:</strong> as in the Moderate example,
+the rows above don’t sum to 1.0 per cohort — some rows were omitted here
+for brevity. In a real project, <code>allocation</code> must sum to
+exactly 1.0 for every
+<code>animal_tag</code>/<code>region</code>/<code>subregion</code>/<code>class_flex</code>
+combination.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-6-final-execution">Step 6: Final Execution<a class="anchor" aria-label="anchor" href="#step-6-final-execution"></a>
+<h3 id="step-6-final-execution">Step 6 — Final Execution<a class="anchor" aria-label="anchor" href="#step-6-final-execution"></a>
 </h3>
-<p>When running the analysis, <code>herdr</code> will process each row
-as a unique “animal-state-region” combination before aggregating the
-results.</p>
+<p>When running the analysis, herdr processes each row as a unique
+“animal–state–region” combination before aggregating the results.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># The model calculates impact for each phase separately</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, </span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
 <span>  year <span class="op">=</span> <span class="fl">2015</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
+</h3>
+<ul>
+<li>
+<a href="Moderate_Example.html">Moderate Example</a> — the
+North/South split this example builds on, without
+<code>class_flex</code>.</li>
+<li>
+<a href="Easy_Example.html">Basic Assessment</a> — the simplest
+single-region starting point.</li>
+<li>
+<a href="Technical_reference.html">Technical Reference</a> — every
+file and column explained in detail.</li>
+</ul>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

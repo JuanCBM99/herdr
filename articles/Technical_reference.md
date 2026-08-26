@@ -7,6 +7,13 @@ correctly, files are divided into two categories:
 - **Reference Libraries** — internal files you consult (but do not
   normally edit).
 
+> ⚠️ **Naming convention:** the model is case-sensitive and does not
+> tolerate spaces. Always use **lowercase** and **underscores** in every
+> identifier you type into a CSV (e.g., `maize_silage`, not
+> `Maize Silage`). This is the single most common source of
+> “unrecognized” errors — keep it in mind as you fill in every file
+> below.
+
 ------------------------------------------------------------------------
 
 ## I. User Input Files (`user_data/`)
@@ -22,7 +29,7 @@ step-by-step instructions.
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
 | `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
-| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. |
+| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr`). |
 | `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
 
 ### Nutrition & Diets
@@ -30,18 +37,18 @@ step-by-step instructions.
 | File | Purpose |
 |:---|:---|
 | `diet_profiles.csv` | Sets the high-level percentage balance between `forage`, `concentrate`, `milk`, and `milk_replacer`. |
-| `diet_ingredients.csv` | Micro-breakdown of exactly which ingredients (from the reference library) make up each macro category. |
+| `diet_ingredients.csv` | Micro-breakdown of exactly which ingredients make up each macro category. You can optionally use the `custom_yield_kg_ha` column to enter a specific farm yield, which will override the default FAO/national yield averages for the land-use footprint. |
 
-> **Note on `origin_country`:** if you don’t know where a feed
-> ingredient comes from, leave the `origin_country` column as `NA`. The
-> package will automatically resolve it using international trade data
-> (see [`fao_trade_matrix.parquet`](#fao_trade_matrix) below).
+> **Note on `country_of_origin`:** if you don’t know where a feed
+> ingredient comes from, leave the `country_of_origin` column as `NA`.
+> The package will automatically resolve it using international trade
+> data (see [`fao_trade_matrix.parquet`](#fao_trade_matrix) below).
 
 ### Manure Management
 
 | File | Purpose |
 |:---|:---|
-| `manure_management.csv` | Defines how waste is handled: system, climate, and `allocation` (0 to 1). |
+| `manure_management.csv` | Defines how waste is handled: system, climate, and `allocation` (0 to 1) — the share of that cohort’s manure assigned to this management system. |
 
 ### Reproduction Parameters
 
@@ -72,14 +79,15 @@ Consult this library to find the correct ingredient names for
 |:---------------------|:---------------------------------------------|
 | `ingredient`         | Ingredient name                              |
 | `feed_category`      | Feed category                                |
+| `DM_pct`             | Dry Matter, % as-fed                         |
 | `ASH_pct`            | Ash, % DM                                    |
 | `CP_pct`             | Crude Protein, % DM                          |
 | `EE_pct`             | Ether Extract, % DM                          |
 | `NDF_pct`            | Neutral Detergent Fiber, % DM                |
 | `DE_pct`             | Digestible Energy, %                         |
 | `GE_feed_kcal_kg`    | Gross Energy, kcal/kg DM                     |
-| `swine_ME_kcal_kg`   | Metabolizable Energy for swine, kcal/kg DM   |
 | `swine_DE_kcal_kg`   | Digestible Energy for swine, kcal/kg DM      |
+| `swine_ME_kcal_kg`   | Metabolizable Energy for swine, kcal/kg DM   |
 | `poultry_ME_kcal_kg` | Metabolizable Energy for poultry, kcal/kg DM |
 
 **Sources:** most nutritional values come from the **FEDNA Tables
@@ -95,67 +103,62 @@ where `EE%`, `CP%`, and `ASH%` correspond to the `EE_pct`, `CP_pct`, and
 
 ### `ipcc_coefficients.csv` — Metabolic Constants
 
-Consult this to find the `description` you need to copy into
-`ruminant_definitions.csv`.
-
-- **Key columns:** `description`, `coefficient` ($`C_a`$, $`C_{fi}`$,
-  etc.), `value`.
-- **Why it matters:** contains the Tier 2 constants that define energy
-  needs for maintenance, pregnancy, and lactation, as well as $`B_0`$
-  (Maximum Methane Producing Capacity) for manure management
-  calculations.
+Consult this file to find the `description` you need to copy into
+`ruminant_definitions.csv`. It holds the Tier 2 constants — indexed by
+`description` and `coefficient` (e.g. $`C_a`$, $`C_{fi}`$) with their
+corresponding `value` — that define energy needs for maintenance,
+pregnancy, and lactation, as well as $`B_0`$ (Maximum Methane Producing
+Capacity) for the manure management calculations.
 
 ### `ipcc_mm.csv` — Manure Reference
 
-The master list for the manure management phase. Contains every valid
-combination of manure systems.
-
-- **Key columns:** `system_base`, `system_variant`, `climate_zone`,
-  `management_months`.
-- **Why it matters:** your entry in `manure_management.csv` must match a
-  row here exactly, or the model will return zero emissions for that
-  cohort.
+The master list of every valid manure management combination:
+`system_base`, `system_variant`, `climate_zone`, and
+`management_months`. Your entry in `manure_management.csv` must match a
+row here exactly — otherwise the model silently returns zero emissions
+for that cohort instead of raising an error, so it’s worth
+double-checking against this file first if a result looks off.
 
 ### `mapping.csv` — Database Connector
 
-The bridge that links your diet ingredient names to the agricultural
-yield databases.
+The bridge between your diet ingredients and the agricultural yield and
+life-cycle-assessment databases, built around four columns:
+`ingredient`, `yield_name`, `agribalyse_name`, and
+`economic_allocation`. `yield_name` tells the model which crop
+productivity to use for the land-use footprint, `agribalyse_name` links
+the ingredient to its LCA database entry, and `economic_allocation`
+(0–1) is the share of that crop’s value attributed to this specific
+ingredient rather than its co-products — e.g. 0.80 for cereal grain
+versus the straw left over.
 
-- **Key columns:** `ingredient`, `yield_name`, `allocation` (0–1
-  factor).
-- **Why it matters:** tells the model which crop productivity to use,
-  and how much of that land footprint is attributed to the animal (e.g.,
-  grain vs. straw allocation).
+Note that this `economic_allocation` column is conceptually different
+from the `allocation` column in `manure_management.csv`: both are 0–1
+shares, but one splits a cohort’s manure across management systems,
+while the other splits a crop’s environmental burden across its
+co-products.
 
-### `forage_yields.csv` — Grass & Silage Data (BC3)
+### `fao_forages.parquet` — Grass & Silage Data (BC3)
 
-Provisional database for forages, supplemented by BC3 researchers.
+A provisional forage database, supplemented by BC3 researchers, giving
+yields (`Area`, `Item`, `Value` in kg DM/ha) for grazing and
+forage-based systems — filling the gaps where official FAOSTAT records
+are often incomplete or missing.
 
-- **Key columns:** `Area (Country)`, `Item (Crop name)`,
-  `Value (kg DM/ha)`.
-- **Why it matters:** provides essential yield data for grazing and
-  forage-based systems, where official FAOSTAT records are often
-  incomplete or missing.
+### `fao_crops.parquet` — Official Statutory Yields
 
-### `fao_crop_yields.csv` — Official Statutory Yields
-
-Direct yield data for grains and pulses from FAOSTAT (2024).
-
-- **Key columns:** `Area`, `Item`, `Year`, `Value (kg DM/ha)`.
-- **Why it matters:** sets the international standard for calculating
-  the land footprint (m²) of concentrate feeds and commercial crops.
+Direct yield data for grains and pulses from FAOSTAT (2024), with the
+same `Area` / `Item` / `Value` (kg DM/ha) structure plus a `Year`
+column. This sets the international standard used to calculate the land
+footprint (m²) of concentrate feeds and commercial crops.
 
 ### `fao_trade_matrix.parquet` — Dynamic Trade Background (Auto-Downloaded)
 
 Unlike the other libraries, this file is **not** tracked in the
-repository, due to its size (~187 MB).
-
-- **How it works:** automatically downloaded from GitHub Releases the
-  first time `herdr` encounters an `NA` in the `origin_country` column
-  of your diets.
-- **Why it matters:** powers the hybrid background allocation engine,
-  using FAO production and trade data to estimate missing feed origins
-  under a 70% self-sufficiency rule.
+repository, due to its size (~187 MB). It’s downloaded automatically
+from GitHub Releases the first time `herdr` encounters an `NA` in the
+`country_of_origin` column of your diets, and it powers the background
+allocation engine that estimates missing feed origins from FAO
+production and trade data under a 70% self-sufficiency rule.
 
 ------------------------------------------------------------------------
 
@@ -168,12 +171,19 @@ Use this table to know where to look when filling out your data:
 | Identify an animal type | `ipcc_coefficients.csv` | `ruminant_definitions.csv` |
 | Pick a feed ingredient | `feed_characteristics.csv` | `diet_ingredients.csv` |
 | Choose a manure system | `ipcc_mm.csv` | `manure_management.csv` |
-| Add a custom crop | `mapping.csv`, `forage_yields.csv`, `fao_crop_yields.csv` | `feed_characteristics.csv` |
+| Add a custom crop | `mapping.csv`, `fao_forages.parquet`, `fao_crops.parquet` | `feed_characteristics.csv` |
 
 ------------------------------------------------------------------------
 
-## Tip
+## Next steps
 
-The model is case-sensitive and does not tolerate spaces. Always use
-**lowercase** and **underscores** (e.g., `maize_silage` instead of
-`Maize Silage`).
+- [General
+  Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
+  how these files fit into a full assessment, step by step.
+- [Land Use
+  Methodology](https://juancbm99.github.io/herdr/articles/land_use.md) —
+  the full self-sufficiency and trade-allocation engine behind
+  `fao_trade_matrix.parquet`.
+- [Manure Management
+  Guide](https://juancbm99.github.io/herdr/articles/Manure.md) — every
+  supported combination in `ipcc_mm.csv`, explained.

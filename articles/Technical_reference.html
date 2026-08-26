@@ -48,7 +48,8 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
 <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide &amp; Disclaimers</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
@@ -97,6 +98,14 @@ model works correctly, files are divided into two categories:</p>
 <strong>Reference Libraries</strong> — internal files you consult
 (but do not normally edit).</li>
 </ul>
+<blockquote>
+<p>⚠️ <strong>Naming convention:</strong> the model is case-sensitive
+and does not tolerate spaces. Always use <strong>lowercase</strong> and
+<strong>underscores</strong> in every identifier you type into a CSV
+(e.g., <code>maize_silage</code>, not <code>Maize Silage</code>). This
+is the single most common source of “unrecognized” errors — keep it in
+mind as you fill in every file below.</p>
+</blockquote>
 <hr>
 <div class="section level2">
 <h2 id="i--user-input-files-user_data">I. User Input Files (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-files-user_data"></a>
@@ -134,7 +143,9 @@ additional parameters for breeder swine.</td>
 <td align="left"><code>ruminant_definitions.csv</code></td>
 <td align="left">Bridge file for <strong>ruminant</strong> animals.
 Links each <code>animal_tag</code> to a <code>diet_tag</code> and an
-IPCC description.</td>
+IPCC description. Includes key reproductive parameters like pregnancy
+rate (<code>pregnancy_rate</code>) and prolificacy
+(<code>pr</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>monogastric_definitions.csv</code></td>
@@ -167,16 +178,19 @@ calculations.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>diet_ingredients.csv</code></td>
-<td align="left">Micro-breakdown of exactly which ingredients (from the
-reference library) make up each macro category.</td>
+<td align="left">Micro-breakdown of exactly which ingredients make up
+each macro category. You can optionally use the
+<code>custom_yield_kg_ha</code> column to enter a specific farm yield,
+which will override the default FAO/national yield averages for the
+land-use footprint.</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>Note on <code>origin_country</code>:</strong> if you don’t
+<p><strong>Note on <code>country_of_origin</code>:</strong> if you don’t
 know where a feed ingredient comes from, leave the
-<code>origin_country</code> column as <code>NA</code>. The package will
-automatically resolve it using international trade data (see <a href="#fao_trade_matrix"><code>fao_trade_matrix.parquet</code></a>
+<code>country_of_origin</code> column as <code>NA</code>. The package
+will automatically resolve it using international trade data (see <a href="#fao_trade_matrix"><code>fao_trade_matrix.parquet</code></a>
 below).</p>
 </blockquote>
 </div>
@@ -195,7 +209,8 @@ below).</p>
 <tbody><tr class="odd">
 <td align="left"><code>manure_management.csv</code></td>
 <td align="left">Defines how waste is handled: system, climate, and
-<code>allocation</code> (0 to 1).</td>
+<code>allocation</code> (0 to 1) — the share of that cohort’s manure
+assigned to this management system.</td>
 </tr></tbody>
 </table>
 </div>
@@ -252,38 +267,42 @@ your input files.</p>
 <td align="left">Feed category</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>DM_pct</code></td>
+<td align="left">Dry Matter, % as-fed</td>
+</tr>
+<tr class="even">
 <td align="left"><code>ASH_pct</code></td>
 <td align="left">Ash, % DM</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>CP_pct</code></td>
 <td align="left">Crude Protein, % DM</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>EE_pct</code></td>
 <td align="left">Ether Extract, % DM</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>NDF_pct</code></td>
 <td align="left">Neutral Detergent Fiber, % DM</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>DE_pct</code></td>
 <td align="left">Digestible Energy, %</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>GE_feed_kcal_kg</code></td>
 <td align="left">Gross Energy, kcal/kg DM</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>swine_ME_kcal_kg</code></td>
-<td align="left">Metabolizable Energy for swine, kcal/kg DM</td>
 </tr>
 <tr class="even">
 <td align="left"><code>swine_DE_kcal_kg</code></td>
 <td align="left">Digestible Energy for swine, kcal/kg DM</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>swine_ME_kcal_kg</code></td>
+<td align="left">Metabolizable Energy for swine, kcal/kg DM</td>
+</tr>
+<tr class="even">
 <td align="left"><code>poultry_ME_kcal_kg</code></td>
 <td align="left">Metabolizable Energy for poultry, kcal/kg DM</td>
 </tr>
@@ -302,87 +321,69 @@ correspond to the <code>EE_pct</code>, <code>CP_pct</code>, and
 <h3 id="ipcc_coefficients-csv-metabolic-constants">
 <code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
 </h3>
-<p>Consult this to find the <code>description</code> you need to copy
-into <code>ruminant_definitions.csv</code>.</p>
-<ul>
-<li>
-<strong>Key columns:</strong> <code>description</code>,
+<p>Consult this file to find the <code>description</code> you need to
+copy into <code>ruminant_definitions.csv</code>. It holds the Tier 2
+constants — indexed by <code>description</code> and
 <code>coefficient</code>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">C_{fi}</annotation></semantics></math>,
-etc.), <code>value</code>.</li>
-<li>
-<strong>Why it matters:</strong> contains the Tier 2 constants that
-define energy needs for maintenance, pregnancy, and lactation, as well
-as
+(e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">C_{fi}</annotation></semantics></math>)
+with their corresponding <code>value</code> — that define energy needs
+for maintenance, pregnancy, and lactation, as well as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>
-(Maximum Methane Producing Capacity) for manure management
-calculations.</li>
-</ul>
+(Maximum Methane Producing Capacity) for the manure management
+calculations.</p>
 </div>
 <div class="section level3">
 <h3 id="ipcc_mm-csv-manure-reference">
 <code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
 </h3>
-<p>The master list for the manure management phase. Contains every valid
-combination of manure systems.</p>
-<ul>
-<li>
-<strong>Key columns:</strong> <code>system_base</code>,
-<code>system_variant</code>, <code>climate_zone</code>,
-<code>management_months</code>.</li>
-<li>
-<strong>Why it matters:</strong> your entry in
-<code>manure_management.csv</code> must match a row here exactly, or the
-model will return zero emissions for that cohort.</li>
-</ul>
+<p>The master list of every valid manure management combination:
+<code>system_base</code>, <code>system_variant</code>,
+<code>climate_zone</code>, and <code>management_months</code>. Your
+entry in <code>manure_management.csv</code> must match a row here
+exactly — otherwise the model silently returns zero emissions for that
+cohort instead of raising an error, so it’s worth double-checking
+against this file first if a result looks off.</p>
 </div>
 <div class="section level3">
 <h3 id="mapping-csv-database-connector">
 <code>mapping.csv</code> — Database Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-database-connector"></a>
 </h3>
-<p>The bridge that links your diet ingredient names to the agricultural
-yield databases.</p>
-<ul>
-<li>
-<strong>Key columns:</strong> <code>ingredient</code>,
-<code>yield_name</code>, <code>allocation</code> (0–1 factor).</li>
-<li>
-<strong>Why it matters:</strong> tells the model which crop
-productivity to use, and how much of that land footprint is attributed
-to the animal (e.g., grain vs. straw allocation).</li>
-</ul>
+<p>The bridge between your diet ingredients and the agricultural yield
+and life-cycle-assessment databases, built around four columns:
+<code>ingredient</code>, <code>yield_name</code>,
+<code>agribalyse_name</code>, and <code>economic_allocation</code>.
+<code>yield_name</code> tells the model which crop productivity to use
+for the land-use footprint, <code>agribalyse_name</code> links the
+ingredient to its LCA database entry, and
+<code>economic_allocation</code> (0–1) is the share of that crop’s value
+attributed to this specific ingredient rather than its co-products —
+e.g. 0.80 for cereal grain versus the straw left over.</p>
+<p>Note that this <code>economic_allocation</code> column is
+conceptually different from the <code>allocation</code> column in
+<code>manure_management.csv</code>: both are 0–1 shares, but one splits
+a cohort’s manure across management systems, while the other splits a
+crop’s environmental burden across its co-products.</p>
 </div>
 <div class="section level3">
-<h3 id="forage_yields-csv-grass-silage-data-bc3">
-<code>forage_yields.csv</code> — Grass &amp; Silage Data (BC3)<a class="anchor" aria-label="anchor" href="#forage_yields-csv-grass-silage-data-bc3"></a>
+<h3 id="fao_forages-parquet-grass-silage-data-bc3">
+<code>fao_forages.parquet</code> — Grass &amp; Silage Data
+(BC3)<a class="anchor" aria-label="anchor" href="#fao_forages-parquet-grass-silage-data-bc3"></a>
 </h3>
-<p>Provisional database for forages, supplemented by BC3
-researchers.</p>
-<ul>
-<li>
-<strong>Key columns:</strong> <code>Area (Country)</code>,
-<code>Item (Crop name)</code>, <code>Value (kg DM/ha)</code>.</li>
-<li>
-<strong>Why it matters:</strong> provides essential yield data for
-grazing and forage-based systems, where official FAOSTAT records are
-often incomplete or missing.</li>
-</ul>
+<p>A provisional forage database, supplemented by BC3 researchers,
+giving yields (<code>Area</code>, <code>Item</code>, <code>Value</code>
+in kg DM/ha) for grazing and forage-based systems — filling the gaps
+where official FAOSTAT records are often incomplete or missing.</p>
 </div>
 <div class="section level3">
-<h3 id="fao_crop_yields-csv-official-statutory-yields">
-<code>fao_crop_yields.csv</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crop_yields-csv-official-statutory-yields"></a>
+<h3 id="fao_crops-parquet-official-statutory-yields">
+<code>fao_crops.parquet</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crops-parquet-official-statutory-yields"></a>
 </h3>
-<p>Direct yield data for grains and pulses from FAOSTAT (2024).</p>
-<ul>
-<li>
-<strong>Key columns:</strong> <code>Area</code>, <code>Item</code>,
-<code>Year</code>, <code>Value (kg DM/ha)</code>.</li>
-<li>
-<strong>Why it matters:</strong> sets the international standard for
-calculating the land footprint (m²) of concentrate feeds and commercial
-crops.</li>
-</ul>
+<p>Direct yield data for grains and pulses from FAOSTAT (2024), with the
+same <code>Area</code> / <code>Item</code> / <code>Value</code> (kg
+DM/ha) structure plus a <code>Year</code> column. This sets the
+international standard used to calculate the land footprint (m²) of
+concentrate feeds and commercial crops.</p>
 </div>
 <div class="section level3">
 <h3 id="fao_trade_matrix">
@@ -390,17 +391,12 @@ crops.</li>
 (Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_trade_matrix"></a>
 </h3>
 <p>Unlike the other libraries, this file is <strong>not</strong> tracked
-in the repository, due to its size (~187 MB).</p>
-<ul>
-<li>
-<strong>How it works:</strong> automatically downloaded from GitHub
-Releases the first time <code>herdr</code> encounters an <code>NA</code>
-in the <code>origin_country</code> column of your diets.</li>
-<li>
-<strong>Why it matters:</strong> powers the hybrid background
-allocation engine, using FAO production and trade data to estimate
-missing feed origins under a 70% self-sufficiency rule.</li>
-</ul>
+in the repository, due to its size (~187 MB). It’s downloaded
+automatically from GitHub Releases the first time <code>herdr</code>
+encounters an <code>NA</code> in the <code>country_of_origin</code>
+column of your diets, and it powers the background allocation engine
+that estimates missing feed origins from FAO production and trade data
+under a 70% self-sufficiency rule.</p>
 <hr>
 </div>
 </div>
@@ -439,7 +435,7 @@ missing feed origins under a 70% self-sufficiency rule.</li>
 <td align="left">Add a custom crop</td>
 <td align="left">
 <code>mapping.csv</code>,
-<code>forage_yields.csv</code>, <code>fao_crop_yields.csv</code>
+<code>fao_forages.parquet</code>, <code>fao_crops.parquet</code>
 </td>
 <td align="left"><code>feed_characteristics.csv</code></td>
 </tr>
@@ -448,11 +444,20 @@ missing feed origins under a 70% self-sufficiency rule.</li>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="tip">Tip<a class="anchor" aria-label="anchor" href="#tip"></a>
+<h2 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
 </h2>
-<p>The model is case-sensitive and does not tolerate spaces. Always use
-<strong>lowercase</strong> and <strong>underscores</strong> (e.g.,
-<code>maize_silage</code> instead of <code>Maize Silage</code>).</p>
+<ul>
+<li>
+<a href="Workflow.html">General Workflow</a> — how these files fit
+into a full assessment, step by step.</li>
+<li>
+<a href="land_use.html">Land Use Methodology</a> — the full
+self-sufficiency and trade-allocation engine behind
+<code>fao_trade_matrix.parquet</code>.</li>
+<li>
+<a href="Manure.html">Manure Management Guide</a> — every supported
+combination in <code>ipcc_mm.csv</code>, explained.</li>
+</ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>
