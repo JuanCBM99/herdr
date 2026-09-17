@@ -1,2 +1,2 @@
-﻿diet_tag,region,subregion,class_flex,forage_share,concentrate_share,milk_share,milk_replacer_share
-diet_random_goat,france,,,90,10,0,0
+diet_tag,forage_share,concentrate_share,milk_share,milk_replacer_share
+diet_random_goat,90,10,0,0

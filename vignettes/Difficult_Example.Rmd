@@ -43,28 +43,28 @@ The census links each population figure to a subregion **and** a physiological s
 
 ## Step 2 — Phase-Specific Nutrition
 
-`class_flex` lets you define a different forage/concentrate ratio, and different ingredients, for each life stage.
+Diets are defined directly with distinct `diet_tag` identifiers reflecting each region and production phase (`class_flex`).
 
 ### A. Diet profiles — `diet_profiles.csv`
 
-| diet_tag | region | subregion | class_flex | forage_share | concentrate_share | milk_share | milk_replacer_share |
-|:---|:---|:---|:---|---:|---:|---:|---:|
-| `diet_dairy_mature` | `spain` | `north` | `dry_phase` | 70 | 30 | 0 | 0 |
-| `diet_dairy_mature` | `spain` | `north` | `lactation_phase` | 55 | 45 | 0 | 0 |
-| `diet_dairy_mature` | `spain` | `south` | `dry_phase` | 54 | 46 | 0 | 0 |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | 50 | 50 | 0 | 0 |
+| diet_tag | forage_share | concentrate_share | milk_share | milk_replacer_share |
+|:---|---:|---:|---:|---:|
+| `diet_dairy_mature_north_dry_phase` | 70 | 30 | 0 | 0 |
+| `diet_dairy_mature_north_lactation_phase` | 55 | 45 | 0 | 0 |
+| `diet_dairy_mature_south_dry_phase` | 54 | 46 | 0 | 0 |
+| `diet_dairy_mature_south_lactation_phase` | 50 | 50 | 0 | 0 |
 
 ### B. Ingredient breakdown — `diet_ingredients.csv`
 
-Ingredients must be assigned precisely to their `subregion` and `class_flex`. Here are the primary ingredients for the South/lactation profile (excerpted from the full dataset):
+Ingredients are linked directly via `diet_tag`. Here are the primary ingredients for the South lactation profile (excerpted from the full dataset):
 
-| diet_tag | region | subregion | class_flex | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
-|:---|:---|:---|:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | forage | `corn_silage_25_30` | 71.40 | `spain` | 12000 |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | forage | `cereals_silage_wheat_barley_oat_triticale` | 28.60 | `spain` | `NA` |
+| diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
+|:---|:---|:---|---:|:---|---:|
+| `diet_dairy_mature_south_lactation_phase` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south_lactation_phase` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
+| `diet_dairy_mature_south_lactation_phase` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
+| `diet_dairy_mature_south_lactation_phase` | forage | `corn_silage_25_30` | 71.40 | `spain` | 12000 |
+| `diet_dairy_mature_south_lactation_phase` | forage | `cereals_silage_wheat_barley_oat_triticale` | 28.60 | `spain` | `NA` |
 
 > ℹ️ **Illustrative excerpt:** In the complete `Level3_Spain_Dairy_Cattle_2015` template, remaining concentrate shares (9.32%) consist of macro-minerals and vitamins, ensuring both concentrate and forage categories sum to exactly 100.0%.
 >
@@ -80,10 +80,10 @@ This is the most technical file — it determines energy requirements under IPCC
 
 | animal_tag | region | subregion | class_flex | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
 |:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | `diet_dairy_mature` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `diet_dairy_mature` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `diet_dairy_mature_north_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | `diet_dairy_mature_north_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | `diet_dairy_mature_south_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `diet_dairy_mature_south_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
 
 ---
 
