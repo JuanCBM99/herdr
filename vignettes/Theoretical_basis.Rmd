@@ -477,5 +477,78 @@ $$N_{leach-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{LeachMS} \
 
 ---
 
+# V. Animal Productivity & Edible Protein Engine (FAO/GLEAM)
+
+In addition to greenhouse gas emissions and land use, `herdr` computes physical livestock productivity and nutritional protein output using the **FAO Global Livestock Environmental Assessment Model (GLEAM v3.0)** framework and International Dairy Federation (IDF) standards.
+
+## 1. Annual Slaughter Output ($N_{\text{exit}}$)
+
+Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) is calculated from the Annual Average Population ($AAP$) based on functional cohort roles:
+
+* **Replacement stock (`replacement`):** $N_{\text{exit}} = 0$ (animals enter the adult herd to maintain stability).
+* **Mature breeding females (`mature`):** 
+  $$N_{\text{exit}} = AAP \times \text{replacement\_rate}$$
+  *(For layer hens where replacement rate is omitted, $N_{\text{exit}} = AAP \times \frac{365}{\text{productive\_period\_days}}$).*
+* **Commercial slaughter cohorts (`slaughter`):**
+  $$N_{\text{exit}} = AAP \times \left( \frac{365}{\text{productive\_period\_days}} \right)$$
+
+## 2. Milk Production & FPCM
+
+Total fresh milk is computed as:
+$$\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}$$
+
+Estimated milk protein content follows IPCC Tier 2:
+$$\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)$$
+
+To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2015)** standard:
+$$\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \cdot \text{Fat} (\%) + 0.0776 \cdot \text{Protein} (\%) + 0.2534 \right]$$
+
+## 3. Meat Production & Carcass Metrics
+
+Meat output transforms live animals leaving the farm into edible protein:
+
+1. **Live weight at slaughter:**
+   $$\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}$$
+2. **Carcass weight:**
+   $$\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)$$
+   where $DP\%$ is the species dressing percentage (FAO GLEAM Table 9.1).
+3. **Boneless meat:**
+   $$\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM$$
+   where $BFM$ is the boneless fraction of carcass meat.
+4. **Meat edible protein:**
+   $$\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}$$
+
+| Species | Dressing Percentage ($DP\%$) | Boneless Fraction ($BFM$) | Protein in Meat ($\text{MEAT\_prot}$) | Default Milk Protein ($\text{MILK\_prot}$) |
+|:---|:---:|:---:|:---:|:---:|
+| **Cattle** | 54.0% | 0.75 | 0.2113 | 0.033 |
+| **Sheep** | 47.0% | 0.70 | 0.2013 | 0.058 |
+| **Goat** | 47.0% | 0.70 | 0.1920 | 0.034 |
+| **Swine** | 73.0% | 0.65 | 0.2020 | — |
+| **Poultry** | 70.0% | 0.75 | 0.1900 | — |
+
+## 4. Egg Production (Poultry)
+
+Annual fresh egg yield and protein content:
+$$\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP$$
+$$\text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240$$
+
+## 5. Total Edible Human Protein
+
+$$\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}$$
+
+---
+
+# VI. Demographic & Herd Dynamics (AAP Rule)
+
+For fast-growing and batch-reared cohorts, the census standing population in `livestock_census.csv` must always represent the **Annual Average Population ($AAP$)**:
+$$AAP = \frac{\sum_{i=1}^{M} N_i \times D_i}{365}$$
+
+Where $N_i$ is the number of animals in batch $i$ and $D_i$ is their duration on farm in days. Conversely, the annual total number of finished animals produced by a fixed barn capacity ($C$) operated continuously is:
+$$\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_period\_days} + \text{empty\_period\_days}} \right)$$
+
+---
+
 ### 📚 References
 * IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
+* FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM) v3.0: Model description*. Food and Agriculture Organization of the United Nations, Rome.
+* IDF (2015). *A common carbon footprint approach for the dairy sector: The green house gas emissions from dairy and beef production*. International Dairy Federation Bulletin 479/2015.

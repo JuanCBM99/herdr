@@ -90,12 +90,15 @@ modal_tooltips <- list(
   cfi_maintenance          = "Maintenance coefficient in kcal/kg_day",
   frac_fat_pct             = "Fat fraction in the animal's daily weight gain.",
   frac_protein_pct         = "Protein fraction in the animal's daily weight gain.",
-  egg_mass_g_day           = "Egg mass produced by laying hens.",
+  egg_mass_g_day           = "Egg mass produced by laying hens (in grams per day).",
+  egg_weight_g             = "Average weight of a single egg in grams (e.g. 60-64 g). Used with egg_mass_g_day to estimate daily egg laying rate.",
+  fertility_rate           = "Fertility and hatchability rate (between 0 and 1) for poultry breeding flocks.",
   alpha                    = "Metabolic weight coefficient",
   piglets_born             = "Average number of piglets born in a single litter (only for breeding sows).",
   piglets_suckling         = "Average number of piglets actively nursing from the mother (only for lactating sows).",
   adult_weight_kg          = "Average weight of a fully grown mature animal (in kg).",
-  productive_period_days   = "Number of days the animal is in its active production phase (e.g., fattening days).",
+  productive_period_days   = "Duration of the production phase in days: for fattening animals (broilers, pigs), days on feed until slaughter; for breeding sows, the farrowing interval (e.g., 149 days); for laying hens, the entire laying period until flock depopulation (e.g., 511 days).",
+  replacement_rate         = "Annual replacement rate for breeding or mature animals (e.g., 0.27 for dairy cows, 0.25 for sows, 1.0 for layer hens per batch). Represents the fraction of adult stock replaced each year.",
   initial_weight_kg        = "Starting weight of the animal at the beginning of the evaluated period (in kg).",
   final_weight_kg          = "Target ending weight of the animal at the end of the period (in kg).",
   sows_gestation_days      = "Number of days a sow is pregnant.",
@@ -441,6 +444,7 @@ ui <- page_sidebar(
         selectInput("function_choice", "Function to Run:", choices = c(
           "Full Assessment (All)" = "generate_impact_assessment",
           "Population" = "calculate_population",
+          "Production (Meat, Milk, Eggs, Wool)" = "calculate_production",
           "Weighted Feed Characteristics" = "calculate_weighted_variable",
           "Net Energy for pregnancy" = "calculate_NE_pregnancy",
           "Net Energy for wool production" = "calculate_NE_wool",
@@ -494,6 +498,83 @@ ui <- page_sidebar(
             p(class = "text-muted mb-4", "A quick guide to understanding the variables and abbreviations used in herdr."),
             div(
               style = "background: var(--herdr-card); border-radius: 12px; border: 1px solid var(--herdr-border); padding: 1.5rem; max-height: calc(100vh - 230px); overflow-y: auto;",
+
+              # --- QUICK DECISION MATRIX ALERT ---
+              div(
+                class = "alert alert-info mb-4",
+                h5(icon("compass"), " 5-Minute Farm Decision Matrix", class = "alert-heading fw-bold mb-2"),
+                p(class = "mb-2 small", "Not sure what to enter for your farm? Here is the quick setup guide:"),
+                tags$div(
+                  class = "table-responsive",
+                  tags$table(
+                    class = "table table-sm table-bordered bg-white text-dark small mb-0",
+                    tags$thead(class = "table-light",
+                      tags$tr(
+                        tags$th("Farm Type"),
+                        tags$th("Census Entry"),
+                        tags$th("productive_period_days"),
+                        tags$th("replacement_rate")
+                      )
+                    ),
+                    tags$tbody(
+                      tags$tr(
+                        tags$td(tags$strong("Broilers (Meat Poultry)")),
+                        tags$td("Average barn capacity (e.g. 20,000)"),
+                        tags$td("42 days (fattening duration)"),
+                        tags$td("0 (None)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Layer Hens (Eggs)")),
+                        tags$td("Laying flock size (e.g. 10,000)"),
+                        tags$td("511 days (laying period)"),
+                        tags$td("Auto (365/511 = 71.4%)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Breeding Sows (Farrow-to-finish)")),
+                        tags$td("Breeding sows (e.g. 500)"),
+                        tags$td("148.9 days (farrowing interval)"),
+                        tags$td("0.25 (25% annual)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Fattening Pigs (Cebo)")),
+                        tags$td("Barn places (e.g. 2,000)"),
+                        tags$td("110 days (fattening duration)"),
+                        tags$td("0 (None)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Dairy Cattle")),
+                        tags$td("Mature cows (e.g. 100)"),
+                        tags$td("365 days"),
+                        tags$td("0.27 (27% annual)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Beef Cattle")),
+                        tags$td("Mature cows (e.g. 100)"),
+                        tags$td("365 days"),
+                        tags$td("0.15 (15% annual)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Meat / Dairy Sheep")),
+                        tags$td("Adult ewes (e.g. 1,000)"),
+                        tags$td("365 days (lambing interval 200 d)"),
+                        tags$td("0.20 (20% annual)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Dairy / Meat Goats")),
+                        tags$td("Adult does (e.g. 500)"),
+                        tags$td("365 days (kidding interval 200 d)"),
+                        tags$td("0.20 (20% annual)")
+                      ),
+                      tags$tr(
+                        tags$td(tags$strong("Breeder Meat Hens")),
+                        tags$td("Breeding flock (e.g. 10,000)"),
+                        tags$td("301 days (breeding cycle)"),
+                        tags$td("Auto (365/301 = 121.3%)")
+                      )
+                    )
+                  )
+                )
+              ),
 
               # --- SECTION 1: Identification & Grouping ---
               h5(icon("tags"), "Identification & Grouping", class = "mb-3 mt-2 text-success"),
@@ -644,7 +725,11 @@ ui <- page_sidebar(
                 tags$dt(class = "col-sm-4", "sow_reserve_gain_kg"),
                 tags$dd(class = "col-sm-8", "Weight gained by the mother sow to recover body fat/reserves after a pregnancy cycle (in kg)."),
                 tags$dt(class = "col-sm-4", "egg_mass_g_day"),
-                tags$dd(class = "col-sm-8", "Egg mass produced by laying hens.")
+                tags$dd(class = "col-sm-8", "Egg mass produced by laying hens (in grams per day). Standard input for IPCC energy equations."),
+                tags$dt(class = "col-sm-4", "egg_weight_g"),
+                tags$dd(class = "col-sm-8", "Average individual egg weight in grams (e.g., 60 to 64 g). Combined with egg_mass_g_day, it calculates daily oviposition rate."),
+                tags$dt(class = "col-sm-4", "fertility_rate"),
+                tags$dd(class = "col-sm-8", "Fertility and hatchability rate (between 0 and 1, or percentage) for poultry breeding flocks.")
               ),
               hr(class = "my-4"),
 

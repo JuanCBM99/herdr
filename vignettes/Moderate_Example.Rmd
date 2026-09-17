@@ -1,6 +1,9 @@
 ---
 title: "Dairy Cattle Spain: North/South"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Dairy Cattle Spain: North/South}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +14,7 @@ vignette: >
 
 This guide walks through a **Moderate Assessment** for **mature dairy cattle in Spain (2015)**, using the multi-regional structure (North and South) to improve precision over a single national figure.
 
-> 📂 **All files referenced below live in `user_data/`.**
+> 📂 **All files referenced below live in `user_data/` and correspond to the pre-configured `inst/Examples/Level2_Spain_Dairy_Cattle_2015/` baseline.**
 
 ## What you'll edit
 
@@ -121,5 +124,5 @@ results <- generate_impact_assessment(
 ## Next steps
 
 - [Basic Assessment](Easy_Example.html) — the single-region version this example builds on.
-- [Hard Example](Difficult_Example.html) — adds physiological life stages (`class_flex`) on top of this North/South split.
+- [Advanced Assessment](Difficult_Example.html) — adds physiological life stages (`class_flex`) on top of this North/South split.
 - [Technical Reference](Technical_reference.html) — every file and column explained in detail.

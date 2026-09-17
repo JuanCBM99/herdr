@@ -26,6 +26,8 @@ navbar:
     - text: "Guides"
       icon: fas fa-map-signs
       menu:
+        - text: "Herd Demography"
+          href: articles/Herd_Demography.html
         - text: "Technical File Reference"
           href: articles/Technical_reference.html
         - text: "Manure System Guide"

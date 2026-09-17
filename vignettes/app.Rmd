@@ -24,7 +24,7 @@ Before building your farm scenario, you need to launch the application and set u
 
 *   **Launch the application:** Open the tool via your R console by running `herdr::run_herdr_app()`. Alternatively, access the cloud-hosted version directly from your web browser at [juancbm99.shinyapps.io/herdr](https://juancbm99.shinyapps.io/herdr/).
 *   **Establish your baseline:** Navigate to the **Step 1: Data Source** panel on the sidebar. Choose to load a predefined package example, upload your existing CSV project files, or clear all data to build a new assessment entirely from scratch.
-*   **Configure farm parameters:** In the **Step 2: Configuration** section, specify the farm's country location and the FAO reference year for trade data. Decide whether to check the **Use automatic herd cycle** box if you want the model to calculate replacement and offspring dynamics automatically.
+*   **Configure farm parameters:** In the **Step 2: Configuration** section, specify the farm's country location and the FAO reference year for trade data. Decide whether to check the **Use automatic herd cycle** box if you want the model to calculate replacement and offspring dynamics automatically. See the [Herd Demography & Population Dynamics](Herd_Demography.html) guide for the complete decision matrix.
 
 ---
 

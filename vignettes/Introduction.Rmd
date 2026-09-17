@@ -191,9 +191,13 @@ The graphical interface uses the same calculation engine as the R functions, ens
 
 The remaining vignettes provide detailed guidance on specific components of the package:
 
+* [Herd Demography & Population Dynamics](Herd_Demography.html) — Population dynamics, biological cycles, and herd structure across species.
 * [General Workflow](Workflow.html) — complete project setup and execution with R.
 * [App Workflow](app.html) — complete project setup and execution with web interface.
-* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — description of input files, parameters, and units.
+* [Technical Reference](Technical_reference.html) — CSV templates and reference database documentation.
+* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — complete mathematical formulation and equations.
 * [Manure Management Guide](Manure.html) — supported manure systems and classifications.
-* [Land Use Methodology](land_use.html) — feed allocation and land-use calculations.
+* [Land Use Methodology](land_use.html) — feed allocation, agroecological classification, and dynamic trade flows.
+* [Adding a New Ingredient](Adding_Ingredient.html) — step-by-step tutorial for expanding nutritional and LCA databases.
+* [Case Studies: Dairy Cattle](Easy_Example.html) — worked baseline examples (Basic, Regional Moderate, and Life Stages).
 

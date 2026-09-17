@@ -101,7 +101,7 @@ Defines the size and categories of your livestock population.
 ### Population Modes:
 
 * **Manual Mode (`automatic_cycle = FALSE`):** Every single cohort and head count is explicitly declared. *Recommended*
-* **Automatic Herd Cycle (`automatic_cycle = TRUE`):** Only adult breeding females are entered. The package uses reproduction parameters (`reproduction_parameters.csv`) to compute offspring, replacement heifers, and mortalities automatically. *Currently supported for ruminants only.*
+* **Automatic Herd Cycle (`automatic_cycle = TRUE`):** Only adult breeding stock (e.g., mature cows, breeding sows) or initial barn places are entered. The package uses reproduction parameters (`reproduction_parameters.csv`) and productive period durations (`productive_period_days`) to compute offspring, replacement cohorts, fattening batches, and mortalities automatically across ruminant (cattle, sheep, goats), swine, and poultry systems. See the [Herd Demography & Population Dynamics](Herd_Demography.html) guide for the complete decision matrix.
 
 ---
 
@@ -189,21 +189,27 @@ head(results)
 You can also run specific computational modules independently for debugging, calibration, or sensitivity analyses:
 
 ```r
-# 1. Calculate Gross Energy intake (GE)
+# 1. Calculate Demographics & Population Dynamics
+pop_results <- calculate_population(automatic_cycle = FALSE)
+
+# 2. Calculate Gross Energy intake (GE)
 ge_results <- calculate_ge(saveoutput = FALSE)
 
-# 2. Calculate Dry Matter Intake (DMI)
+# 3. Calculate Dry Matter Intake (DMI)
 dmi_results <- calculate_DMI(saveoutput = FALSE)
 
-# 3. Calculate Enteric Methane (CH4)
+# 4. Calculate Enteric Methane (CH4)
 enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
 
-# 4. Calculate Feed-Related Land Use (m2)
+# 5. Calculate Feed-Related Land Use (m2)
 land_results <- calculate_land_use(
   farm_country = "Spain", 
   year = 2022, 
   saveoutput = FALSE
 )
+
+# 6. Calculate Animal Production & Edible Protein (GLEAM)
+prod_results <- calculate_production(saveoutput = FALSE)
 ```
 
 ---
@@ -246,7 +252,9 @@ ggplot2::ggsave("output/emissions_chart.png", plot = p, width = 10, height = 6, 
 
 For mathematical details, parameter lookup tables, and scientific references, consult the companion guides:
 
-* [Technical Reference](Technical_reference.html)
-* [Manure Management Guide](Manure.html)
-* [Land Use Methodology](land_use.html)
-* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html)
+* [Herd Demography & Population Dynamics](Herd_Demography.html) — Population dynamics, biological cycles, and herd structure across species.
+* [Technical Reference](Technical_reference.html) — detailed CSV column descriptions and database connectors.
+* [Adding a New Ingredient](Adding_Ingredient.html) — guide to extending feed and LCA databases.
+* [Manure Management Guide](Manure.html) — climate and storage pathway definitions.
+* [Land Use Methodology](land_use.html) — land competition and international trade flows.
+* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — complete mathematical formulation.

@@ -28,7 +28,7 @@ These are the templates you must complete to run your specific analysis. Follow 
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
 | `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
-| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr`). |
+| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr_sheep_goat`). |
 | `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
 
 ### Nutrition & Diets
@@ -144,6 +144,8 @@ Use this table to know where to look when filling out your data:
 
 ## Next steps
 
+- [Herd Demography & Population Dynamics](Herd_Demography.html) — Population dynamics, biological cycles, and herd structure across species.
 - [General Workflow](Workflow.html) — how these files fit into a full assessment, step by step.
 - [Land Use Methodology](land_use.html) — the full self-sufficiency and trade-allocation engine behind `fao_trade_matrix.parquet`.
 - [Manure Management Guide](Manure.html) — every supported combination in `ipcc_mm.csv`, explained.
+- [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — complete mathematical formulation.

@@ -1,6 +1,9 @@
 ---
 title: "Basic Assessment: A Step-by-Step Guide"
-output: rmarkdown::html_vignette
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
 vignette: >
   %\VignetteIndexEntry{Basic Assessment: A Step-by-Step Guide}
   %\VignetteEngine{knitr::rmarkdown}
@@ -11,7 +14,7 @@ vignette: >
 
 This guide walks through a **Basic Assessment** for **mature dairy cattle in Spain (2015)**, using a single national-level identifier to link census data, nutrition, and environmental impact from start to finish.
 
-> 📂 **All files referenced below live in `user_data/`.**
+> 📂 **All files referenced below live in `user_data/` and correspond to the pre-configured `inst/Examples/Level1_Spain_Dairy_Cattle_2015/` baseline.**
 
 ## What you'll edit
 
@@ -121,4 +124,4 @@ results <- generate_impact_assessment(
 
 - [General Workflow](Workflow.html) — the full step-by-step guide this example is based on.
 - [Technical Reference](Technical_reference.html) — every file and column explained in detail.
-- [Moderate Example](Moderate_Example.html) / [Hard Example](Difficult_Example.html) — build on this with multi-region herds and mixed manure systems.
+- [Moderate Example](Moderate_Example.html) / [Advanced Assessment](Difficult_Example.html) — build on this with multi-region herds and mixed manure systems.
