@@ -169,3 +169,38 @@ test_that("calculate_land_use uses Spanish forage yield as proxy fallback for ot
     "Forage yields disclaimer"
   )
 })
+
+test_that("calculate_land_use works with normalized diets without region/subregion/class_flex", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  dir.create("user_data", showWarnings = FALSE)
+
+  dummy_crops <- data.frame(Area = "Spain", Item = "Maize", Element = "Yield", Y2022 = 10)
+  arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
+
+  dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
+  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+
+  # Strip geographic columns from diet tables
+  path_prof <- "user_data/diet_profiles.csv"
+  path_diet <- "user_data/diet_ingredients.csv"
+  if (file.exists(path_prof) && file.exists(path_diet)) {
+    read_csv(path_prof, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      write_csv(path_prof)
+
+    read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      mutate(custom_yield_kg_ha = "5000", country_of_origin = "Spain") %>%
+      write_csv(path_diet)
+  }
+
+  results <- suppressWarnings(calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE))
+  expect_s3_class(results, "data.frame")
+  expect_true("land_use_per_animal_m2" %in% names(results))
+  expect_true(nrow(results) > 0)
+})
+

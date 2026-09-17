@@ -98,9 +98,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE)) %>%
     dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
-  diet_profiles <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE) %>%
-    dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
-
+  diet_profiles <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
   diet_ingredients_raw <- readr::read_csv(
     "user_data/diet_ingredients.csv",
     col_types = readr::cols(
@@ -108,7 +106,25 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       .default = readr::col_guess()
     ),
     show_col_types = FALSE
-  ) %>%
+  )
+
+  legacy_diet_mode <- any(c("region", "subregion", "class_flex") %in% names(diet_profiles)) &&
+                      any(duplicated(diet_profiles$diet_tag))
+
+  if (!legacy_diet_mode) {
+    diet_profiles <- diet_profiles %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      dplyr::distinct(diet_tag, .keep_all = TRUE)
+    diet_ingredients_raw <- diet_ingredients_raw %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex")))
+    diet_join_keys <- "diet_tag"
+  } else {
+    diet_profiles <- diet_profiles %>%
+      dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
+    diet_join_keys <- intersect(c("region", "subregion", "class_flex", "diet_tag"), names(diet_profiles))
+  }
+
+  diet_ingredients_raw <- diet_ingredients_raw %>%
     dplyr::mutate(
       custom_yield_kg_ha = as.numeric(gsub(",", ".", custom_yield_kg_ha)),
       country_of_origin = dplyr::if_else(!is.na(custom_yield_kg_ha), "Custom Data", country_of_origin)
@@ -279,7 +295,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # --- 4. Validate ingredient shares ---
   invalid_share <- diet_ingredients %>%
-    dplyr::group_by(diet_tag, region, subregion, class_flex, ingredient_type) %>%
+    dplyr::group_by(dplyr::across(dplyr::all_of(c(diet_join_keys, "ingredient_type")))) %>%
     dplyr::summarise(total = sum(as.numeric(ingredient_share), na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(abs(total - 100) > 0.1)
 
@@ -289,8 +305,8 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   # --- 5. Merge data and calculate impact ---
   results <- DMI_df %>%
-    dplyr::inner_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
-    dplyr::inner_join(diet_ingredients, by = c("diet_tag", "region", "subregion", "class_flex")) %>%
+    dplyr::inner_join(diet_profiles, by = diet_join_keys) %>%
+    dplyr::inner_join(diet_ingredients, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(fao_yields, by = c("ingredient", "country_of_origin")) %>%
     dplyr::left_join(spain_forage_yields, by = "ingredient") %>%
     dplyr::left_join(name_mapping %>% dplyr::select(ingredient, alloc_ref = economic_allocation) %>% dplyr::distinct(), by = "ingredient") %>%

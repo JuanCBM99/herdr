@@ -15,8 +15,8 @@ if (!dir.exists("user_data")) herdr::herdr_init()
 
 tables_info <- list(
   census    = list(file = "livestock_census.csv", fixed = 0, icon = "clipboard-list", label = "Census"),
-  diet_prof = list(file = "diet_profiles.csv", fixed = 4, icon = "utensils", label = "Diet Profiles"),
-  diet_ingr = list(file = "diet_ingredients.csv", fixed = 4, icon = "wheat-awn", label = "Ingredients"),
+  diet_prof = list(file = "diet_profiles.csv", fixed = 1, icon = "utensils", label = "Diet Profiles"),
+  diet_ingr = list(file = "diet_ingredients.csv", fixed = 1, icon = "wheat-awn", label = "Ingredients"),
   def       = list(file = "ruminant_definitions.csv", fixed = 4, icon = "id-card", label = "Ruminants"),
   mono      = list(file = "monogastric_definitions.csv", fixed = 4, icon = "drumstick-bite", label = "Monogastrics"),
   weights   = list(file = "livestock_weights.csv", fixed = 4, icon = "weight-hanging", label = "Weights"),
