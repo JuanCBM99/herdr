@@ -65,6 +65,7 @@ if(getRversion() >= "2.15.1") {
     "fattening_pigs", "replacement_sows", "annual_piglets", "annual_slaughter",
     "breeder_meat_hens", "laying_hens",
     "annual_meat_pullets", "annual_layer_pullets",
+    "annual_dairy_slaughter", "annual_meat_slaughter",
     "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers",
     "egg_weight_g", "fertility_rate",
 
@@ -94,6 +95,7 @@ if(getRversion() >= "2.15.1") {
     "Production", "Total_Export", "Apparent_Consumption", "Self_Sufficiency_Ratio",
     "Top_Partner", "Calculated_Origin", "Area Code", "DM_pct",
     "fallback_yield", "used_fallback", "raw_yield", "land_use_per_animal_m2", "alloc_ref",
+    "spain_forage_yield",
 
     # --- Production and Edible Protein (GLEAM) ---
     "production_role", "replacement_rate", "BFM", "MEAT_prot", "DP_pct",
