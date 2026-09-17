@@ -50,12 +50,23 @@ if(getRversion() >= "2.15.1") {
     "mature_goat_female_dairy", "mature_goat_male_dairy", "mature_goat_female_meat",
     "mature_goat_male_meat", "pop_kid_goat_female_dairy_replacement",
     "pop_kid_goat_male_dairy_replacement", "pop_kid_goat_female_meat_replacement",
-    "pop_kid_goat_male_meat_replacement", "mature_sheep_female_dairy",
+    "pop_kid_goat_male_meat_replacement", "pop_kid_goat_dairy_slaughter",
+    "pop_kid_goat_meat_slaughter", "pop_kid_goat_female_dairy_repl",
+    "pop_kid_goat_male_dairy_repl", "pop_kid_goat_female_meat_repl",
+    "pop_kid_goat_male_meat_repl", "mature_sheep_female_dairy",
     "mature_sheep_male_dairy", "mature_sheep_female_meat", "mature_sheep_male_meat",
     "total_dairy_births", "pop_lamb_female_dairy_replacement",
     "pop_lamb_male_dairy_replacement", "total_meat_births",
     "pop_lamb_female_meat_replacement", "pop_lamb_male_meat_replacement",
     "pop_lamb_dairy_slaughter", "pop_lamb_meat_slaughter",
+    "pop_lamb_female_dairy_repl", "pop_lamb_male_dairy_repl",
+    "pop_lamb_female_meat_repl", "pop_lamb_male_meat_repl",
+    "breeder_sows", "boars", "pop_replacement_sows", "pop_fattening_pigs",
+    "fattening_pigs", "replacement_sows", "annual_piglets", "annual_slaughter",
+    "breeder_meat_hens", "laying_hens",
+    "annual_meat_pullets", "annual_layer_pullets",
+    "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers",
+    "egg_weight_g", "fertility_rate",
 
     # --- Net Energy Components ---
     "NEm_MJday", "NEa_MJday", "NEg_MJday", "NEl_MJday", "NEwork_MJday",
@@ -82,7 +93,14 @@ if(getRversion() >= "2.15.1") {
     "land_type", "Reporter Countries", "Partner Countries", "Total_Import",
     "Production", "Total_Export", "Apparent_Consumption", "Self_Sufficiency_Ratio",
     "Top_Partner", "Calculated_Origin", "Area Code", "DM_pct",
-    "fallback_yield", "used_fallback", "raw_yield", "land_use_per_animal_m2",
+    "fallback_yield", "used_fallback", "raw_yield", "land_use_per_animal_m2", "alloc_ref",
+
+    # --- Production and Edible Protein (GLEAM) ---
+    "production_role", "replacement_rate", "BFM", "MEAT_prot", "DP_pct",
+    "MILK_prot_def", "milk_fresh_kg", "milk_prot_pct", "N_exit",
+    "slaughter_weight_kg", "meat_live_weight_kg", "meat_carcass_weight_kg",
+    "meat_boneless_kg", "egg_fresh_kg", "milk_protein_kg", "meat_protein_kg",
+    "egg_protein_kg", "milk_FPCM_kg", "wool_kg", "total_protein_kg",
 
     # --- Impacts and Summary (CO2eq) ---
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",

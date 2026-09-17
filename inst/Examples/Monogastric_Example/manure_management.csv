@@ -1,10 +1,10 @@
-﻿animal_tag,region,subregion,class_flex,system_base,system_variant,management_months,system_climate,system_subclimate,climate_zone,climate_moisture,b_0,allocation
+animal_tag,region,subregion,class_flex,system_base,system_variant,management_months,system_climate,system_subclimate,climate_zone,climate_moisture,b_0,allocation
 broilers,spain,,,poultry_manure,with_litter,,cool,,,default,poultry_high_productivity,1
 replacement_meat_pullets,spain,,,poultry_manure,with_litter,,cool,,,default,poultry_high_productivity,1
 breeder_meat_hens,spain,,,poultry_manure,with_litter,,cool,,,default,poultry_high_productivity,1
 replacement_layer_pullets,spain,,,poultry_manure,with_litter,,cool,,,default,chicken_layer_high_productivity,1
-laying_hens,spain,,,poultry_manure,without_litter,,cool,,,default,chicken_layer_high_productivity,1
-free_range_laying_hens,spain,,,pasture_range_paddock,,,cool,,,default,chicken_layer_high_productivity,1
+laying_hens,spain,,caged,poultry_manure,without_litter,,cool,,,default,chicken_layer_high_productivity,1
+laying_hens,spain,,free_range,pasture_range_paddock,,,cool,,,default,chicken_layer_high_productivity,1
 fattening_pigs,spain,,,liquid_slurry,with_natural_crust_cover,12,cool,temperate,zone_wet,wet,swine_western_europe,1
 replacement_sows,spain,,,liquid_slurry,with_natural_crust_cover,12,cool,temperate,zone_wet,wet,swine_western_europe,1
 breeder_sows,spain,,,liquid_slurry,with_natural_crust_cover,12,cool,temperate,zone_wet,wet,swine_western_europe,1

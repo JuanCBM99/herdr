@@ -4,15 +4,38 @@
 \alias{calculate_population_cattle}
 \title{Calculate Cattle Population Structure}
 \usage{
-calculate_population_cattle(census_cattle, rate_parameters, categories)
+calculate_population_cattle(
+  census_cattle,
+  rate_parameters,
+  definitions = NULL,
+  weights = NULL
+)
 }
 \arguments{
 \item{census_cattle}{Filtered census data for cattle.}
 
-\item{rate_parameters}{Reproduction and replacement rates.}
+\item{rate_parameters}{Reproduction and replacement rates table.}
 
-\item{categories}{Definition table for cross-referencing.}
+\item{definitions}{Optional definitions table (e.g., ruminant_definitions) containing \code{pregnancy_rate}.}
+
+\item{weights}{Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.}
+}
+\value{
+A tibble with the modeled cattle population structure.
 }
 \description{
-Internal helper to model the cattle herd based on mature population and biological rates.
+Models the complete cattle herd structure from mature breeding animals using
+biological reproduction rates, replacement dynamics, and feeding period durations.
 }
+\section{Demographic Flow Logic}{
+
+\itemize{
+  \item \strong{Mature Parents}: \code{mature_dairy_cattle}, \code{mature_beef_cattle}, \code{mature_beef_bull}.
+  \item \strong{Replacements}: Female and male calves needed annually to maintain mature stock.
+  \item \strong{Births}: Calculated assuming an equal 50:50 sex ratio (calves divided by 2).
+  \item \strong{Slaughter / Feedlot Calves}: Non-replacement offspring scaled to Average Annual
+        Population (AAP, IPCC Eq. 10.1) based on feeding duration (\code{days / 365}).
+  \item \strong{Yearlings}: Retained replacement calves mapped 1:1 into yearling cohorts.
+}
+}
+

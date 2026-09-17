@@ -2,15 +2,43 @@
 % Please edit documentation in R/population_sheep.R
 \name{calculate_population_sheep}
 \alias{calculate_population_sheep}
-\title{Calculates the full sheep population structure (Internal Helper)}
+\title{Calculate Sheep Population Structure}
 \usage{
-calculate_population_sheep(census_sheep, rate_parameters)
+calculate_population_sheep(
+  census_sheep,
+  rate_parameters,
+  definitions = NULL,
+  weights = NULL
+)
 }
 \arguments{
-\item{census_sheep}{Edit in csv}
+\item{census_sheep}{Filtered census data for sheep.}
 
-\item{rate_parameters}{Edit in csv}
+\item{rate_parameters}{Reproduction and replacement rates table.}
+
+\item{definitions}{Optional definitions table (e.g., ruminant_definitions) containing \code{pr_sheep_goat}.}
+
+\item{weights}{Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.}
+}
+\value{
+A tibble with the modeled sheep population structure.
 }
 \description{
-Calculates the full sheep population structure (Internal Helper)
+Models the complete sheep flock structure from mature breeding animals using
+biological prolificacy rates, reproductive cycle duration (lambing interval),
+replacement dynamics, and feeding period days for slaughter lambs.
 }
+\section{Demographic Flow Logic}{
+
+\itemize{
+  \item \strong{Mature Parents}: \code{mature_sheep_female_dairy}, \code{mature_sheep_female_meat},
+        \code{mature_sheep_male_dairy}, \code{mature_sheep_male_meat}.
+  \item \strong{Lambing Frequency}: Number of lambings per ewe per year (\code{365 / productive_period_days}),
+        supporting accelerated lambing systems (e.g. 240 days = 1.5 lambings/year).
+  \item \strong{Replacements}: Ewe and ram lambs retained annually to sustain the breeding flock.
+  \item \strong{Births}: Total lambs born per year (\code{ewes * lambing_frequency * prolificacy}).
+  \item \strong{Slaughter Lambs}: Remaining offspring (\code{Births - Replacements}) scaled to
+        Average Annual Population (AAP, IPCC Eq. 10.1) based on feeding duration (\code{days / 365}).
+}
+}
+

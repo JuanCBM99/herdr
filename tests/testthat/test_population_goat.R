@@ -39,7 +39,7 @@ test_that("goat population correctly calculates replacement cohorts", {
   mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
     filter(grepl("goat", animal_tag)) %>%
     mutate(value = case_when(
-      animal_tag == "mature_goat_female_dairy" & parameter == "kidding_rate"     ~ 1.5,
+      animal_tag == "mature_goat_female_dairy" & parameter == "pr_sheep_goat"     ~ 1.5,
       animal_tag == "mature_goat_female_dairy" & parameter == "replacement_rate" ~ 0.2,
       animal_tag == "mature_goat_male_dairy"   & parameter == "replacement_rate" ~ 0.1,
       TRUE ~ 0
@@ -49,9 +49,11 @@ test_that("goat population correctly calculates replacement cohorts", {
 
   f_repl <- res %>% filter(animal_tag == "kid_goat_female_dairy_replacement") %>% pull(population)
   m_repl <- res %>% filter(animal_tag == "kid_goat_male_dairy_replacement") %>% pull(population)
+  dairy_slaughter <- res %>% filter(animal_tag == "kid_goat_dairy_slaughter") %>% pull(population)
 
   expect_equal(f_repl, 200)
   expect_equal(m_repl, 10)
+  expect_equal(dairy_slaughter, 1290)
 })
 
 test_that("goat function filters zero populations automatically", {
@@ -69,3 +71,35 @@ test_that("goat function filters zero populations automatically", {
   expect_true(all(res$population > 0))
   expect_false(any(grepl("_meat", res$animal_tag)))
 })
+
+test_that("calculate_population_goat handles accelerated kidding cycles and slaughter AAP scaling", {
+  mock_census <- tibble::tribble(
+    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
+    "mature_goat_female_dairy", "spain", "andalucia", NA_character_, 1000
+  )
+
+  mock_rates <- tibble::tribble(
+    ~animal_tag, ~parameter, ~value,
+    "mature_goat_female_dairy", "pr_sheep_goat", 1.5,
+    "mature_goat_female_dairy", "replacement_rate", 0.2
+  )
+
+  mock_weights <- tibble::tribble(
+    ~animal_tag, ~productive_period_days,
+    "mature_goat_female_dairy", 200,
+    "kid_goat_dairy_slaughter", 70
+  )
+
+  res <- calculate_population_goat(mock_census, mock_rates, definitions = NULL, weights = mock_weights)
+
+  # Births: 1000 * (365 / 200) * 1.5 = 2737.5
+  # Replacements: 1000 * 0.2 = 200
+  # Annual slaughter: 2737.5 - 200 = 2537.5
+  # AAP slaughter: 2537.5 * (70 / 365) = 486.6438
+  dairy_slaughter <- res %>%
+    filter(animal_tag == "kid_goat_dairy_slaughter") %>%
+    pull(population)
+
+  expect_equal(round(dairy_slaughter, 2), 486.64)
+})
+

@@ -7,11 +7,34 @@
 calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \arguments{
-\item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
+\item{automatic_cycle}{Logical. If \code{TRUE}, runs the built-in biological demographic model
+for each species. Default is \code{FALSE}.}
 
-\item{saveoutput}{If TRUE, saves results to the output folder.}
+\item{saveoutput}{Logical. If \code{TRUE}, exports the final population dataset to
+\code{output/population_result.csv}. Default is \code{TRUE}.}
+}
+\value{
+A tibble containing the complete animal population structure with columns:
+  \code{region}, \code{subregion}, \code{animal_tag}, \code{class_flex},
+  \code{animal_type}, \code{animal_subtype}, and \code{population}.
 }
 \description{
-Orchestrates the population calculation. Choose between manual census
-or automatic farm cycle models based on mature animal counts.
+Orchestrates the animal population calculation for the farm. Provides two distinct modes:
+\itemize{
+  \item \strong{Manual Census (\code{automatic_cycle = FALSE})}: Directly uses the animal counts
+        provided by the user in \code{livestock_census.csv}. Allows arbitrary custom categories
+        as long as they are declared in the definitions and parameter tables.
+  \item \strong{Automatic Farm Cycle (\code{automatic_cycle = TRUE})}: Models the complete herd
+        or flock structure (offspring, replacements, fattening/slaughter cohorts) automatically
+        from mature breeding animals using biological reproduction and replacement dynamics.
 }
+}
+\section{Automatic Demographic Modeling}{
+
+When \code{automatic_cycle = TRUE}, the model requires standard mature categories (e.g.,
+\code{mature_dairy_cattle}, \code{mature_beef_cattle}, \code{mature_sheep_female_dairy},
+\code{mature_goat_female_dairy}, \code{breeder_sows}, \code{breeder_meat_hens}, \code{laying_hens}).
+All generated offspring automatically inherit the \code{region} and \code{subregion} of their
+parent cohorts, ensuring seamless downstream integration with diets, weights, and manure management.
+}
+
