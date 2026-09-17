@@ -1,10 +1,10 @@
 animal_tag,region,subregion,class_flex,population
-broilers,spain,NA,NA,100
-replacement_meat_pullets,spain,NA,NA,100
-breeder_meat_hens,spain,NA,NA,100
-replacement_layer_pullets,spain,NA,NA,100
-laying_hens,spain,NA,caged,100
-laying_hens,spain,NA,free_range,100
+broilers,spain,NA,NA,73219430
+replacement_meat_pullets,spain,NA,NA,2088485
+breeder_meat_hens,spain,NA,NA,3999963
+replacement_layer_pullets,spain,NA,NA,9265000
+laying_hens,spain,NA,caged,35640000
+laying_hens,spain,NA,free_range,3960000
 fattening_pigs,spain,,,5237113
 replacement_sows,spain,,,287689
 breeder_sows,spain,,,1299996

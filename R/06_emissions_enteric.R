@@ -1,7 +1,8 @@
 #' Calculate methane emissions from enteric fermentation
 #'
 #' Computes enteric methane emissions based on Gross Energy (GE),
-#' Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic.
+#' Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic for ruminants,
+#' and IPCC Tier 1 with metabolic weight scaling for swine (Table 10.10 & Section 10.2.4).
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -14,7 +15,16 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
   ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE))
   pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  livestock_definitions <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
+  livestock_definitions <- if (file.exists("user_data/ruminant_definitions.csv")) {
+    suppressMessages(readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE))
+  } else {
+    NULL
+  }
+  weights_csv <- if (file.exists("user_data/livestock_weights.csv")) {
+    suppressMessages(readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE))
+  } else {
+    NULL
+  }
 
   if (nrow(diet_vars) == 0) {
     message("\u26a0 No diet data found. Returning empty structure.")
@@ -25,26 +35,51 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
 
   # --- 2. Processing Pipeline: Merge Energy and Population ---
   results <- diet_vars %>%
-
     dplyr::left_join(
       ge_df %>% dplyr::select(dplyr::all_of(join_keys), GE_MJday),
       by = join_keys
     ) %>%
-
     dplyr::left_join(
       pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
-    ) %>%
+    )
 
-    dplyr::left_join(
-      livestock_definitions %>% dplyr::select(dplyr::all_of(join_keys), milk_yield_kg_year),
-      by = join_keys
-    ) %>%
+  if (!is.null(livestock_definitions) && "milk_yield_kg_year" %in% names(livestock_definitions)) {
+    def_keys <- intersect(names(livestock_definitions), join_keys)
+    results <- results %>%
+      dplyr::left_join(
+        livestock_definitions %>% dplyr::select(dplyr::all_of(c(def_keys, "milk_yield_kg_year"))),
+        by = def_keys
+      )
+  }
 
+  if (!is.null(weights_csv)) {
+    w_keys <- intersect(names(weights_csv), join_keys)
+    w_cols <- intersect(names(weights_csv), c(w_keys, "initial_weight_kg", "final_weight_kg", "adult_weight_kg"))
+    results <- results %>%
+      dplyr::left_join(
+        weights_csv %>% dplyr::select(dplyr::all_of(w_cols)),
+        by = w_keys
+      )
+  }
 
-    # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2) ---
+  results <- results %>%
+    # --- 3. Ym and Emission Factor Calculations (IPCC Tier 2 for ruminants, Tier 1 for swine) ---
     dplyr::mutate(
-      across(c(DE_pct, NDF_pct, GE_MJday, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      dplyr::across(c(DE_pct, NDF_pct, GE_MJday, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      milk_yield_kg_year = if ("milk_yield_kg_year" %in% names(.)) tidyr::replace_na(suppressWarnings(as.numeric(milk_yield_kg_year)), 0) else 0,
+      initial_weight_kg  = if ("initial_weight_kg" %in% names(.)) tidyr::replace_na(suppressWarnings(as.numeric(initial_weight_kg)), 0) else 0,
+      final_weight_kg    = if ("final_weight_kg" %in% names(.)) tidyr::replace_na(suppressWarnings(as.numeric(final_weight_kg)), 0) else 0,
+      adult_weight_kg    = if ("adult_weight_kg" %in% names(.)) tidyr::replace_na(suppressWarnings(as.numeric(adult_weight_kg)), 0) else 0,
+
+      live_weight = dplyr::case_when(
+        initial_weight_kg > 0 & final_weight_kg > 0 ~ (initial_weight_kg + final_weight_kg) / 2,
+        final_weight_kg > 0 ~ final_weight_kg,
+        adult_weight_kg > 0 ~ adult_weight_kg,
+        initial_weight_kg > 0 ~ initial_weight_kg,
+        TRUE ~ 72
+      ),
+
       Ym_pct = dplyr::case_when(
         animal_type == "sheep" ~ 6.7,
         animal_type == "goat"  ~ 5.5,
@@ -65,7 +100,19 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
         TRUE ~ 0
       ),
 
-      EF_kgheadyear = (GE_MJday * (Ym_pct / 100) * 365) / 55.65,
+      # EF in kg CH4 / head / year
+      EF_kgheadyear = dplyr::case_when(
+        # [IPCC 2019 Refinement Table 10.10 & Section 10.2.4] Swine Tier 1 with metabolic liveweight scaling
+        animal_type == "swine" ~ dplyr::if_else(
+          live_weight > 0,
+          1.5 * (live_weight / 72)^0.75,
+          1.5
+        ),
+        # Ruminants Tier 2 energy balance
+        animal_type %in% c("cattle", "sheep", "goat") ~ (GE_MJday * (Ym_pct / 100) * 365) / 55.65,
+        # Poultry and non-producing categories: negligible enteric emissions
+        TRUE ~ 0
+      ),
 
       total_CH4_enteric_Ggyear = EF_kgheadyear * (population / 1e6)
     ) %>%
@@ -75,7 +122,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
       dplyr::all_of(join_keys),
       DE_pct, NDF_pct, GE_MJday, Ym_pct, EF_kgheadyear, population, total_CH4_enteric_Ggyear
     ) %>%
-    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
 
   # --- 5. Save Results ---
   if (isTRUE(saveoutput) && nrow(results) > 0) {

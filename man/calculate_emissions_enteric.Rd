@@ -13,5 +13,6 @@ calculate_emissions_enteric(automatic_cycle = FALSE, saveoutput = TRUE)
 }
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),
-Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic.
+Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic for ruminants,
+and IPCC Tier 1 with metabolic weight scaling for swine (Table 10.10 & Section 10.2.4).
 }
