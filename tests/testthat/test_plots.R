@@ -74,4 +74,28 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_equal(nrow(p_agg$data), 1)
   expect_equal(p_agg$data$GE_MJday, 300)
   expect_equal(p_agg$data$DE_pct, 70)
+
+  # 8. Assertions: Diet composition profile plot
+  diet_df <- data.frame(
+    animal_tag = c("cow_1", "cow_2"),
+    region = c("spain", "spain"),
+    DE_pct = c(70, 75),
+    CP_pct = c(16, 18),
+    NDF_pct = c(35, 32)
+  )
+  p_diet <- plot_herdr_results(diet_df, group_cols = "animal_tag")
+  expect_s3_class(p_diet, "ggplot")
+  expect_equal(p_diet$labels$title, "Diet Composition Profiles")
+
+  # 9. Assertions: Land use breakdown plot
+  land_df <- data.frame(
+    animal_tag = c("pig_1", "pig_1"),
+    region = c("spain", "spain"),
+    land_type = c("cropland", "grassland_convertible"),
+    total_land_use_m2 = c(50000, 20000)
+  )
+  p_land <- plot_herdr_results(land_df, group_cols = "animal_tag")
+  expect_s3_class(p_land, "ggplot")
+  expect_match(p_land$labels$title, "Land Use")
 })
+
