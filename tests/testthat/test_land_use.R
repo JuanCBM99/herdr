@@ -99,9 +99,9 @@ test_that("calculate_land_use handles NA origins via FAO engine safely (Parquet 
 })
 
 # ==============================================================================
-# TEST 3: WARNINGS (Using a fake country to test missing yields safely)
+# TEST 3: WARNING DISCLAIMER (Using missing country yields without halting)
 # ==============================================================================
-test_that("calculate_land_use halts with error for missing yields of consumed ingredients", {
+test_that("calculate_land_use emits warning disclaimer for missing yields without halting", {
   temp_test_dir <- tempfile()
   dir.create(temp_test_dir)
   file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
@@ -127,8 +127,45 @@ test_that("calculate_land_use halts with error for missing yields of consumed in
     write_csv(df, path_diet)
   }
 
-  expect_error(
-    calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE),
-    "Missing yield"
+  expect_warning(
+    res <- calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE),
+    "Land use disclaimer"
+  )
+  expect_s3_class(res, "data.frame")
+})
+
+test_that("calculate_land_use uses Spanish forage yield as proxy fallback for other countries with warning", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  dir.create("user_data", showWarnings = FALSE)
+
+  dummy_crops <- data.frame(
+    Area = rep(c("France", "Spain"), each = 4),
+    Item = rep(c("Maize (corn)", "Wheat", "Soya beans", "Rape or colza seed"), 2),
+    Element = "Yield",
+    Y2022 = 10
+  )
+  arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
+
+  dummy_forages <- data.frame(
+    Area = c("Spain", "Spain", "Spain"),
+    Item = c("Maize for forage and silage", "Winter cereals, for forage", "Other grasses, for forage"),
+    Yield = c(9000, 3000, 4500)
+  )
+  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+
+  path_diet <- "user_data/diet_ingredients.csv"
+  if (file.exists(path_diet)) {
+    df <- read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      mutate(country_of_origin = "France", custom_yield_kg_ha = NA_character_)
+    write_csv(df, path_diet)
+  }
+
+  expect_warning(
+    calculate_land_use(farm_country = "France", year = 2022, saveoutput = FALSE),
+    "Forage yields disclaimer"
   )
 })

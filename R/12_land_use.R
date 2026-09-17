@@ -80,6 +80,20 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       economic_allocation = as.numeric(economic_allocation)
     )
 
+  # Spain national forage yields lookup as fallback proxy for other countries
+  spain_forage_yields <- name_mapping %>%
+    dplyr::filter(!is.na(yield_name)) %>%
+    dplyr::inner_join(
+      forage_raw %>% dplyr::filter(Area == "Spain") %>% dplyr::select(Item, Value),
+      by = c("yield_name" = "Item"),
+      relationship = "many-to-many"
+    ) %>%
+    dplyr::transmute(
+      ingredient,
+      spain_forage_yield = Value
+    ) %>%
+    dplyr::distinct(ingredient, .keep_all = TRUE)
+
   # --- 3. Load operational data & Handle Hybrid Country Origins ---
   DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE)) %>%
     dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
@@ -278,29 +292,55 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::inner_join(diet_profiles, by = c("region", "subregion", "class_flex", "diet_tag")) %>%
     dplyr::inner_join(diet_ingredients, by = c("diet_tag", "region", "subregion", "class_flex")) %>%
     dplyr::left_join(fao_yields, by = c("ingredient", "country_of_origin")) %>%
+    dplyr::left_join(spain_forage_yields, by = "ingredient") %>%
     dplyr::left_join(name_mapping %>% dplyr::select(ingredient, alloc_ref = economic_allocation) %>% dplyr::distinct(), by = "ingredient") %>%
-    dplyr::left_join(feed_chars, by = "ingredient") %>%
+    dplyr::left_join(feed_chars, by = "ingredient")
+
+  # Detect forages where country_of_origin != "Spain" (or missing yield for country) and Spain's yield is used as fallback proxy
+  forages_with_proxy <- results %>%
+    dplyr::filter(
+      ingredient_type == "forage",
+      is.na(custom_yield_kg_ha),
+      is.na(dm_yield),
+      !is.na(spain_forage_yield),
+      as.numeric(ingredient_share) > 0
+    ) %>%
+    dplyr::select(ingredient, country_of_origin) %>%
+    dplyr::distinct()
+
+  if (nrow(forages_with_proxy) > 0) {
+    items_txt <- paste0(forages_with_proxy$ingredient, " (", forages_with_proxy$country_of_origin, ")", collapse = ", ")
+    warning(paste0(
+      "\u26A0 [herdr] Forage yields disclaimer: Currently herdr only includes established national forage yield data for Spain (MAPA). ",
+      "Using Spanish yield as proxy for: ", items_txt, ". ",
+      "To provide local yield data, specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
+    ), call. = FALSE)
+  }
+
+  results <- results %>%
     dplyr::mutate(
       raw_yield = dplyr::case_when(
-        land_type %in% c("none", "no_land")      ~ 0,
-        !is.na(custom_yield_kg_ha)                ~ custom_yield_kg_ha,
-        is.na(dm_yield) & !is.na(fallback_yield)  ~ fallback_yield,
-        TRUE                                       ~ dm_yield
+        land_type %in% c("none", "no_land")                         ~ 0,
+        !is.na(custom_yield_kg_ha)                                   ~ custom_yield_kg_ha,
+        !is.na(dm_yield)                                             ~ dm_yield,
+        ingredient_type == "forage" & !is.na(spain_forage_yield)     ~ spain_forage_yield,
+        !is.na(fallback_yield)                                       ~ fallback_yield,
+        TRUE                                                         ~ NA_real_
       ),
       dm_yield = dplyr::case_when(
-        !is.na(custom_yield_kg_ha)               ~ raw_yield,
-        ingredient_type == "forage"              ~ raw_yield,
-        raw_yield > 0                            ~ raw_yield * (suppressWarnings(as.numeric(DM_pct)) / 100),
-        TRUE                                     ~ raw_yield
+        !is.na(custom_yield_kg_ha)                                   ~ raw_yield,
+        ingredient_type == "forage"                                  ~ raw_yield,
+        !is.na(raw_yield) & raw_yield > 0                           ~ raw_yield * (suppressWarnings(as.numeric(DM_pct)) / 100),
+        TRUE                                                         ~ raw_yield
       ),
-      ha_per_kg = dplyr::if_else(dm_yield > 0, 1 / dm_yield, 0)
+      ha_per_kg = dplyr::if_else(!is.na(dm_yield) & dm_yield > 0, 1 / dm_yield, 0)
     )
 
   # --- Validate that all consumed ingredients requiring land have yields ---
   missing_yields <- results %>%
     dplyr::mutate(economic_allocation = dplyr::coalesce(economic_allocation, as.numeric(alloc_ref), 1)) %>%
     dplyr::filter(
-      is.na(dm_yield),
+      is.na(dm_yield) | dm_yield <= 0,
       !land_type %in% c("none", "no_land"),
       as.numeric(ingredient_share) > 0,
       dplyr::coalesce(economic_allocation, 1) > 0
@@ -311,21 +351,21 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   if (nrow(missing_yields) > 0) {
     forage_miss <- missing_yields %>% dplyr::filter(ingredient_type == "forage")
     other_miss  <- missing_yields %>% dplyr::filter(ingredient_type != "forage")
-    err_msgs <- c()
+    warn_msgs <- c()
     if (nrow(forage_miss) > 0) {
-      err_msgs <- c(err_msgs, paste0(
-        "Forage yields are currently only available for Spain (MAPA 2024). ",
-        "Missing yield for: ", paste0(forage_miss$ingredient, " (", forage_miss$country_of_origin, ")", collapse = ", "),
-        ". Please specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
+      warn_msgs <- c(warn_msgs, paste0(
+        "Forage yields are currently only available for Spain (MAPA). No yield found for: ",
+        paste0(forage_miss$ingredient, " (", forage_miss$country_of_origin, ")", collapse = ", "),
+        ". Land use set to 0 m2 for these forages. Please specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
       ))
     }
     if (nrow(other_miss) > 0) {
-      err_msgs <- c(err_msgs, paste0(
+      warn_msgs <- c(warn_msgs, paste0(
         "Missing yield for: ", paste0(other_miss$ingredient, " (", other_miss$country_of_origin, ")", collapse = ", "),
-        ". Please specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
+        ". Land use set to 0 m2. Please specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
       ))
     }
-    stop(paste0("\u274C [herdr] Land use calculation halted: ", paste(err_msgs, collapse = " | ")), call. = FALSE)
+    warning(paste0("\u26A0 [herdr] Land use disclaimer: ", paste(warn_msgs, collapse = " | ")), call. = FALSE)
   }
 
   results <- results %>%
