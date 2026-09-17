@@ -40,29 +40,29 @@ into two climatic regions using `subregion`.
 
 ### Step 2 — Designing the Diet
 
-Forage availability differs between North and South, so both the diet
-profile and its ingredients are defined per subregion.
+Forage availability differs between North and South, so separate diets
+are defined for each region.
 
 #### A. Define the profile — `diet_profiles.csv`
 
 The forage proportion is higher in the North (55%) than in the South
 (50%).
 
-| diet_tag | region | subregion | forage_share | concentrate_share | milk_share | milk_replacer_share |
-|:---|:---|:---|---:|---:|---:|---:|
-| `diet_dairy_mature` | `spain` | `north` | 55 | 45 | 0 | 0 |
-| `diet_dairy_mature` | `spain` | `south` | 50 | 50 | 0 | 0 |
+| diet_tag | forage_share | concentrate_share | milk_share | milk_replacer_share |
+|:---|---:|---:|---:|---:|
+| `diet_dairy_mature_north` | 55 | 45 | 0 | 0 |
+| `diet_dairy_mature_south` | 50 | 50 | 0 | 0 |
 
 #### B. Ingredient breakdown — `diet_ingredients.csv`
 
 Within each `ingredient_type`, `ingredient_share` must sum to 100%.
 Here’s the concentrate portion for Spain South:
 
-| diet_tag | region | subregion | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
-|:---|:---|:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature` | `spain` | `south` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
+|:---|:---|:---|---:|:---|---:|
+| `diet_dairy_mature_south` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
+| `diet_dairy_mature_south` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
 > 🌍 **Missing origins:** `country_of_origin` for the soybean and
 > rapeseed meals is left as `NA`. herdr resolves both automatically
@@ -86,8 +86,8 @@ IPCC physiological equations — each of `cfi`, `ca`, `c`, and
 
 | animal_tag | region | subregion | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
 |:---|:---|:---|:---|:---|:---|:---|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `north` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295.0 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044.0 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `north` | `diet_dairy_mature_north` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295.0 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `south` | `diet_dairy_mature_south` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044.0 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
 
 ------------------------------------------------------------------------
 

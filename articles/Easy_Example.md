@@ -50,19 +50,19 @@ is filled in.
 
 #### B. Define the profile — `diet_profiles.csv`
 
-| diet_tag | region | forage_share | concentrate_share | milk_share | milk_replacer_share |
-|:---|:---|---:|---:|---:|---:|
-| `diet_dairy_mature` | `spain` | 60 | 40 | 0 | 0 |
+| diet_tag | forage_share | concentrate_share | milk_share | milk_replacer_share |
+|:---|---:|---:|---:|---:|
+| `diet_dairy_mature` | 60 | 40 | 0 | 0 |
 
 #### C. Ingredient breakdown — `diet_ingredients.csv`
 
-Repeat the same `diet_tag` and `region` once per ingredient.
+Repeat the same `diet_tag` once per ingredient.
 
-| diet_tag | region | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
-|:---|:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature` | `spain` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature` | `spain` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | `spain` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
+|:---|:---|:---|---:|:---|---:|
+| `diet_dairy_mature` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
+| `diet_dairy_mature` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
 > ✅ **Shares sum to 100% *within* each category** — ensure all
 > `ingredient_share` values within `concentrate` total 100%.

@@ -177,9 +177,9 @@ supplying `custom_yield_kg_ha` per-project instead (Step 3).
 With both reference files updated, the ingredient behaves exactly like
 any bundled one. Add it to a diet as usual:
 
-| diet_tag | region | subregion | class_flex | ingredient | ingredient_share | ingredient_type | country_of_origin | custom_yield_kg_ha |
-|:---|:---|:---|:---|:---|---:|:---|:---|---:|
-| `diet_dairy_mature` | `spain` | `all` | `all` | `brewers_grains_wet` | 15 | `concentrate` | `spain` | `NA` |
+| diet_tag | ingredient | ingredient_share | ingredient_type | country_of_origin | custom_yield_kg_ha |
+|:---|:---|---:|:---|:---|---:|
+| `diet_dairy_mature` | `brewers_grains_wet` | 15 | `concentrate` | `spain` | `NA` |
 
 Keep these practical rules in mind when entering ingredients:
 
@@ -190,8 +190,8 @@ Keep these practical rules in mind when entering ingredients:
   intake share factor to 0, resulting in zero consumption and zero land
   use.
 
-- **`ingredient_share` Validation**: Within any given diet cohort and
-  `ingredient_type`, the sum of `ingredient_share` values must total
+- **`ingredient_share` Validation**: Within any given diet (`diet_tag`)
+  and `ingredient_type`, the sum of `ingredient_share` values must total
   100% ($`\pm 0.1\%`$). Herdr validates this before computing and throws
   a warning if shares do not total 100%:
 

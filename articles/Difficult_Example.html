@@ -213,28 +213,22 @@ annual emission averages.</p>
 <div class="section level3">
 <h3 id="step-2-phase-specific-nutrition">Step 2 — Phase-Specific Nutrition<a class="anchor" aria-label="anchor" href="#step-2-phase-specific-nutrition"></a>
 </h3>
-<p><code>class_flex</code> lets you define a different
-forage/concentrate ratio, and different ingredients, for each life
-stage.</p>
+<p>Diets are defined directly with distinct <code>diet_tag</code>
+identifiers reflecting each region and production phase
+(<code>class_flex</code>).</p>
 <div class="section level4">
 <h4 id="a--diet-profiles-diet_profiles-csv">A. Diet profiles — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#a--diet-profiles-diet_profiles-csv"></a>
 </h4>
 <table class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="right">forage_share</th>
 <th align="right">concentrate_share</th>
 <th align="right">milk_share</th>
@@ -242,40 +236,28 @@ stage.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>diet_dairy_mature_north_dry_phase</code></td>
 <td align="right">70</td>
 <td align="right">30</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_north_lactation_phase</code></td>
 <td align="right">55</td>
 <td align="right">45</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_dry_phase</code></td>
 <td align="right">54</td>
 <td align="right">46</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="right">50</td>
 <td align="right">50</td>
 <td align="right">0</td>
@@ -287,27 +269,20 @@ stage.</p>
 <div class="section level4">
 <h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
-<p>Ingredients must be assigned precisely to their
-<code>subregion</code> and <code>class_flex</code>. Here are the primary
-ingredients for the South/lactation profile (excerpted from the full
-dataset):</p>
+<p>Ingredients are linked directly via <code>diet_tag</code>. Here are
+the primary ingredients for the South lactation profile (excerpted from
+the full dataset):</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="left">ingredient_type</th>
 <th align="left">ingredient</th>
 <th align="right">ingredient_share</th>
@@ -316,10 +291,7 @@ dataset):</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>corn_national</code></td>
 <td align="right">44.85</td>
@@ -327,10 +299,7 @@ dataset):</p>
 <td align="right"><code>NA</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>soybean_meal_44_cp</code></td>
 <td align="right">17.12</td>
@@ -338,10 +307,7 @@ dataset):</p>
 <td align="right"><code>NA</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>rapeseed_meal_00_33_cp</code></td>
 <td align="right">28.71</td>
@@ -349,10 +315,7 @@ dataset):</p>
 <td align="right"><code>NA</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left">forage</td>
 <td align="left"><code>corn_silage_25_30</code></td>
 <td align="right">71.40</td>
@@ -360,10 +323,7 @@ dataset):</p>
 <td align="right">12000</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left">forage</td>
 <td align="left"><code>cereals_silage_wheat_barley_oat_triticale</code></td>
 <td align="right">28.60</td>
@@ -434,7 +394,7 @@ under IPCC Tier 2. Notice how <code>milk_yield_kg_year</code> and
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
 <td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_north_lactation_phase</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>
@@ -449,7 +409,7 @@ under IPCC Tier 2. Notice how <code>milk_yield_kg_year</code> and
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
 <td align="left"><code>dry_phase</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_north_dry_phase</code></td>
 <td align="left"><code>cattle/buffalo</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>
@@ -464,7 +424,7 @@ under IPCC Tier 2. Notice how <code>milk_yield_kg_year</code> and
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
 <td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>
@@ -479,7 +439,7 @@ under IPCC Tier 2. Notice how <code>milk_yield_kg_year</code> and
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
 <td align="left"><code>dry_phase</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_south_dry_phase</code></td>
 <td align="left"><code>cattle/buffalo</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>

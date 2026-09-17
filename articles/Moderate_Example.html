@@ -187,27 +187,23 @@ dairy population into two climatic regions using
 <div class="section level3">
 <h3 id="step-2-designing-the-diet">Step 2 — Designing the Diet<a class="anchor" aria-label="anchor" href="#step-2-designing-the-diet"></a>
 </h3>
-<p>Forage availability differs between North and South, so both the diet
-profile and its ingredients are defined per subregion.</p>
+<p>Forage availability differs between North and South, so separate
+diets are defined for each region.</p>
 <div class="section level4">
 <h4 id="a--define-the-profile-diet_profiles-csv">A. Define the profile — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#a--define-the-profile-diet_profiles-csv"></a>
 </h4>
 <p>The forage proportion is higher in the North (55%) than in the South
 (50%).</p>
-<table style="width:100%;" class="table">
+<table class="table">
 <colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
+<col width="20%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
 <th align="right">forage_share</th>
 <th align="right">concentrate_share</th>
 <th align="right">milk_share</th>
@@ -215,18 +211,14 @@ profile and its ingredients are defined per subregion.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
+<td align="left"><code>diet_dairy_mature_north</code></td>
 <td align="right">55</td>
 <td align="right">45</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
+<td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="right">50</td>
 <td align="right">50</td>
 <td align="right">0</td>
@@ -241,21 +233,17 @@ profile and its ingredients are defined per subregion.</p>
 <p>Within each <code>ingredient_type</code>,
 <code>ingredient_share</code> must sum to 100%. Here’s the concentrate
 portion for Spain South:</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
 <th align="left">ingredient_type</th>
 <th align="left">ingredient</th>
 <th align="right">ingredient_share</th>
@@ -264,9 +252,7 @@ portion for Spain South:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
+<td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>corn_national</code></td>
 <td align="right">44.85</td>
@@ -274,9 +260,7 @@ portion for Spain South:</p>
 <td align="right"><code>NA</code></td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
+<td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>soybean_meal_44_cp</code></td>
 <td align="right">17.12</td>
@@ -284,9 +268,7 @@ portion for Spain South:</p>
 <td align="right"><code>NA</code></td>
 </tr>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
+<td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="left">concentrate</td>
 <td align="left"><code>rapeseed_meal_00_33_cp</code></td>
 <td align="right">28.71</td>
@@ -351,7 +333,7 @@ animal tags to the IPCC physiological equations — each of
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_north</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>
@@ -365,7 +347,7 @@ animal tags to the IPCC physiological equations — each of
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
-<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>

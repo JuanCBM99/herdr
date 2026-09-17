@@ -346,21 +346,15 @@ or skip <code>yield_name</code> resolution entirely by supplying
 like any bundled one. Add it to a diet as usual:</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
-<col width="11%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">diet_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="left">ingredient</th>
 <th align="right">ingredient_share</th>
 <th align="left">ingredient_type</th>
@@ -369,9 +363,6 @@ like any bundled one. Add it to a diet as usual:</p>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>diet_dairy_mature</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>all</code></td>
-<td align="left"><code>all</code></td>
 <td align="left"><code>brewers_grains_wet</code></td>
 <td align="right">15</td>
 <td align="left"><code>concentrate</code></td>
@@ -390,8 +381,8 @@ misspelled or unrecognized, herdr sets the intake share factor to 0,
 resulting in zero consumption and zero land use.</p></li>
 <li>
 <p><strong><code>ingredient_share</code> Validation</strong>: Within
-any given diet cohort and <code>ingredient_type</code>, the sum of
-<code>ingredient_share</code> values must total 100%
+any given diet (<code>diet_tag</code>) and <code>ingredient_type</code>,
+the sum of <code>ingredient_share</code> values must total 100%
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mn>0.1</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\pm 0.1\%</annotation></semantics></math>).
 Herdr validates this before computing and throws a warning if shares do
 not total 100%:</p>
