@@ -10,6 +10,8 @@
   Stages](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
 - [Basic Assessment: A Step-by-Step
   Guide](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
+- [Herd Demography & Population
+  Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md):
 - [Introduction to
   herdr](https://juancbm99.github.io/herdr/articles/Introduction.md):
 - [Land Use

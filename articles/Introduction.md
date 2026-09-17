@@ -234,17 +234,31 @@ executed.
 The remaining vignettes provide detailed guidance on specific components
 of the package:
 
+- [Herd Demography & Population
+  Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
+  — Population dynamics, biological cycles, and herd structure across
+  species.
 - [General
   Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
   complete project setup and execution with R.
 - [App Workflow](https://juancbm99.github.io/herdr/articles/app.md) —
   complete project setup and execution with web interface.
+- [Technical
+  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+  — CSV templates and reference database documentation.
 - [Theoretical Basis: IPCC Tier
   2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) —
-  description of input files, parameters, and units.
+  complete mathematical formulation and equations.
 - [Manure Management
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md) —
   supported manure systems and classifications.
 - [Land Use
   Methodology](https://juancbm99.github.io/herdr/articles/land_use.md) —
-  feed allocation and land-use calculations.
+  feed allocation, agroecological classification, and dynamic trade
+  flows.
+- [Adding a New
+  Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)
+  — step-by-step tutorial for expanding nutritional and LCA databases.
+- [Case Studies: Dairy
+  Cattle](https://juancbm99.github.io/herdr/articles/Easy_Example.md) —
+  worked baseline examples (Basic, Regional Moderate, and Life Stages).

@@ -39,9 +39,15 @@
 - [`calculate_population_cattle()`](https://juancbm99.github.io/herdr/reference/calculate_population_cattle.md)
   : Calculate Cattle Population Structure
 - [`calculate_population_goat()`](https://juancbm99.github.io/herdr/reference/calculate_population_goat.md)
-  : Calculates the full goat population structure (Internal Helper)
+  : Calculate Goat Population Structure
+- [`calculate_population_poultry()`](https://juancbm99.github.io/herdr/reference/calculate_population_poultry.md)
+  : Calculate Poultry Population Structure
 - [`calculate_population_sheep()`](https://juancbm99.github.io/herdr/reference/calculate_population_sheep.md)
-  : Calculates the full sheep population structure (Internal Helper)
+  : Calculate Sheep Population Structure
+- [`calculate_population_swine()`](https://juancbm99.github.io/herdr/reference/calculate_population_swine.md)
+  : Calculate Swine Population Structure
+- [`calculate_production()`](https://juancbm99.github.io/herdr/reference/calculate_production.md)
+  : Calculate Total Livestock Production
 - [`calculate_vs()`](https://juancbm99.github.io/herdr/reference/calculate_vs.md)
   : Calculate Volatile Solids (VS) for Animals
 - [`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)

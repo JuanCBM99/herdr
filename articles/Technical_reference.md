@@ -29,7 +29,7 @@ step-by-step instructions.
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
 | `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
-| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr`). |
+| `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr_sheep_goat`). |
 | `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
 
 #### Nutrition & Diets
@@ -199,6 +199,10 @@ Use this table to know where to look when filling out your data:
 
 ### Next steps
 
+- [Herd Demography & Population
+  Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
+  — Population dynamics, biological cycles, and herd structure across
+  species.
 - [General
   Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
   how these files fit into a full assessment, step by step.
@@ -209,3 +213,6 @@ Use this table to know where to look when filling out your data:
 - [Manure Management
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md) — every
   supported combination in `ipcc_mm.csv`, explained.
+- [Theoretical Basis: IPCC Tier
+  2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) —
+  complete mathematical formulation.

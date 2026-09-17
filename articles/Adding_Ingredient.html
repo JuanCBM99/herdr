@@ -46,7 +46,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
+    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
@@ -236,45 +237,23 @@ one).</li>
 <strong><code>source_DE</code></strong>: this column documents the
 origin of the Digestible Energy (<code>DE_pct</code>) value.</li>
 <li>
-<strong>Forages</strong>: forage ingredients often lack standard
-<code>DE_pct</code> values. Following the reference methodology, Energy
-Digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Ed</annotation></semantics></math>,
-equivalent to <code>DE_pct</code>) is derived from Organic Matter
-digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>).
-First,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>
-is estimated from Acid Detergent Fiber
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">ADF</annotation></semantics></math>)
-content:</li>
-</ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi><mo>=</mo><mn>74.13</mn><mo>−</mo><mn>1.364</mn><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mi>D</mi><mi>F</mi><mo>−</mo><mn>29.83</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">OMd = 74.13 - 1.364 \times (ADF - 29.83)</annotation></semantics></math></p>
-<p>Then, Energy Digestibility
+<strong>Forages (<code>DE_pct</code>)</strong>: If a measured value
+is not available, Energy Digestibility
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Ed</annotation></semantics></math>)
-is calculated using the full regression equation, incorporating Crude
-Protein
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">CP</annotation></semantics></math>),
-Ether Extract
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">EE</annotation></semantics></math>),
-Neutral Detergent Fiber
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">NDF</annotation></semantics></math>),
-and Ash:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi><mo>=</mo><mi>O</mi><mi>M</mi><mi>d</mi><mo>−</mo><mn>3.94</mn><mo>+</mo><mn>0.104</mn><mo>×</mo><mi>C</mi><mi>P</mi><mo>+</mo><mn>0.149</mn><mo>×</mo><mi>E</mi><mi>E</mi><mo>+</mo><mn>0.022</mn><mo>×</mo><mi>N</mi><mi>D</mi><mi>F</mi><mo>−</mo><mn>0.244</mn><mo>×</mo><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ed = OMd - 3.94 + 0.104 \times CP + 0.149 \times EE + 0.022 \times NDF - 0.244 \times Ash</annotation></semantics></math></p>
-<p><em>(Note: the methodology also provides alternative reduced
-equations for cases where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">NDF</annotation></semantics></math>
-or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ash</annotation></semantics></math>
-values are missing, but the full equation above is preferred for herdr’s
-database.)</em></p>
-<ul>
-<li>If you don’t have a directly measured <code>GE_feed_kcal_kg</code>,
-calculate it with the NRC (1989) Ewan equation already used throughout
-herdr’s own database:</li>
-</ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kcal/kg DM</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>4140</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>56</mn><mo>×</mo><mi>E</mi><mi>E</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>15</mn><mo>×</mo><mi>C</mi><mi>P</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>44</mn><mo>×</mo><mi>A</mi><mi>S</mi><mi>H</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)</annotation></semantics></math></p>
-<ul>
+is derived from Organic Matter digestibility
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>)
+and proximate analysis
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">CP</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">EE</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">NDF</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ash</annotation></semantics></math>).
+See the exact regression formulas in the <a href="Technical_reference.html#feed_characteristics.csv--nutritional-values">Technical
+Reference: Feed Characteristics</a>.</li>
+<li>
+<strong>Gross Energy (<code>GE_feed_kcal_kg</code>)</strong>: If
+unmeasured by bomb calorimetry, calculate using the NRC (1989) Ewan
+equation documented in the <a href="Technical_reference.html#feed_characteristics.csv--nutritional-values">Technical
+Reference</a>.</li>
 <li>Leave the swine/poultry energy columns as <code>NA</code> if the
 ingredient is only fed to ruminants (as here) — herdr only needs them
 for monogastric diets.</li>

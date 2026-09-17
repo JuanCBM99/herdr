@@ -5,6 +5,7 @@
 <url><loc>https://juancbm99.github.io/herdr/articles/Adding_Ingredient.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/articles/Difficult_Example.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/articles/Easy_Example.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/articles/Herd_Demography.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/articles/Introduction.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/articles/Manure.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/articles/Moderate_Example.html</loc></url>
@@ -36,7 +37,10 @@
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_population.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_population_cattle.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_population_goat.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/calculate_population_poultry.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_population_sheep.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/calculate_population_swine.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/calculate_production.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_vs.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/generate_impact_assessment.html</loc></url>

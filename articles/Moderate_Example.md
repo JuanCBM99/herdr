@@ -6,7 +6,9 @@ This guide walks through a **Moderate Assessment** for **mature dairy
 cattle in Spain (2015)**, using the multi-regional structure (North and
 South) to improve precision over a single national figure.
 
-> 📂 **All files referenced below live in `user_data/`.**
+> 📂 **All files referenced below live in `user_data/` and correspond to
+> the pre-configured `inst/Examples/Level2_Spain_Dairy_Cattle_2015/`
+> baseline.**
 
 ### What you’ll edit
 
@@ -148,8 +150,8 @@ results <- generate_impact_assessment(
 - [Basic
   Assessment](https://juancbm99.github.io/herdr/articles/Easy_Example.md)
   — the single-region version this example builds on.
-- [Hard
-  Example](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
+- [Advanced
+  Assessment](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
   — adds physiological life stages (`class_flex`) on top of this
   North/South split.
 - [Technical

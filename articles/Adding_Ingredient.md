@@ -87,36 +87,15 @@ A few notes on where these numbers come from and how herdr uses them:
   for by-products like this one).
 - **`source_DE`**: this column documents the origin of the Digestible
   Energy (`DE_pct`) value.
-- **Forages**: forage ingredients often lack standard `DE_pct` values.
-  Following the reference methodology, Energy Digestibility ($`Ed`$,
-  equivalent to `DE_pct`) is derived from Organic Matter digestibility
-  ($`OMd`$). First, $`OMd`$ is estimated from Acid Detergent Fiber
-  ($`ADF`$) content:
-
-``` math
-OMd = 74.13 - 1.364 \times (ADF - 29.83)
-```
-
-Then, Energy Digestibility ($`Ed`$) is calculated using the full
-regression equation, incorporating Crude Protein ($`CP`$), Ether Extract
-($`EE`$), Neutral Detergent Fiber ($`NDF`$), and Ash:
-
-``` math
-Ed = OMd - 3.94 + 0.104 \times CP + 0.149 \times EE + 0.022 \times NDF - 0.244 \times Ash
-```
-
-*(Note: the methodology also provides alternative reduced equations for
-cases where $`NDF`$ or $`Ash`$ values are missing, but the full equation
-above is preferred for herdr’s database.)*
-
-- If you don’t have a directly measured `GE_feed_kcal_kg`, calculate it
-  with the NRC (1989) Ewan equation already used throughout herdr’s own
-  database:
-
-``` math
-GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)
-```
-
+- **Forages (`DE_pct`)**: If a measured value is not available, Energy
+  Digestibility ($`Ed`$) is derived from Organic Matter digestibility
+  ($`OMd`$) and proximate analysis ($`CP`$, $`EE`$, $`NDF`$, $`Ash`$).
+  See the exact regression formulas in the [Technical Reference: Feed
+  Characteristics](https://juancbm99.github.io/herdr/articles/Technical_reference.html#feed_characteristics.csv--nutritional-values).
+- **Gross Energy (`GE_feed_kcal_kg`)**: If unmeasured by bomb
+  calorimetry, calculate using the NRC (1989) Ewan equation documented
+  in the [Technical
+  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.html#feed_characteristics.csv--nutritional-values).
 - Leave the swine/poultry energy columns as `NA` if the ingredient is
   only fed to ruminants (as here) — herdr only needs them for
   monogastric diets.

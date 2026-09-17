@@ -7,7 +7,9 @@ cattle**, splitting the population both by **geography** (North
 vs. South Spain) and by **physiological state**, using the `class_flex`
 column to distinguish the **lactation phase** from the **dry phase**.
 
-> 📂 **All files referenced below live in `user_data/`.**
+> 📂 **All files referenced below live in `user_data/` and correspond to
+> the pre-configured `inst/Examples/Level3_Spain_Dairy_Cattle_2015/`
+> baseline.**
 
 ### What you’ll edit
 
@@ -56,21 +58,29 @@ different ingredients, for each life stage.
 #### B. Ingredient breakdown — `diet_ingredients.csv`
 
 Ingredients must be assigned precisely to their `subregion` and
-`class_flex`. Here’s the South/lactation profile:
+`class_flex`. Here are the primary ingredients for the South/lactation
+profile (excerpted from the full dataset):
 
 | diet_tag | region | subregion | class_flex | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|:---|:---|:---|---:|:---|---:|
 | `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
 | `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | forage | `corn_silage_25_30` | 55.00 | `spain` | 12000 |
+| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
+| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | forage | `corn_silage_25_30` | 71.40 | `spain` | 12000 |
+| `diet_dairy_mature` | `spain` | `south` | `lactation_phase` | forage | `cereals_silage_wheat_barley_oat_triticale` | 28.60 | `spain` | `NA` |
 
-> 🌍 **Missing origins:** as before, an `NA` in `country_of_origin` is
+> ℹ️ **Illustrative excerpt:** In the complete
+> `Level3_Spain_Dairy_Cattle_2015` template, remaining concentrate
+> shares (9.32%) consist of macro-minerals and vitamins, ensuring both
+> concentrate and forage categories sum to exactly 100.0%.
+>
+> 🌍 **Missing origins:** As before, an `NA` in `country_of_origin` is
 > resolved automatically by the dynamic FAO background allocation engine
 > — see [Land Use
 > Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
 > for how.
 >
-> 🎯 **Overriding the yield:** the corn silage row sets
+> 🎯 **Overriding the yield:** The corn silage row sets
 > `custom_yield_kg_ha` to `12000`, so herdr uses that farm-specific
 > figure directly for the land-use footprint instead of a
 > FAO/trade-based lookup.

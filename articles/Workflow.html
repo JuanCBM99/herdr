@@ -46,7 +46,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
+    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
@@ -238,11 +239,14 @@ Every single cohort and head count is explicitly declared.
 <li>
 <strong>Automatic Herd Cycle
 (<code>automatic_cycle = TRUE</code>):</strong> Only adult breeding
-females are entered. The package uses reproduction parameters
-(<code>reproduction_parameters.csv</code>) to compute offspring,
-replacement heifers, and mortalities automatically. <em>Currently
-supported for ruminants only.</em>
-</li>
+stock (e.g., mature cows, breeding sows) or initial barn places are
+entered. The package uses reproduction parameters
+(<code>reproduction_parameters.csv</code>) and productive period
+durations (<code>productive_period_days</code>) to compute offspring,
+replacement cohorts, fattening batches, and mortalities automatically
+across ruminant (cattle, sheep, goats), swine, and poultry systems. See
+the <a href="Herd_Demography.html">Herd Demography &amp; Population
+Dynamics</a> guide for the complete decision matrix.</li>
 </ul>
 <hr>
 </div>
@@ -418,21 +422,27 @@ module tables and summary reports directly to <code>output/</code>.</li>
 <p>You can also run specific computational modules independently for
 debugging, calibration, or sensitivity analyses:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Calculate Gross Energy intake (GE)</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Calculate Demographics &amp; Population Dynamics</span></span>
+<span><span class="va">pop_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_population.html">calculate_population</a></span><span class="op">(</span>automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Calculate Gross Energy intake (GE)</span></span>
 <span><span class="va">ge_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_ge.html">calculate_ge</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Calculate Dry Matter Intake (DMI)</span></span>
+<span><span class="co"># 3. Calculate Dry Matter Intake (DMI)</span></span>
 <span><span class="va">dmi_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_dmi.html">calculate_DMI</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Calculate Enteric Methane (CH4)</span></span>
+<span><span class="co"># 4. Calculate Enteric Methane (CH4)</span></span>
 <span><span class="va">enteric_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_emissions_enteric.html">calculate_emissions_enteric</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 4. Calculate Feed-Related Land Use (m2)</span></span>
+<span><span class="co"># 5. Calculate Feed-Related Land Use (m2)</span></span>
 <span><span class="va">land_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
 <span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>, </span>
 <span>  year <span class="op">=</span> <span class="fl">2022</span>, </span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">FALSE</span></span>
-<span><span class="op">)</span></span></code></pre></div>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 6. Calculate Animal Production &amp; Edible Protein (GLEAM)</span></span>
+<span><span class="va">prod_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_production.html">calculate_production</a></span><span class="op">(</span>saveoutput <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 </div>
@@ -516,11 +526,25 @@ libraries.</td>
 <p>For mathematical details, parameter lookup tables, and scientific
 references, consult the companion guides:</p>
 <ul>
-<li><a href="Technical_reference.html">Technical Reference</a></li>
-<li><a href="Manure.html">Manure Management Guide</a></li>
-<li><a href="land_use.html">Land Use Methodology</a></li>
-<li><a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier
-2</a></li>
+<li>
+<a href="Herd_Demography.html">Herd Demography &amp; Population
+Dynamics</a> — Population dynamics, biological cycles, and herd
+structure across species.</li>
+<li>
+<a href="Technical_reference.html">Technical Reference</a> —
+detailed CSV column descriptions and database connectors.</li>
+<li>
+<a href="Adding_Ingredient.html">Adding a New Ingredient</a> — guide
+to extending feed and LCA databases.</li>
+<li>
+<a href="Manure.html">Manure Management Guide</a> — climate and
+storage pathway definitions.</li>
+<li>
+<a href="land_use.html">Land Use Methodology</a> — land competition
+and international trade flows.</li>
+<li>
+<a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier 2</a>
+— complete mathematical formulation.</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

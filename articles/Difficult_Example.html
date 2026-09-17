@@ -46,7 +46,8 @@
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
+    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
@@ -99,8 +100,10 @@ dairy cattle</strong>, splitting the population both by
 column to distinguish the <strong>lactation phase</strong> from the
 <strong>dry phase</strong>.</p>
 <blockquote>
-<p>📂 <strong>All files referenced below live in
-<code>user_data/</code>.</strong></p>
+<p>📂 <strong>All files referenced below live in <code>user_data/</code>
+and correspond to the pre-configured
+<code>inst/Examples/Level3_Spain_Dairy_Cattle_2015/</code>
+baseline.</strong></p>
 </blockquote>
 <div class="section level3">
 <h3 id="what-youll-edit">What you’ll edit<a class="anchor" aria-label="anchor" href="#what-youll-edit"></a>
@@ -285,8 +288,9 @@ stage.</p>
 <h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
 <p>Ingredients must be assigned precisely to their
-<code>subregion</code> and <code>class_flex</code>. Here’s the
-South/lactation profile:</p>
+<code>subregion</code> and <code>class_flex</code>. Here are the primary
+ingredients for the South/lactation profile (excerpted from the full
+dataset):</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="11%">
@@ -338,20 +342,47 @@ South/lactation profile:</p>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
 <td align="left"><code>lactation_phase</code></td>
+<td align="left">concentrate</td>
+<td align="left"><code>rapeseed_meal_00_33_cp</code></td>
+<td align="right">28.71</td>
+<td align="left"><code>NA</code></td>
+<td align="right"><code>NA</code></td>
+</tr>
+<tr class="even">
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
 <td align="left">forage</td>
 <td align="left"><code>corn_silage_25_30</code></td>
-<td align="right">55.00</td>
+<td align="right">71.40</td>
 <td align="left"><code>spain</code></td>
 <td align="right">12000</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>diet_dairy_mature</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>south</code></td>
+<td align="left"><code>lactation_phase</code></td>
+<td align="left">forage</td>
+<td align="left"><code>cereals_silage_wheat_barley_oat_triticale</code></td>
+<td align="right">28.60</td>
+<td align="left"><code>spain</code></td>
+<td align="right"><code>NA</code></td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>🌍 <strong>Missing origins:</strong> as before, an <code>NA</code> in
+<p>ℹ️ <strong>Illustrative excerpt:</strong> In the complete
+<code>Level3_Spain_Dairy_Cattle_2015</code> template, remaining
+concentrate shares (9.32%) consist of macro-minerals and vitamins,
+ensuring both concentrate and forage categories sum to exactly
+100.0%.</p>
+<p>🌍 <strong>Missing origins:</strong> As before, an <code>NA</code> in
 <code>country_of_origin</code> is resolved automatically by the dynamic
 FAO background allocation engine — see <a href="land_use.html">Land Use
 Methodology</a> for how.</p>
-<p>🎯 <strong>Overriding the yield:</strong> the corn silage row sets
+<p>🎯 <strong>Overriding the yield:</strong> The corn silage row sets
 <code>custom_yield_kg_ha</code> to <code>12000</code>, so herdr uses
 that farm-specific figure directly for the land-use footprint instead of
 a FAO/trade-based lookup.</p>

@@ -7,7 +7,9 @@ cattle in Spain (2015)**, using a single national-level identifier to
 link census data, nutrition, and environmental impact from start to
 finish.
 
-> 📂 **All files referenced below live in `user_data/`.**
+> 📂 **All files referenced below live in `user_data/` and correspond to
+> the pre-configured `inst/Examples/Level1_Spain_Dairy_Cattle_2015/`
+> baseline.**
 
 ### What you’ll edit
 
@@ -154,6 +156,6 @@ results <- generate_impact_assessment(
   — every file and column explained in detail.
 - [Moderate
   Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
-  / [Hard
-  Example](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
+  / [Advanced
+  Assessment](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
   — build on this with multi-region herds and mixed manure systems.

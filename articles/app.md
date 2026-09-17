@@ -31,7 +31,10 @@ and set up your baseline parameters.
   section, specify the farm’s country location and the FAO reference
   year for trade data. Decide whether to check the **Use automatic herd
   cycle** box if you want the model to calculate replacement and
-  offspring dynamics automatically.
+  offspring dynamics automatically. See the [Herd Demography &
+  Population
+  Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
+  guide for the complete decision matrix.
 
 ------------------------------------------------------------------------
 
