@@ -180,6 +180,13 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         0
       ),
 
+      # Daily Nitrogen Feed Intake (kg N / animal / day)
+      N_intake_kgheadday = dplyr::if_else(
+        animal_type %in% c("poultry", "swine"),
+        DMI_kgday * (CP_pct / 100 / 6.25),
+        (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
+      ),
+
       # --- Unified Daily Nitrogen Retention Switch (kg N / animal / day) ---
       N_retention_kg_day = dplyr::case_when(
 
@@ -191,8 +198,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         animal_type == "poultry" & productive_period_days > 0 ~
           ((final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
 
-        # Small Ruminants baseline retention rate (IPCC constant fraction fallback)
-        animal_type %in% c("sheep", "goat") ~ 0.1,
+        # Small Ruminants baseline retention rate (IPCC 2019 Table 10.20 Option 1: 10% of N intake)
+        animal_type %in% c("sheep", "goat") ~ 0.10 * N_intake_kgheadday,
 
         # IPCC 2019 SWINE Scenario 1: Active Reproductora Mothers (Switch activated by gestation/lactation days)
         animal_type == "swine" & (sows_gestation_days > 0 | sows_lactation_days > 0) ~
@@ -218,19 +225,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         TRUE ~ 0
       ),
 
-      # Daily Nitrogen Feed Intake (kg N / animal / day)
-      N_intake_kgheadday = dplyr::if_else(
-        animal_type %in% c("poultry", "swine"),
-        DMI_kgday * (CP_pct / 100 / 6.25),
-        (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
-      ),
-
-      # Annual Nitrogen Excretion (kg N / animal / year)
-      N_excreted_kgheadyear = dplyr::if_else(
-        animal_type %in% c("sheep", "goat"),
-        (N_intake_kgheadday * (1 - N_retention_kg_day)) * 365,
-        (N_intake_kgheadday - N_retention_kg_day) * 365
-      ),
+      # Annual Nitrogen Excretion (kg N / animal / year) [IPCC Eq 10.31a]
+      N_excreted_kgheadyear = (N_intake_kgheadday - N_retention_kg_day) * 365,
 
       # Direct nitrous oxide emissions per active block system (kg N2O / year)
       direct_N2O_kgyear = population * N_excreted_kgheadyear * allocation * EF3 * (44 / 28)

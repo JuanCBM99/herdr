@@ -82,7 +82,7 @@ Once the package has been installed, launch the graphical interface directly fro
 ``` r
 library(herdr)
 
-run_app()
+run_herdr_app()
 ```
 
 ------------------------------------------------------------------------
