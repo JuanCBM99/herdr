@@ -47,9 +47,10 @@ A tibble with the modeled poultry population structure.
   turnover and rearing days (`days / 365`).
 
 - **Broilers**: Meat chickens generated from breeder meat hens based on
-  daily egg mass (`egg_mass_g_day`), average egg weight
-  (`egg_weight_g`), incubation hatchability (`fertility_rate`), and
-  fattening duration (`broiler_days`).
+  annual egg production (`eggs_per_year`) or daily egg mass
+  (`egg_mass_g_day`), average egg weight (`egg_weight_g`), incubation
+  hatchability (`fertility_rate`), and fattening duration
+  (`broiler_days`).
 
 - **Manual Broiler Protection**: If the user explicitly enters a
   positive count for `broilers` in the census (e.g. an independent
