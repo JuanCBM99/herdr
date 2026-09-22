@@ -40,17 +40,27 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     show_col_types = FALSE
   )
 
-  definitions_ruminant <- readr::read_csv(
-    file.path(data_dir, "ruminant_definitions.csv"),
-    col_types = readr::cols(subregion = "c", class_flex = "c"),
-    show_col_types = FALSE
-  )
+  rum_file <- file.path(data_dir, "ruminant_definitions.csv")
+  definitions_ruminant <- if (file.exists(rum_file)) {
+    readr::read_csv(
+      rum_file,
+      col_types = readr::cols(subregion = "c", class_flex = "c"),
+      show_col_types = FALSE
+    )
+  } else {
+    tibble::tibble(animal_tag = character(), region = character(), subregion = character(), class_flex = character(), animal_type = character(), animal_subtype = character())
+  }
 
-  definitions_monogastric <- readr::read_csv(
-    file.path(data_dir, "monogastric_definitions.csv"),
-    col_types = readr::cols(subregion = "c", class_flex = "c"),
-    show_col_types = FALSE
-  )
+  mono_file <- file.path(data_dir, "monogastric_definitions.csv")
+  definitions_monogastric <- if (file.exists(mono_file)) {
+    readr::read_csv(
+      mono_file,
+      col_types = readr::cols(subregion = "c", class_flex = "c"),
+      show_col_types = FALSE
+    )
+  } else {
+    tibble::tibble(animal_tag = character(), region = character(), subregion = character(), class_flex = character(), animal_type = character(), animal_subtype = character())
+  }
 
   weights_file <- file.path(data_dir, "livestock_weights.csv")
   weights_df <- if (file.exists(weights_file)) {

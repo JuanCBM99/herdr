@@ -98,7 +98,7 @@ if(getRversion() >= "2.15.1") {
     "spain_forage_yield",
 
     # --- Production and Edible Protein (GLEAM) ---
-    "production_role", "replacement_rate", "BFM", "MEAT_prot", "DP_pct",
+    "production_role", "replacement_rate", "has_replacement_rate", "BFM", "MEAT_prot", "DP_pct",
     "MILK_prot_def", "milk_fresh_kg", "milk_prot_pct", "N_exit",
     "slaughter_weight_kg", "meat_live_weight_kg", "meat_carcass_weight_kg",
     "meat_boneless_kg", "egg_fresh_kg", "milk_protein_kg", "meat_protein_kg",

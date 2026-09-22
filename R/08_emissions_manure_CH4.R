@@ -62,11 +62,11 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 3. Processing and Joins ---
-  results <- suppressMessages(calculate_vs(saveoutput = FALSE)) %>%
+  results <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
 
     dplyr::left_join(
-      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)) %>%
+      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
         dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
     ) %>%

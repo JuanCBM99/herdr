@@ -23,26 +23,37 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::select(dplyr::all_of(join_keys), population) %>%
     dplyr::distinct()
 
-  weights  <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  repro    <- readr::read_csv(file.path(data_dir, "reproduction_parameters.csv"), show_col_types = FALSE)
-  ruminants <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  monogastrics <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
+  weights_file <- file.path(data_dir, "livestock_weights.csv")
+  weights  <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
+
+  repro_file <- file.path(data_dir, "reproduction_parameters.csv")
+  repro    <- if (file.exists(repro_file)) readr::read_csv(repro_file, show_col_types = FALSE) else tibble::tibble(animal_tag = character(), parameter = character(), value = numeric())
+
+  ruminants_file <- file.path(data_dir, "ruminant_definitions.csv")
+  ruminants <- if (file.exists(ruminants_file)) readr::read_csv(ruminants_file, show_col_types = FALSE) else tibble::tibble()
+
+  monogastrics_file <- file.path(data_dir, "monogastric_definitions.csv")
+  monogastrics <- if (file.exists(monogastrics_file)) readr::read_csv(monogastrics_file, show_col_types = FALSE) else tibble::tibble()
 
   # Consolidate Definitions
-  if (!"production_role" %in% names(ruminants)) {
-    ruminants$production_role <- dplyr::case_when(
-      grepl("mature", ruminants$animal_tag, ignore.case = TRUE) ~ "mature",
-      grepl("replacement", ruminants$animal_tag, ignore.case = TRUE) ~ "replacement",
-      TRUE ~ "slaughter"
-    )
-  }
+  if (nrow(ruminants) > 0) {
+    if (!"production_role" %in% names(ruminants)) {
+      ruminants$production_role <- dplyr::case_when(
+        grepl("mature", ruminants$animal_tag, ignore.case = TRUE) ~ "mature",
+        grepl("replacement", ruminants$animal_tag, ignore.case = TRUE) ~ "replacement",
+        TRUE ~ "slaughter"
+      )
+    }
 
-  ruminants_clean <- ruminants %>%
-    dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year, production_role) %>%
-    dplyr::mutate(
-      dplyr::across(c(milk_yield_kg_year, fat_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
-      egg_mass_g_day = 0
-    )
+    ruminants_clean <- ruminants %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year, production_role) %>%
+      dplyr::mutate(
+        dplyr::across(c(milk_yield_kg_year, fat_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+        egg_mass_g_day = 0
+      )
+  } else {
+    ruminants_clean <- tibble::tibble()
+  }
 
   if (nrow(monogastrics) > 0) {
     if (!"production_role" %in% names(monogastrics)) {
@@ -73,15 +84,25 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   }
 
   # FIX: Simplified distinct syntax to avoid across() bugs in newer dplyr versions
-  animal_defs <- dplyr::bind_rows(ruminants_clean, monogastrics_clean) %>%
-    dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
+  animal_defs <- dplyr::bind_rows(ruminants_clean, monogastrics_clean)
+  if (nrow(animal_defs) > 0) {
+    animal_defs <- animal_defs %>%
+      dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
+  }
 
   # Replacement rate lookup
-  repro_repl <- repro %>%
-    dplyr::filter(parameter == "replacement_rate") %>%
-    dplyr::select(animal_tag, replacement_rate = value) %>%
-    dplyr::mutate(replacement_rate = suppressWarnings(as.numeric(replacement_rate))) %>%
-    dplyr::distinct(animal_tag, .keep_all = TRUE)
+  repro_repl <- if (nrow(repro) > 0 && "parameter" %in% names(repro) && "value" %in% names(repro)) {
+    repro %>%
+      dplyr::filter(tolower(parameter) == "replacement_rate") %>%
+      dplyr::select(animal_tag, replacement_rate = value) %>%
+      dplyr::mutate(
+        replacement_rate = suppressWarnings(as.numeric(replacement_rate)),
+        has_replacement_rate = TRUE
+      ) %>%
+      dplyr::distinct(animal_tag, .keep_all = TRUE)
+  } else {
+    tibble::tibble(animal_tag = character(), replacement_rate = numeric(), has_replacement_rate = logical())
+  }
 
   # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) ---
   production_constants <- tibble::tribble(
@@ -96,12 +117,18 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   egg_prot_fraction <- 0.1240
 
   # --- 3. Pipeline Calculation ---
-  results <- pop_df %>%
-    dplyr::left_join(animal_defs, by = join_keys) %>%
-    dplyr::left_join(weights, by = join_keys) %>%
+  results <- pop_df
+  if (nrow(animal_defs) > 0) {
+    results <- results %>% dplyr::left_join(animal_defs, by = join_keys)
+  }
+  if (nrow(weights) > 0) {
+    results <- results %>% dplyr::left_join(weights, by = intersect(names(weights), join_keys))
+  }
+  results <- results %>%
     dplyr::left_join(repro_repl, by = "animal_tag") %>%
     dplyr::left_join(production_constants, by = "animal_type") %>%
     dplyr::mutate(
+      has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),
       dplyr::across(
         c(population, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year,
           egg_mass_g_day, replacement_rate, productive_period_days, adult_weight_kg,
@@ -121,14 +148,17 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         # 1. Animales de recría/reposición: NO van a matadero comercial
         production_role == "replacement" ~ 0,
 
-        # 2. Adultos con tasa de reposición en CSV (vacuno, ovino, cerdas)
-        production_role == "mature" & replacement_rate > 0 ~ population * replacement_rate,
+        # 2. Adultos con tasa de reposición en CSV (vacuno, ovino, caprino, cerdas, ponedoras)
+        #    Si replacement_rate == 0, da 0 (los reproductores no van a matadero)
+        production_role == "mature" & has_replacement_rate ~ population * replacement_rate,
 
-        # 3. Adultos sin tasa en CSV (gallinas ponedoras/reproductoras): desvieje por ciclo de puesta
-        production_role == "mature" & productive_period_days > 0 ~ population * (365 / productive_period_days),
+        # 3. Adultos sin tasa en CSV exclusivamente para aves (desvieje por ciclo de puesta: e.g. 511 d)
+        production_role == "mature" & !has_replacement_rate & animal_type == "poultry" & productive_period_days > 0 ~
+          population * (365 / productive_period_days),
 
         # 4. Animales de cebo/engorde/sacrificio comercial (broilers, cerdos de cebo, terneros, corderos)
-        production_role == "slaughter" ~ population * (365 / dplyr::if_else(productive_period_days > 0, productive_period_days, 365)),
+        production_role == "slaughter" ~
+          population * (365 / dplyr::if_else(productive_period_days > 0, productive_period_days, 365)),
 
         TRUE ~ 0
       ),

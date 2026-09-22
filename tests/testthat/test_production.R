@@ -97,3 +97,61 @@ test_that("calculate_production works under automatic_cycle = TRUE", {
   expect_s3_class(res_auto, "data.frame")
   expect_true("total_protein_kg" %in% names(res_auto))
 })
+
+test_that("calculate_production correctly produces N_exit = 0 when replacement_rate is 0", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+
+  source_data <- if (dir.exists(test_path("test_data/user_data"))) {
+    test_path("test_data/user_data")
+  } else {
+    "user_data"
+  }
+  file.copy(from = source_data, to = temp_test_dir, recursive = TRUE)
+
+  # Explicitly set replacement_rate to 0 for mature_dairy_cattle
+  repro_file <- file.path(temp_test_dir, "user_data", "reproduction_parameters.csv")
+  repro_df <- readr::read_csv(repro_file, show_col_types = FALSE)
+  repro_df <- repro_df %>%
+    dplyr::mutate(value = dplyr::if_else(animal_tag == "mature_dairy_cattle" & parameter == "replacement_rate", 0, value))
+  readr::write_csv(repro_df, repro_file)
+
+  res_zero <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = file.path(temp_test_dir, "user_data")
+  ))
+
+  dairy_row <- res_zero %>% dplyr::filter(animal_tag == "mature_dairy_cattle")
+  expect_true(nrow(dairy_row) > 0)
+  expect_equal(dairy_row$N_exit[1], 0)
+  expect_equal(dairy_row$meat_live_weight_kg[1], 0)
+  expect_equal(dairy_row$meat_carcass_weight_kg[1], 0)
+  # Milk production should still be positive
+  expect_gt(dairy_row$milk_fresh_kg[1], 0)
+})
+
+test_that("calculate_production succeeds gracefully when optional tables are missing", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+
+  source_data <- if (dir.exists(test_path("test_data/user_data"))) {
+    test_path("test_data/user_data")
+  } else {
+    "user_data"
+  }
+  file.copy(from = source_data, to = temp_test_dir, recursive = TRUE)
+
+  # Remove optional reproduction_parameters and monogastric_definitions
+  unlink(file.path(temp_test_dir, "user_data", "reproduction_parameters.csv"))
+  unlink(file.path(temp_test_dir, "user_data", "monogastric_definitions.csv"))
+
+  res_missing <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = file.path(temp_test_dir, "user_data")
+  ))
+
+  expect_s3_class(res_missing, "data.frame")
+  expect_true("milk_fresh_kg" %in% names(res_missing))
+})
