@@ -96,6 +96,49 @@ format_cohort_label <- function(key) {
   }
 }
 
+# --- Canonical Demographic Cohorts Catalog ---
+DEMOGRAPHIC_SPECIES_MAP <- list(
+  cattle = c(
+    "dairy_calves_female_replacement",
+    "dairy_yearlings_female_replacement",
+    "feedlot_calves_male",
+    "feedlot_calves_female",
+    "beef_calves_male",
+    "beef_calves_female",
+    "beef_calves_male_replacement",
+    "beef_calves_female_replacement",
+    "beef_yearlings_male_replacement",
+    "beef_yearlings_female_replacement"
+  ),
+  sheep = c(
+    "lamb_female_dairy_replacement",
+    "lamb_male_dairy_replacement",
+    "lamb_female_meat_replacement",
+    "lamb_male_meat_replacement",
+    "lamb_dairy_slaughter",
+    "lamb_meat_slaughter"
+  ),
+  goat = c(
+    "kid_goat_female_dairy_replacement",
+    "kid_goat_male_dairy_replacement",
+    "kid_goat_female_meat_replacement",
+    "kid_goat_male_meat_replacement",
+    "kid_goat_dairy_slaughter",
+    "kid_goat_meat_slaughter"
+  ),
+  swine = c(
+    "replacement_sows",
+    "fattening_pigs"
+  ),
+  poultry = c(
+    "replacement_meat_pullets",
+    "replacement_layer_pullets",
+    "broilers"
+  )
+)
+
+ALL_DEMOGRAPHIC_TAGS <- unname(unlist(DEMOGRAPHIC_SPECIES_MAP))
+
 # --- Dynamic & Cascading Dropdown Application ---
 
 get_dropdown_options <- function(id, col_name, rv) {
@@ -136,6 +179,7 @@ get_dropdown_options <- function(id, col_name, rv) {
   } else if (col_name == "animal_tag") {
     options <- c(
       options,
+      ALL_DEMOGRAPHIC_TAGS,
       if (!is.null(rv$census) && "animal_tag" %in% names(rv$census)) rv$census$animal_tag,
       if (!is.null(rv$def) && "animal_tag" %in% names(rv$def)) rv$def$animal_tag,
       if (!is.null(rv$mono) && "animal_tag" %in% names(rv$mono)) rv$mono$animal_tag,
@@ -365,7 +409,7 @@ build_manure_combo_key <- function(df) {
 
 # --- Pre-Flight Data Health Validation Engine ---
 
-validate_project_data <- function(rv) {
+validate_project_data <- function(rv, automatic_cycle = FALSE) {
   issues <- list()
 
   add_issue <- function(severity, table_id, tab_label, title, message) {
@@ -444,18 +488,87 @@ validate_project_data <- function(rv) {
 
   census_keys <- build_keys(active_census)
 
+  # Helper to extract the animal_tag from a 4-key
+  extract_key_tag <- function(keys) {
+    vapply(strsplit(keys, " \\| "), function(p) if (length(p) > 0) p[1] else "", character(1), USE.NAMES = FALSE)
+  }
+
+  # Infer active livestock species from Census cohorts
+  census_animal_tags <- unique(valid_census$animal_tag)
+  census_species <- character(0)
+  if (!is.null(rv$def) && nrow(rv$def) > 0 && "animal_type" %in% names(rv$def)) {
+    m_def <- rv$def$animal_type[rv$def$animal_tag %in% census_animal_tags]
+    census_species <- union(census_species, tolower(na.omit(as.character(m_def))))
+  }
+  if (!is.null(rv$mono) && nrow(rv$mono) > 0 && "animal_type" %in% names(rv$mono)) {
+    m_mono <- rv$mono$animal_type[rv$mono$animal_tag %in% census_animal_tags]
+    census_species <- union(census_species, tolower(na.omit(as.character(m_mono))))
+  }
+  if (any(grepl("cattle|bull|cow", census_animal_tags, ignore.case = TRUE))) census_species <- union(census_species, "cattle")
+  if (any(grepl("sheep|ewe|ram", census_animal_tags, ignore.case = TRUE))) census_species <- union(census_species, "sheep")
+  if (any(grepl("goat", census_animal_tags, ignore.case = TRUE))) census_species <- union(census_species, "goat")
+  if (any(grepl("sow|boar|pig", census_animal_tags, ignore.case = TRUE))) census_species <- union(census_species, "swine")
+  if (any(grepl("hen|poultry|chicken", census_animal_tags, ignore.case = TRUE))) census_species <- union(census_species, "poultry")
+
+  valid_demo_tags <- if (length(census_species) > 0) {
+    unname(unlist(DEMOGRAPHIC_SPECIES_MAP[census_species]))
+  } else {
+    ALL_DEMOGRAPHIC_TAGS
+  }
+
+  check_orphan_cohorts <- function(table_id, tab_label, candidate_keys) {
+    if (length(candidate_keys) == 0) return()
+    raw_orphans <- setdiff(candidate_keys, all_census_keys)
+    raw_orphans <- raw_orphans[raw_orphans != ""]
+    if (length(raw_orphans) == 0) return()
+
+    orphan_tags <- extract_key_tag(raw_orphans)
+
+    is_valid_demo <- orphan_tags %in% valid_demo_tags
+    demo_keys <- raw_orphans[is_valid_demo]
+
+    is_wrong_spec <- (!is_valid_demo) & (orphan_tags %in% ALL_DEMOGRAPHIC_TAGS)
+    wrong_spec_keys <- raw_orphans[is_wrong_spec]
+
+    true_orphans <- raw_orphans[!is_valid_demo & !is_wrong_spec]
+
+    if (length(true_orphans) > 0) {
+      fmt_orphans <- vapply(true_orphans, format_cohort_label, character(1), USE.NAMES = FALSE)
+      fmt_orphans <- fmt_orphans[fmt_orphans != ""]
+      if (length(fmt_orphans) > 0) {
+        add_issue("error", table_id, tab_label, "Cohort Not in Census",
+                  paste0("Cohort(s) in ", tab_label, " do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
+                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
+      }
+    }
+
+    if (length(wrong_spec_keys) > 0) {
+      fmt_wrong <- vapply(wrong_spec_keys, format_cohort_label, character(1), USE.NAMES = FALSE)
+      fmt_wrong <- fmt_wrong[fmt_wrong != ""]
+      if (length(fmt_wrong) > 0) {
+        add_issue("error", table_id, tab_label, "Missing Breeding Adults in Census",
+                  paste0("Cohort(s) in ", tab_label, " (", paste(fmt_wrong, collapse = ", "),
+                         ") are demographic offspring categories, but their parent breeding species is not present in Census."))
+      }
+    }
+
+    if (!isTRUE(automatic_cycle) && length(demo_keys) > 0) {
+      fmt_demo <- vapply(demo_keys, format_cohort_label, character(1), USE.NAMES = FALSE)
+      fmt_demo <- fmt_demo[fmt_demo != ""]
+      if (length(fmt_demo) > 0) {
+        add_issue("warning", table_id, tab_label, "Demographic Cohort Without Automatic Demography",
+                  paste0("Cohort(s) in ", tab_label, " (", paste(fmt_demo, collapse = ", "),
+                         ") are offspring/replacement categories not listed in Census. Check 'Automatic Herd Demography' in the sidebar to calculate their populations automatically, or add them to Census for direct headcount."))
+      }
+    }
+  }
+
   # --- 3. Biological Definitions: Ruminants & Monogastrics must define Census cohorts ---
   # Check for cohorts in Ruminants (def) not in Census
   if (!is.null(rv$def) && nrow(rv$def) > 0) {
     valid_def <- rv$def[!is.na(rv$def$animal_tag) & trimws(as.character(rv$def$animal_tag)) != "", , drop = FALSE]
     if (nrow(valid_def) > 0) {
-      orphans_def <- setdiff(build_keys(valid_def), all_census_keys)
-      if (length(orphans_def) > 0) {
-        fmt_orphans <- vapply(orphans_def, format_cohort_label, character(1), USE.NAMES = FALSE)
-        add_issue("error", "def", "Ruminants", "Cohort Not in Census",
-                  paste0("Cohort(s) in Ruminants do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
-                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
-      }
+      check_orphan_cohorts("def", "Ruminants", build_keys(valid_def))
     }
   }
 
@@ -463,13 +576,7 @@ validate_project_data <- function(rv) {
   if (!is.null(rv$mono) && nrow(rv$mono) > 0) {
     valid_mono <- rv$mono[!is.na(rv$mono$animal_tag) & trimws(as.character(rv$mono$animal_tag)) != "", , drop = FALSE]
     if (nrow(valid_mono) > 0) {
-      orphans_mono <- setdiff(build_keys(valid_mono), all_census_keys)
-      if (length(orphans_mono) > 0) {
-        fmt_orphans <- vapply(orphans_mono, format_cohort_label, character(1), USE.NAMES = FALSE)
-        add_issue("error", "mono", "Monogastrics", "Cohort Not in Census",
-                  paste0("Cohort(s) in Monogastrics do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
-                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
-      }
+      check_orphan_cohorts("mono", "Monogastrics", build_keys(valid_mono))
     }
   }
 
@@ -487,13 +594,7 @@ validate_project_data <- function(rv) {
   if (!is.null(rv$weights) && nrow(rv$weights) > 0) {
     valid_w <- rv$weights[!is.na(rv$weights$animal_tag) & trimws(as.character(rv$weights$animal_tag)) != "", , drop = FALSE]
     if (nrow(valid_w) > 0) {
-      orphans_w <- setdiff(build_keys(valid_w), all_census_keys)
-      if (length(orphans_w) > 0) {
-        fmt_orphans <- vapply(orphans_w, format_cohort_label, character(1), USE.NAMES = FALSE)
-        add_issue("error", "weights", "Weights", "Cohort Not in Census",
-                  paste0("Cohort(s) in Weights do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
-                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
-      }
+      check_orphan_cohorts("weights", "Weights", build_keys(valid_w))
     }
   }
 
@@ -543,17 +644,7 @@ validate_project_data <- function(rv) {
   if (!is.null(rv$manure) && nrow(rv$manure) > 0) {
     valid_m <- rv$manure[!is.na(rv$manure$animal_tag) & trimws(as.character(rv$manure$animal_tag)) != "", , drop = FALSE]
     if (nrow(valid_m) > 0) {
-      orphans_m <- setdiff(build_keys(valid_m), all_census_keys)
-      orphans_m <- orphans_m[orphans_m != ""]
-      if (length(orphans_m) > 0) {
-        fmt_orphans <- vapply(orphans_m, format_cohort_label, character(1), USE.NAMES = FALSE)
-        fmt_orphans <- fmt_orphans[fmt_orphans != ""]
-        if (length(fmt_orphans) > 0) {
-          add_issue("error", "manure", "Manure", "Cohort Not in Census",
-                    paste0("Cohort(s) in Manure do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
-                           ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
-        }
-      }
+      check_orphan_cohorts("manure", "Manure", build_keys(valid_m))
     }
   }
   manure_keys <- if (!is.null(rv$manure)) build_keys(rv$manure) else character(0)

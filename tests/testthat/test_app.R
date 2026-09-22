@@ -138,6 +138,29 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
     rv$def <- rbind(new_def, rv$def)
     issues_downstream <- project_validation_issues()
     expect_true(any(sapply(issues_downstream, function(x) x$table_id == "def" && grepl("Cohort Not in Census", x$title) && grepl("perro", x$message))))
+
+    # 8. Demographic cohorts (feedlot calves, replacement heifers) defined downstream:
+    rv$def <- rv$def[rv$def$animal_tag != "perro", ]
+    rv$census <- rv$census[rv$census$animal_tag != "feedlot_calves_male", ]
+
+    new_demo_def <- rv$def[1, ]
+    new_demo_def$animal_tag <- "feedlot_calves_male"
+    rv$def <- rbind(rv$def, new_demo_def)
+
+    new_demo_w <- rv$weights[1, ]
+    new_demo_w$animal_tag <- "feedlot_calves_male"
+    rv$weights <- rbind(rv$weights, new_demo_w)
+
+    # When auto_cycle is FALSE, demographic cohort raises an advisory warning, NOT a blocking error
+    session$setInputs(auto_cycle = FALSE)
+    issues_demo_off <- project_validation_issues()
+    expect_false(any(sapply(issues_demo_off, function(x) x$severity == "error" && grepl("feedlot_calves_male", x$message))))
+    expect_true(any(sapply(issues_demo_off, function(x) x$severity == "warning" && grepl("feedlot_calves_male", x$message))))
+
+    # When auto_cycle is TRUE, demographic cohort is completely valid (0 errors, 0 warnings for feedlot_calves_male)
+    session$setInputs(auto_cycle = TRUE)
+    issues_demo_on <- project_validation_issues()
+    expect_false(any(sapply(issues_demo_on, function(x) grepl("feedlot_calves_male", x$message))))
   })
 })
 

@@ -141,7 +141,7 @@ herdr_server <- function(input, output, session) {
     for (id in names(tables_info)) {
       force(rv[[id]])
     }
-    validate_project_data(rv)
+    validate_project_data(rv, automatic_cycle = isTRUE(input$auto_cycle))
   })
 
   output$sidebar_data_health <- renderUI({
@@ -464,7 +464,7 @@ herdr_server <- function(input, output, session) {
       if (isTRUE(dirty[[id]])) {
         badges[[length(badges) + 1]] <- tags$span(class = "dirty-dot", title = "Unsaved changes")
       }
-      issues <- validate_project_data(rv)
+      issues <- validate_project_data(rv, automatic_cycle = isTRUE(input$auto_cycle))
       tbl_issues <- Filter(function(x) x$table_id == id, issues)
       if (length(tbl_issues) > 0) {
         has_err <- any(sapply(tbl_issues, function(x) x$severity == "error"))
