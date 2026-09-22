@@ -35,9 +35,9 @@ based on biological laying cycles, incubation fertility, and rearing durations.
   \item \strong{Replacement Pullets}: Rearing cohorts (\code{replacement_layer_pullets},
         \code{replacement_meat_pullets}) generated from the all-in all-out cycle turnover
         and rearing days (\code{days / 365}).
-  \item \strong{Broilers}: Meat chickens generated from breeder meat hens based on daily egg mass
-        (\code{egg_mass_g_day}), average egg weight (\code{egg_weight_g}), incubation hatchability
-        (\code{fertility_rate}), and fattening duration (\code{broiler_days}).
+  \item \strong{Broilers}: Meat chickens generated from breeder meat hens based on annual egg production
+        (\code{eggs_per_year}) or daily egg mass (\code{egg_mass_g_day}), average egg weight (\code{egg_weight_g}),
+        incubation hatchability (\code{fertility_rate}), and fattening duration (\code{broiler_days}).
   \item \strong{Manual Broiler Protection}: If the user explicitly enters a positive count for
         \code{broilers} in the census (e.g. an independent commercial grow-out farm), their manual
         figure is preserved intact without being overwritten.

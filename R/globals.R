@@ -19,7 +19,7 @@ if(getRversion() >= "2.15.1") {
     "wool_yield_kg_year", "work_hours", "a", "b", "C_val", "A_val", "B_val",
     "cfi", "cfi_value", "ca", "ca_value", "c_pregnancy", "c_value", "pr",
     "C_preg_factor", "REM", "REG", "de_safe", "de_percent", "frac_fat_pct",
-    "frac_protein_pct", "egg_mass_g_day", "cfi_maintenance", "W_mean",
+    "frac_protein_pct", "egg_mass_g_day", "eggs_per_year", "cfi_maintenance", "W_mean",
     "W_metabolic", "alpha", "c_pregnancy_cattle", "pr_sheep_goat", "pregnancy_rate",
 
     # --- Nutrition and Intake (DMI) ---

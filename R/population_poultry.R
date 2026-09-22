@@ -10,9 +10,9 @@
 #'   \item \strong{Replacement Pullets}: Rearing cohorts (\code{replacement_layer_pullets},
 #'         \code{replacement_meat_pullets}) generated from the all-in all-out cycle turnover
 #'         and rearing days (\code{days / 365}).
-#'   \item \strong{Broilers}: Meat chickens generated from breeder meat hens based on daily egg mass
-#'         (\code{egg_mass_g_day}), average egg weight (\code{egg_weight_g}), incubation hatchability
-#'         (\code{fertility_rate}), and fattening duration (\code{broiler_days}).
+#'   \item \strong{Broilers}: Meat chickens generated from breeder meat hens based on annual egg production
+#'         (\code{eggs_per_year}) or daily egg mass (\code{egg_mass_g_day}), average egg weight (\code{egg_weight_g}),
+#'         incubation hatchability (\code{fertility_rate}), and fattening duration (\code{broiler_days}).
 #'   \item \strong{Manual Broiler Protection}: If the user explicitly enters a positive count for
 #'         \code{broilers} in the census (e.g. an independent commercial grow-out farm), their manual
 #'         figure is preserved intact without being overwritten.
@@ -111,6 +111,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters, defini
   broiler_days      <- get_period_days("broilers", default_days = 42)
 
   # 2c. Breeder meat hen oviposition and fertility parameters
+  eggs_yr_breeder   <- get_def_val("eggs_per_year", "breeder_meat_hens", default_val = NA_real_)
   egg_mass_breeder  <- get_def_val("egg_mass_g_day", "breeder_meat_hens", default_val = 37.12)
   egg_wt_breeder    <- get_def_val("egg_weight_g", "breeder_meat_hens", default_val = 64.0)
   fertility_def     <- get_def_val("fertility_rate", "breeder_meat_hens", default_val = 0)
@@ -158,7 +159,13 @@ calculate_population_poultry <- function(census_poultry, rate_parameters, defini
     if (!tag %in% names(base_wide)) base_wide[[tag]] <- 0
   }
 
-  eggs_per_day <- if (egg_wt_breeder > 0) (egg_mass_breeder / egg_wt_breeder) else (37.12 / 64.0)
+  eggs_per_day <- if (!is.na(eggs_yr_breeder) && eggs_yr_breeder > 0) {
+    eggs_yr_breeder / 365
+  } else if (egg_wt_breeder > 0 && egg_mass_breeder > 0) {
+    egg_mass_breeder / egg_wt_breeder
+  } else {
+    37.12 / 64.0
+  }
 
   # =========================================================================
   # Step 4: Demographic Modeling Equations

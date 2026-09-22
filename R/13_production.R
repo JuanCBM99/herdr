@@ -53,6 +53,21 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       )
     }
 
+    # Harmonize egg production inputs: eggs_per_year (intuitive) -> egg_mass_g_day (bioenergetics)
+    if (!"egg_mass_g_day" %in% names(monogastrics)) {
+      monogastrics$egg_mass_g_day <- 0
+    }
+    if ("eggs_per_year" %in% names(monogastrics)) {
+      egg_wt <- if ("egg_weight_g" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$egg_weight_g)) else 60
+      egg_wt <- dplyr::coalesce(egg_wt, 60)
+      eggs_yr <- suppressWarnings(as.numeric(monogastrics$eggs_per_year))
+      monogastrics$egg_mass_g_day <- dplyr::if_else(
+        !is.na(eggs_yr) & eggs_yr > 0,
+        (eggs_yr / 365) * egg_wt,
+        suppressWarnings(as.numeric(monogastrics$egg_mass_g_day))
+      )
+    }
+
     monogastrics_clean <- monogastrics %>%
       dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, egg_mass_g_day, production_role) %>%
       dplyr::mutate(

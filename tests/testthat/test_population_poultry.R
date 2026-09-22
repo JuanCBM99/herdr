@@ -220,4 +220,34 @@ test_that("calculate_population_poultry uses default fallbacks for egg_weight_g 
   expect_equal(broiler_pop, expected_broilers, tolerance = 1e-2)
 })
 
+test_that("calculate_population_poultry accepts eggs_per_year and models broilers correctly", {
+  census <- tibble::tribble(
+    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
+    "breeder_meat_hens", "spain", NA_character_, NA_character_, 10000
+  )
+
+  rate_parameters <- tibble::tribble(
+    ~animal_tag, ~parameter, ~value,
+    "breeder_meat_hens", "replacement_rate", 1.0
+  )
+
+  # Providing eggs_per_year = 211.7 (corresponds to 0.58 eggs/day)
+  definitions <- tibble::tribble(
+    ~animal_tag, ~animal_type, ~animal_subtype, ~eggs_per_year, ~egg_weight_g, ~fertility_rate,
+    "breeder_meat_hens", "poultry", "meat", 211.7, 64.0, 0.83,
+    "replacement_meat_pullets", "poultry", "meat", 0, NA_real_, NA_real_,
+    "broilers", "poultry", "meat", 0, NA_real_, NA_real_
+  )
+
+  res <- calculate_population_poultry(census, rate_parameters, definitions)
+
+  expect_setequal(res$animal_tag, c("breeder_meat_hens", "replacement_meat_pullets", "broilers"))
+
+  # Broiler AAP check: 10000 * (211.7 / 365) * 0.83 * 42 = 202287.6
+  broiler_pop <- res %>% filter(animal_tag == "broilers") %>% pull(population)
+  expected_broilers <- 10000 * (211.7 / 365) * 0.83 * 42
+  expect_equal(broiler_pop, expected_broilers, tolerance = 1e-2)
+})
+
+
 
