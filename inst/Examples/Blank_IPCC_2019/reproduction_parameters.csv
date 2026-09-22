@@ -11,3 +11,5 @@ mature_goat_female_dairy,replacement_rate,0.3
 mature_goat_male_meat,replacement_rate,0.25
 mature_goat_female_meat,replacement_rate,0.3
 breeder_sows,replacement_rate,0.25
+laying_hens,replacement_rate,0.714
+breeder_meat_hens,replacement_rate,1.2126
