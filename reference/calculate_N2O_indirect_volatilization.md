@@ -8,7 +8,8 @@ nitrogen (IPCC Eq 10.26 and 10.28).
 ``` r
 calculate_N2O_indirect_volatilization(
   automatic_cycle = FALSE,
-  saveoutput = TRUE
+  saveoutput = TRUE,
+  data_dir = "user_data"
 )
 ```
 
@@ -22,3 +23,8 @@ calculate_N2O_indirect_volatilization(
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Path to the directory containing input CSV/data files. Defaults to
+  \`"user_data"\`.

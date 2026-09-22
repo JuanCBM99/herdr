@@ -6,7 +6,11 @@ population, and management factors (B0, MCF, AWMS) using IPCC Eq 10.23.
 ## Usage
 
 ``` r
-calculate_CH4_manure(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_CH4_manure(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 ```
 
 ## Arguments
@@ -19,3 +23,8 @@ calculate_CH4_manure(automatic_cycle = FALSE, saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.

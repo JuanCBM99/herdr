@@ -8,7 +8,11 @@ ruminants, and IPCC Tier 1 with metabolic weight scaling for swine
 ## Usage
 
 ``` r
-calculate_emissions_enteric(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_emissions_enteric(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 ```
 
 ## Arguments
@@ -21,3 +25,8 @@ calculate_emissions_enteric(automatic_cycle = FALSE, saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.

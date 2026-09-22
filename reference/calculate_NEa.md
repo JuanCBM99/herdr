@@ -5,7 +5,7 @@ Calculate Net Energy for Activity (NEa)
 ## Usage
 
 ``` r
-calculate_NEa(saveoutput = TRUE)
+calculate_NEa(saveoutput = TRUE, data_dir = "user_data")
 ```
 
 ## Arguments
@@ -13,3 +13,8 @@ calculate_NEa(saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.

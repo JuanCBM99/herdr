@@ -6,7 +6,7 @@ poultry and swine using direct mathematical switches.
 ## Usage
 
 ``` r
-calculate_monogastric_energy(saveoutput = TRUE)
+calculate_monogastric_energy(saveoutput = TRUE, data_dir = "user_data")
 ```
 
 ## Arguments
@@ -15,3 +15,8 @@ calculate_monogastric_energy(saveoutput = TRUE)
 
   If TRUE (default), saves the results to
   \`output/monogastric_metabolizable_energy.csv\`.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.

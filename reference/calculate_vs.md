@@ -7,7 +7,7 @@ ruminants, and DMI/Energy ratios for poultry.
 ## Usage
 
 ``` r
-calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
+calculate_vs(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data")
 ```
 
 ## Arguments
@@ -19,6 +19,11 @@ calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.
 
 ## Value
 

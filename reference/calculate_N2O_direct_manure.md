@@ -6,7 +6,11 @@ emission factors, management system, and climate (IPCC Eq 10.25).
 ## Usage
 
 ``` r
-calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_N2O_direct_manure(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 ```
 
 ## Arguments
@@ -19,3 +23,8 @@ calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Path to the directory containing input CSV/data files. Defaults to
+  \`"user_data"\`.

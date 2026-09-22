@@ -7,7 +7,7 @@ combining ruminant and poultry definitions.
 ## Usage
 
 ``` r
-calculate_weighted_variable(saveoutput = TRUE)
+calculate_weighted_variable(saveoutput = TRUE, data_dir = "user_data")
 ```
 
 ## Arguments
@@ -15,3 +15,8 @@ calculate_weighted_variable(saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.

@@ -8,7 +8,11 @@ to 9.5) and IDF standards.
 ## Usage
 
 ``` r
-calculate_production(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_production(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 ```
 
 ## Arguments
@@ -21,6 +25,11 @@ calculate_production(automatic_cycle = FALSE, saveoutput = TRUE)
 - saveoutput:
 
   Logical. If TRUE (default), results are saved to output folder.
+
+- data_dir:
+
+  Path to the directory containing input CSV/data files. Defaults to
+  \`"user_data"\`.
 
 ## Value
 

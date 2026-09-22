@@ -16,7 +16,11 @@ two distinct modes:
 ## Usage
 
 ``` r
-calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_population(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 ```
 
 ## Arguments
@@ -30,6 +34,11 @@ calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
 
   Logical. If `TRUE`, exports the final population dataset to
   `output/population_result.csv`. Default is `TRUE`.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.
 
 ## Value
 

@@ -15,7 +15,8 @@ generate_impact_assessment(
   saveoutput = TRUE,
   group_by_identification = TRUE,
   farm_country = "Spain",
-  year = 2024
+  year = 2024,
+  data_dir = "user_data"
 )
 ```
 
@@ -63,3 +64,8 @@ generate_impact_assessment(
 
   Numeric. The reference year for FAO trade data calculation if origins
   are missing. Default is 2022.
+
+- data_dir:
+
+  Path to the directory containing input CSV/data files. Defaults to
+  \`"user_data"\`.

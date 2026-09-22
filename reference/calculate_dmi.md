@@ -7,7 +7,7 @@ poultry.
 ## Usage
 
 ``` r
-calculate_DMI(saveoutput = TRUE)
+calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
 ```
 
 ## Arguments
@@ -15,3 +15,8 @@ calculate_DMI(saveoutput = TRUE)
 - saveoutput:
 
   If TRUE (default) the results are saved in the output folder.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.
