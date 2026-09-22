@@ -119,7 +119,6 @@ modal_tooltips <- list(
   frac_fat_pct             = "Fat fraction in the animal's daily weight gain.",
   frac_protein_pct         = "Protein fraction in the animal's daily weight gain.",
   eggs_per_year            = "Annual egg production per laying hen (in eggs/hen/year, e.g. 310-325 for commercial table egg layers, 210-220 for broiler breeders).",
-  egg_mass_g_day           = "Egg mass produced by laying hens (in grams per day). Optional legacy fallback for eggs_per_year.",
   egg_weight_g             = "Average weight of a single egg in grams (e.g. 60-64 g). Used to calculate daily egg mass and total egg yield biomass.",
   fertility_rate           = "Fertility and hatchability rate (between 0 and 1) for poultry breeding flocks.",
   alpha                    = "Metabolic weight coefficient",

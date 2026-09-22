@@ -17,20 +17,12 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   mono_csv     <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
-  # Harmonize egg production inputs: eggs_per_year (intuitive) -> egg_mass_g_day (bioenergetics)
-  if (!"egg_mass_g_day" %in% names(mono_csv)) {
-    mono_csv$egg_mass_g_day <- 0
-  }
-  if ("eggs_per_year" %in% names(mono_csv)) {
-    egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
-    egg_wt <- dplyr::coalesce(egg_wt, 60)
-    eggs_yr <- suppressWarnings(as.numeric(mono_csv$eggs_per_year))
-    mono_csv$egg_mass_g_day <- dplyr::if_else(
-      !is.na(eggs_yr) & eggs_yr > 0,
-      (eggs_yr / 365) * egg_wt,
-      suppressWarnings(as.numeric(mono_csv$egg_mass_g_day))
-    )
-  }
+  # Calculate daily egg mass internally for IPCC N retention: (eggs_per_year / 365) * egg_weight_g
+  egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
+  egg_wt <- dplyr::coalesce(egg_wt, 60)
+  eggs_yr <- if ("eggs_per_year" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$eggs_per_year)) else 0
+  eggs_yr <- dplyr::coalesce(eggs_yr, 0)
+  mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
 
   ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
   cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))

@@ -172,8 +172,8 @@ test_that("calculate_population_poultry automatically models broilers from breed
   )
 
   definitions <- tibble::tribble(
-    ~animal_tag, ~animal_type, ~animal_subtype, ~egg_mass_g_day, ~egg_weight_g, ~fertility_rate,
-    "breeder_meat_hens", "poultry", "meat", 37.12, 64.0, 0.83,
+    ~animal_tag, ~animal_type, ~animal_subtype, ~eggs_per_year, ~egg_weight_g, ~fertility_rate,
+    "breeder_meat_hens", "poultry", "meat", 211.7, 64.0, 0.83,
     "replacement_meat_pullets", "poultry", "meat", 0, NA_real_, NA_real_,
     "broilers", "poultry", "meat", 0, NA_real_, NA_real_
   )
@@ -182,9 +182,9 @@ test_that("calculate_population_poultry automatically models broilers from breed
 
   expect_setequal(res$animal_tag, c("breeder_meat_hens", "replacement_meat_pullets", "broilers"))
 
-  # Broiler AAP check: 10000 * (37.12 / 64) * 0.83 * 42 = 202287.6
+  # Broiler AAP check: 10000 * (211.7 / 365) * 0.83 * 42 = 202287.6
   broiler_pop <- res %>% filter(animal_tag == "broilers") %>% pull(population)
-  expected_broilers <- 10000 * (37.12 / 64.0) * 0.83 * 42
+  expected_broilers <- 10000 * (211.7 / 365) * 0.83 * 42
   expect_equal(broiler_pop, expected_broilers, tolerance = 1e-2)
 
   # Replacement pullets check: 10000 * 1.0 * (140 / 365) = 3835.616
@@ -205,8 +205,8 @@ test_that("calculate_population_poultry uses default fallbacks for egg_weight_g 
 
   # No egg_weight_g or fertility_rate columns provided
   definitions <- tibble::tribble(
-    ~animal_tag, ~animal_type, ~animal_subtype, ~egg_mass_g_day,
-    "breeder_meat_hens", "poultry", "meat", 37.12,
+    ~animal_tag, ~animal_type, ~animal_subtype, ~eggs_per_year,
+    "breeder_meat_hens", "poultry", "meat", 211.7,
     "replacement_meat_pullets", "poultry", "meat", 0,
     "broilers", "poultry", "meat", 0
   )
@@ -216,7 +216,7 @@ test_that("calculate_population_poultry uses default fallbacks for egg_weight_g 
   expect_true("broilers" %in% res$animal_tag)
   broiler_pop <- res %>% filter(animal_tag == "broilers") %>% pull(population)
   # Expected with defaults: 64.0g egg weight and 0.83 fertility
-  expected_broilers <- 5000 * (37.12 / 64.0) * 0.83 * 42
+  expected_broilers <- 5000 * (211.7 / 365) * 0.83 * 42
   expect_equal(broiler_pop, expected_broilers, tolerance = 1e-2)
 })
 

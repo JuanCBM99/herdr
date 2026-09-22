@@ -17,20 +17,12 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
   # Platform standard joining keys
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # Harmonize egg production inputs: eggs_per_year (intuitive) -> egg_mass_g_day (bioenergetics)
-  if (!"egg_mass_g_day" %in% names(mono_csv)) {
-    mono_csv$egg_mass_g_day <- 0
-  }
-  if ("eggs_per_year" %in% names(mono_csv)) {
-    egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
-    egg_wt <- dplyr::coalesce(egg_wt, 60)
-    eggs_yr <- suppressWarnings(as.numeric(mono_csv$eggs_per_year))
-    mono_csv$egg_mass_g_day <- dplyr::if_else(
-      !is.na(eggs_yr) & eggs_yr > 0,
-      (eggs_yr / 365) * egg_wt,
-      suppressWarnings(as.numeric(mono_csv$egg_mass_g_day))
-    )
-  }
+  # Calculate daily egg mass internally for bioenergetics: (eggs_per_year / 365) * egg_weight_g
+  egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
+  egg_wt <- dplyr::coalesce(egg_wt, 60)
+  eggs_yr <- if ("eggs_per_year" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$eggs_per_year)) else 0
+  eggs_yr <- dplyr::coalesce(eggs_yr, 0)
+  mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
 
   # 2. Join definition and weight files
   master <- mono_csv %>%
