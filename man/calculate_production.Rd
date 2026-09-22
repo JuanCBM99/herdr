@@ -4,12 +4,18 @@
 \alias{calculate_production}
 \title{Calculate Total Livestock Production}
 \usage{
-calculate_production(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_production(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
 \item{saveoutput}{Logical. If TRUE (default), results are saved to output folder.}
+
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
 }
 \value{
 Tibble with animal production summary.

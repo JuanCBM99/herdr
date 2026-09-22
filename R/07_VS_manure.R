@@ -5,18 +5,19 @@
 #'
 #' @param urinary_energy Numeric. Fraction of energy lost in urine. Default 0.04.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @return Tibble with VS for all animal categories.
 #' @export
-calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE) {
+calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating Volatile Solids (VS)...")
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 1. Load Dependencies and Model Components ---
-  ge_data   <- suppressMessages(calculate_ge(saveoutput = FALSE))
-  dmi_data  <- suppressMessages(calculate_DMI(saveoutput = FALSE))
-  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
+  ge_data   <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  dmi_data  <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
+  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
 
   # --- 2. Merge Assets and Clean Numeric Types ---
   results <- ge_data %>%

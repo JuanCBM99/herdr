@@ -4,12 +4,18 @@
 \alias{calculate_N2O_indirect_leaching}
 \title{Calculate indirect N2O emissions from leaching}
 \usage{
-calculate_N2O_indirect_leaching(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_N2O_indirect_leaching(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
 }
 \description{
 Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).

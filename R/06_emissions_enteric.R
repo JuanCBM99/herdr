@@ -6,22 +6,25 @@
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating enteric fermentation emissions...")
 
   # --- 1. Data Loading and Propagation ---
-  diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
-  ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE))
-  pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  livestock_definitions <- if (file.exists("user_data/ruminant_definitions.csv")) {
-    suppressMessages(readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE))
+  diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  ruminant_file <- file.path(data_dir, "ruminant_definitions.csv")
+  livestock_definitions <- if (file.exists(ruminant_file)) {
+    suppressMessages(readr::read_csv(ruminant_file, show_col_types = FALSE))
   } else {
     NULL
   }
-  weights_csv <- if (file.exists("user_data/livestock_weights.csv")) {
-    suppressMessages(readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE))
+  weights_file <- file.path(data_dir, "livestock_weights.csv")
+  weights_csv <- if (file.exists(weights_file)) {
+    suppressMessages(readr::read_csv(weights_file, show_col_types = FALSE))
   } else {
     NULL
   }

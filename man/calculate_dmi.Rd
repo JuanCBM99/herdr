@@ -4,10 +4,12 @@
 \alias{calculate_DMI}
 \title{Calculate Dry Matter Intake (DMI)}
 \usage{
-calculate_DMI(saveoutput = TRUE)
+calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED)

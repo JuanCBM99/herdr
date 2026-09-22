@@ -10,7 +10,8 @@ calculate_land_use(
   farm_country = "Spain",
   year = 2024,
   max_trace_hops = 4,
-  ssr_threshold = 0.7
+  ssr_threshold = 0.7,
+  data_dir = "user_data"
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ trade data, this caps how many countries the algorithm will follow through re-ex
 
 \item{ssr_threshold}{Numeric. Self-Sufficiency Ratio (Production / Apparent Consumption)
 above which a country is considered a genuine producer. Default is 0.70.}
+
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
 }
 \description{
 Computes total land use (m2) per animal based on validated DMI and specific origin countries.

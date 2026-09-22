@@ -4,17 +4,18 @@
 #' by mapping ingredients to diets and diets to animals, combining ruminant and poultry definitions.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_weighted_variable <- function(saveoutput = TRUE) {
+calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating Weighted Nutritional Variables...")
 
   # --- 1. Load Data Assets ---
-  diets           <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
-  ingredients     <- readr::read_csv("user_data/diet_ingredients.csv", show_col_types = FALSE)
-  characteristics <- readr::read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
-  definitions     <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
-  monogastric     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
+  diets           <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
+  ingredients     <- readr::read_csv(file.path(data_dir, "diet_ingredients.csv"), show_col_types = FALSE)
+  characteristics <- readr::read_csv(file.path(data_dir, "feed_characteristics.csv"), show_col_types = FALSE)
+  definitions     <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  monogastric     <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
   # Check if diets table is normalized (diet_tag unique) or legacy composite
   legacy_diet_mode <- any(c("region", "subregion", "class_flex") %in% names(diets)) &&

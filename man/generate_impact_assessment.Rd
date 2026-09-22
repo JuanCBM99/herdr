@@ -14,7 +14,8 @@ generate_impact_assessment(
   saveoutput = TRUE,
   group_by_identification = TRUE,
   farm_country = "Spain",
-  year = 2024
+  year = 2024,
+  data_dir = "user_data"
 )
 }
 \arguments{
@@ -37,6 +38,8 @@ generate_impact_assessment(
 \item{farm_country}{Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".}
 
 \item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.}
+
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
 }
 \description{
 Summarize CH4, N2O Emissions, and Land Use

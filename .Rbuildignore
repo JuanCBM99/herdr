@@ -29,3 +29,9 @@ fao_trade_matrix\.parquet$
 ^RE1_FORRAJEROS.*$
 ^spain_forages_mapa_2024\.parquet$
 ^herdr$
+^tests/testthat/Examples$
+^tests/testthat/user_data$
+^tests/testthat/output$
+^tests/testthat/test_data/output$
+^.*\.tar\.gz$
+^.*\.Rcheck$

@@ -4,10 +4,12 @@
 \alias{calculate_ge}
 \title{Calculate Gross Energy (GE)}
 \usage{
-calculate_ge(saveoutput = TRUE)
+calculate_ge(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Computes gross energy requirements by aggregating Net Energy (NE) components.

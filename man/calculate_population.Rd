@@ -4,7 +4,11 @@
 \alias{calculate_population}
 \title{Calculate Total Animal Population}
 \usage{
-calculate_population(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_population(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If \code{TRUE}, runs the built-in biological demographic model
@@ -12,6 +16,8 @@ for each species. Default is \code{FALSE}.}
 
 \item{saveoutput}{Logical. If \code{TRUE}, exports the final population dataset to
 \code{output/population_result.csv}. Default is \code{TRUE}.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \value{
 A tibble containing the complete animal population structure with columns:

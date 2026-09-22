@@ -7,9 +7,10 @@
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput Logical. If TRUE (default), results are saved to output folder.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @return Tibble with animal production summary.
 #' @export
-calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f9c3 Calculating total livestock production (physical products & protein)...")
 
@@ -18,14 +19,14 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   # --- 1. Load Data Assets ---
 
   # FIX: Select only necessary columns from population to prevent .x and .y suffixes later
-  pop_df   <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)) %>%
+  pop_df   <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::select(dplyr::all_of(join_keys), population) %>%
     dplyr::distinct()
 
-  weights  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  repro    <- readr::read_csv("user_data/reproduction_parameters.csv", show_col_types = FALSE)
-  ruminants <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
-  monogastrics <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
+  weights  <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  repro    <- readr::read_csv(file.path(data_dir, "reproduction_parameters.csv"), show_col_types = FALSE)
+  ruminants <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  monogastrics <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
   # Consolidate Definitions
   if (!"production_role" %in% names(ruminants)) {

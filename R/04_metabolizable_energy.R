@@ -4,14 +4,15 @@
 #' using direct mathematical switches.
 #'
 #' @param saveoutput If TRUE (default), saves the results to `output/monogastric_metabolizable_energy.csv`.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_monogastric_energy <- function(saveoutput = TRUE) {
+calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f4be Calculating Monogastric Metabolizable Energy (kcal/day)...")
 
   # 1. Read input data files
-  mono_csv <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
-  weights_csv <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
+  mono_csv <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
+  weights_csv <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
 
   # Platform standard joining keys
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")

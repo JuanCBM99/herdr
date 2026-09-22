@@ -10,34 +10,36 @@
 #' @param group_by_identification If TRUE returns by animal_tag.
 #' @param farm_country Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".
 #' @param year Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @export
 generate_impact_assessment <- function(automatic_cycle = FALSE,
                                        region = NULL, subregion = NULL,
                                        animal = NULL, type = NULL, class_flex = NULL,
                                        saveoutput = TRUE, group_by_identification = TRUE,
-                                       farm_country = "Spain", year = 2024) {
+                                       farm_country = "Spain", year = 2024,
+                                       data_dir = "user_data") {
 
   message("\U0001f7e2 Starting impact assessment summary...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # 1. Pipeline calls and unit standardization (Gg)
-  CH4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  CH4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(CH4_enteric_Gg = sum(total_CH4_enteric_Ggyear, na.rm = TRUE), .groups = "drop")
 
-  CH4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  CH4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_kgyear / 1e6, na.rm = TRUE), .groups = "drop")
 
-  N2O_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_direct_Gg = sum(direct_N2O_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_vol_Gg = sum(N2O_vol_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE) %>%
+  N2O_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
@@ -46,7 +48,8 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     automatic_cycle = automatic_cycle,
     saveoutput = FALSE,
     farm_country = farm_country,
-    year = year
+    year = year,
+    data_dir = data_dir
   ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(Land_m2 = sum(total_land_use_m2, na.rm = TRUE), .groups = "drop")

@@ -22,11 +22,12 @@
 #' @param saveoutput Logical. If \code{TRUE}, exports the final population dataset to
 #'   \code{output/population_result.csv}. Default is \code{TRUE}.
 #'
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @return A tibble containing the complete animal population structure with columns:
 #'   \code{region}, \code{subregion}, \code{animal_tag}, \code{class_flex},
 #'   \code{animal_type}, \code{animal_subtype}, and \code{population}.
 #' @export
-calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001F7E2 Calculating Total Population...")
 
@@ -34,25 +35,33 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   # Step 1: Load Input Tables Safely
   # =========================================================================
   census_raw <- readr::read_csv(
-    "user_data/livestock_census.csv",
+    file.path(data_dir, "livestock_census.csv"),
     col_types = readr::cols(subregion = "c", class_flex = "c"),
     show_col_types = FALSE
   )
 
   definitions_ruminant <- readr::read_csv(
-    "user_data/ruminant_definitions.csv",
+    file.path(data_dir, "ruminant_definitions.csv"),
     col_types = readr::cols(subregion = "c", class_flex = "c"),
     show_col_types = FALSE
   )
 
   definitions_monogastric <- readr::read_csv(
-    "user_data/monogastric_definitions.csv",
+    file.path(data_dir, "monogastric_definitions.csv"),
     col_types = readr::cols(subregion = "c", class_flex = "c"),
     show_col_types = FALSE
   )
 
-  rate_parameters <- if (file.exists("user_data/reproduction_parameters.csv")) {
-    readr::read_csv("user_data/reproduction_parameters.csv", show_col_types = FALSE)
+  weights_file <- file.path(data_dir, "livestock_weights.csv")
+  weights_df <- if (file.exists(weights_file)) {
+    readr::read_csv(weights_file, show_col_types = FALSE)
+  } else {
+    NULL
+  }
+
+  repro_file <- file.path(data_dir, "reproduction_parameters.csv")
+  rate_parameters <- if (file.exists(repro_file)) {
+    readr::read_csv(repro_file, show_col_types = FALSE)
   } else {
     tibble::tibble(animal_tag = character(), parameter = character(), value = numeric())
   }
@@ -105,35 +114,35 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
       message("\U0001F403 Calculating populations for CATTLE...")
-      results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions_ruminant)
+      results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions_ruminant, weights = weights_df)
     }
 
     # 3b. Sheep demographic modeling
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
       message("\U0001F411 Calculating populations for SHEEP...")
-      results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters, definitions_ruminant)
+      results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters, definitions_ruminant, weights = weights_df)
     }
 
     # 3c. Goat demographic modeling
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
       message("\U0001F410 Calculating populations for GOAT...")
-      results_list$goat <- calculate_population_goat(df_goat, rate_parameters, definitions_ruminant)
+      results_list$goat <- calculate_population_goat(df_goat, rate_parameters, definitions_ruminant, weights = weights_df)
     }
 
     # 3d. Swine demographic modeling
     df_swine <- census_base %>% dplyr::filter(tolower(animal_type) == "swine")
     if (nrow(df_swine) > 0) {
       message("\U0001F416 Calculating populations for SWINE...")
-      results_list$swine <- calculate_population_swine(df_swine, rate_parameters, definitions_monogastric)
+      results_list$swine <- calculate_population_swine(df_swine, rate_parameters, definitions_monogastric, weights = weights_df)
     }
 
     # 3e. Poultry demographic modeling
     df_poultry <- census_base %>% dplyr::filter(tolower(animal_type) == "poultry")
     if (nrow(df_poultry) > 0) {
       message("\U0001F426 Calculating populations for POULTRY...")
-      results_list$poultry <- calculate_population_poultry(df_poultry, rate_parameters, definitions_monogastric)
+      results_list$poultry <- calculate_population_poultry(df_poultry, rate_parameters, definitions_monogastric, weights = weights_df)
     }
 
     if (length(results_list) == 0) return(tibble::tibble())

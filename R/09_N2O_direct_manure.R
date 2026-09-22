@@ -3,24 +3,25 @@
 #' Computes direct N2O emissions based on nitrogen excretion logic,
 #' emission factors, management system, and climate (IPCC Eq 10.25).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  cat_csv      <- readr::read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE)
-  weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  user_manure  <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  mono_csv     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
+  cat_csv      <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  weights_csv  <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  user_manure  <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  mono_csv     <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
-  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE))
-  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
-  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE))
-  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE))
+  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
+  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
 
   # --- 2. Validations (Asserts) ---
 

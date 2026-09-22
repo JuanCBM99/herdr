@@ -2,13 +2,14 @@
 #'
 #' Computes gross energy requirements by aggregating Net Energy (NE) components.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_ge <- function(saveoutput = TRUE) {
+calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating Gross Energy (GE)...")
 
   # --- 1. Database Preparation ---
-  de_df <- calculate_weighted_variable(saveoutput = FALSE) %>%
+  de_df <- calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir) %>%
     dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, DE_pct)
 
   join_keys_univ <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
@@ -17,7 +18,7 @@ calculate_ge <- function(saveoutput = TRUE) {
   message("  -> Fetching NE components...")
 
   get_ne <- function(func, col_name) {
-    suppressMessages(func(saveoutput = FALSE)) %>%
+    suppressMessages(func(saveoutput = FALSE, data_dir = data_dir)) %>%
       dplyr::select(dplyr::all_of(join_keys_univ), dplyr::all_of(col_name))
   }
 

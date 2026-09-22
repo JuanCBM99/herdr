@@ -9,13 +9,15 @@
 #'   trade data, this caps how many countries the algorithm will follow through re-export hubs. Default is 4.
 #' @param ssr_threshold Numeric. Self-Sufficiency Ratio (Production / Apparent Consumption)
 #'   above which a country is considered a genuine producer. Default is 0.70.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @export
 calculate_land_use <- function(automatic_cycle = FALSE,
                                saveoutput = TRUE,
                                farm_country = "Spain",
                                year = 2024,
                                max_trace_hops = 4,
-                               ssr_threshold = 0.70) {
+                               ssr_threshold = 0.70,
+                               data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating land use...")
 
@@ -25,7 +27,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   country_area_code_max <- 5000
 
   # --- 1. Load reference data ---
-  fao_ds <- arrow::open_dataset("user_data/fao_crops.parquet")
+  fao_ds <- arrow::open_dataset(file.path(data_dir, "fao_crops.parquet"))
   fao_filtered <- dplyr::filter(fao_ds, Element == "Yield")
   if ("Area Code" %in% names(fao_ds)) {
     fao_filtered <- dplyr::filter(fao_filtered, `Area Code` < country_area_code_max)
@@ -37,21 +39,21 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::mutate(Year = as.numeric(year))
 
   # Assuming forages might use the same code structure; if not, you can remove the filter here.
-  forage_raw <- arrow::read_parquet("user_data/fao_forages.parquet") %>%
+  forage_raw <- arrow::read_parquet(file.path(data_dir, "fao_forages.parquet")) %>%
     dplyr::rename(Value = Yield) %>%
     dplyr::mutate(Year = as.numeric(year))
 
-  name_mapping <- readr::read_csv("user_data/mapping.csv", show_col_types = FALSE)
+  name_mapping <- readr::read_csv(file.path(data_dir, "mapping.csv"), show_col_types = FALSE)
 
-  feed_chars_raw <- readr::read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
+  feed_chars_raw <- readr::read_csv(file.path(data_dir, "feed_characteristics.csv"), show_col_types = FALSE)
 
   if (!"land_type" %in% colnames(feed_chars_raw)) {
-    warning("\u26A0 Column 'land_type' not found in user_data/feed_characteristics.csv. Setting as NA.")
+    warning("\u26A0 Column 'land_type' not found in feed_characteristics.csv. Setting as NA.")
     feed_chars_raw$land_type <- NA_character_
   }
 
   if (!"DM_pct" %in% colnames(feed_chars_raw)) {
-    warning("\u26A0 Column 'DM_pct' not found in user_data/feed_characteristics.csv. Assuming 100%.")
+    warning("\u26A0 Column 'DM_pct' not found in feed_characteristics.csv. Assuming 100%.")
     feed_chars_raw$DM_pct <- 100
   }
 
@@ -95,12 +97,12 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::distinct(ingredient, .keep_all = TRUE)
 
   # --- 3. Load operational data & Handle Hybrid Country Origins ---
-  DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE)) %>%
+  DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
-  diet_profiles <- readr::read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
+  diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
   diet_ingredients_raw <- readr::read_csv(
-    "user_data/diet_ingredients.csv",
+    file.path(data_dir, "diet_ingredients.csv"),
     col_types = readr::cols(
       custom_yield_kg_ha = readr::col_character(),
       .default = readr::col_guess()
@@ -132,7 +134,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   if (any(is.na(diet_ingredients_raw$country_of_origin))) {
 
-    path_parquet_trade <- "user_data/fao_trade_matrix.parquet"
+    path_parquet_trade <- file.path(data_dir, "fao_trade_matrix.parquet")
 
     # nocov start
     if (!file.exists(path_parquet_trade)) {
@@ -154,7 +156,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
     # --- 3a. Load global production & trade tables ONCE ---
-    global_prod_ds <- arrow::open_dataset("user_data/fao_crops.parquet")
+    global_prod_ds <- arrow::open_dataset(file.path(data_dir, "fao_crops.parquet"))
     global_prod_filtered <- dplyr::filter(
       global_prod_ds,
       Item %in% fao_items,
@@ -290,7 +292,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::mutate(fallback_yield = NA_real_)
   }
 
-  population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)) %>%
+  population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::distinct(animal_tag, region, subregion, class_flex, population)
 
   # --- 4. Validate ingredient shares ---
