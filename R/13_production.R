@@ -136,36 +136,36 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
-      # Peso vivo al sacrificio (LW)
+      # Live weight at slaughter (LW)
       slaughter_weight_kg = dplyr::case_when(
         final_weight_kg > 0 ~ final_weight_kg,
         adult_weight_kg > 0 ~ adult_weight_kg,
         TRUE ~ 0
       ),
 
-      # Número anual de animales al sacrificio (N_exit)
+      # Annual number of animals exiting for slaughter (N_exit)
       N_exit = dplyr::case_when(
-        # 1. Animales de recría/reposición: NO van a matadero comercial
+        # 1. Replacement/rearing stock: do not exit to commercial slaughter
         production_role == "replacement" ~ 0,
 
-        # 2. Adultos con tasa de reposición en CSV (vacuno, ovino, caprino, cerdas, ponedoras)
-        #    Si replacement_rate == 0, da 0 (los reproductores no van a matadero)
+        # 2. Mature breeding stock with replacement rate defined in CSV (cattle, sheep, goats, sows, layers)
+        #    If replacement_rate == 0, yields 0 (breeding stock are not culled)
         production_role == "mature" & has_replacement_rate ~ population * replacement_rate,
 
-        # 3. Adultos sin tasa en CSV exclusivamente para aves (desvieje por ciclo de puesta: e.g. 511 d)
+        # 3. Mature animals without replacement rate in CSV (poultry culling by laying cycle: e.g. 511 d)
         production_role == "mature" & !has_replacement_rate & animal_type == "poultry" & productive_period_days > 0 ~
           population * (365 / productive_period_days),
 
-        # 4. Animales de cebo/engorde/sacrificio comercial (broilers, cerdos de cebo, terneros, corderos)
+        # 4. Commercial slaughter/fattening cohort (broilers, fattening pigs, calves, lambs)
         production_role == "slaughter" ~
           population * (365 / dplyr::if_else(productive_period_days > 0, productive_period_days, 365)),
 
         TRUE ~ 0
       ),
 
-      # --- A) PRODUCCIÓN DE LECHE ---
+      # --- A) MILK PRODUCTION ---
       milk_fresh_kg = population * milk_yield_kg_year,
-      # Proteína real calculada según IPCC (o default de GLEAM si no hay grasa)
+      # Real protein percentage per IPCC (or GLEAM default if fat content unavailable)
       milk_prot_pct = dplyr::if_else(fat_content_pct > 0, (1.9 + 0.4 * fat_content_pct) / 100, MILK_prot_def),
       milk_protein_kg = milk_fresh_kg * milk_prot_pct,
       # FPCM (Fat and Protein Corrected Milk - IDF)
@@ -175,32 +175,32 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         milk_fresh_kg
       ),
 
-      # --- B) PRODUCCIÓN DE CARNE ---
+      # --- B) MEAT PRODUCTION ---
       meat_live_weight_kg = N_exit * slaughter_weight_kg,
       meat_carcass_weight_kg = meat_live_weight_kg * (DP_pct / 100),
       meat_boneless_kg = meat_carcass_weight_kg * BFM,
       meat_protein_kg = meat_boneless_kg * MEAT_prot,
 
-      # --- C) PRODUCCIÓN DE HUEVOS ---
+      # --- C) EGG PRODUCTION ---
       egg_fresh_kg = dplyr::if_else(egg_mass_g_day > 0, (egg_mass_g_day * 365 / 1000) * population, 0),
       egg_protein_kg = egg_fresh_kg * egg_prot_fraction,
 
-      # --- D) FIBRA / LANA ---
+      # --- D) FIBRE / WOOL ---
       wool_kg = population * wool_yield_kg_year,
 
-      # --- E) PROTEÍNA TOTAL COMESTIBLE ---
+      # --- E) TOTAL EDIBLE PROTEIN ---
       total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg
     ) %>%
     dplyr::select(
       dplyr::all_of(join_keys), animal_type, animal_subtype, population, N_exit,
-      # Productos comerciales
+      # Commercial products
       milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
-      # Proteína comestible (GLEAM)
+      # Edible protein (GLEAM)
       milk_protein_kg, meat_protein_kg, egg_protein_kg, total_protein_kg
     ) %>%
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 2)))
 
-  # --- 4. Guardar archivo ---
+  # --- 4. Save output file ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/production.csv")
