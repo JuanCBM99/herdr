@@ -130,7 +130,7 @@ The differences between species in `herdr` are not arbitrary tool formulas, but 
 | **Sheep** | `mature_sheep_female_*`, `mature_sheep_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — both sexes) | `productive_period_days` (`livestock_weights.csv` — lamb fattening) |
 | **Goats** | `mature_goat_female_*`, `mature_goat_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — both sexes) | `productive_period_days` (`livestock_weights.csv` — kid fattening) |
 | **Swine** | `breeder_sows`, `boars` | `piglets_suckling` (`monogastric_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — sows only) | `productive_period_days` (`livestock_weights.csv` — 110 days fattening) |
-| **Poultry** | `laying_hens`, `breeder_meat_hens` | `fertility_rate`, `egg_mass_g_day` (`monogastric_definitions.csv`) | *Automatically derived from flock cycle length* | `productive_period_days` (`livestock_weights.csv` — rearing & broilers) |
+| **Poultry** | `laying_hens`, `breeder_meat_hens` | `fertility_rate`, `eggs_per_year` (`monogastric_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv`) | `productive_period_days` (`livestock_weights.csv` — rearing & broilers) |
 
 ---
 
