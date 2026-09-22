@@ -97,5 +97,21 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   p_land <- plot_herdr_results(land_df, group_cols = "animal_tag")
   expect_s3_class(p_land, "ggplot")
   expect_match(p_land$labels$title, "Land Use")
+
+  # 10. Assertions: Edible protein production plot and calculate_production registration
+  protein_df <- data.frame(
+    animal_tag = c("dairy_cow", "broiler_chicken"),
+    region = c("spain", "spain"),
+    subregion = c("north", "south"),
+    class_flex = c("dairy", "meat"),
+    milk_protein_kg = c(2500, 0),
+    meat_protein_kg = c(300, 800),
+    egg_protein_kg = c(0, 0),
+    total_protein_kg = c(2800, 800)
+  )
+  p_protein <- plot_herdr_results(protein_df, group_cols = "animal_tag", func_name = "calculate_production")
+  expect_s3_class(p_protein, "ggplot")
+  expect_equal(p_protein$labels$title, "Edible Protein Production")
+  expect_true("Protein_kg" %in% names(p_protein$data))
 })
 

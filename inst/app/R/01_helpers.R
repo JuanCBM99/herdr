@@ -607,6 +607,22 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
                      ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
   }
 
+  if (isTRUE(automatic_cycle)) {
+    bio_tags <- extract_key_tag(all_bio_keys)
+    demo_in_bio <- all_bio_keys[bio_tags %in% valid_demo_tags]
+    missing_demo_weights <- setdiff(demo_in_bio, weights_keys)
+    if (length(missing_demo_weights) > 0) {
+      fmt_demo_w <- vapply(missing_demo_weights, format_cohort_label, character(1), USE.NAMES = FALSE)
+      fmt_demo_w <- fmt_demo_w[fmt_demo_w != ""]
+      if (length(fmt_demo_w) > 0) {
+        add_issue("warning", "weights", "Weights", "Missing Weights for Demographic Cohort",
+                  paste0("Demographic offspring cohort(s) defined in Definitions but missing in Weights: ",
+                         paste(fmt_demo_w, collapse = ", "),
+                         ". Configure live weight and productive period for full accuracy under automatic demography."))
+      }
+    }
+  }
+
   if (!is.null(rv$weights) && nrow(rv$weights) > 0) {
     clean_weights <- rv$weights[!is.na(rv$weights$animal_tag) & trimws(as.character(rv$weights$animal_tag)) != "", , drop = FALSE]
     if (nrow(clean_weights) > 0) {
@@ -657,6 +673,22 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       add_issue("error", "manure", "Manure", "Missing Manure System",
                 paste0("Active cohort(s) from Census missing in Manure: ", paste(fmt_manure, collapse = ", "),
                        ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
+    }
+  }
+
+  if (isTRUE(automatic_cycle)) {
+    bio_tags <- extract_key_tag(all_bio_keys)
+    demo_in_bio <- all_bio_keys[bio_tags %in% valid_demo_tags]
+    missing_demo_manure <- setdiff(demo_in_bio, manure_keys)
+    if (length(missing_demo_manure) > 0) {
+      fmt_demo_m <- vapply(missing_demo_manure, format_cohort_label, character(1), USE.NAMES = FALSE)
+      fmt_demo_m <- fmt_demo_m[fmt_demo_m != ""]
+      if (length(fmt_demo_m) > 0) {
+        add_issue("warning", "manure", "Manure", "Missing Manure System for Demographic Cohort",
+                  paste0("Demographic offspring cohort(s) defined in Definitions but missing in Manure: ",
+                         paste(fmt_demo_m, collapse = ", "),
+                         ". Configure manure management systems for full emissions accounting under automatic demography."))
+      }
     }
   }
 

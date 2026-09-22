@@ -198,6 +198,47 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     }
   }
 
+  # D) EDIBLE PROTEIN PRODUCTION (stacked bars by commodity)
+  if (all(c("milk_protein_kg", "meat_protein_kg", "egg_protein_kg") %in% names(df_agg))) {
+    df_agg$Total_Protein <- df_agg$milk_protein_kg + df_agg$meat_protein_kg + df_agg$egg_protein_kg
+    df_agg <- df_agg[order(df_agg$Total_Protein), ]
+    df_agg$plot_label <- factor(df_agg$plot_label, levels = df_agg$plot_label)
+
+    df_long <- tidyr::pivot_longer(
+      df_agg,
+      cols = c("milk_protein_kg", "meat_protein_kg", "egg_protein_kg"),
+      names_to = "Protein_Source", values_to = "Protein_kg"
+    )
+
+    palette_protein <- c(
+      "milk_protein_kg" = "#3B6EA5",
+      "meat_protein_kg" = "#B4483C",
+      "egg_protein_kg"  = "#D9A441"
+    )
+
+    labels_protein <- c(
+      "milk_protein_kg" = "Milk Protein",
+      "meat_protein_kg" = "Meat Protein",
+      "egg_protein_kg"  = "Egg Protein"
+    )
+
+    return(
+      ggplot(df_long, aes(x = Protein_kg, y = plot_label, fill = Protein_Source)) +
+        geom_col(width = 0.62) +
+        theme_herdr_plot() +
+        scale_x_continuous(expand = expansion(mult = c(0, 0.08)), labels = scales::comma) +
+        scale_fill_manual(
+          values = palette_protein,
+          labels = labels_protein
+        ) +
+        labs(
+          title = "Edible Protein Production",
+          subtitle = "Total human-edible protein output by product (kg protein)",
+          x = "Edible Protein (kg)"
+        )
+    )
+  }
+
   # =================================================================
   # UNIVERSAL PLOT (all other functions)
   # =================================================================
@@ -207,6 +248,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     calculate_vs                          = "VS_kgday",
     calculate_monogastric_energy          = "ME_total_kcal_day",
     calculate_population                  = "population",
+    calculate_production                  = "total_protein_kg",
     calculate_emissions_enteric           = "total_CH4_enteric_Ggyear",
     calculate_CH4_manure                  = "total_CH4_mm_kgyear",
     calculate_N2O_direct_manure           = "direct_N2O_kgyear",

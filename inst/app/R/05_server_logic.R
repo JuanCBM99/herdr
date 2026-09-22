@@ -677,6 +677,66 @@ herdr_server <- function(input, output, session) {
       )
     }
 
+    if ("total_protein_kg" %in% names(df)) {
+      total_prot <- sum(df$total_protein_kg, na.rm = TRUE)
+      if (total_prot > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card pasture",
+          div(class = "kpi-icon-wrap", icon("dna")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(total_prot, 1), big.mark = ",")),
+            span(class = "kpi-label", "Edible Protein (kg)")
+          )
+        )
+      }
+    }
+
+    if ("milk_FPCM_kg" %in% names(df)) {
+      total_milk <- sum(df$milk_FPCM_kg, na.rm = TRUE)
+      if (total_milk > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card wheat",
+          div(class = "kpi-icon-wrap", icon("bottle-water")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(total_milk, 1), big.mark = ",")),
+            span(class = "kpi-label", "FPCM Milk (kg)")
+          )
+        )
+      }
+    }
+
+    if ("meat_carcass_weight_kg" %in% names(df)) {
+      total_meat <- sum(df$meat_carcass_weight_kg, na.rm = TRUE)
+      if (total_meat > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card barn",
+          div(class = "kpi-icon-wrap", icon("drumstick-bite")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(total_meat, 1), big.mark = ",")),
+            span(class = "kpi-label", "Carcass Meat (kg)")
+          )
+        )
+      }
+    }
+
+    if ("egg_fresh_kg" %in% names(df)) {
+      total_eggs <- sum(df$egg_fresh_kg, na.rm = TRUE)
+      if (total_eggs > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card wheat",
+          div(class = "kpi-icon-wrap", icon("egg")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(total_eggs, 1), big.mark = ",")),
+            span(class = "kpi-label", "Fresh Eggs (kg)")
+          )
+        )
+      }
+    }
+
     if (length(cards) > 0) {
       div(class = "kpi-container", cards)
     } else {
@@ -723,8 +783,8 @@ herdr_server <- function(input, output, session) {
         save_clean(rv[[id]], file.path(temp_zip_dir, tables_info[[id]]$file))
       }
 
-      archivos_a_comprimir <- list.files(temp_zip_dir, full.names = TRUE)
-      zip::zip(zipfile = file, files = archivos_a_comprimir, mode = "cherry-pick")
+      files_to_compress <- list.files(temp_zip_dir, full.names = TRUE)
+      zip::zip(zipfile = file, files = files_to_compress, mode = "cherry-pick")
     },
     contentType = "application/zip"
   )
