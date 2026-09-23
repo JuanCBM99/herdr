@@ -27,7 +27,7 @@ These are the templates you must complete to run your specific analysis. Follow 
 | File | Purpose |
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
-| `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
+| `livestock_weights.csv` | Defines animal weights (`adult_weight_kg`, `initial_weight_kg`, `final_weight_kg`) and `productive_period_days` (for adult breeding females except hens: inter-parturition interval; for laying hens: laying cycle duration; for all other cohorts: life cycle / days on feed). Also contains breeder swine parameters. |
 | `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr_sheep_goat`). |
 | `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and species-specific parameters for swine (litter sizes, gestation/lactation durations) and poultry (egg production via `eggs_per_year` and `egg_weight_g`). |
 

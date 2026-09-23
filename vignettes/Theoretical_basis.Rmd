@@ -379,7 +379,7 @@ $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}$$
 |:---|:---|:---|
 | $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
 | $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Productive period (days) | `livestock_weights.csv` |
+| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 
 For laying hens:
 
@@ -400,7 +400,7 @@ $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times N_{gain}}{Days}$$
 |:---|:---|:---|
 | $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
 | $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Productive period (days) | `livestock_weights.csv` |
+| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 | $N_{gain}$ | Nitrogen retention coefficient according to final body weight | IPCC (2019) |
 
 For breeding sows:
@@ -419,7 +419,7 @@ $$N_{weaned} = \frac{0.025 \times Piglets \times FR \times (W_{weaning} - W_{bir
 |:---|:---|:---|
 | $N_{gain,sow}$ | Annual nitrogen retained in sow body tissues (kg N/year) | Calculated |
 | $N_{weaned}$ | Annual nitrogen retained in weaned piglets (kg N/year) | Calculated |
-| $FR$ | Annual farrowing rate (farrowings/year) | Calculated |
+| $FR$ | Annual farrowing rate ($365 / \text{productive\_period\_days}$, where `productive_period_days` is the farrowing interval) | Calculated |
 | $S_{kg}$ | Sow body weight change between consecutive parturitions (kg/year) | Calculated |
 | $Piglets$ | Number of piglets born per litter | `monogastric_definitions.csv` |
 | $W_{weaning}$ | Piglet weaning weight (kg) | `livestock_weights.csv` |

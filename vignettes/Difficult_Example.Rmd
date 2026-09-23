@@ -98,6 +98,11 @@ Accurate weights are essential to calculate Maintenance Energy ($NE_m$) and to v
 | `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | 675 | 365 | 675 | 675 |
 | `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | 675 | 365 | 675 | 675 |
 
+> ℹ️ **About `productive_period_days`:**  
+> * For **adult breeding females (except laying hens)**, this represents the **inter-parturition interval** in days (here, `365` days corresponds to an annual calving interval).  
+> * For **laying hens**, it represents the **commercial laying cycle duration** until depopulation.  
+> * For **all other cohorts (growing, fattening, replacement)**, it represents their **life cycle / life-stage duration** (days on feed).
+
 ---
 
 ## Step 5 — Advanced Manure Management (`manure_management.csv`)

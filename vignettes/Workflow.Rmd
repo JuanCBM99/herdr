@@ -76,7 +76,7 @@ All data tables in `herdr` are connected using **four standardized cohort keys**
 └─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘
 ```
 
-> ⚠️ **Critical Rule:** Every unique combination of `animal_tag`, `region`, `subregion`, and `class_flex` declared in the census must match the definition, weight, diet, and manure tables exactly.
+> ⚠️ **Critical Rule:** Every unique combination of `animal_tag`, `region`, `subregion`, and `class_flex` declared in the census must match the definition, weight, and manure tables exactly.
 
 ---
 
@@ -112,7 +112,10 @@ Defines the physical characteristics and production cycles required to compute m
 * `initial_weight_kg`: Live weight at the beginning of the evaluated production phase.
 * `final_weight_kg`: Live weight at the end of the period.
 * `adult_weight_kg`: Average mature body weight of an adult animal (kg).
-* `productive_period_days`: Total active feeding days per year (e.g., `365` for breeding cows, `120` for fattening pigs).
+* `productive_period_days`: Biological cycle duration in days, defined according to animal class:
+  * **Adult breeding females (except laying hens):** The **inter-parturition interval** in days between consecutive births (calving, lambing, kidding, or farrowing interval; e.g., `365` to `400` days for cows, `200` to `365` days for ewes/does, `149` days for sows). This defines annual reproductive frequency ($365 / \text{productive\_period\_days}$).
+  * **Laying hens & breeder poultry:** The **commercial laying cycle duration** in the barn until depopulation (e.g., `511` days for commercial layers, `301` days for meat breeders).
+  * **All other cohorts (growing, fattening, and replacement animals):** Their **life cycle / life-stage duration** (days on feed or days from birth/weaning to slaughter/exit; e.g., `42` days for broilers, `110` days for fattening pigs, `70` days for feedlot lambs). This determines Average Daily Gain (ADG) and translates annual meat throughput into standing barn places using the IPCC Average Annual Population (AAP) formula.
 
 ---
 

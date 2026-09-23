@@ -225,7 +225,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("adult_weight_kg")),
                 tags$dd(class = "col-sm-9", "Average live body weight of a fully grown mature animal (in kg)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("productive_period_days")),
-                tags$dd(class = "col-sm-9", "Production cycle duration in days: fattening period for meat animals, farrowing interval for sows, laying duration for hens, or 365 for adults."),
+                tags$dd(class = "col-sm-9", "Cycle duration in days: for adult breeding females (except laying hens), the inter-parturition interval (calving, lambing, kidding, farrowing interval); for laying hens, the commercial flock laying cycle duration; for all other cohorts (growing, fattening, replacement), their life cycle / days on feed."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("initial_weight_kg")),
                 tags$dd(class = "col-sm-9", "Starting live weight at the beginning of the evaluated production period (in kg)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("final_weight_kg")),

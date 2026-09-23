@@ -88,6 +88,11 @@ Open `livestock_weights.csv`. Make sure the identifying keys match the census ex
 | `mature_dairy_cattle` | `spain` | `north` | 675 | 365 | 675 | 675 |
 | `mature_dairy_cattle` | `spain` | `south` | 675 | 365 | 675 | 675 |
 
+> ℹ️ **About `productive_period_days`:**  
+> * For **adult breeding females (except laying hens)**, this represents the **inter-parturition interval** in days (here, `365` days corresponds to an annual calving interval).  
+> * For **laying hens**, it represents the **commercial laying cycle duration** until depopulation.  
+> * For **all other cohorts (growing, fattening, replacement)**, it represents their **life cycle / life-stage duration** (days on feed).
+
 ---
 
 ## Step 5 — Manure Management (`manure_management.csv`)

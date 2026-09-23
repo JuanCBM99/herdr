@@ -125,7 +125,7 @@ modal_tooltips <- list(
   piglets_born             = "Average number of piglets born in a single litter (only for breeding sows).",
   piglets_suckling         = "Average number of piglets actively nursing from the mother (only for lactating sows).",
   adult_weight_kg          = "Average weight of a fully grown mature animal (in kg).",
-  productive_period_days   = "Duration of the production phase in days: for fattening animals (broilers, pigs), days on feed until slaughter; for breeding sows, the farrowing interval (e.g., 149 days); for laying hens, the entire laying period until flock depopulation (e.g., 511 days).",
+  productive_period_days   = "Cycle duration in days: for adult breeding females (except laying hens), the inter-parturition interval (e.g., 365 days for cows, 149 days for sows); for laying hens, the commercial flock laying cycle duration (e.g., 511 days); for all other cohorts (growing/fattening/replacement), their life cycle / days on feed (e.g., 42 days for broilers, 110 days for pigs).",
   replacement_rate         = "Annual replacement rate for breeding or mature animals (e.g., 0.27 for dairy cows, 0.25 for sows, 1.0 for layer hens per batch). Represents the fraction of adult stock replaced each year.",
   initial_weight_kg        = "Starting weight of the animal at the beginning of the evaluated period (in kg).",
   final_weight_kg          = "Target ending weight of the animal at the end of the period (in kg).",

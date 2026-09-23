@@ -41,7 +41,7 @@ Navigate left-to-right through the top data tabs. Follow this sequence to accura
     * Add a row for each ingredient (e.g., 'Corn silage') and specify its `ingredient_share` within its ingredient_type (e.g., 100% of the forage fraction).
     * Leave both the `custom_yield_kg_ha` and `country_of_origin` columns blank to let the model dynamically trace the feed using FAO trade data. To override the database, you can either input a specific nation in the `country_of_origin` column, or bypass FAO statistics entirely by entering an exact farm yield into the `custom_yield_kg_ha` column.
 *   **Input productive traits (`Definitions` & `Weights`):** Navigate to the ruminant/monogastric definitions and weights tabs to enter performance metrics for your cohorts. 
-    * **Weights:** You must provide starting and ending weights, adult mature weights, and productive days (e.g., 365 for a continuous herd, 120 for a fattening cycle).
+    * **Weights:** You must provide starting, ending, and adult mature body weights, as well as `productive_period_days` (for adult breeding females except laying hens: the inter-parturition interval, e.g. 365 days; for laying hens: the commercial laying cycle duration; for all other cohorts: their life cycle / days on feed, e.g. 110 days for fattening pigs).
     * **Definitions:** Enter species-specific yields (such as milk kg/year, wool, or eggs) and select the appropriate IPCC coefficients from the dropdown menus to accurately calculate energy requirements.
 *   **Manage waste (`Manure Management`):** Specify how each cohort's manure is stored and treated. 
     * Use the cascading dropdowns to select valid combinations of `system_base` (e.g., 'Liquid/Slurry') and subsequent columns.
