@@ -80,7 +80,7 @@ test_that("Shiny server initializes tables and runs calculation cycle safely", {
     expect_s3_class(summary_res, "data.frame")
 
     # 4. Test Data Reset Action
-    session$setInputs(reset_data = 1)
+    session$setInputs(reset_data = 1, confirm_reset_data = 1)
     expect_equal(nrow(rv$census), 0)
     expect_null(model_data())
   })
@@ -134,13 +134,13 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
 
     # 7. Cohort defined downstream in def that is NOT in Census triggers error
     new_def <- rv$def[1, ]
-    new_def$animal_tag <- "perro"
+    new_def$animal_tag <- "unknown_cohort"
     rv$def <- rbind(new_def, rv$def)
     issues_downstream <- project_validation_issues()
-    expect_true(any(sapply(issues_downstream, function(x) x$table_id == "def" && grepl("Cohort Not in Census", x$title) && grepl("perro", x$message))))
+    expect_true(any(sapply(issues_downstream, function(x) x$table_id == "def" && grepl("Cohort Not in Census", x$title) && grepl("unknown_cohort", x$message))))
 
     # 8. Demographic cohorts (feedlot calves, replacement heifers) defined downstream:
-    rv$def <- rv$def[rv$def$animal_tag != "perro", ]
+    rv$def <- rv$def[rv$def$animal_tag != "unknown_cohort", ]
     rv$census <- rv$census[rv$census$animal_tag != "feedlot_calves_male", ]
 
     new_demo_def <- rv$def[1, ]
