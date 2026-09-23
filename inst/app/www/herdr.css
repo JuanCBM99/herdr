@@ -76,6 +76,45 @@ body {
   margin-left: 0.4rem;
 }
 
+/* --- Header Navigation Actions --- */
+.herdr-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-shrink: 0;
+}
+.herdr-header-actions .btn {
+  font-size: 0.76rem;
+  font-weight: 600;
+  border-radius: 6px;
+  padding: 0.22rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  text-decoration: none;
+  border: 1px solid var(--herdr-border);
+  color: var(--herdr-ink);
+  background: var(--herdr-card);
+  transition: all 0.15s ease;
+}
+.herdr-header-actions .btn:hover {
+  color: var(--herdr-pasture-dark);
+  background: var(--herdr-pasture-light);
+  border-color: var(--herdr-pasture);
+}
+.herdr-version-pill {
+  font-size: 0.70rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  padding: 0.18rem 0.5rem;
+  border-radius: 20px;
+  background: var(--herdr-pasture-light);
+  color: var(--herdr-pasture-dark);
+  border: 1px solid var(--herdr-border);
+  display: inline-flex;
+  align-items: center;
+}
+
 /* --- Sidebar & Step Cards --- */
 .herdr-sidebar {
   background: var(--herdr-paper) !important;
@@ -236,6 +275,19 @@ body {
   font-weight: 700 !important;
   font-size: 0.82rem !important;
   padding: 6px 4px !important;
+}
+.handsontable th i.herdr-col-info,
+.handsontable th i.fa-circle-info {
+  color: rgba(255, 255, 255, 0.85) !important;
+  transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), color 0.15s ease !important;
+  display: inline-block !important;
+  margin-left: 4px !important;
+}
+.handsontable th i.herdr-col-info:hover,
+.handsontable th i.fa-circle-info:hover {
+  color: #ffffff !important;
+  transform: scale(1.25) !important;
+  filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.75)) !important;
 }
 .handsontable.listbox .wtHolder {
   overflow-y: auto !important;

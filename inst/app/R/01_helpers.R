@@ -402,7 +402,7 @@ apply_column_tooltips <- function(tbl) {
     if (clean_name %in% names(modal_tooltips)) {
       tip <- modal_tooltips[[clean_name]]
       tip_escaped <- gsub("'", "&#39;", gsub("\"", "&quot;", tip, fixed = TRUE), fixed = TRUE)
-      sprintf('%s <i class="fa-solid fas fa-circle-info ms-1 text-muted" title="%s" style="cursor:help; font-size:0.85em;" onclick="event.stopPropagation();"></i>', clean_name, tip_escaped)
+      sprintf('%s <i class="fa-solid fas fa-circle-info herdr-col-info" title="%s" style="cursor:help; font-size:0.85em;" onclick="event.stopPropagation();"></i>', clean_name, tip_escaped)
     } else {
       col_header
     }

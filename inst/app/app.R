@@ -148,7 +148,10 @@ ui <- bslib::page_sidebar(
         )
       ),
       div(
-        class = "d-flex align-items-center gap-3",
+        class = "herdr-header-actions",
+        tags$span(class = "herdr-version-pill", "v1.0.3"),
+        tags$a(href = "https://juancbm99.github.io/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("book"), "Docs"),
+        tags$a(href = "https://github.com/JuanCBM99/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("github"), "GitHub"),
         bslib::input_dark_mode(id = "dark_mode", mode = "light")
       )
     )
@@ -156,6 +159,7 @@ ui <- bslib::page_sidebar(
   sidebar = build_herdr_sidebar(),
   bslib::navset_card_tab(
     id = "main_tabs",
+    selected = "census",
     full_screen = TRUE,
     build_dictionary_panel(),
     !!!lapply(standard_ids, build_standard_tab),

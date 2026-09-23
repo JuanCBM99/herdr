@@ -33,12 +33,24 @@ build_results_panel <- function() {
         ),
         div(
           style = "margin-bottom: 1.5rem;",
-          plotOutput("main_plot", height = "420px")
+          shinycssloaders::withSpinner(
+            plotOutput("main_plot", height = "420px"),
+            type = 6,
+            color = "#2D5A38"
+          )
         ),
-        hr(),
         div(
-          style = "overflow-x: auto;",
-          tableOutput("table_results")
+          class = "d-flex justify-content-between align-items-center mb-2 mt-4",
+          h5("Detailed Model Outputs", class = "m-0 text-muted", style = "font-family: 'Fraunces', serif; font-weight: 700;"),
+          tags$span(class = "text-muted small", icon("table"), " Interactive preview — click column headers to sort, select cells to copy (Ctrl+C)")
+        ),
+        div(
+          style = "background: var(--herdr-card); border-radius: 8px; border: 1px solid var(--herdr-border); margin-bottom: 1rem; overflow: hidden;",
+          shinycssloaders::withSpinner(
+            rhandsontable::rHandsontableOutput("table_results_hot", height = "360px"),
+            type = 4,
+            color = "#2D5A38"
+          )
         )
       )
     )

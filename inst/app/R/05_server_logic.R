@@ -98,8 +98,25 @@ herdr_server <- function(input, output, session) {
   })
 
   observeEvent(input$reset_data, {
+    showModal(modalDialog(
+      title = tagList(icon("triangle-exclamation", class = "text-danger me-2"), "Clear All Project Data?"),
+      div(
+        class = "p-2",
+        p("Are you sure you want to reset all data? This will restore all 12 input tables to blank templates and erase any unsaved inputs."),
+        p(class = "text-muted small mb-0", "If you want to save your current work, click 'Download Input Data (ZIP)' in the sidebar first.")
+      ),
+      footer = tagList(
+        modalButton("Cancel"),
+        actionButton("confirm_reset_data", "Yes, Clear All Data", class = "btn btn-danger", icon = icon("trash-can"))
+      ),
+      easyClose = TRUE
+    ))
+  })
+
+  observeEvent(input$confirm_reset_data, {
+    removeModal()
     load_all_data(reset = TRUE)
-    showNotification("All data cleared.", type = "message")
+    showNotification("All data tables have been reset to blank templates.", type = "message")
     nav_select("main_tabs", "census")
   })
 
@@ -366,19 +383,22 @@ herdr_server <- function(input, output, session) {
     # Render tab header status badge
     output[[paste0("dirty_badge_", id)]] <- renderUI({
       issues <- project_validation_issues()
-      tab_issues <- Filter(function(x) x$table_id == id, issues)
-      err_count <- sum(sapply(tab_issues, function(x) x$severity == "error"))
-      warn_count <- sum(sapply(tab_issues, function(x) x$severity == "warning"))
+      tab_issues <- Filter(function(x) isTRUE(x$table_id == id), issues)
+      err_count <- if (length(tab_issues) > 0) sum(vapply(tab_issues, function(x) isTRUE(x$severity == "error"), logical(1))) else 0L
+      warn_count <- if (length(tab_issues) > 0) sum(vapply(tab_issues, function(x) isTRUE(x$severity == "warning"), logical(1))) else 0L
 
+      badges <- list()
       if (err_count > 0) {
-        tags$span(class = "badge bg-danger rounded-pill ms-1", title = paste(err_count, "issue(s) in this table"), err_count)
+        badges[[length(badges) + 1]] <- tags$span(class = "badge bg-danger rounded-pill ms-1", title = paste(err_count, "issue(s) in this table"), err_count)
       } else if (warn_count > 0) {
-        tags$span(class = "badge bg-warning text-dark rounded-pill ms-1", title = paste(warn_count, "advisory in this table"), warn_count)
-      } else if (isTRUE(dirty[[id]])) {
-        tags$span(class = "badge bg-secondary rounded-pill ms-1", style = "font-size: 0.65rem;", "unsaved")
-      } else {
-        NULL
+        badges[[length(badges) + 1]] <- tags$span(class = "badge bg-warning text-dark rounded-pill ms-1", title = paste(warn_count, "advisory in this table"), warn_count)
       }
+
+      if (isTRUE(dirty[[id]])) {
+        badges[[length(badges) + 1]] <- tags$span(class = "dirty-dot", title = "Unsaved changes")
+      }
+
+      if (length(badges) > 0) tagList(badges) else NULL
     })
 
     observeEvent(input[[paste0("table_", id)]], {
@@ -458,26 +478,6 @@ herdr_server <- function(input, output, session) {
       table_render_triggers[[id]] <- if (is.null(table_render_triggers[[id]])) 1 else table_render_triggers[[id]] + 1
       removeModal()
       showNotification("Record added successfully", type = "message")
-    })
-
-    output[[paste0("dirty_badge_", id)]] <- renderUI({
-      badges <- list()
-      if (isTRUE(dirty[[id]])) {
-        badges[[length(badges) + 1]] <- tags$span(class = "dirty-dot", title = "Unsaved changes")
-      }
-      issues <- validate_project_data(rv, automatic_cycle = isTRUE(input$auto_cycle))
-      tbl_issues <- Filter(function(x) x$table_id == id, issues)
-      if (length(tbl_issues) > 0) {
-        has_err <- any(sapply(tbl_issues, function(x) x$severity == "error"))
-        badge_class <- if (has_err) "badge bg-danger rounded-pill ms-1" else "badge bg-warning text-dark rounded-pill ms-1"
-        badges[[length(badges) + 1]] <- tags$span(
-          class = badge_class,
-          style = "font-size: 0.65rem; padding: 0.2em 0.5em;",
-          title = paste(sapply(tbl_issues, function(x) x$title), collapse = "\n"),
-          length(tbl_issues)
-        )
-      }
-      if (length(badges) > 0) tagList(badges) else NULL
     })
   })
 
@@ -738,6 +738,7 @@ herdr_server <- function(input, output, session) {
       }
     }
 
+
     if (length(cards) > 0) {
       div(class = "kpi-container", cards)
     } else {
@@ -766,6 +767,29 @@ herdr_server <- function(input, output, session) {
   )
 
   output$table_results <- renderTable({ req(model_data()); model_data() }, digits = 6)
+
+  output$table_results_hot <- renderRHandsontable({
+    df <- model_data()
+    req(df)
+    if (nrow(df) == 0) return(NULL)
+
+    df_display <- df
+    num_cols <- sapply(df_display, is.numeric)
+    df_display[num_cols] <- lapply(df_display[num_cols], function(x) {
+      if (all(is.na(x))) return(x)
+      round(x, 4)
+    })
+
+    tbl <- rhandsontable(
+      df_display,
+      readOnly = TRUE,
+      width = "100%",
+      height = 360,
+      stretchH = "all"
+    )
+    tbl <- hot_cols(tbl, columnSorting = TRUE)
+    tbl
+  })
 
   output$download <- downloadHandler(
     filename = function() paste0("herdr_results_", Sys.Date(), ".csv"),
