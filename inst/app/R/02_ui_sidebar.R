@@ -23,6 +23,11 @@ build_herdr_sidebar <- function() {
       class = "step-card wheat",
       div(class = "step-head", span("2", class = "step-tag"), h5("Configuration", class = "step-title m-0")),
       checkboxInput("auto_cycle", "Use automatic herd cycle", value = FALSE),
+      tags$small(
+        class = "text-muted d-block",
+        style = "font-size: 0.78rem; line-height: 1.35; margin-top: -6px; margin-bottom: 10px;",
+        "Use this if you only enter adult breeding stock (e.g. mature cows, sows) or barn capacity in Census and want herdr to auto-model offspring and replacements."
+      ),
       hr(),
       selectInput("farm_country", "Farm Country / Area:", choices = c("Loading..." = "")),
       numericInput("year", "FAO Reference Year:", value = 2022, step = 1)
