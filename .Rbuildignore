@@ -35,3 +35,4 @@ fao_trade_matrix\.parquet$
 ^tests/testthat/test_data/output$
 ^.*\.tar\.gz$
 ^.*\.Rcheck$
+^CITATION\.cff$
