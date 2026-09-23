@@ -98,7 +98,7 @@ The differences between species in `herdr` are not arbitrary tool formulas, but 
   Internal herd replacement focuses exclusively on the **future breeding mothers** (replacement gilts and sows). Breeding boars are not raised from the fattening herd; modern swine units source specialized boars from external genetic multipliers or rely on artificial insemination.
 * **Poultry:**  
   Commercial poultry flocks do not replace individual birds as they age. Flocks are managed in complete batches (**all-in / all-out**): the entire flock enters at the same age, lays throughout the batch cycle, and is depopulated all at once for slaughter.  
-  *Therefore, **the user does not set an arbitrary replacement rate for poultry**.* The need for standing replacement pullets is self-determined by the lifespan of the flock in the laying house relative to the rearing duration of the growing pullets.
+  *By default, replacement pullet requirements are derived from batch turnover ($365 / \text{productive\_period\_days}$)*. However, `herdr` also supports defining custom replacement rates for `laying_hens` and `breeder_meat_hens` in `reproduction_parameters.csv` for flexible multi-cycle or molting scenarios.
 
 ---
 

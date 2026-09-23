@@ -141,7 +141,7 @@ Defines the individual feedstuffs composing each category:
 Connects cohorts with species-specific constants and production targets:
 
 * **Ruminants (`ruminant_definitions.csv`):** Maintenance coefficient ($c_{fi}$), feeding activity ($c_a$), growth constants ($C$, $a$, $b$), pregnancy coefficient ($c_{pregnancy}$), annual milk yield (kg/year), milk fat percentage, and wool yield (kg/year).
-* **Monogastrics (`monogastric_definitions.csv`):** Exponent ($\alpha$), protein and fat tissue retention fractions, sow gestation/lactation lengths, litter sizes, and egg mass output.
+* **Monogastrics (`monogastric_definitions.csv`):** Exponent ($\alpha$), protein and fat tissue retention fractions, sow gestation/lactation lengths, litter sizes, and egg production parameters (`eggs_per_year`, `egg_weight_g`).
 
 ---
 
@@ -168,7 +168,7 @@ library(herdr)
 results <- generate_impact_assessment(
   automatic_cycle = FALSE,
   farm_country    = "Spain",
-  year            = 2022,
+  year            = 2024,
   saveoutput      = TRUE
 )
 
@@ -179,7 +179,7 @@ head(results)
 ### Argument Reference:
 * `automatic_cycle`: Set to `TRUE` to use reproductive cycle dynamics, or `FALSE` for manual populations (*Recommended*).
 * `farm_country`: The reference country used to query crop yields and bilateral FAO trade matrices.
-* `year`: The reference statistical year for FAO data queries (e.g., `2022`).
+* `year`: The reference statistical year for FAO data queries (e.g., `2024`).
 * `saveoutput`: If `TRUE`, writes individual module tables and summary reports directly to `output/`.
 
 ---
@@ -204,7 +204,7 @@ enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
 # 5. Calculate Feed-Related Land Use (m2)
 land_results <- calculate_land_use(
   farm_country = "Spain", 
-  year = 2022, 
+  year = 2024, 
   saveoutput = FALSE
 )
 

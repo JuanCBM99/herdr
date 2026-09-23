@@ -175,7 +175,9 @@ For laying hens:
 
 $$ME_{eggs} = 2 \times Egg_{mass}$$
 
-Where $Egg_{mass}$ is the daily egg mass produced (g/day).
+Where $Egg_{mass}$ is the daily egg mass produced (g/day), derived internally from user input parameters in `monogastric_definitions.csv` (`eggs_per_year` and `egg_weight_g`):
+
+$$Egg_{mass} = \frac{\text{eggs\_per\_year} \times \text{egg\_weight\_g}}{365}$$
 
 ---
 
@@ -261,6 +263,14 @@ $$E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)$$
 |:---|:---|:---|
 | $E_T$ | Total emissions from category $T$ (Gg $CH_4$/year) | Calculated |
 | $N_{(T,P)}$ | Number of animals in category $T$ | `livestock_census.csv` |
+
+### Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)
+
+For swine, enteric methane emissions are estimated using the IPCC Tier 1 methodology with metabolic liveweight scaling relative to the standard reference market pig (72 kg):
+
+$$EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}$$
+
+Where $EF$ is in kg $CH_4$/head/year, $1.5$ is the baseline IPCC emission factor for market swine, and $LiveWeight$ (kg) is derived from `livestock_weights.csv`.
 
 ---
 

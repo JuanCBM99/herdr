@@ -29,7 +29,7 @@ These are the templates you must complete to run your specific analysis. Follow 
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
 | `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
 | `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr_sheep_goat`). |
-| `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
+| `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and species-specific parameters for swine (litter sizes, gestation/lactation durations) and poultry (egg production via `eggs_per_year` and `egg_weight_g`). |
 
 ### Nutrition & Diets
 
@@ -50,7 +50,7 @@ These are the templates you must complete to run your specific analysis. Follow 
 
 | File | Purpose |
 |:---|:---|
-| `reproduction_parameters.csv` | Default offspring and replacement rates, used to estimate missing animal categories under the automatic herd cycle. |
+| `reproduction_parameters.csv` | Default offspring and replacement rates (including cattle, sheep, goats, swine, and poultry via `replacement_rate_laying_hens` and `replacement_rate_breeder_hens`), used to estimate missing animal categories under the automatic herd cycle. |
 
 Only needs editing if the population of some animal categories is unknown, or if offspring/replacement rates need adjusting for a specific study.
 
