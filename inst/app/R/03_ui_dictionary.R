@@ -50,13 +50,13 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("animal_tag")),
                 tags$dd(class = "col-sm-9", "Mandatory: A unique name for this specific cohort/group of animals (e.g., 'mature_dairy_cattle', 'fattening_pigs')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("region")),
-                tags$dd(class = "col-sm-9", "Optional: Country or broad geographic grouping (e.g., 'spain', 'europe'). Used for climatic and crop yield lookups."),
+                tags$dd(class = "col-sm-9", "Optional: Country or broad geographic grouping (e.g., 'spain', 'europe')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("subregion")),
                 tags$dd(class = "col-sm-9", "Optional: Province, region, or specific farm unit (e.g., 'euskadi', 'farm_north')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("class_flex")),
                 tags$dd(class = "col-sm-9", "Optional: Flexible category tag to differentiate production stages or breeds (e.g., 'lactating', 'dry', 'angus')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("population")),
-                tags$dd(class = "col-sm-9", "Mandatory: Average Annual Population (AAP) per IPCC Tier 2 guidelines (standing headcount or occupied barn places present on average over the year). For short-cycle animals like broilers or fattening pigs, annual throughput is calculated via 365 / productive_period_days.")
+                tags$dd(class = "col-sm-9", "Mandatory: Average Annual Population (AAP) per IPCC Tier 2 guidelines (standing headcount or occupied barn places present on average over the year).")
               )
             ),
 
@@ -102,9 +102,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient_share")),
                 tags$dd(class = "col-sm-9", "Percentage of this specific ingredient within its ingredient_type (shares for each type must sum to 100%)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("country_of_origin")),
-                tags$dd(class = "col-sm-9", "Optional: Country where this feed was produced. Used for international trade matrix and deforestation footprints."),
+                tags$dd(class = "col-sm-9", "Optional: Country where this feed was produced. Use this if the origin is known or leave blank for automatic country allocation."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("custom_yield_kg_ha")),
-                tags$dd(class = "col-sm-9", "Optional: On-farm or local crop yield in kg fresh matter per hectare. If left blank, FAO national averages are used.")
+                tags$dd(class = "col-sm-9", "Optional: Specific known yield for this ingredient in kg dry matter, leave blank if you dont know.")
               )
             ),
 
@@ -182,7 +182,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("animal_type")),
                 tags$dd(class = "col-sm-9", "Species category: 'swine' or 'poultry'."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("animal_subtype")),
-                tags$dd(class = "col-sm-9", "Production category: 'breeder', 'fattening', 'layer', 'meat', or 'replacement'."),
+                tags$dd(class = "col-sm-9", "Production category: 'breeder', 'layer' or 'meat'."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("production_role")),
                 tags$dd(class = "col-sm-9", "Role in production cycle: 'mature' (breeding sows / layer hens), 'replacement' (gilts / pullets), or 'slaughter' (fattening pigs / broilers)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("diet_tag")),
@@ -198,7 +198,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("egg_weight_g")),
                 tags$dd(class = "col-sm-9", "Average individual egg weight in grams (e.g., 60 to 64 g). Used to determine total egg biomass."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("fertility_rate")),
-                tags$dd(class = "col-sm-9", "Fertility and hatchability rate (0 to 1) for poultry breeding flocks."),
+                tags$dd(class = "col-sm-9", "Fertility and hatchability rate (0 to 1) for poultry/swine breeders."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("alpha")),
                 tags$dd(class = "col-sm-9", "Metabolic body weight exponent (typically 0.75 for swine/poultry)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("piglets_born")),
@@ -291,9 +291,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("animal_tag")),
                 tags$dd(class = "col-sm-9", "Cohort identifier matching Census."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("parameter")),
-                tags$dd(class = "col-sm-9", "Name of the parameter: 'replacement_rate', 'pregnancy_rate', 'pr_sheep_goat', or 'fertility_rate'."),
+                tags$dd(class = "col-sm-9", "Name of the parameter: 'replacement_rate'."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("value")),
-                tags$dd(class = "col-sm-9", "Numeric value of the parameter (proportion between 0 and 1, or prolificacy ratio).")
+                tags$dd(class = "col-sm-9", "Numeric value of the parameter (proportion between 0 and 1).")
               )
             ),
 
