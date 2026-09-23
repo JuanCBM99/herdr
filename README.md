@@ -8,63 +8,52 @@
 
 # 🌱 herdr: Greenhouse Gas Emissions & Land Use Assessment for Livestock
 
-**herdr** is an R package for estimating **greenhouse gas (GHG) emissions** and **land use** from livestock production systems using **IPCC Tier 2** methodologies.
+**herdr** is an R package for estimating **greenhouse gas (GHG) emissions**, **feed-related land use**, and **livestock production** from livestock farming systems using **IPCC Tier 2** methodologies.
 
-The package currently supports:
+The package supports 5 major livestock species:
 
-- 🐄 Cattle
-- 🐑 Sheep
-- 🐐 Goats
-- 🐖 Swine
-- 🐔 Poultry
+- 🐄 **Cattle** (dairy and beef)
+- 🐑 **Sheep** (dairy and meat)
+- 🐐 **Goats** (dairy and meat)
+- 🐖 **Swine** (breeding sows, boars, piglets, and fattening pigs)
+- 🐔 **Poultry** (broilers, laying hens, and breeding flocks)
 
-It provides estimates of:
+It provides comprehensive estimates of:
 
-- Enteric methane (CH₄)
-- Methane from manure management (CH₄)
-- Direct and indirect nitrous oxide emissions (N₂O)
-- Feed-related land use (m²)
+- 🌿 **Enteric methane (CH₄)**
+- ♻️ **Manure methane (CH₄)**
+- 🌱 **Direct and indirect nitrous oxide emissions (N₂O)**
+- 🌾 **Feed-related land use (m²)**
+- 🥩 **Livestock production outputs** (meat liveweight, carcass weight, milk, and eggs)
 
 ------------------------------------------------------------------------
 
 # 🌐 Web Interface (No R or installation required!)
 
-You don't need to be a programmer or have R installed to use **herdr**. A fully interactive web application allows users to estimate greenhouse gas emissions, calculate feed-related land use, modify diets, and export results directly from a web browser.
+You don't need programming experience or R installed to use **herdr**. A fully interactive web application allows users to build herds, configure diets, estimate emissions and land use, and export publication-ready results directly from a web browser.
 
-👉 **Launch the herdr Web Interface:**\
+👉 **Launch the herdr Web Application:**  
 [**https://juancbm99.shinyapps.io/herdr/**](https://juancbm99.shinyapps.io/herdr/)
 
-> **Note:** The web application performs all calculations in the background and does not require any software installation or local datasets.
+> **Note:** The web application performs all calculations in the cloud and does not require local downloads or setup.
 
 ------------------------------------------------------------------------
 
 # 📺 Video Tutorial
 
-A complete walkthrough covering installation, project setup, input files, and running your first assessment is available on YouTube.
+A complete video walkthrough covering installation, project setup, input files, and running your first assessment is available on YouTube:
 
-👉 <https://youtu.be/wmGIQ3g-ZFk>
-
-------------------------------------------------------------------------
-
-# 💻 Prerequisites (For Local Installation)
-
-To use **herdr** locally, first install both **R** and **RStudio**.
-
-## Install R
-
-<https://cran.r-project.org/>
-
-## Install RStudio
-
-<https://posit.co/download/rstudio-desktop/>
+👉 [**Watch the herdr Video Tutorial**](https://youtu.be/wmGIQ3g-ZFk)
 
 ------------------------------------------------------------------------
 
-# 🚀 Installation
+# 💻 Installation & Quick Start
 
-Install the development version directly from GitHub.
+## Installation
 
-``` r
+Install the development version directly from GitHub:
+
+```r
 if (!requireNamespace("remotes", quietly = TRUE))
   install.packages("remotes")
 
@@ -73,48 +62,25 @@ remotes::install_github("JuanCBM99/herdr")
 library(herdr)
 ```
 
-------------------------------------------------------------------------
+## Option A: Interactive Web App (GUI)
 
-# 🖥️ Launch the Interactive Application
+Launch the interactive graphical interface locally from R:
 
-Once the package has been installed, launch the graphical interface directly from R.
-
-``` r
-library(herdr)
-
+```r
 run_herdr_app()
 ```
 
-------------------------------------------------------------------------
+## Option B: Command Line (R Script)
 
-# ⚡ Quick Start (Command Line)
+Run a complete assessment in two simple commands:
 
-## 1. Initialize a new project
+```r
+library(herdr)
 
-``` r
+# 1. Initialize project (creates 'user_data/' pre-populated with a default template)
 herdr_init()
-```
 
-## 2. Copy one of the bundled examples
-
-``` r
-file.copy(
-  list.files(
-    system.file(
-      "Examples",
-      "Level1_Spain_Dairy_Cattle_2015",
-      package = "herdr"
-    ),
-    full.names = TRUE
-  ),
-  "user_data",
-  overwrite = TRUE
-)
-```
-
-## 3. Run the assessment
-
-``` r
+# 2. Run the impact assessment
 results <- generate_impact_assessment(
   farm_country = "Spain",
   year = "2024"
@@ -123,68 +89,60 @@ results <- generate_impact_assessment(
 results
 ```
 
-> **Important:** The first time an assessment requires feed origin allocation, **herdr** automatically downloads the required FAO background dataset (\~187 MB). This download occurs only once and is reused in future analyses.
+> **Important:** The first time an assessment requires feed origin allocation, **herdr** automatically downloads the FAO background trade matrix (~187 MB). This download occurs only once and is cached locally for all future runs.
+>
+> 💡 **Tip:** To explore more complex farming systems (e.g. multi-region herds, seasonal rations, or physiological phases), browse the bundled `Examples/` folder created by `herdr_init()` and copy any template into `user_data/`.
 
-Output files are automatically saved in the `output/` directory.
+All output CSV files and plots are automatically saved in the `output/` directory.
 
 ------------------------------------------------------------------------
 
 # ✨ Main Features
 
-- 🌐 Interactive web interface requiring no programming experience.
-- 📖 Full implementation of the **IPCC 2019 Refinement (Tier 2)** methodology.
-- 🐄 Support for both ruminant and monogastric livestock.
-- 🐖 FEDNA-based energy requirement equations for swine and poultry.
-- ⚡ Automatic calculation of:
-  - Gross Energy (GE)
-  - Dry Matter Intake (DMI)
-  - Volatile Solids (VS)
-  - Nitrogen intake, retention and excretion
-- 🌿 Enteric methane (CH₄) emissions.
-- ♻️ Manure methane (CH₄) emissions.
-- 🌱 Direct and indirect nitrous oxide (N₂O) emissions.
-- 🌾 Feed-related land use using:
-  - FAOSTAT crop yields
-  - Forage yield databases
-  - Dynamic FAO trade allocation matrix
-  - 70% domestic self-sufficiency allocation rule
-- 🧩 Modular workflow allowing both individual calculations and complete assessments.
-- 📄 Transparent CSV-based input files that can easily be modified by users.
+- 🌐 **Interactive GUI:** Full-featured Shiny interface with in-app data dictionary, tooltips, validation alerts, and interactive tables.
+- 📖 **IPCC 2019 Refinement (Tier 2):** Complete equations for gross energy, dry matter intake, volatile solids, and nitrogen mass balances.
+- 🐄 **Ruminant & Monogastric Support:** Tailored models for cattle, sheep, goats, swine, and poultry.
+- 🐖 **FEDNA Nutritional Standards:** Energy requirement equations for swine and poultry based on official Spanish FEDNA guidelines.
+- 🔄 **Automated Herd Demography:** Built-in biological engine (`automatic_cycle = TRUE`) calculating births, replacement rates, and standing barn places (IPCC Average Annual Population) from breeding stock.
+- 🌾 **High-Resolution Land Use:** Feed footprint calculation combining FAOSTAT yields, official national forage statistics (e.g. MAPA 2024), and an international trade matrix with a 70% domestic self-sufficiency rule.
+- 🥩 **Production Accounting:** Calculates annual meat liveweight, carcass weight, milk yield, and egg production.
+- 🧩 **Modular Architecture:** Run the entire pipeline with one function or call individual calculation modules independently.
+- 📄 **Transparent CSV Inputs:** Intuitive spreadsheet templates that work seamlessly with Excel, LibreOffice, or text editors.
 
 ------------------------------------------------------------------------
 
-# 📚 Documentation
+# 📚 Documentation & Guides
 
-Complete documentation, theoretical background, workflow guides, and examples are available at:
+Comprehensive documentation, theoretical background, and step-by-step guides are hosted on the [**herdr Documentation Website**](https://juancbm99.github.io/herdr/):
 
-<https://juancbm99.github.io/herdr/>
+| Guide | Description |
+|:---|:---|
+| [**Introduction to herdr**](https://juancbm99.github.io/herdr/articles/Introduction.html) | High-level package overview, scope, and core philosophy. |
+| [**R Workflow Guide**](https://juancbm99.github.io/herdr/articles/Workflow.html) | Detailed walkthrough of input files, table relations, and execution. |
+| [**Web Application Guide**](https://juancbm99.github.io/herdr/articles/app.html) | Step-by-step manual for the interactive Shiny app. |
+| [**Herd Demography & Population Dynamics**](https://juancbm99.github.io/herdr/articles/Herd_Demography.html) | How biological cycles, reproduction, replacements, and fattening batches work. |
+| [**Land Use & Trade Matrix**](https://juancbm99.github.io/herdr/articles/land_use.html) | Methodology for feed-related land use, trade tracing, and crop/forage yields. |
+| [**Theoretical Basis (IPCC Tier 2)**](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html) | Full mathematical formulations for enteric methane, manure, and nitrogen excretion. |
+| [**Technical File Reference**](https://juancbm99.github.io/herdr/articles/Technical_reference.html) | Column-by-column dictionary for all CSV user inputs and internal databases. |
+| [**Tutorial Examples**](https://juancbm99.github.io/herdr/articles/Easy_Example.html) | Practical case studies across [Easy (Tier 1)](https://juancbm99.github.io/herdr/articles/Easy_Example.html), [Moderate (Tier 2)](https://juancbm99.github.io/herdr/articles/Moderate_Example.html), and [Difficult (Tier 3)](https://juancbm99.github.io/herdr/articles/Difficult_Example.html) complexities. |
 
 ------------------------------------------------------------------------
 
-# 📖 Methodology
+# 📖 Methodology & References
 
-**herdr** follows the methodologies described in:
+**herdr** is built upon internationally recognized guidelines:
 
-> **2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories**
->
-> Volume 4 — Agriculture, Forestry and Other Land Use (AFOLU)
->
-> Chapter 10 — Emissions from Livestock and Manure Management.
-
-Energy requirement equations for swine and poultry follow the **FEDNA** methodology published by the Spanish Ministry of Agriculture.
+* **IPCC (2019):** *2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*, Volume 4 (AFOLU), Chapter 10 (*Emissions from Livestock and Manure Management*).
+* **FEDNA (2019):** Energy and nutritional requirement systems for monogastric livestock (swine and poultry) published by the Spanish Ministry of Agriculture, Fisheries and Food (MAPA) and the Fundación Española para el Desarrollo de la Nutrición Animal.
 
 ------------------------------------------------------------------------
 
 # 🤝 Contributing
 
-Contributions are welcome.
-
-If you encounter a bug, identify an error, or have suggestions for improvements, please open an issue or submit a pull request.
+Contributions, feedback, and issue reports are very welcome! If you encounter a bug, have questions about the methodology, or wish to suggest new features, please [open an issue](https://github.com/JuanCBM99/herdr/issues) or submit a pull request.
 
 ------------------------------------------------------------------------
 
 # 📄 License
 
-This project is distributed under the **MIT License**.
-
-See the `LICENSE` file for details.
+This project is open-source software licensed under the [**MIT License**](LICENSE).

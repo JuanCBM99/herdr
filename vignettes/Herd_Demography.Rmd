@@ -35,7 +35,7 @@ calculate_population(automatic_cycle = TRUE)
 
 ### When to use `automatic_cycle = TRUE` (Automatic Demographic Cycle)
 * **Future scenario modeling & prospective studies:** Choose this when planning farm expansions, simulating genetic or management improvements, or conducting prospective environmental impact assessments.
-* **Breeding-only inventory:** You only need to declare your adult breeding animals in `livestock_census.csv` (e.g., mature cows, breeding sows, ewes, does, or hens).
+* **Breeding-only inventory:** You only need to declare your adult breeding animals in `livestock_census.csv` (e.g., mature cows, breeding sows, ewes, or hens).
 * **Automated biological pyramid:** `herdr` automatically models the complete demographic flow: annual births, young animals retained to replace culled adults, and the average standing population in the fattening barn.
 
 ---
