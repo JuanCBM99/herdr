@@ -1,5 +1,5 @@
 # ==============================================================================
-# herdr — Data Dictionary & Decision Matrix UI Component
+# herdr — Data Dictionary UI Component
 # ==============================================================================
 
 build_dictionary_panel <- function() {
@@ -12,7 +12,7 @@ build_dictionary_panel <- function() {
         class = "row",
         div(
           class = "col-lg-10 mx-auto",
-          h3("Data Dictionary & Decision Matrix", class = "mb-2", style = "font-family: 'Fraunces', serif; font-weight: 900;"),
+          h3("Data Dictionary", class = "mb-2", style = "font-family: 'Fraunces', serif; font-weight: 900;"),
           p(class = "text-muted mb-3", "A comprehensive guide to variables, definitions, and CSV file structures used across herdr, organized sequentially by table."),
 
           # --- QUICK JUMP NAVIGATION BAR ---
@@ -36,83 +36,6 @@ build_dictionary_panel <- function() {
 
           div(
             style = "background: var(--herdr-card); border-radius: 12px; border: 1px solid var(--herdr-border); padding: 1.5rem; max-height: calc(100vh - 270px); overflow-y: auto;",
-
-            # --- QUICK DECISION MATRIX ALERT ---
-            div(
-              class = "alert alert-info mb-4 shadow-sm",
-              h5(icon("compass"), " 5-Minute Farm Decision Matrix", class = "alert-heading fw-bold mb-2"),
-              p(class = "mb-2 small", "Not sure what to enter for your farm? Use this quick reference guide to configure herd cohorts, cycles, and turnover rates:"),
-              tags$div(
-                class = "table-responsive",
-                tags$table(
-                  class = "table table-sm table-bordered bg-white text-dark small mb-0",
-                  tags$thead(class = "table-light",
-                    tags$tr(
-                      tags$th("Farm Type"),
-                      tags$th("Census Entry (population)"),
-                      tags$th("productive_period_days"),
-                      tags$th("replacement_rate")
-                    )
-                  ),
-                  tags$tbody(
-                    tags$tr(
-                      tags$td(tags$strong("Broilers (Meat Poultry)")),
-                      tags$td("Average barn capacity (e.g. 20,000)"),
-                      tags$td("42 days (fattening duration)"),
-                      tags$td("0 (None)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Layer Hens (Eggs)")),
-                      tags$td("Laying flock size (e.g. 10,000)"),
-                      tags$td("511 days (laying period)"),
-                      tags$td("Auto (365/511 = 71.4%)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Breeding Sows (Farrow-to-finish)")),
-                      tags$td("Breeding sows (e.g. 500)"),
-                      tags$td("148.9 days (farrowing interval)"),
-                      tags$td("0.25 (25% annual)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Fattening Pigs (Cebo)")),
-                      tags$td("Barn places (e.g. 2,000)"),
-                      tags$td("110 days (fattening duration)"),
-                      tags$td("0 (None)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Dairy Cattle")),
-                      tags$td("Mature cows (e.g. 100)"),
-                      tags$td("365 days"),
-                      tags$td("0.27 (27% annual)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Beef Cattle")),
-                      tags$td("Mature cows (e.g. 100)"),
-                      tags$td("365 days"),
-                      tags$td("0.15 (15% annual)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Meat / Dairy Sheep")),
-                      tags$td("Adult ewes (e.g. 1,000)"),
-                      tags$td("365 days (lambing interval 200 d)"),
-                      tags$td("0.20 (20% annual)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Dairy / Meat Goats")),
-                      tags$td("Adult does (e.g. 500)"),
-                      tags$td("365 days (kidding interval 200 d)"),
-                      tags$td("0.20 (20% annual)")
-                    ),
-                    tags$tr(
-                      tags$td(tags$strong("Breeder Meat Hens")),
-                      tags$td("Breeding flock (e.g. 10,000)"),
-                      tags$td("301 days (breeding cycle)"),
-                      tags$td("Auto (365/301 = 121.3%)")
-                    )
-                  )
-                )
-              )
-            ),
 
             # ==================================================================
             # 1. CENSUS (livestock_census.csv)
