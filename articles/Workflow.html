@@ -145,7 +145,7 @@ hierarchy and default templates:</p>
 <strong><code>user_data/</code></strong>: The active working
 directory containing editable CSV templates and local reference
 databases (<code>fao_crops.parquet</code>,
-<code>fao_forages.parquet</code>).</li>
+<code>forages.parquet</code>).</li>
 <li>
 <strong><code>Examples/</code></strong>: Pre-configured baseline
 datasets (e.g., dairy cattle, beef cattle, swine, sheep) ready to use as
@@ -173,7 +173,7 @@ results, emission inventories, and land-use summaries are saved.</li>
 <p>⚠️ <strong>Critical Rule:</strong> Every unique combination of
 <code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
 and <code>class_flex</code> declared in the census must match the
-definition, weight, diet, and manure tables exactly.</p>
+definition, weight, and manure tables exactly.</p>
 </blockquote>
 <hr>
 </div>
@@ -270,9 +270,33 @@ period.</li>
 <code>adult_weight_kg</code>: Average mature body weight of an adult
 animal (kg).</li>
 <li>
-<code>productive_period_days</code>: Total active feeding days per
-year (e.g., <code>365</code> for breeding cows, <code>120</code> for
-fattening pigs).</li>
+<code>productive_period_days</code>: Biological cycle duration in
+days, defined according to animal class:
+<ul>
+<li>
+<strong>Adult breeding females (except laying hens):</strong> The
+<strong>inter-parturition interval</strong> in days between consecutive
+births (calving, lambing, kidding, or farrowing interval; e.g.,
+<code>365</code> to <code>400</code> days for cows, <code>200</code> to
+<code>365</code> days for ewes/does, <code>149</code> days for sows).
+This defines annual reproductive frequency
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>).</li>
+<li>
+<strong>Laying hens &amp; breeder poultry:</strong> The
+<strong>commercial laying cycle duration</strong> in the barn until
+depopulation (e.g., <code>511</code> days for commercial layers,
+<code>301</code> days for meat breeders).</li>
+<li>
+<strong>All other cohorts (growing, fattening, and replacement
+animals):</strong> Their <strong>life cycle / life-stage
+duration</strong> (days on feed or days from birth/weaning to
+slaughter/exit; e.g., <code>42</code> days for broilers,
+<code>110</code> days for fattening pigs, <code>70</code> days for
+feedlot lambs). This determines Average Daily Gain (ADG) and translates
+annual meat throughput into standing barn places using the IPCC Average
+Annual Population (AAP) formula.</li>
+</ul>
+</li>
 </ul>
 <hr>
 </div>
@@ -342,7 +366,8 @@ annual milk yield (kg/year), milk fat percentage, and wool yield
 (<code>monogastric_definitions.csv</code>):</strong> Exponent
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>α</mi><annotation encoding="application/x-tex">\alpha</annotation></semantics></math>),
 protein and fat tissue retention fractions, sow gestation/lactation
-lengths, litter sizes, and egg mass output.</li>
+lengths, litter sizes, and egg production parameters
+(<code>eggs_per_year</code>, <code>egg_weight_g</code>).</li>
 </ul>
 <hr>
 </div>
@@ -389,7 +414,7 @@ single command:</p>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year            <span class="op">=</span> <span class="fl">2022</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2024</span>,</span>
 <span>  saveoutput      <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -408,7 +433,7 @@ populations (<em>Recommended</em>).</li>
 yields and bilateral FAO trade matrices.</li>
 <li>
 <code>year</code>: The reference statistical year for FAO data
-queries (e.g., <code>2022</code>).</li>
+queries (e.g., <code>2024</code>).</li>
 <li>
 <code>saveoutput</code>: If <code>TRUE</code>, writes individual
 module tables and summary reports directly to <code>output/</code>.</li>
@@ -437,7 +462,7 @@ debugging, calibration, or sensitivity analyses:</p>
 <span><span class="co"># 5. Calculate Feed-Related Land Use (m2)</span></span>
 <span><span class="va">land_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
 <span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>, </span>
-<span>  year <span class="op">=</span> <span class="fl">2022</span>, </span>
+<span>  year <span class="op">=</span> <span class="fl">2024</span>, </span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span>
 <span></span>

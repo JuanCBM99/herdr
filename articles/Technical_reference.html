@@ -135,10 +135,12 @@ step-by-step instructions.</p>
 </tr>
 <tr class="even">
 <td align="left"><code>livestock_weights.csv</code></td>
-<td align="left">Defines the physical scale of the animals:
-<code>adult_weight</code>, <code>initial_weight</code>,
-<code>final_weight</code>, <code>productive_period</code>, plus
-additional parameters for breeder swine.</td>
+<td align="left">Defines animal weights (<code>adult_weight_kg</code>,
+<code>initial_weight_kg</code>, <code>final_weight_kg</code>) and
+<code>productive_period_days</code> (for adult breeding females except
+hens: inter-parturition interval; for laying hens: laying cycle
+duration; for all other cohorts: life cycle / days on feed). Also
+contains breeder swine parameters.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>ruminant_definitions.csv</code></td>
@@ -151,9 +153,10 @@ rate (<code>pregnancy_rate</code>) and prolificacy
 <tr class="even">
 <td align="left"><code>monogastric_definitions.csv</code></td>
 <td align="left">Bridge file for <strong>monogastric</strong> animals.
-Links each <code>animal_tag</code> to a <code>diet_tag</code> and the
-species-specific parameters required for monogastric energy
-calculations.</td>
+Links each <code>animal_tag</code> to a <code>diet_tag</code> and
+species-specific parameters for swine (litter sizes, gestation/lactation
+durations) and poultry (egg production via <code>eggs_per_year</code>
+and <code>egg_weight_g</code>).</td>
 </tr>
 </tbody>
 </table>
@@ -229,8 +232,11 @@ assigned to this management system.</td>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>reproduction_parameters.csv</code></td>
-<td align="left">Default offspring and replacement rates, used to
-estimate missing animal categories under the automatic herd cycle.</td>
+<td align="left">Default offspring and replacement rates (including
+cattle, sheep, goats, swine, and poultry via
+<code>replacement_rate_laying_hens</code> and
+<code>replacement_rate_breeder_hens</code>), used to estimate missing
+animal categories under the automatic herd cycle.</td>
 </tr></tbody>
 </table>
 <p>Only needs editing if the population of some animal categories is
@@ -421,14 +427,16 @@ a cohort’s manure across management systems, while the other splits a
 crop’s environmental burden across its co-products.</p>
 </div>
 <div class="section level4">
-<h4 id="fao_forages-parquet-grass-silage-data-bc3">
-<code>fao_forages.parquet</code> — Grass &amp; Silage Data
-(BC3)<a class="anchor" aria-label="anchor" href="#fao_forages-parquet-grass-silage-data-bc3"></a>
+<h4 id="forages-parquet-grass-silage-data-mapa-2024-bc3">
+<code>forages.parquet</code> — Grass &amp; Silage Data (MAPA 2024 /
+BC3)<a class="anchor" aria-label="anchor" href="#forages-parquet-grass-silage-data-mapa-2024-bc3"></a>
 </h4>
-<p>A provisional forage database, supplemented by BC3 researchers,
-giving yields (<code>Area</code>, <code>Item</code>, <code>Value</code>
-in kg DM/ha) for grazing and forage-based systems — filling the gaps
-where official FAOSTAT records are often incomplete or missing.</p>
+<p>Curated forage and pasture database, incorporating official Spanish
+national statistics from MAPA (2024, Anuario de Estadística Agraria) and
+BC3 research, giving dry matter yields (<code>Area</code>,
+<code>Item</code>, <code>Value</code> in kg DM/ha) for grazing, natural
+pastures, and forage silages/hays — filling the gaps where international
+FAOSTAT records lack forage data.</p>
 </div>
 <div class="section level4">
 <h4 id="fao_crops-parquet-official-statutory-yields">
@@ -488,8 +496,8 @@ under a 70% self-sufficiency rule.</p>
 <tr class="even">
 <td align="left">Add a custom crop</td>
 <td align="left">
-<code>mapping.csv</code>,
-<code>fao_forages.parquet</code>, <code>fao_crops.parquet</code>
+<code>mapping.csv</code>, <code>forages.parquet</code>,
+<code>fao_crops.parquet</code>
 </td>
 <td align="left"><code>feed_characteristics.csv</code></td>
 </tr>

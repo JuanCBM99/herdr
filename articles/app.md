@@ -72,9 +72,12 @@ identifier for each cohort across all tables.*
 - **Input productive traits (`Definitions` & `Weights`):** Navigate to
   the ruminant/monogastric definitions and weights tabs to enter
   performance metrics for your cohorts.
-  - **Weights:** You must provide starting and ending weights, adult
-    mature weights, and productive days (e.g., 365 for a continuous
-    herd, 120 for a fattening cycle).
+  - **Weights:** You must provide starting, ending, and adult mature
+    body weights, as well as `productive_period_days` (for adult
+    breeding females except laying hens: the inter-parturition interval,
+    e.g. 365 days; for laying hens: the commercial laying cycle
+    duration; for all other cohorts: their life cycle / days on feed,
+    e.g. 110 days for fattening pigs).
   - **Definitions:** Enter species-specific yields (such as milk
     kg/year, wool, or eggs) and select the appropriate IPCC coefficients
     from the dropdown menus to accurately calculate energy requirements.

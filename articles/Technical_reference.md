@@ -28,9 +28,9 @@ step-by-step instructions.
 | File | Purpose |
 |:---|:---|
 | `livestock_census.csv` | Defines the `animal_tag`, location (`region`), and the number of heads (`population`). |
-| `livestock_weights.csv` | Defines the physical scale of the animals: `adult_weight`, `initial_weight`, `final_weight`, `productive_period`, plus additional parameters for breeder swine. |
+| `livestock_weights.csv` | Defines animal weights (`adult_weight_kg`, `initial_weight_kg`, `final_weight_kg`) and `productive_period_days` (for adult breeding females except hens: inter-parturition interval; for laying hens: laying cycle duration; for all other cohorts: life cycle / days on feed). Also contains breeder swine parameters. |
 | `ruminant_definitions.csv` | Bridge file for **ruminant** animals. Links each `animal_tag` to a `diet_tag` and an IPCC description. Includes key reproductive parameters like pregnancy rate (`pregnancy_rate`) and prolificacy (`pr_sheep_goat`). |
-| `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and the species-specific parameters required for monogastric energy calculations. |
+| `monogastric_definitions.csv` | Bridge file for **monogastric** animals. Links each `animal_tag` to a `diet_tag` and species-specific parameters for swine (litter sizes, gestation/lactation durations) and poultry (egg production via `eggs_per_year` and `egg_weight_g`). |
 
 #### Nutrition & Diets
 
@@ -54,7 +54,7 @@ step-by-step instructions.
 
 | File | Purpose |
 |:---|:---|
-| `reproduction_parameters.csv` | Default offspring and replacement rates, used to estimate missing animal categories under the automatic herd cycle. |
+| `reproduction_parameters.csv` | Default offspring and replacement rates (including cattle, sheep, goats, swine, and poultry via `replacement_rate_laying_hens` and `replacement_rate_breeder_hens`), used to estimate missing animal categories under the automatic herd cycle. |
 
 Only needs editing if the population of some animal categories is
 unknown, or if offspring/replacement rates need adjusting for a specific
@@ -159,12 +159,13 @@ shares, but one splits a cohort’s manure across management systems,
 while the other splits a crop’s environmental burden across its
 co-products.
 
-#### `fao_forages.parquet` — Grass & Silage Data (BC3)
+#### `forages.parquet` — Grass & Silage Data (MAPA 2024 / BC3)
 
-A provisional forage database, supplemented by BC3 researchers, giving
-yields (`Area`, `Item`, `Value` in kg DM/ha) for grazing and
-forage-based systems — filling the gaps where official FAOSTAT records
-are often incomplete or missing.
+Curated forage and pasture database, incorporating official Spanish
+national statistics from MAPA (2024, Anuario de Estadística Agraria) and
+BC3 research, giving dry matter yields (`Area`, `Item`, `Value` in kg
+DM/ha) for grazing, natural pastures, and forage silages/hays — filling
+the gaps where international FAOSTAT records lack forage data.
 
 #### `fao_crops.parquet` — Official Statutory Yields
 
@@ -193,7 +194,7 @@ Use this table to know where to look when filling out your data:
 | Identify an animal type | `ipcc_coefficients.csv` | `ruminant_definitions.csv` |
 | Pick a feed ingredient | `feed_characteristics.csv` | `diet_ingredients.csv` |
 | Choose a manure system | `ipcc_mm.csv` | `manure_management.csv` |
-| Add a custom crop | `mapping.csv`, `fao_forages.parquet`, `fao_crops.parquet` | `feed_characteristics.csv` |
+| Add a custom crop | `mapping.csv`, `forages.parquet`, `fao_crops.parquet` | `feed_characteristics.csv` |
 
 ------------------------------------------------------------------------
 

@@ -36,7 +36,7 @@ calculate_land_use(
 - year:
 
   Numeric. The reference year for FAO trade data calculation if origins
-  are missing. Default is 2022.
+  are missing. Default is 2024.
 
 - max_trace_hops:
 

@@ -206,7 +206,13 @@ For laying hens:
 ME_{eggs} = 2 \times Egg_{mass}
 ```
 
-Where $`Egg_{mass}`$ is the daily egg mass produced (g/day).
+Where $`Egg_{mass}`$ is the daily egg mass produced (g/day), derived
+internally from user input parameters in `monogastric_definitions.csv`
+(`eggs_per_year` and `egg_weight_g`):
+
+``` math
+Egg_{mass} = \frac{\text{eggs\_per\_year} \times \text{egg\_weight\_g}}{365}
+```
 
 ------------------------------------------------------------------------
 
@@ -313,6 +319,20 @@ E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)
 |:---|:---|:---|
 | $`E_T`$ | Total emissions from category $`T`$ (Gg $`CH_4`$/year) | Calculated |
 | $`N_{(T,P)}`$ | Number of animals in category $`T`$ | `livestock_census.csv` |
+
+#### Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)
+
+For swine, enteric methane emissions are estimated using the IPCC Tier 1
+methodology with metabolic liveweight scaling relative to the standard
+reference market pig (72 kg):
+
+``` math
+EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}
+```
+
+Where $`EF`$ is in kg $`CH_4`$/head/year, $`1.5`$ is the baseline IPCC
+emission factor for market swine, and $`LiveWeight`$ (kg) is derived
+from `livestock_weights.csv`.
 
 ------------------------------------------------------------------------
 
@@ -445,11 +465,11 @@ For growing birds:
 N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}
 ```
 
-| Variable         | Description              | Source in Package       |
-|:-----------------|:-------------------------|:------------------------|
-| $`BW_{final}`$   | Final body weight (kg)   | `livestock_weights.csv` |
+| Variable | Description | Source in Package |
+|:---|:---|:---|
+| $`BW_{final}`$ | Final body weight (kg) | `livestock_weights.csv` |
 | $`BW_{initial}`$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $`Days`$         | Productive period (days) | `livestock_weights.csv` |
+| $`Days`$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 
 For laying hens:
 
@@ -474,7 +494,7 @@ N_{retention} = \frac{(BW_{final} - BW_{initial}) \times N_{gain}}{Days}
 |:---|:---|:---|
 | $`BW_{final}`$ | Final body weight (kg) | `livestock_weights.csv` |
 | $`BW_{initial}`$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $`Days`$ | Productive period (days) | `livestock_weights.csv` |
+| $`Days`$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 | $`N_{gain}`$ | Nitrogen retention coefficient according to final body weight | IPCC (2019) |
 
 For breeding sows:
@@ -499,7 +519,7 @@ N_{weaned} = \frac{0.025 \times Piglets \times FR \times (W_{weaning} - W_{birth
 |:---|:---|:---|
 | $`N_{gain,sow}`$ | Annual nitrogen retained in sow body tissues (kg N/year) | Calculated |
 | $`N_{weaned}`$ | Annual nitrogen retained in weaned piglets (kg N/year) | Calculated |
-| $`FR`$ | Annual farrowing rate (farrowings/year) | Calculated |
+| $`FR`$ | Annual farrowing rate ($`365 / \text{productive\_period\_days}`$, where `productive_period_days` is the farrowing interval) | Calculated |
 | $`S_{kg}`$ | Sow body weight change between consecutive parturitions (kg/year) | Calculated |
 | $`Piglets`$ | Number of piglets born per litter | `monogastric_definitions.csv` |
 | $`W_{weaning}`$ | Piglet weaning weight (kg) | `livestock_weights.csv` |

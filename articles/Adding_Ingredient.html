@@ -318,7 +318,7 @@ land requirement:</p>
 <p>This must match, <strong>exactly</strong>, an <code>Item</code> name
 already present in herdr’s bundled yield databases —
 <code>fao_crops.parquet</code> for arable crops or
-<code>fao_forages.parquet</code> for grasses and silages — since that’s
+<code>forages.parquet</code> for grasses and silages — since that’s
 where the actual kg/ha figure is pulled from. Herdr combines both
 datasets and filters out aggregate areas (using
 <code>Area Code &lt; 5000</code> to keep only genuine countries).</p>
@@ -394,7 +394,7 @@ not total 100%:</p>
 <li>
 <strong>Explicit country</strong> (e.g. <code>"spain"</code>): herdr
 resolves yields for that specific country from
-<code>fao_crops.parquet</code> / <code>fao_forages.parquet</code>.</li>
+<code>fao_crops.parquet</code> / <code>forages.parquet</code>.</li>
 <li>
 <strong>Bypassing FAO lookups
 (<code>custom_yield_kg_ha</code>)</strong>: If you already know the

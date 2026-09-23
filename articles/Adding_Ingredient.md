@@ -145,7 +145,7 @@ If left blank or `NA`, herdr defaults `economic_allocation` to `1.0`.
 
 This must match, **exactly**, an `Item` name already present in herdr’s
 bundled yield databases — `fao_crops.parquet` for arable crops or
-`fao_forages.parquet` for grasses and silages — since that’s where the
+`forages.parquet` for grasses and silages — since that’s where the
 actual kg/ha figure is pulled from. Herdr combines both datasets and
 filters out aggregate areas (using `Area Code < 5000` to keep only
 genuine countries).
@@ -200,8 +200,7 @@ Keep these practical rules in mind when entering ingredients:
 - **Country of Origin & Yield Resolution**:
 
   - **Explicit country** (e.g. `"spain"`): herdr resolves yields for
-    that specific country from `fao_crops.parquet` /
-    `fao_forages.parquet`.
+    that specific country from `fao_crops.parquet` / `forages.parquet`.
   - **Bypassing FAO lookups (`custom_yield_kg_ha`)**: If you already
     know the specific crop yield (e.g. from local farm records), enter
     it in `custom_yield_kg_ha` (in kg DM/ha). Herdr will use this number

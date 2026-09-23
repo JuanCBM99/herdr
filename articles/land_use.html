@@ -130,7 +130,10 @@ arable crop production.</li>
 <strong><code>grassland_unconvertible</code>:</strong> Permanent
 native pastures, upland scrub, savannas, and extensive rangelands
 situated on steep, rocky, or marginal soils unsuitable for crop
-cultivation.</li>
+cultivation (including natural fresh pastures such as
+<code>atlantic_pasture_fresh</code>,
+<code>mediterranean_pasture_fresh</code>, and
+<code>mountain_pasture_fresh</code>).</li>
 <li>
 <strong><code>none</code>:</strong> Inputs requiring zero direct
 agricultural land footprint. This includes synthetic amino acids,
@@ -167,23 +170,40 @@ LandPerKg_i =
 <p>where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>
 is expressed in kg DM/ha. For non-land inputs (<code>none</code>), the
-yield is strictly zeroed to avoid false database warnings.</p>
-<p>Because FAOSTAT productivities (<code>fao_crops.parquet</code> and
-<code>fao_forages.parquet</code>) report crop yields on an as-harvested
-fresh weight basis
+yield is strictly zeroed to avoid unnecessary database lookups.</p>
+<div class="section level4">
+<h4 id="dry-matter-yield-resolution">Dry Matter Yield Resolution<a class="anchor" aria-label="anchor" href="#dry-matter-yield-resolution"></a>
+</h4>
+<p>Depending on whether an ingredient is an arable crop or a forage,
+<code>herdr</code> applies distinct dry matter handling:</p>
+<ul>
+<li>
+<strong>Arable crops (<code>fao_crops.parquet</code>):</strong>
+Because FAOSTAT productivities report yields on an as-harvested fresh
+weight basis
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">RawYield_i</annotation></semantics></math>),
 <code>herdr</code> converts them to a dry matter yield
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>)
-using the ingredient’s dry matter fraction from
-<code>user_data/feed_characteristics.csv</code>:</p>
+using the ingredient’s dry matter fraction
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">DM\_pct_i</annotation></semantics></math>)
+from <code>user_data/feed_characteristics.csv</code>:</li>
+</ul>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>=</mo><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">
 Yield_i = RawYield_i \times \left(\frac{DM\_pct_i}{100}\right)
 </annotation></semantics></math></p>
-<p>If a user provides a <code>custom_yield_kg_ha</code> in
-<code>diet_ingredients.csv</code>, it is assumed to already represent
-dry matter and is used directly without
+<ul>
+<li>
+<strong>Curated forages (<code>forages.parquet</code>) &amp; Custom
+yields (<code>custom_yield_kg_ha</code>):</strong> National forage
+statistics (such as MAPA 2024) and user-supplied custom yields are
+<strong>already reported on a 100% dry matter basis</strong> (kg DM/ha).
+Therefore, <code>herdr</code> assigns
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>=</mo><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i = RawYield_i</annotation></semantics></math>
+directly, avoiding redundant or erroneous
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">DM\_pct</annotation></semantics></math>
-scaling.</p>
+discounts.</li>
+</ul>
+</div>
 </div>
 <div class="section level3">
 <h3 id="economic-allocation-adjustment">2. Economic allocation adjustment<a class="anchor" aria-label="anchor" href="#economic-allocation-adjustment"></a>
@@ -228,7 +248,8 @@ AnnualConsumption_i =
 </annotation></semantics></math></p>
 <p><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Share_{cat}</annotation></semantics></math>
 corresponds to whichever of forage, concentrate, milk, or milk replacer
-the ingredient belongs to. Within any given cohort and category,
+the ingredient belongs to. Diets link seamlessly to cohorts via
+<code>diet_tag</code>. Within any given cohort and category,
 <code>herdr</code> validates that
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mi>i</mi></msub><mo>=</mo><mn>100</mn><mi>%</mi><mo>±</mo><mn>0.1</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\sum Share_i = 100\% \pm 0.1\%</annotation></semantics></math>.</p>
 </div>
@@ -269,19 +290,37 @@ assigned a yield of 0 kg DM/ha and bypass all database lookups.</li>
 <strong>User custom yields:</strong> If
 <code>custom_yield_kg_ha</code> is provided in
 <code>diet_ingredients.csv</code>, <code>herdr</code> uses it directly
-(labeled <code>"Custom Data"</code>) and bypasses FAO databases.</li>
+(labeled <code>"Custom Data"</code>) and bypasses database queries.</li>
 <li>
-<strong>FAOSTAT crop yields:</strong> Otherwise, crop productivities
-are queried from <code>fao_crops.parquet</code> for the resolved country
-and reporting year (filtering out regional aggregate areas where
+<strong>FAOSTAT crop yields:</strong> Arable crop productivities are
+queried from <code>fao_crops.parquet</code> for the resolved country and
+reporting year (filtering out regional aggregate areas where
 <code>Area Code &gt;= 5000</code>).</li>
 <li>
-<strong>Curated forage database:</strong> For forages and pasture
-grasses not covered in FAOSTAT arable crops, yields are queried from
-<code>fao_forages.parquet</code>.</li>
+<strong>Curated forage database
+(<code>forages.parquet</code>):</strong> Because FAOSTAT does not
+provide consistent national forage productivities across countries,
+<code>herdr</code> bundles <code>forages.parquet</code>, containing
+official national statistics for Spain (<strong>MAPA 2024</strong>,
+Anuario de Estadística Agraria), covering pastures (Atlantic,
+Mediterranean, Mountain), annual silages, and hays:
+<ul>
 <li>
-<strong>Global mix fallback:</strong> If a crop has no recorded
-yield in the resolved country for that reference year,
+<strong>Proxy fallback for international studies:</strong> When
+analyzing a farm outside Spain whose diets contain bundled forages
+without <code>custom_yield_kg_ha</code>, <code>herdr</code> applies the
+Spanish national forage yield as a proxy fallback and emits an
+informative warning disclaimer. Users can provide local forage yields at
+any time via <code>custom_yield_kg_ha</code>.</li>
+<li>
+<strong>Backward compatibility:</strong> For existing projects, the
+engine automatically checks for <code>forages.parquet</code> and
+gracefully accepts <code>fao_forages.parquet</code> if present.</li>
+</ul>
+</li>
+<li>
+<strong>Global mix fallback:</strong> If an arable crop has no
+recorded yield in the resolved country for that reference year,
 <code>herdr</code> computes a production-weighted mean yield from the
 top 3 global producing countries of that crop, tagged as
 <code>"Global Mix (Top 3 Producers)"</code>:</li>
@@ -368,33 +407,139 @@ Reference</a>.</p>
 <h2 id="execution-visualization">Execution &amp; Visualization<a class="anchor" aria-label="anchor" href="#execution-visualization"></a>
 </h2>
 <div class="section level3">
+<h3 id="function-arguments">Function Arguments<a class="anchor" aria-label="anchor" href="#function-arguments"></a>
+</h3>
+<p><code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code> supports the following
+arguments:</p>
+<ul>
+<li>
+<code>automatic_cycle</code>: Logical (default <code>FALSE</code>).
+When <code>TRUE</code>, links directly to <code>herdr</code>’s
+demographic population engine (<code><a href="../reference/calculate_population.html">calculate_population()</a></code>) to
+compute life-cycle herd replacement structures.</li>
+<li>
+<code>farm_country</code>: Character (default <code>"Spain"</code>).
+Country where the farm is located, used as the starting point for trade
+origin tracing and domestic yield lookups.</li>
+<li>
+<code>year</code>: Numeric (default <code>2024</code>). Reference
+year for FAO productivities and trade data.</li>
+<li>
+<code>data_dir</code>: Path (default <code>"user_data"</code>).
+Location of editable input CSVs and reference parquet files.</li>
+<li>
+<code>max_trace_hops</code>: Numeric (default <code>4</code>).
+Maximum hops through trade partner hubs.</li>
+<li>
+<code>ssr_threshold</code>: Numeric (default <code>0.70</code>).
+Minimum self-sufficiency ratio to identify a true producer country.</li>
+<li>
+<code>saveoutput</code>: Logical (default <code>TRUE</code>). When
+<code>TRUE</code>, writes results to
+<code>output/land_use.csv</code>.</li>
+</ul>
+</div>
+<div class="section level3">
 <h3 id="running-the-assessment">Running the Assessment<a class="anchor" aria-label="anchor" href="#running-the-assessment"></a>
 </h3>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Standalone land use calculation</span></span>
 <span><span class="va">land_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span></span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2022</span>,</span>
-<span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span></span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2024</span>,</span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  data_dir        <span class="op">=</span> <span class="st">"user_data"</span>,</span>
+<span>  saveoutput      <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Integrated execution via full assessment</span></span>
+<span><span class="co"># Integrated execution via full farm impact assessment</span></span>
 <span><span class="va">full_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2022</span></span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2024</span>,</span>
+<span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  data_dir        <span class="op">=</span> <span class="st">"user_data"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="output-schema">Output Schema<a class="anchor" aria-label="anchor" href="#output-schema"></a>
+</h3>
+<p>The output dataframe (and <code>output/land_use.csv</code>) provides
+a complete agroecological and spatial breakdown:</p>
+<table class="table">
+<colgroup>
+<col width="50%">
+<col width="50%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="left">Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<code>region</code>, <code>subregion</code>,
+<code>animal_tag</code>, <code>class_flex</code>
+</td>
+<td align="left">Cohort identification and geographic stratum</td>
+</tr>
+<tr class="even">
+<td align="left">
+<code>animal_type</code>,
+<code>animal_subtype</code>
+</td>
+<td align="left">Species and production system category</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>ingredient</code></td>
+<td align="left">Specific feedstuff name from diet</td>
+</tr>
+<tr class="even">
+<td align="left"><code>land_type</code></td>
+<td align="left">Agroecological classification (<code>cropland</code>,
+<code>grassland_convertible</code>,
+<code>grassland_unconvertible</code>, <code>none</code>)</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>country_of_origin</code></td>
+<td align="left">Resolved producing country (or
+<code>"Custom Data"</code> / <code>"Global Mix"</code>)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>DM_pct</code></td>
+<td align="left">Dry matter percentage of the ingredient</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>dm_yield</code></td>
+<td align="left">Applied dry matter yield (kg DM/ha)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>population</code></td>
+<td align="left">Headcount of the cohort</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>land_use_per_animal_m2</code></td>
+<td align="left">Land occupation per individual animal (m2/year)</td>
+</tr>
+<tr class="even">
+<td align="left"><code>total_land_use_m2</code></td>
+<td align="left">Total cohort land footprint (m2/year)</td>
+</tr>
+</tbody>
+</table>
 </div>
 <div class="section level3">
 <h3 id="visualizing-agroecological-profiles">Visualizing Agroecological Profiles<a class="anchor" aria-label="anchor" href="#visualizing-agroecological-profiles"></a>
 </h3>
 <p><code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> automatically detects the presence
-of <code>land_type</code> and renders stacked bar charts:</p>
+of <code>land_type</code> and renders stacked bar charts categorized by
+agroecological land competition:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Stacked land use breakdown across cohorts</span></span>
 <span><span class="va">land</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span><span class="va">land</span><span class="op">)</span></span></code></pre></div>
 <p>Non-land inputs (<code>none</code>) are automatically filtered from
 the visualization to focus exclusively on productive land footprint.</p>
+<hr>
 </div>
 </div>
 <div class="section level2">
@@ -405,6 +550,8 @@ the visualization to focus exclusively on productive land footprint.</p>
 Gerber, P. (2017). <em>More fuel than food: Global food security and the
 role of livestock feed</em>. <strong>Global Food Security</strong>, 14,
 1–8.</li>
+<li>MAPA (2024). <em>Anuario de Estadística Agraria</em>. Ministerio de
+Agricultura, Pesca y Alimentación, Gobierno de España.</li>
 </ul>
 </div>
 <div class="section level2">

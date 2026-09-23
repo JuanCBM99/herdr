@@ -61,7 +61,7 @@ This function creates three primary directories:
 
 - **`user_data/`**: The active working directory containing editable CSV
   templates and local reference databases (`fao_crops.parquet`,
-  `fao_forages.parquet`).
+  `forages.parquet`).
 - **`Examples/`**: Pre-configured baseline datasets (e.g., dairy cattle,
   beef cattle, swine, sheep) ready to use as templates.
 - **`output/`**: Destination directory where results, emission
@@ -86,7 +86,7 @@ cohort keys**:
 
 > ⚠️ **Critical Rule:** Every unique combination of `animal_tag`,
 > `region`, `subregion`, and `class_flex` declared in the census must
-> match the definition, weight, diet, and manure tables exactly.
+> match the definition, weight, and manure tables exactly.
 
 ------------------------------------------------------------------------
 
@@ -135,8 +135,24 @@ compute maintenance energy ($`NE_m`$) and feed intake boundaries:
   production phase.
 - `final_weight_kg`: Live weight at the end of the period.
 - `adult_weight_kg`: Average mature body weight of an adult animal (kg).
-- `productive_period_days`: Total active feeding days per year (e.g.,
-  `365` for breeding cows, `120` for fattening pigs).
+- `productive_period_days`: Biological cycle duration in days, defined
+  according to animal class:
+  - **Adult breeding females (except laying hens):** The
+    **inter-parturition interval** in days between consecutive births
+    (calving, lambing, kidding, or farrowing interval; e.g., `365` to
+    `400` days for cows, `200` to `365` days for ewes/does, `149` days
+    for sows). This defines annual reproductive frequency
+    ($`365 / \text{productive\_period\_days}`$).
+  - **Laying hens & breeder poultry:** The **commercial laying cycle
+    duration** in the barn until depopulation (e.g., `511` days for
+    commercial layers, `301` days for meat breeders).
+  - **All other cohorts (growing, fattening, and replacement animals):**
+    Their **life cycle / life-stage duration** (days on feed or days
+    from birth/weaning to slaughter/exit; e.g., `42` days for broilers,
+    `110` days for fattening pigs, `70` days for feedlot lambs). This
+    determines Average Daily Gain (ADG) and translates annual meat
+    throughput into standing barn places using the IPCC Average Annual
+    Population (AAP) formula.
 
 ------------------------------------------------------------------------
 
@@ -183,7 +199,8 @@ Connects cohorts with species-specific constants and production targets:
   yield (kg/year), milk fat percentage, and wool yield (kg/year).
 - **Monogastrics (`monogastric_definitions.csv`):** Exponent
   ($`\alpha`$), protein and fat tissue retention fractions, sow
-  gestation/lactation lengths, litter sizes, and egg mass output.
+  gestation/lactation lengths, litter sizes, and egg production
+  parameters (`eggs_per_year`, `egg_weight_g`).
 
 ------------------------------------------------------------------------
 
@@ -217,7 +234,7 @@ library(herdr)
 results <- generate_impact_assessment(
   automatic_cycle = FALSE,
   farm_country    = "Spain",
-  year            = 2022,
+  year            = 2024,
   saveoutput      = TRUE
 )
 
@@ -232,7 +249,7 @@ head(results)
 - `farm_country`: The reference country used to query crop yields and
   bilateral FAO trade matrices.
 - `year`: The reference statistical year for FAO data queries (e.g.,
-  `2022`).
+  `2024`).
 - `saveoutput`: If `TRUE`, writes individual module tables and summary
   reports directly to `output/`.
 
@@ -260,7 +277,7 @@ enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
 # 5. Calculate Feed-Related Land Use (m2)
 land_results <- calculate_land_use(
   farm_country = "Spain", 
-  year = 2022, 
+  year = 2024, 
   saveoutput = FALSE
 )
 

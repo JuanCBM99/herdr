@@ -554,7 +554,10 @@ weight gain (kg protein/kg gain)</td>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><msub><mi>E</mi><mrow><mi>e</mi><mi>g</mi><mi>g</mi><mi>s</mi></mrow></msub><mo>=</mo><mn>2</mn><mo>×</mo><mi>E</mi><mi>g</mi><msub><mi>g</mi><mrow><mi>m</mi><mi>a</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow><annotation encoding="application/x-tex">ME_{eggs} = 2 \times Egg_{mass}</annotation></semantics></math></p>
 <p>Where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>g</mi><msub><mi>g</mi><mrow><mi>m</mi><mi>a</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Egg_{mass}</annotation></semantics></math>
-is the daily egg mass produced (g/day).</p>
+is the daily egg mass produced (g/day), derived internally from user
+input parameters in <code>monogastric_definitions.csv</code>
+(<code>eggs_per_year</code> and <code>egg_weight_g</code>):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>g</mi><msub><mi>g</mi><mrow><mi>m</mi><mi>a</mi><mi>s</mi><mi>s</mi></mrow></msub><mo>=</mo><mfrac><mrow><mtext mathvariant="normal">eggs_per_year</mtext><mo>×</mo><mtext mathvariant="normal">egg_weight_g</mtext></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">Egg_{mass} = \frac{\text{eggs\_per\_year} \times \text{egg\_weight\_g}}{365}</annotation></semantics></math></p>
 <hr>
 </div>
 <div class="section level3">
@@ -753,6 +756,22 @@ gain in kcal/day.</em></p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level4">
+<h4 id="swine-enteric-fermentation-ipcc-2019-refinement-table-10-10">Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)<a class="anchor" aria-label="anchor" href="#swine-enteric-fermentation-ipcc-2019-refinement-table-10-10"></a>
+</h4>
+<p>For swine, enteric methane emissions are estimated using the IPCC
+Tier 1 methodology with metabolic liveweight scaling relative to the
+standard reference market pig (72 kg):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mtext mathvariant="normal">swine</mtext></msub><mo>=</mo><mn>1.5</mn><mo>×</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>L</mi><mi>i</mi><mi>v</mi><mi>e</mi><mi>W</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi></mrow><mn>72</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>0.75</mn></msup></mrow><annotation encoding="application/x-tex">EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}</annotation></semantics></math></p>
+<p>Where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">EF</annotation></semantics></math>
+is in kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>/head/year,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1.5</mn><annotation encoding="application/x-tex">1.5</annotation></semantics></math>
+is the baseline IPCC emission factor for market swine, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>i</mi><mi>v</mi><mi>e</mi><mi>W</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">LiveWeight</annotation></semantics></math>
+(kg) is derived from <code>livestock_weights.csv</code>.</p>
 <hr>
 </div>
 </div>
@@ -1013,6 +1032,11 @@ to be a constant value:</p>
 <p>For growing birds:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>−</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mn>0.028</mn></mrow><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}</annotation></semantics></math></p>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Variable</th>
 <th align="left">Description</th>
@@ -1031,7 +1055,8 @@ to be a constant value:</p>
 </tr>
 <tr class="odd">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Days</annotation></semantics></math></td>
-<td align="left">Productive period (days)</td>
+<td align="left">Life-stage feeding duration / cycle
+(<code>productive_period_days</code>)</td>
 <td align="left"><code>livestock_weights.csv</code></td>
 </tr>
 </tbody>
@@ -1092,7 +1117,8 @@ to be a constant value:</p>
 </tr>
 <tr class="odd">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Days</annotation></semantics></math></td>
-<td align="left">Productive period (days)</td>
+<td align="left">Life-stage feeding duration / cycle
+(<code>productive_period_days</code>)</td>
 <td align="left"><code>livestock_weights.csv</code></td>
 </tr>
 <tr class="even">
@@ -1135,7 +1161,10 @@ N/year)</td>
 </tr>
 <tr class="odd">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>R</mi></mrow><annotation encoding="application/x-tex">FR</annotation></semantics></math></td>
-<td align="left">Annual farrowing rate (farrowings/year)</td>
+<td align="left">Annual farrowing rate
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>,
+where <code>productive_period_days</code> is the farrowing
+interval)</td>
 <td align="left">Calculated</td>
 </tr>
 <tr class="even">

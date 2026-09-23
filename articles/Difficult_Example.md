@@ -17,7 +17,7 @@ column to distinguish the **lactation phase** from the **dry phase**.
 |:---|:---|
 | **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
 | **If using the automatic herd cycle** | `reproduction_parameters.csv` |
-| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `fao_forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
+| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
 
 Full details on every file above are in the [Technical
 Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
@@ -114,6 +114,15 @@ Accurate weights are essential to calculate Maintenance Energy
 | `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | 675 | 365 | 675 | 675 |
 | `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | 675 | 365 | 675 | 675 |
 | `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | 675 | 365 | 675 | 675 |
+
+> ℹ️ **About `productive_period_days`:**  
+> \* For **adult breeding females (except laying hens)**, this
+> represents the **inter-parturition interval** in days (here, `365`
+> days corresponds to an annual calving interval).  
+> \* For **laying hens**, it represents the **commercial laying cycle
+> duration** until depopulation.  
+> \* For **all other cohorts (growing, fattening, replacement)**, it
+> represents their **life cycle / life-stage duration** (days on feed).
 
 ------------------------------------------------------------------------
 

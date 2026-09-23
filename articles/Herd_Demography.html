@@ -131,7 +131,7 @@ assessments.</li>
 <li>
 <strong>Breeding-only inventory:</strong> You only need to declare
 your adult breeding animals in <code>livestock_census.csv</code> (e.g.,
-mature cows, breeding sows, ewes, does, or hens).</li>
+mature cows, breeding sows, ewes, or hens).</li>
 <li>
 <strong>Automated biological pyramid:</strong> <code>herdr</code>
 automatically models the complete demographic flow: annual births, young
@@ -275,10 +275,13 @@ Commercial poultry flocks do not replace individual birds as they age.
 Flocks are managed in complete batches (<strong>all-in /
 all-out</strong>): the entire flock enters at the same age, lays
 throughout the batch cycle, and is depopulated all at once for
-slaughter.<br><em>Therefore, <strong>the user does not set an arbitrary replacement
-rate for poultry</strong>.</em> The need for standing replacement
-pullets is self-determined by the lifespan of the flock in the laying
-house relative to the rearing duration of the growing pullets.</li>
+slaughter.<br><em>By default, replacement pullet requirements are derived from batch
+turnover
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>)</em>.
+However, <code>herdr</code> also supports defining custom replacement
+rates for <code>laying_hens</code> and <code>breeder_meat_hens</code> in
+<code>reproduction_parameters.csv</code> for flexible multi-cycle or
+molting scenarios.</li>
 </ul>
 <hr>
 </div>
@@ -311,22 +314,65 @@ adults without intermediate yearling tiers.</li>
 <hr>
 </div>
 <div class="section level4">
-<h4 id="concept-d-the-ipcc-standing-population-principle-annual-flow-vs--daily-census">Concept D: The IPCC Standing Population Principle (Annual Flow
-vs. Daily Census)<a class="anchor" aria-label="anchor" href="#concept-d-the-ipcc-standing-population-principle-annual-flow-vs--daily-census"></a>
+<h4 id="concept-d-the-dual-role-of-productive_period_days-inter-parturition-intervals-vs--life-cycles-aap">Concept D: The Dual Role of <code>productive_period_days</code>
+(Inter-Parturition Intervals vs. Life Cycles &amp; AAP)<a class="anchor" aria-label="anchor" href="#concept-d-the-dual-role-of-productive_period_days-inter-parturition-intervals-vs--life-cycles-aap"></a>
 </h4>
-<ul>
-<li>A farm never holds all the slaughter animals produced over a whole
-year at the exact same moment. Meat animals are only present during
-their feeding window.</li>
+<p>The parameter <code>productive_period_days</code> in
+<code>livestock_weights.csv</code> serves two distinct biological
+purposes depending on the animal cohort:</p>
+<ol style="list-style-type: decimal">
 <li>
-<strong>The IPCC Average Annual Population (AAP) concept translates
-an annual animal throughput into average daily occupied barn
-places.</strong><br>
-For example, if a fattening pig stays in the barn for 110 days, that
-single physical barn place turns over more than 3 times during the year.
-For calculating emissions, manure, and feed requirements, the number of
-standing animals on any average day is:<br><code>Annual Finished Animals * (Feeding Period Days / 365)</code>.</li>
+<p><strong>For Adult Breeding Females (except laying hens):
+Inter-Parturition Interval</strong><br>
+For cows, ewes, does, and sows, <code>productive_period_days</code>
+represents the <strong>period between consecutive births</strong>
+(calving, lambing, kidding, or farrowing interval):</p>
+<ul>
+<li>
+<strong>Cattle:</strong> Typically <code>365</code> days (or
+<code>365</code>–<code>400</code> days) for a single annual
+calving.</li>
+<li>
+<strong>Sheep and Goats:</strong> <code>365</code> days in annual
+seasonal systems, or shortened (e.g., <code>200</code> to
+<code>240</code> days) in accelerated intensive breeding schedules.</li>
+<li>
+<strong>Swine:</strong> Averages <code>149</code> days (115 d
+gestation + 21–28 d lactation + return to estrus), yielding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mn>149</mn><mo>≈</mo><mn>2.45</mn></mrow><annotation encoding="application/x-tex">365 / 149 \approx 2.45</annotation></semantics></math>
+farrowings per sow per year.<br>
+The annual reproduction frequency is calculated as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>.</li>
 </ul>
+</li>
+<li><p><strong>For Laying Hens &amp; Poultry Breeders: Flock Laying
+Cycle</strong><br>
+Birds follow an all-in / all-out batch dynamic.
+<code>productive_period_days</code> represents the <strong>commercial
+laying cycle duration</strong> in the barn until depopulation (e.g.,
+<code>511</code> days for commercial layers, <code>301</code> days for
+meat breeders). In the absence of an explicit replacement rate, flock
+turnover is
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>.</p></li>
+<li>
+<p><strong>For All Other Cohorts (Growing, Fattening, and
+Replacement Stock): Life Cycle / Days on Feed</strong><br>
+For meat animals and rearing stock, <code>productive_period_days</code>
+represents their <strong>entire life-stage duration</strong> (days on
+feed from birth/weaning to slaughter or replacement transition; e.g.,
+<code>42</code> days for broilers, <code>110</code> days for fattening
+pigs, <code>70</code> days for feedlot lambs).</p>
+<ul>
+<li>Meat animals do not stay in the barn for 365 days. The package
+applies the <strong>IPCC Average Annual Population (AAP)</strong>
+principle:<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Standing Places (AAP)</mtext><mo>=</mo><mtext mathvariant="normal">Annual Slaughter Animals</mtext><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mtext mathvariant="normal">productive_period_days</mtext><mn>365</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Standing Places (AAP)} = \text{Annual Slaughter Animals} \times \left(\frac{\text{productive\_period\_days}}{365}\right)</annotation></semantics></math><br>
+</li>
+<li>It also determines the Average Daily Gain (ADG) used for energy and
+nitrogen retention calculations:<br><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">ADG</mtext><mo>=</mo><mfrac><mrow><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>−</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><mtext mathvariant="normal">productive_period_days</mtext></mfrac></mrow><annotation encoding="application/x-tex">\text{ADG} = \frac{BW_{final} - BW_{initial}}{\text{productive\_period\_days}}</annotation></semantics></math>
+</li>
+</ul>
+</li>
+</ol>
 <hr>
 </div>
 </div>
@@ -348,7 +394,9 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 </th>
 <th align="left">Productivity Column &amp; Source File</th>
 <th align="left">Replacement Column &amp; Source File</th>
-<th align="left">Feeding Period Column &amp; Source File</th>
+<th align="left">Cycle Duration Column
+(<code>productive_period_days</code> in
+<code>livestock_weights.csv</code>)</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
@@ -363,9 +411,8 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 <td align="left">
 <code>replacement_rate</code>
 (<code>reproduction_parameters.csv</code> — both sexes)</td>
-<td align="left">
-<code>productive_period_days</code>
-(<code>livestock_weights.csv</code> — feedlot calves)</td>
+<td align="left">Calving interval (e.g. 365 d) for cows; feeding
+duration for feedlot calves</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Sheep</strong></td>
@@ -379,9 +426,8 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 <td align="left">
 <code>replacement_rate</code>
 (<code>reproduction_parameters.csv</code> — both sexes)</td>
-<td align="left">
-<code>productive_period_days</code>
-(<code>livestock_weights.csv</code> — lamb fattening)</td>
+<td align="left">Lambing interval (e.g. 200–365 d) for ewes; feeding
+duration for lambs</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Goats</strong></td>
@@ -395,9 +441,8 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 <td align="left">
 <code>replacement_rate</code>
 (<code>reproduction_parameters.csv</code> — both sexes)</td>
-<td align="left">
-<code>productive_period_days</code>
-(<code>livestock_weights.csv</code> — kid fattening)</td>
+<td align="left">Kidding interval (e.g. 200–365 d) for does; feeding
+duration for kids</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>Swine</strong></td>
@@ -410,9 +455,8 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 <td align="left">
 <code>replacement_rate</code>
 (<code>reproduction_parameters.csv</code> — sows only)</td>
-<td align="left">
-<code>productive_period_days</code>
-(<code>livestock_weights.csv</code> — 110 days fattening)</td>
+<td align="left">Farrowing interval (e.g. 149 d) for sows; feeding
+duration (110 d) for pigs</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Poultry</strong></td>
@@ -426,9 +470,8 @@ standing animals on any average day is:<br><code>Annual Finished Animals * (Feed
 <td align="left">
 <code>replacement_rate</code>
 (<code>reproduction_parameters.csv</code>)</td>
-<td align="left">
-<code>productive_period_days</code>
-(<code>livestock_weights.csv</code> — rearing &amp; broilers)</td>
+<td align="left">Laying flock cycle (e.g. 511 d) for hens; life cycle
+(e.g. 42 d) for broilers</td>
 </tr>
 </tbody>
 </table>
