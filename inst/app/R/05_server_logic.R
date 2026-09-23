@@ -329,6 +329,7 @@ herdr_server <- function(input, output, session) {
             )
           }
         }
+        tbl <- apply_column_tooltips(tbl)
         tbl
       })
     })

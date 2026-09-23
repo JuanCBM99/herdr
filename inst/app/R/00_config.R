@@ -86,7 +86,7 @@ modal_tooltips <- list(
   region                   = "Optional: A general location or grouping level (e.g., 'Europe', 'Spain', or 'Farm A').",
   subregion                = "Optional: A subdivision of your Region (e.g., if Region is 'Spain', Subregion could be 'Euskadi').",
   class_flex               = "Optional: A flexible tag to group animals by trait, breed, or phase (e.g., 'lactating', 'dry', 'angus').",
-  population               = "Total number of animals in this exact combination of animal_tag, region, subregion and class_flex.",
+  population               = "Average Annual Population (AAP) per IPCC Tier 2 guidelines: the average standing headcount present on the farm over the year (i.e. occupied barn or pasture capacity). For short-cycle animals (e.g. broilers, fattening pigs), annual slaughter throughput is automatically derived from productive_period_days (365 / days on feed).",
   forage_share             = "Percentage of the diet made up of roughage/forage (e.g., pasture, hay, silage).",
   concentrate_share        = "Percentage of the diet made up of concentrates (e.g., grains, pellets, soy).",
   milk_share               = "Percentage of the diet consisting of natural maternal milk (for young animals).",
@@ -159,7 +159,11 @@ modal_tooltips <- list(
   agribalyse_name          = "Agribalyse name of the ingredient used to link its database with herdr",
   pregnancy_rate           = "Pregnancy rate expressed as a proportion (numeric value bounded between 0 and 1).",
   pr_sheep_goat            = "Prolificacy rate for sheep and goats, representing the number of lambs/kids born divided by pregnant ewes.",
-  c_pregnancy_cattle       = "Pregnancy coefficient specific to cattle. Populate this parameter only for breeding groups."
+  c_pregnancy_cattle       = "Pregnancy coefficient specific to cattle. Populate this parameter only for breeding groups.",
+  parameter                = "Name of the reproduction or herd parameter (e.g., replacement_rate, pregnancy_rate, pr_sheep_goat).",
+  value                    = "Numerical value for the parameter.",
+  coefficient              = "IPCC standard coefficient code.",
+  description              = "Descriptive category or condition for the coefficient."
 )
 
 standard_ids <- c("census", "diet_prof", "diet_ingr", "def", "mono", "weights", "manure", "repro")

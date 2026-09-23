@@ -392,6 +392,26 @@ apply_diet_ingredient_cascade <- function(tbl, df, feed_char_df) {
   htmlwidgets::onRender(tbl, reset_js)
 }
 
+# Apply interactive info tooltip icons to Handsontable column headers
+apply_column_tooltips <- function(tbl) {
+  if (is.null(tbl) || is.null(tbl$x) || is.null(tbl$x$colHeaders)) return(tbl)
+
+  headers <- tbl$x$colHeaders
+  new_headers <- vapply(headers, function(col_header) {
+    clean_name <- sub(" <i class=.*$", "", col_header)
+    if (clean_name %in% names(modal_tooltips)) {
+      tip <- modal_tooltips[[clean_name]]
+      tip_escaped <- gsub("'", "&#39;", gsub("\"", "&quot;", tip, fixed = TRUE), fixed = TRUE)
+      sprintf('%s <i class="fa-solid fas fa-circle-info ms-1 text-muted" title="%s" style="cursor:help; font-size:0.85em;" onclick="event.stopPropagation();"></i>', clean_name, tip_escaped)
+    } else {
+      col_header
+    }
+  }, FUN.VALUE = character(1), USE.NAMES = FALSE)
+
+  tbl$x$colHeaders <- new_headers
+  tbl
+}
+
 # Helper to build 7-part manure combination key for IPCC verification
 build_manure_combo_key <- function(df) {
   cols <- c("system_base", "management_months", "system_climate", "system_subclimate", "system_variant", "climate_zone", "climate_moisture")

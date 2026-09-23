@@ -133,7 +133,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("class_flex")),
                 tags$dd(class = "col-sm-9", "Optional: Flexible category tag to differentiate production stages or breeds (e.g., 'lactating', 'dry', 'angus')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("population")),
-                tags$dd(class = "col-sm-9", "Mandatory: Number of animals (head count or standing barn capacity) in this cohort.")
+                tags$dd(class = "col-sm-9", "Mandatory: Average Annual Population (AAP) per IPCC Tier 2 guidelines (standing headcount or occupied barn places present on average over the year). For short-cycle animals like broilers or fattening pigs, annual throughput is calculated via 365 / productive_period_days.")
               )
             ),
 
