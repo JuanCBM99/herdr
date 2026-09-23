@@ -4,11 +4,13 @@
 \alias{calculate_NEm}
 \title{Calculate Net Energy for Maintenance (NEm)}
 \usage{
-calculate_NEm(saveoutput = TRUE)
+calculate_NEm(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
-Calculate Net Energy for Maintenance (NEm)
+Computes net energy for maintenance based on animal weight and CFI coefficient.
 }

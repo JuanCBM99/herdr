@@ -11,7 +11,7 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
   # 2. Normalize and prepare input CSVs
   # N2O calculation requires almost all master files to be consistent
   files_to_fix <- c(
-    "livestock_definitions.csv", "livestock_weights.csv",
+    "ruminant_definitions.csv", "livestock_weights.csv",
     "livestock_census.csv", "manure_management.csv",
     "ipcc_mm.csv", "diet_profiles.csv",
     "diet_ingredients.csv", "feed_characteristics.csv",
@@ -47,10 +47,10 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
     expect_true(all(results$N_intake_kgheadday >= 0))
 
     # N_retention logic check:
-    # For sheep/goats it should be a fixed 0.1 according to your function
+    # For sheep/goats it should be 10% of N intake according to IPCC 2019 Table 10.20
     small_ruminants <- results %>% filter(tolower(animal_type) %in% c("sheep", "goat"))
     if(nrow(small_ruminants) > 0) {
-      expect_equal(unique(small_ruminants$N_retention), 0.1)
+      expect_equal(small_ruminants$N_retention_kg_day, round(0.10 * small_ruminants$N_intake_kgheadday, 4), tolerance = 1e-4)
     }
 
     # Total N2O must be numeric and not NA

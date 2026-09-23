@@ -4,10 +4,12 @@
 \alias{calculate_weighted_variable}
 \title{Calculate Weighted Nutritional Variables}
 \usage{
-calculate_weighted_variable(saveoutput = TRUE)
+calculate_weighted_variable(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)

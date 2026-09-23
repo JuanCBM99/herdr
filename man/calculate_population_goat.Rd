@@ -2,15 +2,43 @@
 % Please edit documentation in R/population_goat.R
 \name{calculate_population_goat}
 \alias{calculate_population_goat}
-\title{Calculates the full goat population structure (Internal Helper)}
+\title{Calculate Goat Population Structure}
 \usage{
-calculate_population_goat(census_goat, rate_parameters)
+calculate_population_goat(
+  census_goat,
+  rate_parameters,
+  definitions = NULL,
+  weights = NULL
+)
 }
 \arguments{
-\item{census_goat}{Edit in csv}
+\item{census_goat}{Filtered census data for goat.}
 
-\item{rate_parameters}{Edit in csv}
+\item{rate_parameters}{Reproduction and replacement rates table.}
+
+\item{definitions}{Optional definitions table (e.g., ruminant_definitions) containing \code{pr_sheep_goat}.}
+
+\item{weights}{Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.}
+}
+\value{
+A tibble with the modeled goat population structure.
 }
 \description{
-Calculates the full goat population structure (Internal Helper)
+Models the complete goat herd structure from mature breeding animals using
+biological prolificacy rates, reproductive cycle duration (kidding interval),
+replacement dynamics, and feeding period days for slaughter kids.
 }
+\section{Demographic Flow Logic}{
+
+\itemize{
+  \item \strong{Mature Parents}: \code{mature_goat_female_dairy}, \code{mature_goat_female_meat},
+        \code{mature_goat_male_dairy}, \code{mature_goat_male_meat}.
+  \item \strong{Kidding Frequency}: Number of kiddings per doe per year (\code{365 / productive_period_days}),
+        supporting accelerated kidding systems (e.g. 240 days = 1.5 kiddings/year).
+  \item \strong{Replacements}: Doeling and buck kids retained annually to sustain the breeding herd.
+  \item \strong{Births}: Total kids born per year (\code{does * kidding_frequency * prolificacy}).
+  \item \strong{Slaughter Kids}: Remaining offspring (\code{Births - Replacements}) scaled to
+        Average Annual Population (AAP, IPCC Eq. 10.1) based on feeding duration (\code{days / 365}).
+}
+}
+

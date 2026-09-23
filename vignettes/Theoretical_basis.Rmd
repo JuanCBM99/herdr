@@ -28,7 +28,7 @@ $$NE_m = Cf_i \cdot Weight^{0.75}$$
 |:----------|:-------------|:---------------------|
 | $NE_m$    | Net energy for maintenance (MJ/day) | Calculated |
 | $Cf_i$    | Maintenance coefficient based on animal species/status | `ipcc_coefficients.csv` |
-| $Weight$  | Live weight of the individual animal (kg) | `weights.csv` |
+| $Weight$  | Live weight of the individual animal (kg) | `livestock_weights.csv` |
 
 ---
 
@@ -44,7 +44,7 @@ $NE_a$ represents energy used for grazing, walking, or other activities.
 | $NE_a$    | Net energy for activity (MJ/day) | Calculated |
 | $C_a$     | Activity coefficient (varies by feeding situation) | `ipcc_coefficients.csv` |
 | $NE_m$    | Maintenance energy | Result of Eq. 10.3 |
-| $Weight$  | Live weight of the animal (kg) | `weights.csv` |
+| $Weight$  | Live weight of the animal (kg) | `livestock_weights.csv` |
 
 ---
 
@@ -60,11 +60,11 @@ $$NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{365}$$
 
 | Variable | Description | Source in the Package |
 |:--- |:--- |:--- |
-| $BW$ | Average live body weight of the animal (kg) | `weights.csv` |
-| $MW$ | Mature body weight of an adult (kg) | `weights.csv` |
-| $WG$ | Daily weight gain (kg/day) | `weights.csv` |
+| $BW$ | Average live body weight of the animal (kg) | `livestock_weights.csv` |
+| $MW$ | Mature body weight of an adult (kg) | `livestock_weights.csv` |
+| $WG$ | Daily weight gain (kg/day) | `livestock_weights.csv` |
 | $C, a, b$ | IPCC species-specific growth constants | `ipcc_coefficients.csv` |
-| $BW_i / BW_f$| Initial and final weight for the period (kg) | `weights.csv` |
+| $BW_i / BW_f$| Initial and final weight for the period (kg) | `livestock_weights.csv` |
 
 ---
 
@@ -78,8 +78,8 @@ Energy required for milk production based on volume and fat content.
 | Variable | Description | Source in the Package |
 |:----------|:-------------|:---------------------|
 | $NE_l$    | Net energy for lactation (MJ/day) | Calculated |
-| $Milk$    | Average daily milk yield (kg/day) | `livestock_definitions.csv` |
-| $Fat$     | Milk fat content percentage (%) | `livestock_definitions.csv` |
+| $Milk$    | Average daily milk yield (kg/day) | `ruminant_definitions.csv` |
+| $Fat$     | Milk fat content percentage (%) | `ruminant_definitions.csv` |
 | $EV_{milk}$| Energy required to produce 1 kg of milk (MJ/kg) | `ipcc_coefficients.csv` |
 
 ---
@@ -92,8 +92,8 @@ Energy required for milk production based on volume and fat content.
 
 | Variable | Description | Source in the Package |
 |:----------|:-------------|:---------------------|
-| $Hours$   | Number of hours worked per day (draft animals) | `livestock_definitions.csv` |
-| $Pr_{wool}$| Annual wool production (kg/year) | `livestock_definitions.csv` |
+| $Hours$   | Number of hours worked per day (draft animals) | `ruminant_definitions.csv` |
+| $Pr_{wool}$| Annual wool production (kg/year) | `ruminant_definitions.csv` |
 | $EV_{wool}$| Energy per kg of wool (IPCC default 24 MJ/kg) | Constant |
 | $C_{pregnancy}$| Pregnancy energy coefficient | `ipcc_coefficients.csv` |
 
@@ -175,7 +175,9 @@ For laying hens:
 
 $$ME_{eggs} = 2 \times Egg_{mass}$$
 
-Where $Egg_{mass}$ is the daily egg mass produced (g/day).
+Where $Egg_{mass}$ is the daily egg mass produced (g/day), derived internally from user input parameters in `monogastric_definitions.csv` (`eggs_per_year` and `egg_weight_g`):
+
+$$Egg_{mass} = \frac{\text{eggs\_per\_year} \times \text{egg\_weight\_g}}{365}$$
 
 ---
 
@@ -262,6 +264,14 @@ $$E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)$$
 | $E_T$ | Total emissions from category $T$ (Gg $CH_4$/year) | Calculated |
 | $N_{(T,P)}$ | Number of animals in category $T$ | `livestock_census.csv` |
 
+### Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)
+
+For swine, enteric methane emissions are estimated using the IPCC Tier 1 methodology with metabolic liveweight scaling relative to the standard reference market pig (72 kg):
+
+$$EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}$$
+
+Where $EF$ is in kg $CH_4$/head/year, $1.5$ is the baseline IPCC emission factor for market swine, and $LiveWeight$ (kg) is derived from `livestock_weights.csv`.
+
 ---
 
 ## 2. Manure Management ($CH_{4(mm)}$)
@@ -345,9 +355,9 @@ $$N_{retention} = \frac{Milk \times (Milk_{protein}/100)}{6.38} + \frac{WG \left
 | Variable | Description | Source in Package |
 |:---|:---|:---|
 | $N_{retention}$ | Daily nitrogen retained (kg N/head/day) | Calculated |
-| $Milk$ | Daily milk yield (kg/day) | `livestock_definitions.csv` |
+| $Milk$ | Daily milk yield (kg/day) | `ruminant_definitions.csv` |
 | $Milk_{protein}$ | Estimated milk protein concentration (%) | Calculated |
-| $Fat_{content}$ | Milk fat content (%) | `livestock_definitions.csv` |
+| $Fat_{content}$ | Milk fat content (%) | `ruminant_definitions.csv` |
 | $WG$ | Daily body weight gain (kg/day) | Calculated |
 | $NE_g$ | Net energy for growth (MJ/day) | Calculated |
 
@@ -369,7 +379,7 @@ $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}$$
 |:---|:---|:---|
 | $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
 | $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Productive period (days) | `livestock_weights.csv` |
+| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 
 For laying hens:
 
@@ -390,7 +400,7 @@ $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times N_{gain}}{Days}$$
 |:---|:---|:---|
 | $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
 | $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Productive period (days) | `livestock_weights.csv` |
+| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
 | $N_{gain}$ | Nitrogen retention coefficient according to final body weight | IPCC (2019) |
 
 For breeding sows:
@@ -409,7 +419,7 @@ $$N_{weaned} = \frac{0.025 \times Piglets \times FR \times (W_{weaning} - W_{bir
 |:---|:---|:---|
 | $N_{gain,sow}$ | Annual nitrogen retained in sow body tissues (kg N/year) | Calculated |
 | $N_{weaned}$ | Annual nitrogen retained in weaned piglets (kg N/year) | Calculated |
-| $FR$ | Annual farrowing rate (farrowings/year) | Calculated |
+| $FR$ | Annual farrowing rate ($365 / \text{productive\_period\_days}$, where `productive_period_days` is the farrowing interval) | Calculated |
 | $S_{kg}$ | Sow body weight change between consecutive parturitions (kg/year) | Calculated |
 | $Piglets$ | Number of piglets born per litter | `monogastric_definitions.csv` |
 | $W_{weaning}$ | Piglet weaning weight (kg) | `livestock_weights.csv` |
@@ -477,5 +487,78 @@ $$N_{leach-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{LeachMS} \
 
 ---
 
+# V. Animal Productivity & Edible Protein Engine (FAO/GLEAM)
+
+In addition to greenhouse gas emissions and land use, `herdr` computes physical livestock productivity and nutritional protein output using the **FAO Global Livestock Environmental Assessment Model (GLEAM v3.0)** framework and International Dairy Federation (IDF) standards.
+
+## 1. Annual Slaughter Output ($N_{\text{exit}}$)
+
+Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) is calculated from the Annual Average Population ($AAP$) based on functional cohort roles:
+
+* **Replacement stock (`replacement`):** $N_{\text{exit}} = 0$ (animals enter the adult herd to maintain stability).
+* **Mature breeding females (`mature`):** 
+  $$N_{\text{exit}} = AAP \times \text{replacement\_rate}$$
+  *(For layer hens where replacement rate is omitted, $N_{\text{exit}} = AAP \times \frac{365}{\text{productive\_period\_days}}$).*
+* **Commercial slaughter cohorts (`slaughter`):**
+  $$N_{\text{exit}} = AAP \times \left( \frac{365}{\text{productive\_period\_days}} \right)$$
+
+## 2. Milk Production & FPCM
+
+Total fresh milk is computed as:
+$$\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}$$
+
+Estimated milk protein content follows IPCC Tier 2:
+$$\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)$$
+
+To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2015)** standard:
+$$\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \cdot \text{Fat} (\%) + 0.0776 \cdot \text{Protein} (\%) + 0.2534 \right]$$
+
+## 3. Meat Production & Carcass Metrics
+
+Meat output transforms live animals leaving the farm into edible protein:
+
+1. **Live weight at slaughter:**
+   $$\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}$$
+2. **Carcass weight:**
+   $$\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)$$
+   where $DP\%$ is the species dressing percentage (FAO GLEAM Table 9.1).
+3. **Boneless meat:**
+   $$\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM$$
+   where $BFM$ is the boneless fraction of carcass meat.
+4. **Meat edible protein:**
+   $$\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}$$
+
+| Species | Dressing Percentage ($DP\%$) | Boneless Fraction ($BFM$) | Protein in Meat ($\text{MEAT\_prot}$) | Default Milk Protein ($\text{MILK\_prot}$) |
+|:---|:---:|:---:|:---:|:---:|
+| **Cattle** | 54.0% | 0.75 | 0.2113 | 0.033 |
+| **Sheep** | 47.0% | 0.70 | 0.2013 | 0.058 |
+| **Goat** | 47.0% | 0.70 | 0.1920 | 0.034 |
+| **Swine** | 73.0% | 0.65 | 0.2020 | — |
+| **Poultry** | 70.0% | 0.75 | 0.1900 | — |
+
+## 4. Egg Production (Poultry)
+
+Annual fresh egg yield and protein content:
+$$\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP$$
+$$\text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240$$
+
+## 5. Total Edible Human Protein
+
+$$\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}$$
+
+---
+
+# VI. Demographic & Herd Dynamics (AAP Rule)
+
+For fast-growing and batch-reared cohorts, the census standing population in `livestock_census.csv` must always represent the **Annual Average Population ($AAP$)**:
+$$AAP = \frac{\sum_{i=1}^{M} N_i \times D_i}{365}$$
+
+Where $N_i$ is the number of animals in batch $i$ and $D_i$ is their duration on farm in days. Conversely, the annual total number of finished animals produced by a fixed barn capacity ($C$) operated continuously is:
+$$\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_period\_days} + \text{empty\_period\_days}} \right)$$
+
+---
+
 ### 📚 References
 * IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
+* FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM) v3.0: Model description*. Food and Agriculture Organization of the United Nations, Rome.
+* IDF (2015). *A common carbon footprint approach for the dairy sector: The green house gas emissions from dairy and beef production*. International Dairy Federation Bulletin 479/2015.

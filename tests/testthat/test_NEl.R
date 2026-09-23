@@ -9,9 +9,9 @@ test_that("calculate_NEl computes lactation energy for cattle and sheep", {
   withr::local_dir(test_path("test_data"))
 
   # Normalize CSVs: ensure yield and fat are numeric and join keys are character
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     mutate(across(c(milk_yield_kg_year, fat_content_pct), as.numeric)) %>%
-    write_csv("user_data/livestock_definitions.csv")
+    write_csv("user_data/ruminant_definitions.csv")
 
   read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/livestock_weights.csv")

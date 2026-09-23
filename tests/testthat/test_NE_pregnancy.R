@@ -9,9 +9,9 @@ test_that("calculate_NE_pregnancy computes gestation energy for cattle and sheep
   withr::local_dir(test_path("test_data"))
 
   # Normalize CSVs: force character for join keys and numeric for pregnancy rates
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     mutate(across(any_of("pr"), as.numeric)) %>%
-    write_csv("user_data/livestock_definitions.csv")
+    write_csv("user_data/ruminant_definitions.csv")
 
   read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/livestock_weights.csv")

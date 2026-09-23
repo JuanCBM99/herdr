@@ -4,10 +4,12 @@
 \alias{calculate_monogastric_energy}
 \title{Calculate Monogastric Metabolizable Energy Requirements (FEDNA)}
 \usage{
-calculate_monogastric_energy(saveoutput = TRUE)
+calculate_monogastric_energy(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default), saves the results to `output/monogastric_metabolizable_energy.csv`.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Calculates daily metabolizable energy requirements (kcal/day) for poultry and swine

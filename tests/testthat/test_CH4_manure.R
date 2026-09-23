@@ -32,3 +32,13 @@ test_that("calculate_CH4_manure computes emissions correctly using CSV data", {
     }
   }
 })
+
+test_that("calculate_CH4_manure respects explicit data_dir parameter", {
+  custom_dir <- test_path("test_data", "user_data")
+  res <- suppressWarnings(calculate_CH4_manure(data_dir = custom_dir, saveoutput = FALSE))
+  expect_s3_class(res, "data.frame")
+  expect_true("total_CH4_mm_kgyear" %in% names(res))
+  if (nrow(res) > 0) {
+    expect_true(all(res$total_CH4_mm_kgyear >= 0, na.rm = TRUE))
+  }
+})

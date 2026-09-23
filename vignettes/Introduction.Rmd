@@ -9,66 +9,204 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
-**herdr** is an R package designed to calculate **greenhouse gas (GHG) emissions** and **land use (LU)** associated with livestock production. It offers a robust framework for environmental impact assessment based on animal physiology and diet composition.
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
 
-### Currently supported animals:
-* 🐂 **Cattle**
-* 🐐 **Goat**
+# Introduction
+
+`herdr` is an R package for estimating **greenhouse gas (GHG) emissions** and **feed-related land use** from livestock production systems.
+
+The package implements the **IPCC Tier 2 methodology** described in the *2019 Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories* and provides a complete workflow from livestock census data to environmental impact indicators.
+
+Unlike many emission calculators, `herdr` integrates animal physiology, diet composition, manure management, and feed production into a single modelling framework. The package can therefore estimate both greenhouse gas emissions and the agricultural land required to sustain livestock diets in a single, internally consistent workflow — rather than requiring separate tools for emissions and land-use accounting.
+
+Although designed primarily for research applications, `herdr` can also support teaching, scenario analysis, inventory development, and decision-support studies.
+
+# Quick start
+
+Load the package, initialize the user data directory, and launch the interactive interface:
+
+```r
+library(herdr)
+
+herdr_init()
+run_herdr_app()
+```
+
+`herdr_init()` sets up a local working directory with the input templates and reference databases the package needs. `run_herdr_app()` launches the graphical interface described in [Interactive user interface](#interactive-user-interface); every calculation is also available directly from R for users who prefer a scripted workflow.
+
+# Supported livestock species
+
+`herdr` currently supports the following livestock production systems:
+
+* 🐄 **Cattle**
 * 🐑 **Sheep**
-* 🐖 **Pigs**
+* 🐐 **Goats**
+* 🐖 **Swine**
 * 🐔 **Poultry**
 
----
+Additional species may be incorporated in future releases.
 
-## 📊 What the Package Calculates
+# Overall workflow
 
-The package models the primary sources of environmental impact from livestock based on a detailed **Energy Balance** model. It accounts for energy requirements for maintenance, growth, lactation, pregnancy, work, and wool production.
+The package follows a modular workflow in which calculations are performed sequentially:
 
-### Methane ($CH_4$) Emissions
-* **Enteric fermentation:** Emissions produced during the digestive process based on Gross Energy intake and diet digestibility ($Y_m$).
-* **Manure management:** Emissions derived from Volatile Solids ($VS$) decay, adjusting for specific management systems (e.g., liquid lagoons, solid storage, pasture, composting).
+```text
+Livestock census
+       │
+       ▼
+Animal definitions
+       │
+       ▼
+Diet composition
+       │
+       ▼
+Energy requirements
+       │
+       ▼
+Nutrient balance
+       │
+       ▼
+Greenhouse gas emissions
+       │
+       ▼
+Feed-related land use
+       │
+       ▼
+Integrated assessment
+```
 
-### Nitrous Oxide ($N_2O$) Emissions
-* **Direct:** Emissions from manure storage and treatment systems.
-* **Indirect:** Emissions via nitrogen volatilization ($NH_3$, $NO_x$) and leaching into water systems.
+Each stage can be executed independently using individual functions, or combined into a complete assessment using `generate_impact_assessment()`.
 
-### Land Use
-* Calculates the **land area ($m^2$)** required to produce the feed based on economic allocation, linking animal intake directly to crop yields using FAOSTAT and BC3 databases.
+This modular structure allows users to inspect intermediate calculations, validate assumptions, perform sensitivity analyses, or integrate `herdr` into larger modelling workflows. See the [General Workflow](Workflow.html) vignette for a step-by-step walkthrough of each stage.
 
-### Multi-Scenario Analysis
-`herdr` allows you to model different farms, regions, or management strategies within the same project. You can compare results across different geographic scales or management intensities in a single run.
+# Environmental indicators
 
----
+`herdr` estimates the principal greenhouse gas emission sources associated with livestock production together with the land required to produce animal feed.
 
-## 🎯 Calculation Methodology 
+## Methane (CH₄)
 
-All emission calculations within `herdr` adhere to the **Tier 2** methods established by the Intergovernmental Panel on Climate Change (IPCC). 
+Methane emissions are estimated from:
 
-Specifically, we follow the **2019 Refinement** to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories:
-> *"Volume 4: Agriculture, Forestry and Other Land Use, Chapter 10: EMISSIONS FROM LIVESTOCK AND MANURE MANAGEMENT"*
+* Enteric fermentation.
+* Manure management.
 
-For **swine** and **poultry**, metabolizable energy requirements are calculated using the equations published by **FEDNA** and adopted by the **Spanish Ministry of Agriculture, Fisheries and Food (MAPA)** for national nitrogen balance and emission inventories.
+Enteric methane is calculated from gross energy intake and methane conversion factors (*Ym*), whereas manure methane is estimated from volatile solids production and manure management systems.
 
-These equations are available in the MAPA documentation:
-https://www.mapa.gob.es/es/ganaderia/temas/ganaderia-y-medio-ambiente/balance-de-nitrogeno-e-inventario-de-emisiones-de-gases
----
+## Nitrous oxide (N₂O)
 
-## 🥕 The Role of Diet & Validation
+Nitrous oxide calculations include:
 
-* **Diet-Driven:** Diet composition is the primary driver of the results, determining key parameters like the Methane Conversion Factor ($Y_m$) and Nitrogen Excretion ($N_{ex}$).
-* **Automatic Validation:** Before calculating, `herdr` automatically checks the consistency of input data, ensuring that biologically implausible values (e.g., impossible intake relative to weight) are flagged.
+* Direct emissions from manure management systems.
+* Indirect emissions from nitrogen volatilization.
+* Indirect emissions from nitrogen leaching and runoff.
 
----
+For a full breakdown of supported manure systems and how they map to IPCC categories, see the [Manure Management Guide](Manure.html) vignette.
 
-## 🚀 Getting Started
+## Feed-related land use
 
-To begin using **herdr**, you need to install the package and initialize your workspace. We have prepared a comprehensive, step-by-step guide to help you set up your project, manage your data, and run your first assessment.
+Land-use calculations link feed consumption with crop and forage productivity.
 
-**In the Workflow guide, you will find:**
+The model combines:
 
-* 📥 **Installation**: How to install the package and avoid common Windows errors.
-* 🛠️ **Initialization**: How to set up the folder structure with `herdr_init()`.
-* 📂 **Data Management**: A detailed walkthrough of the input CSV files (Census, Nutrition, Manure).
-* 📊 **Execution**: How to run the final `generate_impact_assessment()`.
+* Feed intake.
+* Forage yield databases.
+* FAOSTAT crop production & yields.
+* FAOSTAT trade information.
+* Economic allocation factors.
 
-👉 **[Go to the General Workflow Guide](Workflow.html)**
+These data are used to estimate the land area required to produce each feed ingredient consumed by the animals. Details on the allocation methodology are covered in the [Land Use Methodology](land_use.html) vignette.
+
+## Livestock Production & Edible Protein
+
+In addition to environmental burdens, `herdr` implements the FAO/GLEAM methodology (`calculate_production()`) to quantify the nutritional outputs generated by the livestock herd:
+
+* **Milk production:** Annual liquid milk output and Fat-Protein Corrected Milk (FPCM).
+* **Meat production:** Annual animal slaughter throughput, live slaughter weight, cold dressed carcass weight, and boneless edible meat.
+* **Egg production:** Total annual eggs and edible egg mass for laying flocks.
+* **Edible human protein:** Total edible protein output (kg protein/year) across all dairy, meat, and egg commodities, providing the essential denominator for carbon intensity and nutritional footprint metrics (e.g., kg CO2eq / kg protein).
+
+# Physiological and calculation methodology
+
+Emission estimates rely on a set of intermediate physiological and nutritional calculations.
+
+Depending on the livestock species, `herdr` estimates:
+
+* Gross Energy intake (GE).
+* Digestible Energy (DE).
+* Metabolizable Energy (ME).
+* Net Energy requirements.
+* Dry Matter Intake (DMI).
+* Nitrogen intake.
+* Nitrogen retention.
+* Nitrogen excretion.
+* Volatile Solids (VS).
+
+These variables form the basis of the emission equations implemented throughout the package.
+
+## Ruminants
+
+For cattle, sheep, and goats, energy requirements and associated physiological calculations follow the equations described in the IPCC 2019 Refinement.
+
+The model considers the relevant Net Energy requirements, including maintenance, growth, lactation, pregnancy, wool production, and work where applicable.
+
+These calculations are subsequently used to estimate dry matter intake, nitrogen balances, volatile solids production, and greenhouse gas emissions.
+
+## Monogastrics
+
+For swine and poultry, energy and nutrient requirements are calculated using methodologies based on **FEDNA** and adopted by the **Spanish Ministry of Agriculture, Fisheries and Food (MAPA)**.
+
+The approach uses metabolizable and digestible energy systems together with nutrient retention and nitrogen balance calculations.
+
+These physiological calculations are then combined with the relevant emission equations to estimate methane and nitrous oxide emissions.
+
+Input parameters, units, and default values for both ruminant and monogastric species are documented in the [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) vignette.
+
+# Data validation
+
+Before calculations begin, `herdr` performs consistency checks across the input datasets.
+
+These checks include verification of:
+
+* Animal definitions.
+* Diet assignments.
+* Body weight information.
+* Manure management systems.
+* Duplicated or missing combinations.
+* Diet composition and input consistency.
+* Biologically implausible values.
+
+The objective is to identify common input errors before environmental indicators are calculated.
+
+# Interactive user interface
+
+Although every calculation can be performed directly from R, `herdr` also includes an interactive graphical interface.
+
+The application allows users to:
+
+* Edit input tables.
+* Validate datasets.
+* Navigate through a guided workflow.
+* Run complete assessments.
+* Export results.
+
+The graphical interface uses the same calculation engine as the R functions, ensuring consistent results regardless of how the model is executed.
+
+# Next steps
+
+The remaining vignettes provide detailed guidance on specific components of the package:
+
+* [Herd Demography & Population Dynamics](Herd_Demography.html) — Population dynamics, biological cycles, and herd structure across species.
+* [General Workflow](Workflow.html) — complete project setup and execution with R.
+* [App Workflow](app.html) — complete project setup and execution with web interface.
+* [Technical Reference](Technical_reference.html) — CSV templates and reference database documentation.
+* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — complete mathematical formulation and equations.
+* [Manure Management Guide](Manure.html) — supported manure systems and classifications.
+* [Land Use Methodology](land_use.html) — feed allocation, agroecological classification, and dynamic trade flows.
+* [Adding a New Ingredient](Adding_Ingredient.html) — step-by-step tutorial for expanding nutritional and LCA databases.
+* [Case Studies: Dairy Cattle](Easy_Example.html) — worked baseline examples (Basic, Regional Moderate, and Life Stages).
+

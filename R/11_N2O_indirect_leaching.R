@@ -2,19 +2,20 @@
 #'
 #' Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq 10.27 and 10.29).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating indirect N2O emissions (leaching)...")
 
   # --- 1. Data Loading ---
-  user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
 
-  # Añadidos los suppressMessages()
-  direct_N2O_df <- suppressMessages(calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  pop_df        <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
+  # Suppress verbose messages from internal calculation routines
+  direct_N2O_df <- suppressMessages(calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  pop_df        <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
 
   # --- 2. Validations (Asserts) ---
 

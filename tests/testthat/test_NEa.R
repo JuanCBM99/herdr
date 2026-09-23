@@ -12,8 +12,8 @@ test_that("calculate_NEa computes activity energy correctly with test data", {
   read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/livestock_weights.csv")
 
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_definitions.csv")
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/ruminant_definitions.csv")
 
   read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/ipcc_coefficients.csv")

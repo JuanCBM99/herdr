@@ -16,18 +16,27 @@ navbar:
     - text: "Introduction"
       icon: fas fa-book-open
       href: articles/Introduction.html
-    - text: "Workflow: Step-by-Step"
+    - text: "Workflows"
       icon: fas fa-route
-      href: articles/Workflow.html
+      menu:
+        - text: "R Workflow"
+          href: articles/Workflow.html
+        - text: "App Workflow"
+          href: articles/app.html
     - text: "Guides"
       icon: fas fa-map-signs
       menu:
+        - text: "Herd Demography"
+          href: articles/Herd_Demography.html
         - text: "Technical File Reference"
           href: articles/Technical_reference.html
         - text: "Manure System Guide"
           href: articles/Manure.html
-        - text: "Land use Guide & Disclaimers"
+        - text: "Land use Guide"
           href: articles/land_use.html
+        - text: "Adding a new ingredient"
+          href: articles/Adding_Ingredient.html
+
     - text: "Cases"
       icon: fa-tools
       menu:

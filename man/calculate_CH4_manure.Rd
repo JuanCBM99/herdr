@@ -4,12 +4,18 @@
 \alias{calculate_CH4_manure}
 \title{Calculate CH4 Emissions from Manure Management}
 \usage{
-calculate_CH4_manure(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_CH4_manure(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Computes CH4 emissions from manure based on Volatile Solids (VS),

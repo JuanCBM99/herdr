@@ -10,7 +10,7 @@ test_that("calculate_vs computes volatile solids using CSV data", {
 
   # 2. Normalize input CSVs to ensure consistent types for joins
   files_to_fix <- c(
-    "livestock_weights.csv", "livestock_definitions.csv",
+    "livestock_weights.csv", "ruminant_definitions.csv",
     "ipcc_coefficients.csv", "diet_profiles.csv",
     "diet_ingredients.csv", "feed_characteristics.csv"
   )

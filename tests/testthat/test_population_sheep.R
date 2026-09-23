@@ -21,7 +21,7 @@ test_that("calculate_population_sheep returns correct structure and math from CS
   mock_rates <- rates_raw %>%
     filter(grepl("sheep", animal_tag)) %>%
     mutate(value = case_when(
-      animal_tag == "mature_sheep_female_meat" & parameter == "lambing_rate"     ~ 1.5,
+      animal_tag == "mature_sheep_female_meat" & parameter == "pr_sheep_goat"     ~ 1.5,
       animal_tag == "mature_sheep_female_meat" & parameter == "replacement_rate" ~ 0.2,
       TRUE ~ 0
     ))
@@ -56,3 +56,35 @@ test_that("calculate_population_sheep filters out zero populations using CSV str
   expect_true(all(res$population > 0))
   expect_false("lamb_dairy_slaughter" %in% res$animal_tag)
 })
+
+test_that("calculate_population_sheep handles accelerated lambing cycles and slaughter AAP scaling", {
+  mock_census <- tibble::tribble(
+    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
+    "mature_sheep_female_meat", "spain", "aragon", NA_character_, 1000
+  )
+
+  mock_rates <- tibble::tribble(
+    ~animal_tag, ~parameter, ~value,
+    "mature_sheep_female_meat", "pr_sheep_goat", 1.5,
+    "mature_sheep_female_meat", "replacement_rate", 0.2
+  )
+
+  mock_weights <- tibble::tribble(
+    ~animal_tag, ~productive_period_days,
+    "mature_sheep_female_meat", 200,
+    "lamb_meat_slaughter", 70
+  )
+
+  res <- calculate_population_sheep(mock_census, mock_rates, definitions = NULL, weights = mock_weights)
+
+  # Births: 1000 * (365 / 200) * 1.5 = 2737.5
+  # Replacements: 1000 * 0.2 = 200
+  # Annual slaughter: 2737.5 - 200 = 2537.5
+  # AAP slaughter: 2537.5 * (70 / 365) = 486.6438
+  meat_slaughter <- res %>%
+    filter(animal_tag == "lamb_meat_slaughter") %>%
+    pull(population)
+
+  expect_equal(round(meat_slaughter, 2), 486.64)
+})
+

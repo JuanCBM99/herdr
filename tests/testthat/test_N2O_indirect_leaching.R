@@ -11,7 +11,7 @@ test_that("calculate_N2O_indirect_leaching integrates correctly using CSV data",
   # 2. Normalize input CSVs
   # Essential for joining manure systems, leaching fractions (frac_leach) and EF5
   files_to_fix <- c(
-    "livestock_definitions.csv", "livestock_weights.csv",
+    "ruminant_definitions.csv", "livestock_weights.csv",
     "livestock_census.csv", "manure_management.csv",
     "ipcc_mm.csv", "diet_profiles.csv",
     "diet_ingredients.csv", "feed_characteristics.csv",

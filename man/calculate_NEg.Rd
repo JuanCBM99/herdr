@@ -4,10 +4,12 @@
 \alias{calculate_NEg}
 \title{Calculate Net Energy for Growth (NEg)}
 \usage{
-calculate_NEg(saveoutput = TRUE)
+calculate_NEg(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Calculate Net Energy for Growth (NEg)

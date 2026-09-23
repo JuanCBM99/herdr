@@ -70,4 +70,19 @@ test_that("generate_impact_assessment creates a consistent final report safely",
 
     expect_equal(sample_row$CO2eq_Total_Gg, calculated_co2, tolerance = 0.01)
   }
+
+  # 6. FILTERING AND AGGREGATION OPTIONS
+  filtered_res <- suppressWarnings(
+    generate_impact_assessment(
+      farm_country = "Spain",
+      year = 2022,
+      animal = "cattle",
+      group_by_identification = FALSE,
+      saveoutput = TRUE
+    )
+  )
+  expect_s3_class(filtered_res, "data.frame")
+  expect_true(all(filtered_res$animal_type == "cattle"))
+  expect_true(file.exists("output/impact_assessment_summary.csv"))
 })
+

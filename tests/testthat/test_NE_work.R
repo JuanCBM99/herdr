@@ -12,8 +12,8 @@ test_that("calculate_NE_work computes work energy correctly", {
   read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/livestock_weights.csv")
 
-  read_csv("user_data/livestock_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_definitions.csv")
+  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    write_csv("user_data/ruminant_definitions.csv")
 
   read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
     write_csv("user_data/ipcc_coefficients.csv")
@@ -34,9 +34,9 @@ test_that("calculate_NE_work handles missing work hours with zero", {
   withr::local_dir(test_path("test_data"))
 
   # Inject NA in work_hours for testing
-  defs <- read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE) %>%
+  defs <- read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE) %>%
     mutate(work_hours = NA)
-  write_csv(defs, "user_data/livestock_definitions.csv")
+  write_csv(defs, "user_data/ruminant_definitions.csv")
 
   results <- calculate_NE_work(saveoutput = FALSE)
 

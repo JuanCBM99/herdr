@@ -17,24 +17,28 @@ herdr_init <- function() {
     }
   }
 
-  path_user_data <- system.file("user_data", package = "herdr")
-  if (path_user_data != "") {
-    files_ud <- list.files(path_user_data, full.names = TRUE)
+
+  path_default_example <- system.file("Examples/Level1_Spain_Dairy_Cattle_2015", package = "herdr")
+  if (path_default_example != "") {
+    files_ud <- list.files(path_default_example, full.names = TRUE)
 
     file.copy(files_ud, "user_data", overwrite = FALSE)
-    message("\u1f4d1 Copied default configuration files to 'user_data/'.")
+    message("\U0001f4d1 Copied default template (Level1_Spain_Dairy_Cattle_2015) to 'user_data/'.")
+  } else {
+    message("\u26a0\ufe0f Note: Default example 'Level1_Spain_Dairy_Cattle_2015' not found in the package.")
   }
+
 
   path_examples <- system.file("Examples", package = "herdr")
   if (path_examples != "") {
     items_to_copy <- list.files(path_examples, full.names = TRUE)
 
     file.copy(items_to_copy, "Examples", recursive = TRUE, overwrite = FALSE)
-    message("\u1f4ca Copied reference examples (including subfolders) to 'Examples/'.")
+    message("\U0001f4ca Copied reference examples (including subfolders) to 'Examples/'.")
   } else {
     message("\u2139\ufe0f Note: No 'Examples' folder found in the package.")
   }
 
   message("\n\u2728 Project initialized successfully!")
-  message("\u1f4a1 Check your working directory: ", getwd())
+  message("\U0001f4a1 Check your working directory: ", getwd())
 }

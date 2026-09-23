@@ -4,12 +4,14 @@
 \alias{calculate_vs}
 \title{Calculate Volatile Solids (VS) for Animals}
 \usage{
-calculate_vs(urinary_energy = 0.04, saveoutput = TRUE)
+calculate_vs(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{urinary_energy}{Numeric. Fraction of energy lost in urine. Default 0.04.}
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \value{
 Tibble with VS for all animal categories.

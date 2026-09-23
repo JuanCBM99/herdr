@@ -1,0 +1,156 @@
+---
+title: "Herd Demography & Population Dynamics"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 3
+vignette: >
+  %\VignetteIndexEntry{Herd Demography & Population Dynamics}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# 1. Choosing Your Mode: Manual Census vs. Automatic Cycle
+
+When running `calculate_population()`, your first decision is whether to provide your own inventory numbers or let `herdr` model the farm's herd structure automatically:
+
+```r
+# Option A: Manual Census (Default)
+calculate_population(automatic_cycle = FALSE)
+
+# Option B: Automatic Biological Cycle
+calculate_population(automatic_cycle = TRUE)
+```
+
+### When to use `automatic_cycle = FALSE` (Manual Census)
+* **Real-world farm records:** Choose this when you have actual farm records, historical census data, or you already know the Annual Average Population (AAP) / standing barn places of every cohort.
+* **Direct control:** You fill in `livestock_census.csv` with each group present on the farm (e.g., 100 dairy cows, 27 replacement heifers, 35 feedlot calves). `herdr` uses your figures directly as declared.
+
+### When to use `automatic_cycle = TRUE` (Automatic Demographic Cycle)
+* **Future scenario modeling & prospective studies:** Choose this when planning farm expansions, simulating genetic or management improvements, or conducting prospective environmental impact assessments.
+* **Breeding-only inventory:** You only need to declare your adult breeding animals in `livestock_census.csv` (e.g., mature cows, breeding sows, ewes, or hens).
+* **Automated biological pyramid:** `herdr` automatically models the complete demographic flow: annual births, young animals retained to replace culled adults, and the average standing population in the fattening barn.
+
+---
+
+# 2. The Core Demographic Concept
+
+Regardless of the species, livestock farm demography in `herdr` divides animals into two conceptual populations:
+
+1. **The Breeding Base (Permanent Adults):** Animals that live year-round on the farm generating offspring. Because they age, lose productivity, or are culled, a proportion must be replaced periodically to keep the herd size stable.
+2. **The Offspring & Meat Flow (Temporal Cohorts):** All young animals born on the farm. A fraction is retained as replacements to sustain the breeding base, while all remaining surplus animals flow into the fattening barn or slaughterhouse.
+
+### The Universal 5-Step Biological Flow
+Every species in automatic mode follows the exact same chain:
+```
+[Adult Breeding Stock] 
+         │
+         ▼
+  (Births / Eggs Laid)
+         │
+         ├───> [Replacements Retained] (to sustain adult breeding stock)
+         │
+         └───> [Surplus Animals] ──> Fattening / Slaughter Pool ──> [Standing Barn Places (IPCC AAP)]
+```
+
+1. **Start with Mature Breeding Animals:** You declare only the adult breeding parents in `livestock_census.csv`.
+2. **Calculate Offspring Born or Eggs Laid:** Driven by biological reproduction: parturition intervals, prolificacy, litter size, or daily egg output and fertility.
+3. **Deduct Replacements:** The young animals required to replace culled or aged breeding stock are retained on the farm (`replacement_rate`).
+4. **Direct the Surplus to Meat Production:** All offspring not retained for replacement move into the fattening barn / slaughter pool.
+5. **Convert Annual Slaughter Animals into Standing Barn Places (IPCC Formula):** Meat animals do not stay on the farm for 365 days; they only occupy a barn place for their feeding duration (`productive_period_days`). Using the IPCC Average Annual Population (AAP) formula, `herdr` translates the total annual finished animals into the average number of occupied barn places on any given day:  
+   `Standing Places (AAP) = Annual Slaughter Animals * (Days on Feed / 365)`
+
+---
+
+# 3. Conceptual Differences Across Species
+
+The differences between species in `herdr` are not arbitrary tool formulas, but direct reflections of **four fundamental zootechnical and management concepts**:
+
+---
+
+### Concept A: Single Births vs. Multiple Litters vs. Continuous Egg Laying
+
+* **Cattle (Single-birth monotocous):**  
+  Cows have a long 9-month gestation and conceive a single calf. Therefore, the biological rhythm is strictly annual (at most 1 calving per cow per year). The main driver of births is the success of breeding: the pregnancy rate (`pregnancy_rate`), which is split equally (50:50) into male and female calves.
+* **Sheep and Goats (Multiple-birth seasonal polytocous):**  
+  Small ruminants have a shorter 5-month gestation. Farm managers can leverage two biological levers:
+  1. *Prolificacy (`pr_sheep_goat`):* Multiple births per parturition (singles, twins, triplets).
+  2. *Parturition frequency:* In traditional seasonal systems, ewes lamb once per calendar year (365-day cycle). In intensified systems with accelerated breeding schedules, the lambing interval is shortened (e.g., 200 days, yielding 1.825 lambings per ewe per year).
+* **Swine (Continuous litter-bearing):**  
+  Sows have high fecundity and are non-seasonal. The key driver is the **farrowing interval** (gestation + lactation + weaning-to-service interval, averaging 148.9 days, or 2.45 litters per sow per year) combined with a large weaned litter size (`piglets_suckling`).
+* **Poultry (Continuous egg laying):**  
+  Birds do not experience mammalian pregnancies or parturitions; they lay eggs continuously throughout a batch laying curve. In broiler breeder flocks, fertile hatching eggs (daily egg output multiplied by fertility rate) hatch into day-old chicks that move directly into broiler houses.
+
+---
+
+### Concept B: Replacement Logic — Who Gets Replaced and How?
+
+* **Ruminants (Cattle, Sheep, Goats):**  
+  Adult breeding males (bulls, rams, bucks) live on the farm alongside breeding females. Consequently, **the farm retains both female and male replacement offspring** to ensure the generational renewal of both sexes (`replacement_rate`).
+* **Swine:**  
+  Internal herd replacement focuses exclusively on the **future breeding mothers** (replacement gilts and sows). Breeding boars are not raised from the fattening herd; modern swine units source specialized boars from external genetic multipliers or rely on artificial insemination.
+* **Poultry:**  
+  Commercial poultry flocks do not replace individual birds as they age. Flocks are managed in complete batches (**all-in / all-out**): the entire flock enters at the same age, lays throughout the batch cycle, and is depopulated all at once for slaughter.  
+  *By default, replacement pullet requirements are derived from batch turnover ($365 / \text{productive\_period\_days}$)*. However, `herdr` also supports defining custom replacement rates for `laying_hens` and `breeder_meat_hens` in `reproduction_parameters.csv` for flexible multi-cycle or molting scenarios.
+
+---
+
+### Concept C: Rearing Duration (One Year vs. Two Years)
+
+* **Cattle:**  
+  A replacement heifer takes over two years to reach adult breeding weight and deliver her first calf. Because of this extended growth period, the demographic model establishes **two consecutive age tiers**:
+  1. Replacement calves (< 1 year of age): `dairy_calves_female_replacement`, `beef_calves_*_replacement`.
+  2. Replacement yearlings (1 to 2 years of age): `dairy_yearlings_female_replacement`, `beef_yearlings_*_replacement` (mapped 1:1 from replacement calves).
+* **Sheep, Goats, Swine, and Poultry:**  
+  Young females reach reproductive maturity within their first year of life. They transition directly from growing replacements into productive adults without intermediate yearling tiers.
+
+---
+
+### Concept D: The Dual Role of `productive_period_days` (Inter-Parturition Intervals vs. Life Cycles & AAP)
+
+The parameter `productive_period_days` in `livestock_weights.csv` serves two distinct biological purposes depending on the animal cohort:
+
+1. **For Adult Breeding Females (except laying hens): Inter-Parturition Interval**  
+   For cows, ewes, does, and sows, `productive_period_days` represents the **period between consecutive births** (calving, lambing, kidding, or farrowing interval):
+   * **Cattle:** Typically `365` days (or `365`–`400` days) for a single annual calving.
+   * **Sheep and Goats:** `365` days in annual seasonal systems, or shortened (e.g., `200` to `240` days) in accelerated intensive breeding schedules.
+   * **Swine:** Averages `149` days (115 d gestation + 21–28 d lactation + return to estrus), yielding $365 / 149 \approx 2.45$ farrowings per sow per year.  
+   The annual reproduction frequency is calculated as $365 / \text{productive\_period\_days}$.
+
+2. **For Laying Hens & Poultry Breeders: Flock Laying Cycle**  
+   Birds follow an all-in / all-out batch dynamic. `productive_period_days` represents the **commercial laying cycle duration** in the barn until depopulation (e.g., `511` days for commercial layers, `301` days for meat breeders). In the absence of an explicit replacement rate, flock turnover is $365 / \text{productive\_period\_days}$.
+
+3. **For All Other Cohorts (Growing, Fattening, and Replacement Stock): Life Cycle / Days on Feed**  
+   For meat animals and rearing stock, `productive_period_days` represents their **entire life-stage duration** (days on feed from birth/weaning to slaughter or replacement transition; e.g., `42` days for broilers, `110` days for fattening pigs, `70` days for feedlot lambs).  
+   * Meat animals do not stay in the barn for 365 days. The package applies the **IPCC Average Annual Population (AAP)** principle:  
+     $$\text{Standing Places (AAP)} = \text{Annual Slaughter Animals} \times \left(\frac{\text{productive\_period\_days}}{365}\right)$$  
+   * It also determines the Average Daily Gain (ADG) used for energy and nitrogen retention calculations:  
+     $$\text{ADG} = \frac{BW_{final} - BW_{initial}}{\text{productive\_period\_days}}$$
+
+---
+
+# 4. Summary of Associated Parameter Columns
+
+| Species | Base Adult Tag in `livestock_census.csv` | Productivity Column & Source File | Replacement Column & Source File | Cycle Duration Column (`productive_period_days` in `livestock_weights.csv`) |
+| :--- | :--- | :--- | :--- | :--- |
+| **Cattle** | `mature_dairy_cattle`, `mature_beef_cattle`, `mature_beef_bull` | `pregnancy_rate` (`ruminant_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — both sexes) | Calving interval (e.g. 365 d) for cows; feeding duration for feedlot calves |
+| **Sheep** | `mature_sheep_female_*`, `mature_sheep_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — both sexes) | Lambing interval (e.g. 200–365 d) for ewes; feeding duration for lambs |
+| **Goats** | `mature_goat_female_*`, `mature_goat_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — both sexes) | Kidding interval (e.g. 200–365 d) for does; feeding duration for kids |
+| **Swine** | `breeder_sows`, `boars` | `piglets_suckling` (`monogastric_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv` — sows only) | Farrowing interval (e.g. 149 d) for sows; feeding duration (110 d) for pigs |
+| **Poultry** | `laying_hens`, `breeder_meat_hens` | `fertility_rate`, `eggs_per_year` (`monogastric_definitions.csv`) | `replacement_rate` (`reproduction_parameters.csv`) | Laying flock cycle (e.g. 511 d) for hens; life cycle (e.g. 42 d) for broilers |
+
+---
+
+# 5. Next Steps
+
+* [Technical File Reference](Technical_reference.html) — detailed column-by-column descriptions of all CSV templates.
+* [R Workflow](Workflow.html) — full execution walkthrough in R.
+* [App Workflow](app.html) — interactive guide for the Shiny application.
+* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — mathematical formulas for enteric methane, manure, and nitrogen.

@@ -3,24 +3,32 @@
 #' Computes direct N2O emissions based on nitrogen excretion logic,
 #' emission factors, management system, and climate (IPCC Eq 10.25).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @export
-calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  cat_csv      <- readr::read_csv("user_data/livestock_definitions.csv", show_col_types = FALSE)
-  weights_csv  <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  user_manure  <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  mono_csv     <- readr::read_csv("user_data/monogastric_definitions.csv", show_col_types = FALSE)
+  cat_csv      <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  weights_csv  <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  user_manure  <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  mono_csv     <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
-  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE))
-  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
-  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE))
-  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE))
-  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE))
+  # Calculate daily egg mass internally for IPCC N retention: (eggs_per_year / 365) * egg_weight_g
+  egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
+  egg_wt <- dplyr::coalesce(egg_wt, 60)
+  eggs_yr <- if ("eggs_per_year" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$eggs_per_year)) else 0
+  eggs_yr <- dplyr::coalesce(eggs_yr, 0)
+  mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
+
+  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
+  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
 
   # --- 2. Validations (Asserts) ---
 
@@ -180,6 +188,13 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         0
       ),
 
+      # Daily Nitrogen Feed Intake (kg N / animal / day)
+      N_intake_kgheadday = dplyr::if_else(
+        animal_type %in% c("poultry", "swine"),
+        DMI_kgday * (CP_pct / 100 / 6.25),
+        (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
+      ),
+
       # --- Unified Daily Nitrogen Retention Switch (kg N / animal / day) ---
       N_retention_kg_day = dplyr::case_when(
 
@@ -191,8 +206,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         animal_type == "poultry" & productive_period_days > 0 ~
           ((final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
 
-        # Small Ruminants baseline retention rate (IPCC constant fraction fallback)
-        animal_type %in% c("sheep", "goat") ~ 0.1,
+        # Small Ruminants baseline retention rate (IPCC 2019 Table 10.20 Option 1: 10% of N intake)
+        animal_type %in% c("sheep", "goat") ~ 0.10 * N_intake_kgheadday,
 
         # IPCC 2019 SWINE Scenario 1: Active Reproductora Mothers (Switch activated by gestation/lactation days)
         animal_type == "swine" & (sows_gestation_days > 0 | sows_lactation_days > 0) ~
@@ -218,19 +233,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         TRUE ~ 0
       ),
 
-      # Daily Nitrogen Feed Intake (kg N / animal / day)
-      N_intake_kgheadday = dplyr::if_else(
-        animal_type %in% c("poultry", "swine"),
-        DMI_kgday * (CP_pct / 100 / 6.25),
-        (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
-      ),
-
-      # Annual Nitrogen Excretion (kg N / animal / year)
-      N_excreted_kgheadyear = dplyr::if_else(
-        animal_type %in% c("sheep", "goat"),
-        (N_intake_kgheadday * (1 - N_retention_kg_day)) * 365,
-        (N_intake_kgheadday - N_retention_kg_day) * 365
-      ),
+      # Annual Nitrogen Excretion (kg N / animal / year) [IPCC Eq 10.31a]
+      N_excreted_kgheadyear = (N_intake_kgheadday - N_retention_kg_day) * 365,
 
       # Direct nitrous oxide emissions per active block system (kg N2O / year)
       direct_N2O_kgyear = population * N_excreted_kgheadyear * allocation * EF3 * (44 / 28)

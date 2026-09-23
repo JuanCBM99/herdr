@@ -81,14 +81,6 @@ The `climate_moisture` column serves as a secondary filter.
    - If `zone_dry` is selected → Use `dry`.
 2. **Standard Systems:** Since these have no `climate_zone`, use `climate_moisture` to define the local state (`wet` or `dry`). If the distinction is unknown or does not apply, use `default`.
 
-### Animal Classification
-Every row must specify the correct species and production type:
-
-| Parameter | Valid Options |
-| :--- | :--- |
-| **animal_type** | `cattle`, `sheep`, `goat` |
-| **animal_subtype** | **Cattle:** `dairy` or `beef` <br> **Sheep/Goat:** `dairy` or `meat` |
-
 ---
 
 ## 🌍 IPCC Climate Zone Definitions

@@ -3,16 +3,17 @@
 #' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED)
 #' for ruminants and metabolizable energy parameters (FEDNA) for poultry.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_DMI <- function(saveoutput = TRUE) {
+calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f37d Calculating Dry Matter Intake (DMI)...")
 
   # --- 1. Load Dependencies and Inputs ---
-  ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE))
-  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE))
-  weights   <- readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE)
-  mono  <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE))
+  ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  weights   <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  mono      <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 

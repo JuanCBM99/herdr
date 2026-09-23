@@ -1,5 +1,9 @@
 # Generated to satisfy R CMD check - herdr global variables
-#' @importFrom utils globalVariables
+#' @importFrom utils globalVariables download.file tail
+#' @importFrom bslib bs_theme
+#' @importFrom rhandsontable rHandsontableOutput
+#' @importFrom shinycssloaders withSpinner
+#' @importFrom zip zip
 NULL
 
 if(getRversion() >= "2.15.1") {
@@ -15,8 +19,8 @@ if(getRversion() >= "2.15.1") {
     "wool_yield_kg_year", "work_hours", "a", "b", "C_val", "A_val", "B_val",
     "cfi", "cfi_value", "ca", "ca_value", "c_pregnancy", "c_value", "pr",
     "C_preg_factor", "REM", "REG", "de_safe", "de_percent", "frac_fat_pct",
-    "frac_protein_pct", "egg_mass_g_day", "cfi_maintenance", "W_mean",
-    "W_metabolic", "alpha",
+    "frac_protein_pct", "egg_mass_g_day", "eggs_per_year", "cfi_maintenance", "W_mean",
+    "W_metabolic", "alpha", "c_pregnancy_cattle", "pr_sheep_goat", "pregnancy_rate",
 
     # --- Nutrition and Intake (DMI) ---
     "GE_MJday", "GE_feed_kcal_kg", "DE_pct", "CP_pct", "NDF_pct", "ASH_pct",
@@ -46,12 +50,24 @@ if(getRversion() >= "2.15.1") {
     "mature_goat_female_dairy", "mature_goat_male_dairy", "mature_goat_female_meat",
     "mature_goat_male_meat", "pop_kid_goat_female_dairy_replacement",
     "pop_kid_goat_male_dairy_replacement", "pop_kid_goat_female_meat_replacement",
-    "pop_kid_goat_male_meat_replacement", "mature_sheep_female_dairy",
+    "pop_kid_goat_male_meat_replacement", "pop_kid_goat_dairy_slaughter",
+    "pop_kid_goat_meat_slaughter", "pop_kid_goat_female_dairy_repl",
+    "pop_kid_goat_male_dairy_repl", "pop_kid_goat_female_meat_repl",
+    "pop_kid_goat_male_meat_repl", "mature_sheep_female_dairy",
     "mature_sheep_male_dairy", "mature_sheep_female_meat", "mature_sheep_male_meat",
     "total_dairy_births", "pop_lamb_female_dairy_replacement",
     "pop_lamb_male_dairy_replacement", "total_meat_births",
     "pop_lamb_female_meat_replacement", "pop_lamb_male_meat_replacement",
     "pop_lamb_dairy_slaughter", "pop_lamb_meat_slaughter",
+    "pop_lamb_female_dairy_repl", "pop_lamb_male_dairy_repl",
+    "pop_lamb_female_meat_repl", "pop_lamb_male_meat_repl",
+    "breeder_sows", "boars", "pop_replacement_sows", "pop_fattening_pigs",
+    "fattening_pigs", "replacement_sows", "annual_piglets", "annual_slaughter",
+    "breeder_meat_hens", "laying_hens",
+    "annual_meat_pullets", "annual_layer_pullets",
+    "annual_dairy_slaughter", "annual_meat_slaughter",
+    "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers",
+    "egg_weight_g", "fertility_rate",
 
     # --- Net Energy Components ---
     "NEm_MJday", "NEa_MJday", "NEg_MJday", "NEl_MJday", "NEwork_MJday",
@@ -74,11 +90,27 @@ if(getRversion() >= "2.15.1") {
     "Area", "Item", "Year", "Value", "yield_name", "agribalyse_name", "avg",
     "dm_yield", "ha_per_kg", "economic_allocation", "share_factor",
     "ha_kg_allocated", "annual_cons_kg", "land_use_m2", "total_land_use_m2",
-    "total",
+    "total", "Element", "Yield", "country_of_origin", "custom_yield_kg_ha",
+    "land_type", "Reporter Countries", "Partner Countries", "Total_Import",
+    "Production", "Total_Export", "Apparent_Consumption", "Self_Sufficiency_Ratio",
+    "Top_Partner", "Calculated_Origin", "Area Code", "DM_pct",
+    "fallback_yield", "used_fallback", "raw_yield", "land_use_per_animal_m2", "alloc_ref",
+    "spain_forage_yield",
+
+    # --- Production and Edible Protein (GLEAM) ---
+    "production_role", "replacement_rate", "has_replacement_rate", "BFM", "MEAT_prot", "DP_pct",
+    "MILK_prot_def", "milk_fresh_kg", "milk_prot_pct", "N_exit",
+    "slaughter_weight_kg", "meat_live_weight_kg", "meat_carcass_weight_kg",
+    "meat_boneless_kg", "egg_fresh_kg", "milk_protein_kg", "meat_protein_kg",
+    "egg_protein_kg", "milk_FPCM_kg", "wool_kg", "total_protein_kg",
 
     # --- Impacts and Summary (CO2eq) ---
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
     "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
-    "CO2eq_Total_Gg", "Land_m2"
+    "CO2eq_Total_Gg", "Land_m2",
+
+    # --- Plotting and Graphics ---
+    "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
+    "Land_Val", "tail", "download.file"
   ))
 }

@@ -1,6 +1,6 @@
 Package: herdr
 Title: herdr
-Version: 1.0.2
+Version: 1.0.3
 Authors@R: c(
     person("Juan Carlos", "Baez", 
            email = "juancarlos.baez@bc3research.org", 
@@ -31,7 +31,6 @@ Depends:
     R (>= 4.1.0)
 License: MIT + file LICENSE
 Encoding: UTF-8
-LazyData: true
 Imports: 
     dplyr,
     tidyr,
@@ -44,16 +43,20 @@ Imports:
     shiny,
     bslib,
     rhandsontable,
-    shinycssloaders
+    shinycssloaders,
+    arrow,
+    ggplot2,
+    scales,
+    zip,
+    rlang
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),
     pkgdown,
     withr,
-    knitr,
-    arrow
+    knitr
 VignetteBuilder: 
      knitr
 Config/testthat/edition: 3
 Config/roxygen2/version: 8.0.0
-RoxygenNote: 7.3.3
+RoxygenNote: 8.0.0

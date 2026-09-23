@@ -1,0 +1,211 @@
+#' Calculate Total Livestock Production
+#'
+#' Computes total production of milk, meat, eggs, and fibre in physical units
+#' (fresh milk, FPCM, live weight, carcass weight) and nutritional units
+#' (kg of edible protein and fibre) based on FAO/GLEAM (Equations 9.1 to 9.5)
+#' and IDF standards.
+#'
+#' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
+#' @param saveoutput Logical. If TRUE (default), results are saved to output folder.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
+#' @return Tibble with animal production summary.
+#' @export
+calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
+
+  message("\U0001f9c3 Calculating total livestock production (physical products & protein)...")
+
+  join_keys <- c("region", "subregion", "animal_tag", "class_flex")
+
+  # --- 1. Load Data Assets ---
+
+  # FIX: Select only necessary columns from population to prevent .x and .y suffixes later
+  pop_df   <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+    dplyr::select(dplyr::all_of(join_keys), population) %>%
+    dplyr::distinct()
+
+  weights_file <- file.path(data_dir, "livestock_weights.csv")
+  weights  <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
+
+  repro_file <- file.path(data_dir, "reproduction_parameters.csv")
+  repro    <- if (file.exists(repro_file)) readr::read_csv(repro_file, show_col_types = FALSE) else tibble::tibble(animal_tag = character(), parameter = character(), value = numeric())
+
+  ruminants_file <- file.path(data_dir, "ruminant_definitions.csv")
+  ruminants <- if (file.exists(ruminants_file)) readr::read_csv(ruminants_file, show_col_types = FALSE) else tibble::tibble()
+
+  monogastrics_file <- file.path(data_dir, "monogastric_definitions.csv")
+  monogastrics <- if (file.exists(monogastrics_file)) readr::read_csv(monogastrics_file, show_col_types = FALSE) else tibble::tibble()
+
+  # Consolidate Definitions
+  if (nrow(ruminants) > 0) {
+    if (!"production_role" %in% names(ruminants)) {
+      ruminants$production_role <- dplyr::case_when(
+        grepl("mature", ruminants$animal_tag, ignore.case = TRUE) ~ "mature",
+        grepl("replacement", ruminants$animal_tag, ignore.case = TRUE) ~ "replacement",
+        TRUE ~ "slaughter"
+      )
+    }
+
+    ruminants_clean <- ruminants %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year, production_role) %>%
+      dplyr::mutate(
+        dplyr::across(c(milk_yield_kg_year, fat_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+        egg_mass_g_day = 0
+      )
+  } else {
+    ruminants_clean <- tibble::tibble()
+  }
+
+  if (nrow(monogastrics) > 0) {
+    if (!"production_role" %in% names(monogastrics)) {
+      monogastrics$production_role <- dplyr::case_when(
+        grepl("mature|layer|sow", monogastrics$animal_tag, ignore.case = TRUE) ~ "mature",
+        grepl("replacement", monogastrics$animal_tag, ignore.case = TRUE) ~ "replacement",
+        TRUE ~ "slaughter"
+      )
+    }
+
+    # Calculate daily egg mass internally for egg yield: (eggs_per_year / 365) * egg_weight_g
+    egg_wt <- if ("egg_weight_g" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$egg_weight_g)) else 60
+    egg_wt <- dplyr::coalesce(egg_wt, 60)
+    eggs_yr <- if ("eggs_per_year" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$eggs_per_year)) else 0
+    eggs_yr <- dplyr::coalesce(eggs_yr, 0)
+    monogastrics$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
+
+    monogastrics_clean <- monogastrics %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, egg_mass_g_day, production_role) %>%
+      dplyr::mutate(
+        egg_mass_g_day = tidyr::replace_na(suppressWarnings(as.numeric(egg_mass_g_day)), 0),
+        milk_yield_kg_year = 0,
+        fat_content_pct = 0,
+        wool_yield_kg_year = 0
+      )
+  } else {
+    monogastrics_clean <- tibble::tibble()
+  }
+
+  # FIX: Simplified distinct syntax to avoid across() bugs in newer dplyr versions
+  animal_defs <- dplyr::bind_rows(ruminants_clean, monogastrics_clean)
+  if (nrow(animal_defs) > 0) {
+    animal_defs <- animal_defs %>%
+      dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
+  }
+
+  # Replacement rate lookup
+  repro_repl <- if (nrow(repro) > 0 && "parameter" %in% names(repro) && "value" %in% names(repro)) {
+    repro %>%
+      dplyr::filter(tolower(parameter) == "replacement_rate") %>%
+      dplyr::select(animal_tag, replacement_rate = value) %>%
+      dplyr::mutate(
+        replacement_rate = suppressWarnings(as.numeric(replacement_rate)),
+        has_replacement_rate = TRUE
+      ) %>%
+      dplyr::distinct(animal_tag, .keep_all = TRUE)
+  } else {
+    tibble::tibble(animal_tag = character(), replacement_rate = numeric(), has_replacement_rate = logical())
+  }
+
+  # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) ---
+  production_constants <- tibble::tribble(
+    ~animal_type, ~BFM,  ~MEAT_prot, ~DP_pct, ~MILK_prot_def,
+    "cattle",     0.75,  0.2113,     54.0,    0.033,
+    "sheep",      0.70,  0.2013,     47.0,    0.058,
+    "goat",       0.70,  0.1920,     47.0,    0.034,
+    "swine",      0.65,  0.2020,     73.0,    0.000,
+    "poultry",    0.75,  0.1900,     70.0,    0.000
+  )
+
+  egg_prot_fraction <- 0.1240
+
+  # --- 3. Pipeline Calculation ---
+  results <- pop_df
+  if (nrow(animal_defs) > 0) {
+    results <- results %>% dplyr::left_join(animal_defs, by = join_keys)
+  }
+  if (nrow(weights) > 0) {
+    results <- results %>% dplyr::left_join(weights, by = intersect(names(weights), join_keys))
+  }
+  results <- results %>%
+    dplyr::left_join(repro_repl, by = "animal_tag") %>%
+    dplyr::left_join(production_constants, by = "animal_type") %>%
+    dplyr::mutate(
+      has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),
+      dplyr::across(
+        c(population, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year,
+          egg_mass_g_day, replacement_rate, productive_period_days, adult_weight_kg,
+          final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def),
+        ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+
+      # Live weight at slaughter (LW)
+      slaughter_weight_kg = dplyr::case_when(
+        final_weight_kg > 0 ~ final_weight_kg,
+        adult_weight_kg > 0 ~ adult_weight_kg,
+        TRUE ~ 0
+      ),
+
+      # Annual number of animals exiting for slaughter (N_exit)
+      N_exit = dplyr::case_when(
+        # 1. Replacement/rearing stock: do not exit to commercial slaughter
+        production_role == "replacement" ~ 0,
+
+        # 2. Mature breeding stock with replacement rate defined in CSV (cattle, sheep, goats, sows, layers)
+        #    If replacement_rate == 0, yields 0 (breeding stock are not culled)
+        production_role == "mature" & has_replacement_rate ~ population * replacement_rate,
+
+        # 3. Mature animals without replacement rate in CSV (poultry culling by laying cycle: e.g. 511 d)
+        production_role == "mature" & !has_replacement_rate & animal_type == "poultry" & productive_period_days > 0 ~
+          population * (365 / productive_period_days),
+
+        # 4. Commercial slaughter/fattening cohort (broilers, fattening pigs, calves, lambs)
+        production_role == "slaughter" ~
+          population * (365 / dplyr::if_else(productive_period_days > 0, productive_period_days, 365)),
+
+        TRUE ~ 0
+      ),
+
+      # --- A) MILK PRODUCTION ---
+      milk_fresh_kg = population * milk_yield_kg_year,
+      # Real protein percentage per IPCC (or GLEAM default if fat content unavailable)
+      milk_prot_pct = dplyr::if_else(fat_content_pct > 0, (1.9 + 0.4 * fat_content_pct) / 100, MILK_prot_def),
+      milk_protein_kg = milk_fresh_kg * milk_prot_pct,
+      # FPCM (Fat and Protein Corrected Milk - IDF)
+      milk_FPCM_kg = dplyr::if_else(
+        milk_fresh_kg > 0 & fat_content_pct > 0,
+        milk_fresh_kg * (0.1226 * fat_content_pct + 0.0776 * (milk_prot_pct * 100) + 0.2534),
+        milk_fresh_kg
+      ),
+
+      # --- B) MEAT PRODUCTION ---
+      meat_live_weight_kg = N_exit * slaughter_weight_kg,
+      meat_carcass_weight_kg = meat_live_weight_kg * (DP_pct / 100),
+      meat_boneless_kg = meat_carcass_weight_kg * BFM,
+      meat_protein_kg = meat_boneless_kg * MEAT_prot,
+
+      # --- C) EGG PRODUCTION ---
+      egg_fresh_kg = dplyr::if_else(egg_mass_g_day > 0, (egg_mass_g_day * 365 / 1000) * population, 0),
+      egg_protein_kg = egg_fresh_kg * egg_prot_fraction,
+
+      # --- D) FIBRE / WOOL ---
+      wool_kg = population * wool_yield_kg_year,
+
+      # --- E) TOTAL EDIBLE PROTEIN ---
+      total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg
+    ) %>%
+    dplyr::select(
+      dplyr::all_of(join_keys), animal_type, animal_subtype, population, N_exit,
+      # Commercial products
+      milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
+      # Edible protein (GLEAM)
+      milk_protein_kg, meat_protein_kg, egg_protein_kg, total_protein_kg
+    ) %>%
+    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 2)))
+
+  # --- 4. Save output file ---
+  if (isTRUE(saveoutput)) {
+    if (!dir.exists("output")) dir.create("output")
+    readr::write_csv(results, "output/production.csv")
+    message("\U0001f4be Production report saved to output/production.csv")
+  }
+
+  return(results)
+}

@@ -4,10 +4,12 @@
 \alias{calculate_NEa}
 \title{Calculate Net Energy for Activity (NEa)}
 \usage{
-calculate_NEa(saveoutput = TRUE)
+calculate_NEa(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Calculate Net Energy for Activity (NEa)

@@ -4,14 +4,21 @@
 \alias{calculate_emissions_enteric}
 \title{Calculate methane emissions from enteric fermentation}
 \usage{
-calculate_emissions_enteric(automatic_cycle = FALSE, saveoutput = TRUE)
+calculate_emissions_enteric(
+  automatic_cycle = FALSE,
+  saveoutput = TRUE,
+  data_dir = "user_data"
+)
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),
-Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic.
+Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic for ruminants,
+and IPCC Tier 1 with metabolic weight scaling for swine (Table 10.10 & Section 10.2.4).
 }

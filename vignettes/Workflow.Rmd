@@ -1,214 +1,263 @@
 ---
-title: "General Workflow: Step-by-Step Guide"
+title: "General Workflow: Step-by-Step Scripting Guide"
 output: 
   rmarkdown::html_vignette:
     toc: true
+    toc_depth: 3
 vignette: >
-  %\VignetteIndexEntry{General Workflow: Step-by-Step Guide}
+  %\VignetteIndexEntry{General Workflow: Step-by-Step Scripting Guide}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
 
-# herdr Workflow: From Raw Data to Impact Assessment
+# Introduction
 
-The `herdr` package follows a modular logic where information flows from population and nutrition to biological metabolism and, finally, to environmental impact. 
+The **`herdr`** package provides a modular computational framework for estimating greenhouse gas (GHG) emissions, energy requirements, and agricultural land use across livestock production systems.
+
+This guide explains how to build a complete project in R from scratch using reproducible scripts and CSV templates. Whether you are running national inventories, farm-scale assessments, or research scenarios, following this structured workflow ensures full consistency across all calculation tiers.
 
 ---
 
-## 🛠️ Step-by-Step Setup
+# 1. Installation & Environment Setup
 
-Follow these steps in order to prepare your environment and run your first model.
+## Step 1: Install the Package
 
-### 1. Installation
-First, you need to install `herdr` from GitHub. Open your R console and run:
+You can install the development version of `herdr` directly from GitHub using `remotes`:
 
 ```r
-# Install 'remotes' if you haven't already
+# Install remotes if not already installed
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-# Install herdr
-
+# Install herdr from GitHub
 remotes::install_github("JuanCBM99/herdr")
+
+# Load library
+library(herdr)
 ```
 
----
+## Step 2: Create a Dedicated R Project
 
-### 2. Create an R project
-Open RStudio and go to File > New Project... > New Directory > New Project.
-Name your folder (e.g., "my_livestock_study"). 
-Working inside an .Rproj is essential; it ensures herdr knows exactly where to find your data and keeps your workspace organized.
+Working within an isolated R project (`.Rproj`) ensures relative file paths resolve cleanly and keeps your data organized:
 
-
-### 3. Initialize your Workspace
-Once inside your new project, load the library and generate the folder structure:
 ```r
-library(herdr)
+# Create and switch to a new project directory
+usethis::create_project("My_Livestock_Project")
+```
 
-# This creates 'user_data/' and 'Examples/' folders
+## Step 3: Initialize the Project Structure
+
+Run `herdr_init()` to generate the standard folder hierarchy and default templates:
+
+```r
 herdr_init()
 ```
 
-### 4. Fill the CSVs
-Go to the `user_data/` folder in your project directory. Fill the blank templates following the Phases 1-4 detailed below.
-To test the package immediately, copy the files from `Examples/Easy_Cattle/` into `user_data/` and skip to step 6.
+This function creates three primary directories:
 
-#### 📂 Folder Structure & File Roles
+* **`user_data/`**: The active working directory containing editable CSV templates and local reference databases (`fao_crops.parquet`, `forages.parquet`).
+* **`Examples/`**: Pre-configured baseline datasets (e.g., dairy cattle, beef cattle, swine, sheep) ready to use as templates.
+* **`output/`**: Destination directory where results, emission inventories, and land-use summaries are saved.
 
-To keep your project organized, *herdr* separates your project data from internal scientific libraries. To see which specific files you should edit and which ones to leave as references, check the [Technical Reference](Technical_reference.html).
+---
 
-### 5. Choose Your Population Mode
-Decide how the model should handle your animal numbers:
+# 2. Project Architecture & Demographic Keys
 
-* `automatic_cycle = TRUE`: The model projects offspring and replacements automatically based on your mature animals (Phase 1, Option B).
+All data tables in `herdr` are connected using **four standardized cohort keys**:
 
-* `automatic_cycle = FALSE`: The model uses the exact numbers you enter manually in livestock_census.csv.
+```text
+┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                                PRIMARY COHORT KEYS                                     │
+├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
+│  animal_tag     │  region      │  subregion      │  class_flex                         │
+│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
+│  e.g., "dairy"  │  e.g., Spain │  e.g., Euskadi  │  e.g., "lactating", "dry", "starter"│
+└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘
+```
 
-### 6. Run the Assessment
-Execute the main function. It will scan your `user_data/`, perform the calculations, and save the results in `output/`.
+> ⚠️ **Critical Rule:** Every unique combination of `animal_tag`, `region`, `subregion`, and `class_flex` declared in the census must match the definition, weight, and manure tables exactly.
+
+---
+
+# 3. Preparing Input Tables (`user_data/`)
+
+You can edit the CSV templates located in `user_data/` using any spreadsheet software (Excel, LibreOffice) or programmatically within R.
+
+---
+
+## 3.1. Herd Census (`livestock_census.csv`)
+
+Defines the size and categories of your livestock population.
+
+| Column | Description | Example |
+|:---|:---|:---|
+| `animal_tag` | Unique cohort identifier | `mature_dairy_cattle` |
+| `region` | Broad geographical region | `spain` |
+| `subregion` | Farm identifier or administrative subdivision | `north` |
+| `class_flex` | Physiological status, breed, or life stage | `lactation_phase` |
+| `population` | Number of live animals in this exact cohort | `448921.13` |
+
+### Population Modes:
+
+* **Manual Mode (`automatic_cycle = FALSE`):** Every single cohort and head count is explicitly declared. *Recommended*
+* **Automatic Herd Cycle (`automatic_cycle = TRUE`):** Only adult breeding stock (e.g., mature cows, breeding sows) or initial barn places are entered. The package uses reproduction parameters (`reproduction_parameters.csv`) and productive period durations (`productive_period_days`) to compute offspring, replacement cohorts, fattening batches, and mortalities automatically across ruminant (cattle, sheep, goats), swine, and poultry systems. See the [Herd Demography & Population Dynamics](Herd_Demography.html) guide for the complete decision matrix.
+
+---
+
+## 3.2. Body Weights & Growth (`livestock_weights.csv`)
+
+Defines the physical characteristics and production cycles required to compute maintenance energy ($NE_m$) and feed intake boundaries:
+
+* `initial_weight_kg`: Live weight at the beginning of the evaluated production phase.
+* `final_weight_kg`: Live weight at the end of the period.
+* `adult_weight_kg`: Average mature body weight of an adult animal (kg).
+* `productive_period_days`: Biological cycle duration in days, defined according to animal class:
+  * **Adult breeding females (except laying hens):** The **inter-parturition interval** in days between consecutive births (calving, lambing, kidding, or farrowing interval; e.g., `365` to `400` days for cows, `200` to `365` days for ewes/does, `149` days for sows). This defines annual reproductive frequency ($365 / \text{productive\_period\_days}$).
+  * **Laying hens & breeder poultry:** The **commercial laying cycle duration** in the barn until depopulation (e.g., `511` days for commercial layers, `301` days for meat breeders).
+  * **All other cohorts (growing, fattening, and replacement animals):** Their **life cycle / life-stage duration** (days on feed or days from birth/weaning to slaughter/exit; e.g., `42` days for broilers, `110` days for fattening pigs, `70` days for feedlot lambs). This determines Average Daily Gain (ADG) and translates annual meat throughput into standing barn places using the IPCC Average Annual Population (AAP) formula.
+
+---
+
+## 3.3. Nutrition & Feed Formulation
+
+Feed intake and land use are parameterized through two complementary tables:
+
+### A. Diet Profiles (`diet_profiles.csv`)
+Specifies the macro-distribution of the ration. The four proportions must sum to **100%**:
+
+$$\text{forage\_share} + \text{concentrate\_share} + \text{milk\_share} + \text{milk\_replacer\_share} = 100\%$$
+
+### B. Diet Ingredients (`diet_ingredients.csv`)
+Defines the individual feedstuffs composing each category:
+
+* `ingredient`: Specific name matching `feed_characteristics.csv` (e.g., `corn_silage`, `barley_grain`, `soybean_meal`).
+* `ingredient_type`: Feed category (`forage`, `concentrate`, `milk`, or `milk_replacer`).
+* `ingredient_share`: Proportion (%) within that specific category (must sum to **100%** per ingredient_type).
+* `custom_yield_kg_ha`: *(Optional)* User-defined crop/forage yield (kg DM/ha). When filled, the model overrides national FAO averages and tags the origin as `"Custom Data"`.
+* `country_of_origin`: *(Optional)* Cultivation country. If left blank (`NA`), `herdr` applies its dynamic FAO trade balance engine (70% self-sufficiency rule) to allocate origins automatically.
+
+---
+
+## 3.4. Physiological Definitions
+
+Connects cohorts with species-specific constants and production targets:
+
+* **Ruminants (`ruminant_definitions.csv`):** Maintenance coefficient ($c_{fi}$), feeding activity ($c_a$), growth constants ($C$, $a$, $b$), pregnancy coefficient ($c_{pregnancy}$), annual milk yield (kg/year), milk fat percentage, and wool yield (kg/year).
+* **Monogastrics (`monogastric_definitions.csv`):** Exponent ($\alpha$), protein and fat tissue retention fractions, sow gestation/lactation lengths, litter sizes, and egg production parameters (`eggs_per_year`, `egg_weight_g`).
+
+---
+
+## 3.5. Manure Management (`manure_management.csv`)
+
+Specifies waste storage pathways and regional environmental conditions:
+
+* `system_base` & `system_variant`: Storage or grazing system (e.g., `liquid_slurry`, `solid_storage`, `pasture_range_paddock`).
+* `climate_zone` & `climate_moisture`: Climate classification (e.g., `cool`, `temperate`, `warm`, `wet`, `dry`).
+* `allocation`: Fraction of manure managed by the system ($0.0 \text{ to } 1.0$). If manure is split across multiple systems (e.g., housing vs. pasture), create multiple rows for that cohort ensuring total allocations sum to **1.0**.
+
+Check [Manure Management Guide](Manure.html) for available combinations of different systems and climates.
+---
+
+# 4. Running the Environmental Assessment
+
+## 4.1. Full Integrated Assessment
+
+To execute the entire modeling pipeline (energy balance, enteric fermentation, volatile solids, manure emissions, and land use) in a single command:
 
 ```r
+library(herdr)
+
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE, 
-  crop_yield_country = "Spain",
-  saveoutput = TRUE
+  automatic_cycle = FALSE,
+  farm_country    = "Spain",
+  year            = 2024,
+  saveoutput      = TRUE
 )
+
+# Inspect the first rows of the results table
+head(results)
+```
+
+### Argument Reference:
+* `automatic_cycle`: Set to `TRUE` to use reproductive cycle dynamics, or `FALSE` for manual populations (*Recommended*).
+* `farm_country`: The reference country used to query crop yields and bilateral FAO trade matrices.
+* `year`: The reference statistical year for FAO data queries (e.g., `2024`).
+* `saveoutput`: If `TRUE`, writes individual module tables and summary reports directly to `output/`.
+
+---
+
+## 4.2. Running Modular Functions Individually
+
+You can also run specific computational modules independently for debugging, calibration, or sensitivity analyses:
+
+```r
+# 1. Calculate Demographics & Population Dynamics
+pop_results <- calculate_population(automatic_cycle = FALSE)
+
+# 2. Calculate Gross Energy intake (GE)
+ge_results <- calculate_ge(saveoutput = FALSE)
+
+# 3. Calculate Dry Matter Intake (DMI)
+dmi_results <- calculate_DMI(saveoutput = FALSE)
+
+# 4. Calculate Enteric Methane (CH4)
+enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
+
+# 5. Calculate Feed-Related Land Use (m2)
+land_results <- calculate_land_use(
+  farm_country = "Spain", 
+  year = 2024, 
+  saveoutput = FALSE
+)
+
+# 6. Calculate Animal Production & Edible Protein (GLEAM)
+prod_results <- calculate_production(saveoutput = FALSE)
 ```
 
 ---
 
-## Phase 1: Population and Geography (`livestock_census.csv`)
+# 5. Visualizing & Exporting Results
 
-This file is the starting point of your inventory. Here, you define **who** is being studied, **where** they are located, and **how many** animals are present.
+## Visualizing Cohort Emissions
 
-### Main Columns:
-* **`animal_tag`**: Unique identifier for the animal group (e.g., `mature_dairy_cattle`).
-* **`region` & `subregion`**: Defines the geographic scope (e.g., `spain` & `north`).
-* **`class_flex`**: A flexible tag for anything you want to study (e.g., `intensive`, `grazing`, `dry_phase`, `lactation_phase`).
-* **`population`**: Total number of heads.
+Use `plot_herdr_results()` to generate publication-ready ggplot2 charts grouped by demographic variables:
 
-### Calculation Methodologies:
+```r
+# Generate stacked bar chart grouped by animal cohort and region
+p <- plot_herdr_results(
+  df         = results,
+  group_cols = c("animal_tag", "region"),
+  func_name  = "generate_impact_assessment"
+)
 
-#### Option A: Manual Census (Static Populations)
-Best used when you already have the exact numbers for all animal categories (including offspring) and want to study a specific "snapshot" in time.
+# Display chart
+print(p)
 
-- **Usage:** Manually enter the population for every category. If you wish to add a new category just add a new row, but you must manually ensure that every new `animal_tag` exists in all other configuration files (definitions, nutrition, manure, etc.), or the model will fail.
-
-#### Option B: Automatic Cycle (Herd Projection)
-Best used when you want the model to **project the herd structure** for you. Based on the number of mature animals (mothers/sires) and biological rates, the model automatically calculates how many offspring are born and how many replacement animals are present.
-
-- **Usage:** Triggered by using standard predefined tags (e.g., `mature_dairy_cattle`, `mature_sheep_female_meat`).
-- **Note:** Custom tags added by the user do not participate in this automatic cycle.
+# Save chart to disk
+ggplot2::ggsave("output/emissions_chart.png", plot = p, width = 10, height = 6, dpi = 300)
+```
 
 ---
 
-## Phase 2: Nutritional Strategy
+# 6. Common Issues & Troubleshooting
 
-This phase calculates the **Gross Energy (GE)**, which drives methane and nitrogen results.
-
-### 1. Macro Diet (`diet_profiles.csv`)
-Set the general balance of the diet using a `diet_tag`:
-
-* **Categories**: Forage, Concentrate, Milk, and Milk Replacer.
-* **The 100% Rule**: These four must sum to **100.0** (e.g., 70 Forage + 30 Concentrate).
-
-### 2. Micro Ingredients (`diet_ingredients.csv`)
-List exactly what is inside each diet_tag.
-
-* **The 100% Rule**: Ingredients inside each category (like "Forage") must sum to **100.0**. 
-* **Example:** If your "Forage" macro is 70, your ingredient list for Forage (e.g., 50.0 Alfalfa + 50.0 Maize Silage) must sum to 100.0.
-* **Source**: Choose names from the existing library (`feed_characteristics.csv`) or add your own.
-
-### 🟢 Adding a New Ingredient
-If you add a new ingredient name, you **must** add it to these two files:
-
-1. **`feed_characteristics.csv`**: Enter the nutritional data (% Protein, % Digestibility, etc.). This tells the model how it affects the **animal**.
-2. **`forage_yields.csv`**: If your ingredient is a forage (grass, silage, alfalfa), ensure a row exists for your target country with its productivity in kg DM/ha.
-3. **`fao_crop_yields.csv`**: This contains official FAOSTAT data for crops (grains, pulses). If more recent year is available you could download and substitute the one in the package by setting th exact name.
-4. **`mapping.csv`**: This is the "bridge". You must add a row where:
-    * **ingredient**: Matches exactly the name used in your diet files.
-    * **yield_name**: Matches exactly the name used in the yield databases (`forage_yields.csv` or `fao_crop_yields.csv`).
-    * **allocation**: Set the factor (0 to 1) to define how much land impact is attributed to the feed based on economy.
-
-
-*The Diet File:* Don't forget that the new ingredient must also be present in your `diet_ingredients.csv.` If you define an ingredient in the databases but don't add it to a diet, it won't be calculated.
-
-*Dry Matter (DM) Basis:* All yields in `forage_yields.csv` and `fao_crop_yields.csv` must be expressed in Dry Matter, not fresh weight. If you enter fresh weight, your land use requirements will be significantly underestimated.
+| Issue / Warning | Cause | Solution |
+|:---|:---|:---|
+| **Missing Cohorts Warning** | An `animal_tag` in Census is missing in definitions or weights. | Ensure all four keys (`animal_tag`, `region`, `subregion`, `class_flex`) match across all tables. |
+| **Shares do not sum to 100%** | Diet category or ingredient proportions do not sum to 100. | Adjust `forage_share`, `concentrate_share`, etc. in `diet_profiles.csv`, or ingredient shares in `diet_ingredients.csv`. |
+| **Manure allocation $\neq 1.0$** | Allocations for a cohort do not sum to 1.0. | Adjust `allocation` values in `manure_management.csv` so their sum equals exactly 1.0 per cohort. |
+| **Unknown Ingredient** | An ingredient in diets is missing in reference libraries. | Add the ingredient to `feed_characteristics.csv` and `mapping.csv`. |
 
 ---
 
-## Phase 3: Animal Metabolism
+# Next Steps
 
-This phase connects your animals to their diet and defines their physical characteristics. The model uses this data to calculate energy requirements (IPCC Tier 2).
+For mathematical details, parameter lookup tables, and scientific references, consult the companion guides:
 
-### 1. Defining Animal Traits (`livestock_definitions.csv` & `monogastric_definitions.csv`)
-
-For every `animal_tag` defined in your census, you must assign its biological parameters and associated diet.
-
-* **`diet_tag`**: Links each animal category to one of the diets created in Phase 2.
-
-* **Ruminants (`livestock_definitions.csv`)**: Select the appropriate **IPCC description** from `ipcc_coefficients.csv`.
-  * *How it works:* The selected description (e.g., `cattle and buffalo`) allows the model to automatically retrieve the corresponding Tier 2 coefficients ($C_a$, $C_{fi}$, etc.) required for the energy equations. For sheep and goats, the pregnancy coefficient ($C_{pregnancy}$) is calculated automatically from the pregnancy rate and the proportion of single and twin births.
-
-* **Monogastrics (`monogastric_definitions.csv`)**: Fill in the species-specific biological parameters required by the FEDNA equations. Default values are provided for all coefficients, but they can be modified if more representative values are available.
-
-### 2. Body Metrics (`livestock_weights.csv`)
-
-You must replicate the exact combinations of `animal_tag`, `region`, `subregion`, and `class_flex` used in your census and assign the corresponding body parameters.
-
-* **`adult_weight`**: Mature body weight of the adult animal (kg).
-* **`initial_weight`**: Live weight of the animal at the beginning of the production period (kg).
-* **`final_weight`**: Live weight of the animal at the end of the production period (kg).
-* **`productive_period`**: Duration of the production period (days).
-
-#### Additional parameters for breeding sows
-
-The following variables are only required for breeding sows and are used to estimate gestation, lactation, and nitrogen retention:
-
-* **`sows_gestation_days`**: Gestation length (days).
-* **`sows_lactation_days`**: Lactation length (days).
-* **`piglet_birth_weight_kg`**: Average birth weight of piglets (kg).
-* **`piglet_weaning_weight_kg`**: Average weaning weight of piglets (kg).
-* **`sow_reserve_gain_kg`**: Body reserve gain of the sow during gestation (kg).
-
-💡 **How to Proceed**
-
-1. **Tag Consistency:** Start by copying the `animal_tag`, `region`, `subregion`, and `class_flex` columns from your `livestock_census.csv`. They must be identical.
-2. **Add New Tags:** If you created custom animal categories in Phase 1, include them here as well.
-3. **Assign Body Metrics:** Complete the weight and production-period variables for every animal category. If applicable, also fill in the sow-specific parameters.
-4. **Assign Diets:** Select the appropriate `diet_tag` for each category in `livestock_definitions.csv` or `monogastric_definitions.csv`.
-5. **Select IPCC Coefficients:** Open `ipcc_coefficients.csv`, identify the description that best matches your animal category, and copy that exact value into `livestock_definitions.csv`.
-
----
-
-## Phase 4: Manure Management (`manure_management.csv`)
-
-This phase is dedicated to defining the fate of animal excreta. It is the final link in the chain that connects animal metabolism to environmental impact. By specifying how manure is handled, the model can quantify the gases released during storage, treatment, and application.
-
-### 🎯 Purpose of this Phase
-The goal is to characterize the management systems used for each livestock group. This data allows the model to derive two primary environmental impacts:
-
-* **Methane ($CH_4$):** Driven by the conditions of the storage (determined by system type, temperature, and duration).
-* **Nitrous Oxide ($N_2O$):** Driven by the Nitrogen excretion ($N_{ex}$) and the specific emission factors of each system.
-
----
-
-### 🛠️ How to Proceed
-
-Follow these steps to fill your `manure_management.csv` file correctly:
-
-1.  **Consult the Reference Guide:** Before entering data, review the **[Manure System Guide](Manure.html)**. You must use the exact system names and variants listed there, as they are the only ones recognized by the IPCC reference database.
-2.  **Sync the Tags:** Copy the `animal_tag`, `region`, `subregion`, and `class_flex` from your `livestock_census.csv`. They must match exactly.
-3.  **Manage Multiple Systems (Row Duplication):** If a single animal group uses more than one system (e.g., 60% in "Pasture" and 40% in "Solid Storage"), you must **create two identical rows** for that group, changing only the system details and the allocation value.
-4.  **Assign Systems and Climates:** For each row, select the appropriate `system_base`, `system_variant`, and `climate_zone` following the logic provided in the Manure System Guide.
-
----
-
-### ⚖️ The Allocation Rule
-The `allocation` column defines what percentage of the manure is handled by a specific system.
-
-* **The 1.0 Rule:** For every unique livestock group (same tag, region, and class), the sum of the `allocation` column must be exactly **1.0 (100%)**.
-* **Example:** If a group uses three different systems, you will have **three separate rows** for that group, and the total of their allocations (e.g., 0.5 + 0.3 + 0.2) must equal 1.0.
-
----
+* [Herd Demography & Population Dynamics](Herd_Demography.html) — Population dynamics, biological cycles, and herd structure across species.
+* [Technical Reference](Technical_reference.html) — detailed CSV column descriptions and database connectors.
+* [Adding a New Ingredient](Adding_Ingredient.html) — guide to extending feed and LCA databases.
+* [Manure Management Guide](Manure.html) — climate and storage pathway definitions.
+* [Land Use Methodology](land_use.html) — land competition and international trade flows.
+* [Theoretical Basis: IPCC Tier 2](Theoretical_basis.html) — complete mathematical formulation.

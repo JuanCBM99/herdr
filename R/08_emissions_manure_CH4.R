@@ -4,15 +4,16 @@
 #' population, and management factors (B0, MCF, AWMS) using IPCC Eq 10.23.
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
-calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
+calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
   message("\U0001f7e2 Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Loading ---
-  user_manure <- readr::read_csv("user_data/manure_management.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv("user_data/ipcc_mm.csv", col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  coefficients <- readr::read_csv("user_data/ipcc_coefficients.csv", show_col_types = FALSE)
+  user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
   # --- 2. Validations (Asserts) ---
 
@@ -61,11 +62,11 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE) {
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # --- 3. Processing and Joins ---
-  results <- suppressMessages(calculate_vs(saveoutput = FALSE)) %>%
+  results <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
 
     dplyr::left_join(
-      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE)) %>%
+      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
         dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
     ) %>%
