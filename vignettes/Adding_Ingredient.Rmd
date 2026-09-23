@@ -91,7 +91,7 @@ If left blank or `NA`, herdr defaults `economic_allocation` to `1.0`.
 
 ### `yield_name`
 
-This must match, **exactly**, an `Item` name already present in herdr's bundled yield databases — `fao_crops.parquet` for arable crops or `fao_forages.parquet` for grasses and silages — since that's where the actual kg/ha figure is pulled from. Herdr combines both datasets and filters out aggregate areas (using `Area Code < 5000` to keep only genuine countries).
+This must match, **exactly**, an `Item` name already present in herdr's bundled yield databases — `fao_crops.parquet` for arable crops or `forages.parquet` for grasses and silages — since that's where the actual kg/ha figure is pulled from. Herdr combines both datasets and filters out aggregate areas (using `Area Code < 5000` to keep only genuine countries).
 
 Don't guess or type a name from the live FAOSTAT website: the local `.parquet` files are what the model actually reads, and their naming doesn't always match FAOSTAT's current item names exactly. Check them directly instead:
 
@@ -122,7 +122,7 @@ Keep these practical rules in mind when entering ingredients:
   ⚠️ Ingredient shares do not sum to 100% in: diet_dairy_mature
   ```
 - **Country of Origin & Yield Resolution**:
-  - **Explicit country** (e.g. `"spain"`): herdr resolves yields for that specific country from `fao_crops.parquet` / `fao_forages.parquet`.
+  - **Explicit country** (e.g. `"spain"`): herdr resolves yields for that specific country from `fao_crops.parquet` / `forages.parquet`.
   - **Bypassing FAO lookups (`custom_yield_kg_ha`)**: If you already know the specific crop yield (e.g. from local farm records), enter it in `custom_yield_kg_ha` (in kg DM/ha). Herdr will use this number directly and label the origin as `"Custom Data"`.
   - **Leaving it blank or `NA`**: If `country_of_origin` is `NA`, herdr automatically estimates the genuine producer country through dynamic international trade flows (see the [Land Use Methodology](land_use.html#feed-origin--dynamic-trade-allocation) vignette for how trade flows and re-export hubs are traced).
 

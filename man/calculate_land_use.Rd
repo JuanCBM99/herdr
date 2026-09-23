@@ -21,7 +21,7 @@ calculate_land_use(
 
 \item{farm_country}{Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".}
 
-\item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.}
+\item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2024.}
 
 \item{max_trace_hops}{Numeric. When an ingredient's country of origin has to be inferred from
 trade data, this caps how many countries the algorithm will follow through re-export hubs. Default is 4.}

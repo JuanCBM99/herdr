@@ -28,7 +28,7 @@ To distinguish between feed grown on arable land suitable for direct human crop 
 
 * **`cropland`:** Cultivated agricultural soils with arable potential suitable for human food crops (cereal grains, oilseeds, pulses, roots, agroindustrial by-products, and annual arable silages).
 * **`grassland_convertible`:** Pastures situated on fertile ground that could agronomically be converted to arable crop production.
-* **`grassland_unconvertible`:** Permanent native pastures, upland scrub, savannas, and extensive rangelands situated on steep, rocky, or marginal soils unsuitable for crop cultivation.
+* **`grassland_unconvertible`:** Permanent native pastures, upland scrub, savannas, and extensive rangelands situated on steep, rocky, or marginal soils unsuitable for crop cultivation (including natural fresh pastures such as `atlantic_pasture_fresh`, `mediterranean_pasture_fresh`, and `mountain_pasture_fresh`).
 * **`none`:** Inputs requiring zero direct agricultural land footprint. This includes synthetic amino acids, mineral supplements, vitamins, technological additives (e.g., bentonites and mycotoxin binders), post-consumer recycled fats (`yellow_grease`), and animal/marine co-products (excluded from feed land accounting to prevent double-counting livestock impacts).
 
 ---
@@ -50,15 +50,19 @@ LandPerKg_i =
 \end{cases}
 $$
 
-where $Yield_i$ is expressed in kg DM/ha. For non-land inputs (`none`), the yield is strictly zeroed to avoid false database warnings.
+where $Yield_i$ is expressed in kg DM/ha. For non-land inputs (`none`), the yield is strictly zeroed to avoid unnecessary database lookups.
 
-Because FAOSTAT productivities (`fao_crops.parquet` and `fao_forages.parquet`) report crop yields on an as-harvested fresh weight basis ($RawYield_i$), `herdr` converts them to a dry matter yield ($Yield_i$) using the ingredient's dry matter fraction from `user_data/feed_characteristics.csv`:
+#### Dry Matter Yield Resolution
+
+Depending on whether an ingredient is an arable crop or a forage, `herdr` applies distinct dry matter handling:
+
+* **Arable crops (`fao_crops.parquet`):** Because FAOSTAT productivities report yields on an as-harvested fresh weight basis ($RawYield_i$), `herdr` converts them to a dry matter yield ($Yield_i$) using the ingredient's dry matter fraction ($DM\_pct_i$) from `user_data/feed_characteristics.csv`:
 
 $$
 Yield_i = RawYield_i \times \left(\frac{DM\_pct_i}{100}\right)
 $$
 
-If a user provides a `custom_yield_kg_ha` in `diet_ingredients.csv`, it is assumed to already represent dry matter and is used directly without $DM\_pct$ scaling.
+* **Curated forages (`forages.parquet`) & Custom yields (`custom_yield_kg_ha`):** National forage statistics (such as MAPA 2024) and user-supplied custom yields are **already reported on a 100% dry matter basis** (kg DM/ha). Therefore, `herdr` assigns $Yield_i = RawYield_i$ directly, avoiding redundant or erroneous $DM\_pct$ discounts.
 
 ### 2. Economic allocation adjustment
 
@@ -87,7 +91,7 @@ AnnualConsumption_i =
 \left(\frac{Share_i}{100}\right)
 $$
 
-$Share_{cat}$ corresponds to whichever of forage, concentrate, milk, or milk replacer the ingredient belongs to. Within any given cohort and category, `herdr` validates that $\sum Share_i = 100\% \pm 0.1\%$.
+$Share_{cat}$ corresponds to whichever of forage, concentrate, milk, or milk replacer the ingredient belongs to. Diets link seamlessly to cohorts via `diet_tag`. Within any given cohort and category, `herdr` validates that $\sum Share_i = 100\% \pm 0.1\%$.
 
 ### 4. Cohort land footprint
 
@@ -116,10 +120,12 @@ $$
 `herdr` resolves $Yield_i$ through a five-tiered hierarchy, checked in order:
 
 1. **Non-land inputs:** Ingredients with `land_type %in% c("none", "no_land")` are immediately assigned a yield of 0 kg DM/ha and bypass all database lookups.
-2. **User custom yields:** If `custom_yield_kg_ha` is provided in `diet_ingredients.csv`, `herdr` uses it directly (labeled `"Custom Data"`) and bypasses FAO databases.
-3. **FAOSTAT crop yields:** Otherwise, crop productivities are queried from `fao_crops.parquet` for the resolved country and reporting year (filtering out regional aggregate areas where `Area Code >= 5000`).
-4. **Curated forage database:** For forages and pasture grasses not covered in FAOSTAT arable crops, yields are queried from `fao_forages.parquet`.
-5. **Global mix fallback:** If a crop has no recorded yield in the resolved country for that reference year, `herdr` computes a production-weighted mean yield from the top 3 global producing countries of that crop, tagged as `"Global Mix (Top 3 Producers)"`:
+2. **User custom yields:** If `custom_yield_kg_ha` is provided in `diet_ingredients.csv`, `herdr` uses it directly (labeled `"Custom Data"`) and bypasses database queries.
+3. **FAOSTAT crop yields:** Arable crop productivities are queried from `fao_crops.parquet` for the resolved country and reporting year (filtering out regional aggregate areas where `Area Code >= 5000`).
+4. **Curated forage database (`forages.parquet`):** Because FAOSTAT does not provide consistent national forage productivities across countries, `herdr` bundles `forages.parquet`, containing official national statistics for Spain (**MAPA 2024**, Anuario de Estadística Agraria), covering pastures (Atlantic, Mediterranean, Mountain), annual silages, and hays:
+   * **Proxy fallback for international studies:** When analyzing a farm outside Spain whose diets contain bundled forages without `custom_yield_kg_ha`, `herdr` applies the Spanish national forage yield as a proxy fallback and emits an informative warning disclaimer. Users can provide local forage yields at any time via `custom_yield_kg_ha`.
+   * **Backward compatibility:** For existing projects, the engine automatically checks for `forages.parquet` and gracefully accepts `fao_forages.parquet` if present.
+5. **Global mix fallback:** If an arable crop has no recorded yield in the resolved country for that reference year, `herdr` computes a production-weighted mean yield from the top 3 global producing countries of that crop, tagged as `"Global Mix (Top 3 Producers)"`:
 
 $$
 Yield_{\text{fallback}} = \frac{\sum_{k=1}^3 Production_k \times Yield_k}{\sum_{k=1}^3 Production_k}
@@ -166,26 +172,59 @@ To prevent this, `herdr` uses a bounded recursive traceback algorithm:
 
 ## Execution & Visualization
 
+### Function Arguments
+
+`calculate_land_use()` supports the following arguments:
+
+* `automatic_cycle`: Logical (default `FALSE`). When `TRUE`, links directly to `herdr`'s demographic population engine (`calculate_population()`) to compute life-cycle herd replacement structures.
+* `farm_country`: Character (default `"Spain"`). Country where the farm is located, used as the starting point for trade origin tracing and domestic yield lookups.
+* `year`: Numeric (default `2024`). Reference year for FAO productivities and trade data.
+* `data_dir`: Path (default `"user_data"`). Location of editable input CSVs and reference parquet files.
+* `max_trace_hops`: Numeric (default `4`). Maximum hops through trade partner hubs.
+* `ssr_threshold`: Numeric (default `0.70`). Minimum self-sufficiency ratio to identify a true producer country.
+* `saveoutput`: Logical (default `TRUE`). When `TRUE`, writes results to `output/land_use.csv`.
+
 ### Running the Assessment
 
 ```r
 # Standalone land use calculation
 land_results <- calculate_land_use(
-  farm_country = "Spain",
-  year = 2022,
-  saveoutput = TRUE
+  farm_country    = "Spain",
+  year            = 2024,
+  automatic_cycle = FALSE,
+  data_dir        = "user_data",
+  saveoutput      = TRUE
 )
 
-# Integrated execution via full assessment
+# Integrated execution via full farm impact assessment
 full_results <- generate_impact_assessment(
-  farm_country = "Spain",
-  year = 2022
+  farm_country    = "Spain",
+  year            = 2024,
+  automatic_cycle = FALSE,
+  data_dir        = "user_data"
 )
 ```
 
+### Output Schema
+
+The output dataframe (and `output/land_use.csv`) provides a complete agroecological and spatial breakdown:
+
+| Column | Description |
+|:---|:---|
+| `region`, `subregion`, `animal_tag`, `class_flex` | Cohort identification and geographic stratum |
+| `animal_type`, `animal_subtype` | Species and production system category |
+| `ingredient` | Specific feedstuff name from diet |
+| `land_type` | Agroecological classification (`cropland`, `grassland_convertible`, `grassland_unconvertible`, `none`) |
+| `country_of_origin` | Resolved producing country (or `"Custom Data"` / `"Global Mix"`) |
+| `DM_pct` | Dry matter percentage of the ingredient |
+| `dm_yield` | Applied dry matter yield (kg DM/ha) |
+| `population` | Headcount of the cohort |
+| `land_use_per_animal_m2` | Land occupation per individual animal (m2/year) |
+| `total_land_use_m2` | Total cohort land footprint (m2/year) |
+
 ### Visualizing Agroecological Profiles
 
-`plot_herdr_results()` automatically detects the presence of `land_type` and renders stacked bar charts:
+`plot_herdr_results()` automatically detects the presence of `land_type` and renders stacked bar charts categorized by agroecological land competition:
 
 ```r
 # Stacked land use breakdown across cohorts
@@ -195,9 +234,12 @@ plot_herdr_results(land)
 
 Non-land inputs (`none`) are automatically filtered from the visualization to focus exclusively on productive land footprint.
 
+---
+
 ## References
 
 * Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., & Gerber, P. (2017). *More fuel than food: Global food security and the role of livestock feed*. **Global Food Security**, 14, 1--8.
+* MAPA (2024). *Anuario de Estadística Agraria*. Ministerio de Agricultura, Pesca y Alimentación, Gobierno de España.
 
 ## Next steps
 

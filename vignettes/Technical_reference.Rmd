@@ -115,9 +115,9 @@ The bridge between your diet ingredients and the agricultural yield and life-cyc
 
 Note that this `economic_allocation` column is conceptually different from the `allocation` column in `manure_management.csv`: both are 0–1 shares, but one splits a cohort's manure across management systems, while the other splits a crop's environmental burden across its co-products.
 
-### `fao_forages.parquet` — Grass & Silage Data (BC3)
+### `forages.parquet` — Grass & Silage Data (MAPA 2024 / BC3)
 
-A provisional forage database, supplemented by BC3 researchers, giving yields (`Area`, `Item`, `Value` in kg DM/ha) for grazing and forage-based systems — filling the gaps where official FAOSTAT records are often incomplete or missing.
+Curated forage and pasture database, incorporating official Spanish national statistics from MAPA (2024, Anuario de Estadística Agraria) and BC3 research, giving dry matter yields (`Area`, `Item`, `Value` in kg DM/ha) for grazing, natural pastures, and forage silages/hays — filling the gaps where international FAOSTAT records lack forage data.
 
 ### `fao_crops.parquet` — Official Statutory Yields
 
@@ -138,7 +138,7 @@ Use this table to know where to look when filling out your data:
 | Identify an animal type | `ipcc_coefficients.csv` | `ruminant_definitions.csv` |
 | Pick a feed ingredient | `feed_characteristics.csv` | `diet_ingredients.csv` |
 | Choose a manure system | `ipcc_mm.csv` | `manure_management.csv` |
-| Add a custom crop | `mapping.csv`, `fao_forages.parquet`, `fao_crops.parquet` | `feed_characteristics.csv` |
+| Add a custom crop | `mapping.csv`, `forages.parquet`, `fao_crops.parquet` | `feed_characteristics.csv` |
 
 ---
 

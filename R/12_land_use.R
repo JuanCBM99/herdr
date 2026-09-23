@@ -4,7 +4,7 @@
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param farm_country Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".
-#' @param year Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.
+#' @param year Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2024.
 #' @param max_trace_hops Numeric. When an ingredient's country of origin has to be inferred from
 #'   trade data, this caps how many countries the algorithm will follow through re-export hubs. Default is 4.
 #' @param ssr_threshold Numeric. Self-Sufficiency Ratio (Production / Apparent Consumption)
@@ -38,8 +38,13 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::rename(Value = dplyr::all_of(year_col)) %>%
     dplyr::mutate(Year = as.numeric(year))
 
-  # Assuming forages might use the same code structure; if not, you can remove the filter here.
-  forage_raw <- arrow::read_parquet(file.path(data_dir, "fao_forages.parquet")) %>%
+  # Curated forage yields (MAPA 2024 / BC3); supports forages.parquet with legacy fallback
+  forage_path <- if (file.exists(file.path(data_dir, "forages.parquet"))) {
+    file.path(data_dir, "forages.parquet")
+  } else {
+    file.path(data_dir, "fao_forages.parquet")
+  }
+  forage_raw <- arrow::read_parquet(forage_path) %>%
     dplyr::rename(Value = Yield) %>%
     dplyr::mutate(Year = as.numeric(year))
 

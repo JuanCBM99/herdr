@@ -22,7 +22,7 @@ This guide tackles a high-complexity scenario for **mature dairy cattle**, split
 |:---|:---|
 | **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
 | **If using the automatic herd cycle** | `reproduction_parameters.csv` |
-| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `fao_forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
+| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
 
 Full details on every file above are in the [Technical Reference](Technical_reference.html) vignette. This guide builds directly on the [Moderate Example](Moderate_Example.html) — start there first if you haven't used `class_flex` before.
 

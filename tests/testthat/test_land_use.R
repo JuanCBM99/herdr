@@ -20,7 +20,7 @@ test_that("calculate_land_use computes m2 safely without triggering FAO engine",
   arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
 
   dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
 
   path_diet <- "user_data/diet_ingredients.csv"
   if (file.exists(path_diet)) {
@@ -80,7 +80,7 @@ test_that("calculate_land_use handles NA origins via FAO engine safely (Parquet 
   arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
 
   dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
 
   dummy_trade <- data.frame(
     `Reporter Countries` = "Spain",
@@ -113,7 +113,7 @@ test_that("calculate_land_use emits warning disclaimer for missing yields withou
   arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
 
   dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
 
   path_diet <- "user_data/diet_ingredients.csv"
   if (file.exists(path_diet)) {
@@ -155,7 +155,7 @@ test_that("calculate_land_use uses Spanish forage yield as proxy fallback for ot
     Item = c("Maize for forage and silage", "Winter cereals, for forage", "Other grasses, for forage"),
     Yield = c(9000, 3000, 4500)
   )
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
 
   path_diet <- "user_data/diet_ingredients.csv"
   if (file.exists(path_diet)) {
@@ -182,7 +182,7 @@ test_that("calculate_land_use works with normalized diets without region/subregi
   arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
 
   dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
 
   # Strip geographic columns from diet tables
   path_prof <- "user_data/diet_profiles.csv"
@@ -202,5 +202,25 @@ test_that("calculate_land_use works with normalized diets without region/subregi
   expect_s3_class(results, "data.frame")
   expect_true("land_use_per_animal_m2" %in% names(results))
   expect_true(nrow(results) > 0)
+})
+
+test_that("calculate_land_use supports backward compatibility with legacy fao_forages.parquet", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  dir.create("user_data", showWarnings = FALSE)
+
+  dummy_crops <- data.frame(Area = "Spain", Item = "Maize", Element = "Yield", Y2022 = 10)
+  arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
+
+  dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
+  # Explicitly write legacy name only and remove modern name if present
+  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
+  if (file.exists("user_data/forages.parquet")) file.remove("user_data/forages.parquet")
+
+  results <- suppressWarnings(calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE))
+  expect_s3_class(results, "data.frame")
 })
 

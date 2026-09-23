@@ -56,7 +56,7 @@ herdr_init()
 
 This function creates three primary directories:
 
-* **`user_data/`**: The active working directory containing editable CSV templates and local reference databases (`fao_crops.parquet`, `fao_forages.parquet`).
+* **`user_data/`**: The active working directory containing editable CSV templates and local reference databases (`fao_crops.parquet`, `forages.parquet`).
 * **`Examples/`**: Pre-configured baseline datasets (e.g., dairy cattle, beef cattle, swine, sheep) ready to use as templates.
 * **`output/`**: Destination directory where results, emission inventories, and land-use summaries are saved.
 
