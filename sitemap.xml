@@ -43,9 +43,14 @@
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_production.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_vs.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/fao_data_cache.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/generate_impact_assessment.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/herdr-imports.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/herdr-package.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/herdr_cache_dir.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/herdr_get_fao_crops_path.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/herdr_get_fao_trade_matrix_path.html</loc></url>
+<url><loc>https://juancbm99.github.io/herdr/reference/herdr_get_forages_path.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/herdr_init.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/index.html</loc></url>
 <url><loc>https://juancbm99.github.io/herdr/reference/plot_herdr_results.html</loc></url>

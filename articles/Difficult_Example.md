@@ -63,7 +63,7 @@ dataset):
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature_south_lactation_phase` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south_lactation_phase` | concentrate | `corn` | 44.85 | `spain` | `NA` |
 | `diet_dairy_mature_south_lactation_phase` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
 | `diet_dairy_mature_south_lactation_phase` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
 | `diet_dairy_mature_south_lactation_phase` | forage | `corn_silage_25_30` | 71.40 | `spain` | 12000 |

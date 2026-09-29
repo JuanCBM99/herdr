@@ -60,7 +60,7 @@ Here’s the concentrate portion for Spain South:
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature_south` | concentrate | `corn_national` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south` | concentrate | `corn` | 44.85 | `spain` | `NA` |
 | `diet_dairy_mature_south` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
 | `diet_dairy_mature_south` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 

@@ -11,7 +11,8 @@ calculate_population_swine(
   census_swine,
   rate_parameters,
   definitions = NULL,
-  weights = NULL
+  weights = NULL,
+  data_dir = "user_data"
 )
 ```
 
@@ -33,6 +34,11 @@ calculate_population_swine(
 
   Optional weights table (e.g., livestock_weights) containing
   `productive_period_days`.
+
+- data_dir:
+
+  Character. Path to the folder containing input CSV files. Default is
+  `"user_data"`.
 
 ## Value
 
