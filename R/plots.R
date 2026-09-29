@@ -254,11 +254,33 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       )
       plot_data$panel <- factor(plot_data$panel, levels = c(emiss_panel, land_panel))
 
+      totals_df <- plot_data %>%
+        dplyr::group_by(plot_label, panel) %>%
+        dplyr::summarise(total_val = sum(value, na.rm = TRUE), .groups = "drop") %>%
+        dplyr::filter(total_val > 0) %>%
+        dplyr::mutate(
+          label_text = dplyr::case_when(
+            total_val >= 1000 ~ scales::comma(total_val, accuracy = 1),
+            total_val >= 10   ~ formatC(total_val, digits = 1, format = "f"),
+            total_val >= 1    ~ formatC(total_val, digits = 2, format = "f"),
+            TRUE              ~ formatC(total_val, digits = 3, format = "f")
+          )
+        )
+
       p <- ggplot(plot_data, aes(x = value, y = plot_label, fill = component)) +
         geom_col(position = position_stack(reverse = TRUE), width = 0.62) +
+        geom_text(
+          data = totals_df,
+          aes(x = total_val, y = plot_label, label = label_text),
+          inherit.aes = FALSE,
+          hjust = -0.15,
+          size = 3.4,
+          fontface = "bold",
+          color = text_mid
+        ) +
         facet_wrap(~ panel, scales = "free_x") +
         theme_herdr_plot() +
-        scale_x_continuous(expand = expansion(mult = c(0, 0.08)), labels = scales::comma) +
+        scale_x_continuous(expand = expansion(mult = c(0, 0.18)), labels = scales::comma) +
         scale_fill_manual(values = palette_impact) +
         labs(
           title = "Environmental Impact Assessment",
@@ -266,10 +288,32 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
           x = NULL
         )
     } else {
+      totals_df <- emissions_df %>%
+        dplyr::group_by(plot_label) %>%
+        dplyr::summarise(total_val = sum(value, na.rm = TRUE), .groups = "drop") %>%
+        dplyr::filter(total_val > 0) %>%
+        dplyr::mutate(
+          label_text = dplyr::case_when(
+            total_val >= 1000 ~ scales::comma(total_val, accuracy = 1),
+            total_val >= 10   ~ formatC(total_val, digits = 1, format = "f"),
+            total_val >= 1    ~ formatC(total_val, digits = 2, format = "f"),
+            TRUE              ~ formatC(total_val, digits = 3, format = "f")
+          )
+        )
+
       p <- ggplot(emissions_df, aes(x = value, y = plot_label, fill = component)) +
         geom_col(position = position_stack(reverse = TRUE), width = 0.62) +
+        geom_text(
+          data = totals_df,
+          aes(x = total_val, y = plot_label, label = label_text),
+          inherit.aes = FALSE,
+          hjust = -0.15,
+          size = 3.4,
+          fontface = "bold",
+          color = text_mid
+        ) +
         theme_herdr_plot() +
-        scale_x_continuous(expand = expansion(mult = c(0, 0.08)), labels = scales::comma) +
+        scale_x_continuous(expand = expansion(mult = c(0, 0.18)), labels = scales::comma) +
         scale_fill_manual(values = palette_impact) +
         labs(
           title = "Greenhouse Gas Emissions",

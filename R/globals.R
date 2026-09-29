@@ -114,6 +114,7 @@ if(getRversion() >= "2.15.1") {
     "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg",
     "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
     "co2e_n2o_dir", "co2e_n2o_ind", "land_ha", "land_val", "functional_unit",
+    "total_val", "label_text",
 
     # --- Functional Units and Intensities ---
     "GHG_intensity_protein", "Land_intensity_protein",
