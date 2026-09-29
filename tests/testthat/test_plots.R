@@ -113,5 +113,26 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_s3_class(p_protein, "ggplot")
   expect_equal(p_protein$labels$title, "Edible Protein Production")
   expect_true("Protein_kg" %in% names(p_protein$data))
+
+  # 11. Assertions: Environmental Impact Assessment plot (stacked emissions + land footprint)
+  impact_df <- data.frame(
+    animal_tag = c("dairy_cows", "fattening_pigs"),
+    region = c("spain", "spain"),
+    subregion = c("north", "south"),
+    class_flex = c("dairy", "meat"),
+    CH4_enteric_Gg = c(2.5, 0.05),
+    CH4_manure_Gg = c(0.6, 0.4),
+    N2O_direct_Gg = c(0.03, 0.02),
+    N2O_vol_Gg = c(0.01, 0.005),
+    N2O_lea_Gg = c(0.005, 0.002),
+    Land_m2 = c(5000000, 1500000)
+  )
+  p_impact <- plot_herdr_results(impact_df, group_cols = "animal_tag", func_name = "generate_impact_assessment")
+  expect_s3_class(p_impact, "ggplot")
+  expect_equal(p_impact$labels$title, "Environmental Impact Assessment")
+  expect_true("Land Footprint (ha)" %in% levels(p_impact$data$panel))
+  expect_true("GHG Emissions (Gg CO2e)" %in% levels(p_impact$data$panel))
+  expect_true("CH4 Enteric" %in% levels(p_impact$data$component))
+  expect_true("Land Use" %in% levels(p_impact$data$component))
 })
 

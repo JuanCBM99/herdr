@@ -107,10 +107,12 @@ if(getRversion() >= "2.15.1") {
     # --- Impacts and Summary (CO2eq) ---
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
     "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
-    "CO2eq_Total_Gg", "Land_m2",
+    "CO2eq_N2O_direct", "CO2eq_N2O_indirect", "CO2eq_Total_Gg", "Land_m2",
 
     # --- Plotting and Graphics ---
     "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
-    "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg"
+    "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg",
+    "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
+    "co2e_n2o_dir", "co2e_n2o_ind", "land_ha"
   ))
 }

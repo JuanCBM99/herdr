@@ -77,10 +77,12 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   # 5. Calculate CO2eq and Carbon Footprint (AR5 GWP: CH4=28, N2O=265)
   final_summary <- final_summary %>%
     dplyr::mutate(
-      CO2eq_enteric  = CH4_enteric_Gg * 28,
-      CO2eq_manure   = CH4_manure_Gg * 28,
-      CO2eq_N2O      = (N2O_direct_Gg + N2O_vol_Gg + N2O_lea_Gg) * 265,
-      CO2eq_Total_Gg = CO2eq_enteric + CO2eq_manure + CO2eq_N2O)
+      CO2eq_enteric      = CH4_enteric_Gg * 28,
+      CO2eq_manure       = CH4_manure_Gg * 28,
+      CO2eq_N2O_direct   = N2O_direct_Gg * 265,
+      CO2eq_N2O_indirect = (N2O_vol_Gg + N2O_lea_Gg) * 265,
+      CO2eq_N2O          = CO2eq_N2O_direct + CO2eq_N2O_indirect,
+      CO2eq_Total_Gg     = CO2eq_enteric + CO2eq_manure + CO2eq_N2O)
 
   # 6. Save Output
   if (saveoutput) {

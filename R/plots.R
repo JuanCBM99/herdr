@@ -7,7 +7,7 @@
 #' @export
 #' @import ggplot2
 #' @importFrom tidyr pivot_longer
-#' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter
+#' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter select bind_rows
 #' @importFrom scales comma
 plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL) {
   if (!is.data.frame(df) || nrow(df) == 0) return(NULL)
@@ -85,6 +85,121 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # =================================================================
   # SPECIAL-CASE PLOTS
   # =================================================================
+
+  # A0) ENVIRONMENTAL IMPACT ASSESSMENT (Stacked Emissions + Land Footprint)
+  is_impact_assessment <- identical(func_name, "generate_impact_assessment") ||
+    all(c("CH4_enteric_Gg", "CH4_manure_Gg") %in% names(df_agg)) ||
+    all(c("CO2eq_enteric", "CO2eq_manure") %in% names(df_agg))
+
+  if (is_impact_assessment) {
+    co2e_ch4_ent <- if ("CO2eq_enteric" %in% names(df_agg)) df_agg$CO2eq_enteric else df_agg$CH4_enteric_Gg * 28
+    co2e_ch4_man <- if ("CO2eq_manure" %in% names(df_agg)) df_agg$CO2eq_manure else df_agg$CH4_manure_Gg * 28
+
+    co2e_n2o_dir <- if ("CO2eq_N2O_direct" %in% names(df_agg)) {
+      df_agg$CO2eq_N2O_direct
+    } else if ("N2O_direct_Gg" %in% names(df_agg)) {
+      df_agg$N2O_direct_Gg * 265
+    } else {
+      0
+    }
+
+    co2e_n2o_ind <- if ("CO2eq_N2O_indirect" %in% names(df_agg)) {
+      df_agg$CO2eq_N2O_indirect
+    } else if (all(c("N2O_vol_Gg", "N2O_lea_Gg") %in% names(df_agg))) {
+      (df_agg$N2O_vol_Gg + df_agg$N2O_lea_Gg) * 265
+    } else if ("CO2eq_N2O" %in% names(df_agg)) {
+      pmax(0, df_agg$CO2eq_N2O - co2e_n2o_dir)
+    } else {
+      0
+    }
+
+    df_agg$total_co2e <- co2e_ch4_ent + co2e_ch4_man + co2e_n2o_dir + co2e_n2o_ind
+    df_agg$co2e_ch4_ent <- co2e_ch4_ent
+    df_agg$co2e_ch4_man <- co2e_ch4_man
+    df_agg$co2e_n2o_dir <- co2e_n2o_dir
+    df_agg$co2e_n2o_ind <- co2e_n2o_ind
+
+    has_land <- "Land_m2" %in% names(df_agg) && any(df_agg$Land_m2 > 0, na.rm = TRUE)
+    if (has_land) {
+      df_agg$land_ha <- df_agg$Land_m2 / 10000
+    }
+
+    # Order cohorts by total emissions
+    df_agg <- df_agg[order(df_agg$total_co2e), ]
+    df_agg$plot_label <- factor(df_agg$plot_label, levels = df_agg$plot_label)
+
+    # Long dataset for emissions
+    emissions_df <- df_agg %>%
+      dplyr::select(dplyr::all_of(c("plot_label", "co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind"))) %>%
+      tidyr::pivot_longer(
+        cols = c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind"),
+        names_to = "component_raw",
+        values_to = "value"
+      ) %>%
+      dplyr::mutate(
+        panel = "GHG Emissions (Gg CO2e)",
+        component = factor(
+          component_raw,
+          levels = c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind"),
+          labels = c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect")
+        )
+      )
+
+    palette_impact <- c(
+      "CH4 Enteric"  = "#38BDF8",  # Sky blue
+      "CH4 Manure"   = "#1E40AF",  # Dark navy blue
+      "N2O Direct"   = "#7E22CE",  # Deep royal purple
+      "N2O Indirect" = "#C084FC",  # Lavender / light purple
+      "Land Use"     = "#15803D"   # Forest / emerald green
+    )
+
+    if (has_land) {
+      land_df <- df_agg %>%
+        dplyr::select(dplyr::all_of(c("plot_label", "land_ha"))) %>%
+        dplyr::mutate(
+          value = land_ha,
+          panel = "Land Footprint (ha)",
+          component = factor("Land Use", levels = c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Land Use"))
+        ) %>%
+        dplyr::select(plot_label, value, panel, component)
+
+      emissions_df$component <- factor(
+        emissions_df$component,
+        levels = c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Land Use")
+      )
+
+      plot_data <- dplyr::bind_rows(
+        emissions_df %>% dplyr::select(plot_label, value, panel, component),
+        land_df
+      )
+      plot_data$panel <- factor(plot_data$panel, levels = c("GHG Emissions (Gg CO2e)", "Land Footprint (ha)"))
+
+      p <- ggplot(plot_data, aes(x = value, y = plot_label, fill = component)) +
+        geom_col(position = position_stack(reverse = TRUE), width = 0.62) +
+        facet_wrap(~ panel, scales = "free_x") +
+        theme_herdr_plot() +
+        scale_x_continuous(expand = expansion(mult = c(0, 0.08)), labels = scales::comma) +
+        scale_fill_manual(values = palette_impact) +
+        labs(
+          title = "Environmental Impact Assessment",
+          subtitle = "Greenhouse gas emissions breakdown (Gg CO2e) and land footprint (ha)",
+          x = NULL
+        )
+    } else {
+      p <- ggplot(emissions_df, aes(x = value, y = plot_label, fill = component)) +
+        geom_col(position = position_stack(reverse = TRUE), width = 0.62) +
+        theme_herdr_plot() +
+        scale_x_continuous(expand = expansion(mult = c(0, 0.08)), labels = scales::comma) +
+        scale_fill_manual(values = palette_impact) +
+        labs(
+          title = "Greenhouse Gas Emissions",
+          subtitle = "Total emissions breakdown by source (Gg CO2e)",
+          x = "Total Emissions (Gg CO2e)"
+        )
+    }
+
+    return(p)
+  }
 
   # A) EMISSIONS BREAKDOWN (stacked bars)
   if (all(c("ch4_enteric", "ch4_manure", "n2o_manure") %in% names(df_agg))) {
@@ -243,6 +358,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # UNIVERSAL PLOT (all other functions)
   # =================================================================
   target_var_dict <- list(
+    generate_impact_assessment            = "CO2eq_Total_Gg",
     calculate_DMI                         = "DMI_kgday",
     calculate_ge                          = "GE_MJday",
     calculate_vs                          = "VS_kgday",
