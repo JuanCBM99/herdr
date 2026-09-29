@@ -49,7 +49,11 @@ test_that("generate_impact_assessment creates a consistent final report safely",
   # Verify that all important columns have been joined and calculated
   expected_cols <- c(
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg",
-    "N2O_vol_Gg", "N2O_lea_Gg", "Land_m2", "CO2eq_Total_Gg"
+    "N2O_vol_Gg", "N2O_lea_Gg", "Land_m2", "CO2eq_Total_Gg",
+    "total_protein_kg", "population", "primary_product",
+    "GHG_intensity_protein", "Land_intensity_protein",
+    "GHG_intensity_head", "Land_intensity_head",
+    "GHG_intensity_product", "Land_intensity_product"
   )
   for (col in expected_cols) {
     expect_true(col %in% colnames(results))

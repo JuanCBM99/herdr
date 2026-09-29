@@ -137,5 +137,30 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
 
   p_impact_ar6 <- plot_herdr_results(impact_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", ar = "AR6")
   expect_s3_class(p_impact_ar6, "ggplot")
+
+  # 12. Assertions: Functional unit plots (protein, product, head)
+  impact_fu_df <- impact_df %>%
+    dplyr::mutate(
+      population = c(1000, 5000),
+      milk_FPCM_kg = c(8000000, 0),
+      meat_carcass_weight_kg = c(200000, 450000),
+      egg_fresh_kg = c(0, 0),
+      total_protein_kg = c(260000, 80000)
+    )
+
+  p_fu_prot <- plot_herdr_results(impact_fu_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "protein")
+  expect_s3_class(p_fu_prot, "ggplot")
+  expect_true("GHG Intensity (kg CO2e / kg protein)" %in% levels(p_fu_prot$data$panel))
+  expect_true("Land Footprint (m2 / kg protein)" %in% levels(p_fu_prot$data$panel))
+
+  p_fu_head <- plot_herdr_results(impact_fu_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "head")
+  expect_s3_class(p_fu_head, "ggplot")
+  expect_true("GHG per Head (kg CO2e / head)" %in% levels(p_fu_head$data$panel))
+  expect_true("Land per Head (m2 / head)" %in% levels(p_fu_head$data$panel))
+
+  p_fu_prod <- plot_herdr_results(impact_fu_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "product")
+  expect_s3_class(p_fu_prod, "ggplot")
+  expect_true("GHG Intensity (kg CO2e / kg product)" %in% levels(p_fu_prod$data$panel))
+  expect_true("Land Footprint (m2 / kg product)" %in% levels(p_fu_prod$data$panel))
 })
 

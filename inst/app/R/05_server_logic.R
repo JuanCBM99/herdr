@@ -628,7 +628,8 @@ herdr_server <- function(input, output, session) {
       df = model_data(),
       group_cols = input$plot_groups,
       func_name = input$function_choice,
-      gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5"
+      gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5",
+      functional_unit = if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
     )
   })
 

@@ -5,13 +5,14 @@
 #' @param func_name Name of the function that generated the data.
 #' @param gwp_report Character string or named numeric vector. IPCC GWP standard used as fallback when GWP columns are not pre-calculated. Options: `"AR5"`, `"AR6"`, `"AR4"`, `"SAR"`. Default is `"AR5"`.
 #' @param ar Optional alias for `gwp_report`.
+#' @param functional_unit Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e and ha), `"protein"` (kg CO2e and m2 per kg edible protein), `"product"` (kg CO2e and m2 per kg commercial product), or `"head"` (kg CO2e and m2 per animal head). Default is `"total"`.
 #' @return A ggplot2 object.
 #' @export
 #' @import ggplot2
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter select bind_rows
 #' @importFrom scales comma
-plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL, gwp_report = "AR5", ar = NULL) {
+plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL, gwp_report = "AR5", ar = NULL, functional_unit = "total") {
   if (!is.data.frame(df) || nrow(df) == 0) return(NULL)
 
   valid_groups <- intersect(group_cols, names(df))
@@ -143,15 +144,64 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       0
     }
 
-    df_agg$total_co2e <- co2e_ch4_ent + co2e_ch4_man + co2e_n2o_dir + co2e_n2o_ind
-    df_agg$co2e_ch4_ent <- co2e_ch4_ent
-    df_agg$co2e_ch4_man <- co2e_ch4_man
-    df_agg$co2e_n2o_dir <- co2e_n2o_dir
-    df_agg$co2e_n2o_ind <- co2e_n2o_ind
+    # Functional unit scaling
+    fu <- tolower(functional_unit[1])
+    if (!fu %in% c("protein", "product", "head")) fu <- "total"
+
+    emiss_scale <- rep(1, nrow(df_agg))
+    land_scale  <- rep(1 / 10000, nrow(df_agg)) # m2 to ha
+    emiss_panel <- "GHG Emissions (Gg CO2e)"
+    land_panel  <- "Land Footprint (ha)"
+    sub_title   <- "Greenhouse gas emissions breakdown (Gg CO2e) and land footprint (ha)"
+
+    if (fu == "protein" && "total_protein_kg" %in% names(df_agg)) {
+      prot <- df_agg$total_protein_kg
+      valid <- prot > 0
+      emiss_scale <- ifelse(valid, 1e6 / prot, 0)
+      land_scale  <- ifelse(valid, 1 / prot, 0)
+      emiss_panel <- "GHG Intensity (kg CO2e / kg protein)"
+      land_panel  <- "Land Footprint (m2 / kg protein)"
+      sub_title   <- "Emissions intensity and land use per kg of edible protein"
+    } else if (fu == "head" && "population" %in% names(df_agg)) {
+      pop <- df_agg$population
+      valid <- pop > 0
+      emiss_scale <- ifelse(valid, 1e6 / pop, 0)
+      land_scale  <- ifelse(valid, 1 / pop, 0)
+      emiss_panel <- "GHG per Head (kg CO2e / head)"
+      land_panel  <- "Land per Head (m2 / head)"
+      sub_title   <- "Emissions and land use per animal head per year"
+    } else if (fu == "product" && any(c("milk_FPCM_kg", "meat_carcass_weight_kg", "egg_fresh_kg") %in% names(df_agg))) {
+      milk_kg <- if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg else 0
+      meat_kg <- if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg else 0
+      egg_kg  <- if ("egg_fresh_kg" %in% names(df_agg)) df_agg$egg_fresh_kg else 0
+      prod_yield <- dplyr::case_when(
+        milk_kg > 0 ~ milk_kg,
+        egg_kg > 0  ~ egg_kg,
+        meat_kg > 0 ~ meat_kg,
+        TRUE ~ 0
+      )
+      af <- dplyr::case_when(
+        milk_kg > 0 & meat_kg > 0 ~ pmax(0.5, pmin(1.0, 1 - 5.7717 * (meat_kg / milk_kg))),
+        prod_yield > 0 ~ 1.0,
+        TRUE ~ 0
+      )
+      valid <- prod_yield > 0
+      emiss_scale <- ifelse(valid, (1e6 * af) / prod_yield, 0)
+      land_scale  <- ifelse(valid, af / prod_yield, 0)
+      emiss_panel <- "GHG Intensity (kg CO2e / kg product)"
+      land_panel  <- "Land Footprint (m2 / kg product)"
+      sub_title   <- "Emissions intensity and land use per kg of commercial product"
+    }
+
+    df_agg$co2e_ch4_ent <- co2e_ch4_ent * emiss_scale
+    df_agg$co2e_ch4_man <- co2e_ch4_man * emiss_scale
+    df_agg$co2e_n2o_dir <- co2e_n2o_dir * emiss_scale
+    df_agg$co2e_n2o_ind <- co2e_n2o_ind * emiss_scale
+    df_agg$total_co2e   <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir + df_agg$co2e_n2o_ind
 
     has_land <- "Land_m2" %in% names(df_agg) && any(df_agg$Land_m2 > 0, na.rm = TRUE)
     if (has_land) {
-      df_agg$land_ha <- df_agg$Land_m2 / 10000
+      df_agg$land_val <- df_agg$Land_m2 * land_scale
     }
 
     # Order cohorts by total emissions
@@ -167,7 +217,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         values_to = "value"
       ) %>%
       dplyr::mutate(
-        panel = "GHG Emissions (Gg CO2e)",
+        panel = emiss_panel,
         component = factor(
           component_raw,
           levels = c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind"),
@@ -185,10 +235,10 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
 
     if (has_land) {
       land_df <- df_agg %>%
-        dplyr::select(dplyr::all_of(c("plot_label", "land_ha"))) %>%
+        dplyr::select(dplyr::all_of(c("plot_label", "land_val"))) %>%
         dplyr::mutate(
-          value = land_ha,
-          panel = "Land Footprint (ha)",
+          value = land_val,
+          panel = land_panel,
           component = factor("Land Use", levels = c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Land Use"))
         ) %>%
         dplyr::select(plot_label, value, panel, component)
@@ -202,7 +252,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         emissions_df %>% dplyr::select(plot_label, value, panel, component),
         land_df
       )
-      plot_data$panel <- factor(plot_data$panel, levels = c("GHG Emissions (Gg CO2e)", "Land Footprint (ha)"))
+      plot_data$panel <- factor(plot_data$panel, levels = c(emiss_panel, land_panel))
 
       p <- ggplot(plot_data, aes(x = value, y = plot_label, fill = component)) +
         geom_col(position = position_stack(reverse = TRUE), width = 0.62) +
@@ -212,7 +262,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         scale_fill_manual(values = palette_impact) +
         labs(
           title = "Environmental Impact Assessment",
-          subtitle = "Greenhouse gas emissions breakdown (Gg CO2e) and land footprint (ha)",
+          subtitle = sub_title,
           x = NULL
         )
     } else {
@@ -223,8 +273,8 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         scale_fill_manual(values = palette_impact) +
         labs(
           title = "Greenhouse Gas Emissions",
-          subtitle = "Total emissions breakdown by source (Gg CO2e)",
-          x = "Total Emissions (Gg CO2e)"
+          subtitle = sub_title,
+          x = emiss_panel
         )
     }
 

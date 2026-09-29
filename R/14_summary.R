@@ -85,8 +85,20 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(Land_m2 = sum(total_land_use_m2, na.rm = TRUE), .groups = "drop")
 
+  # Production outputs for functional units
+  prod_data <- suppressMessages(calculate_production(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(
+      population             = sum(population, na.rm = TRUE),
+      milk_FPCM_kg           = sum(milk_FPCM_kg, na.rm = TRUE),
+      meat_carcass_weight_kg = sum(meat_carcass_weight_kg, na.rm = TRUE),
+      egg_fresh_kg           = sum(egg_fresh_kg, na.rm = TRUE),
+      total_protein_kg       = sum(total_protein_kg, na.rm = TRUE),
+      .groups = "drop"
+    )
+
   # 2. Consolidation
-  complete_summary <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u) %>%
+  complete_summary <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u, prod_data) %>%
     purrr::reduce(dplyr::full_join, by = join_keys) %>%
     dplyr::mutate(across(where(is.numeric), ~ tidyr::replace_na(., 0)))
 
@@ -113,7 +125,68 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       CO2eq_N2O_direct   = N2O_direct_Gg * n2o_factor,
       CO2eq_N2O_indirect = (N2O_vol_Gg + N2O_lea_Gg) * n2o_factor,
       CO2eq_N2O          = CO2eq_N2O_direct + CO2eq_N2O_indirect,
-      CO2eq_Total_Gg     = CO2eq_enteric + CO2eq_manure + CO2eq_N2O)
+      CO2eq_Total_Gg     = CO2eq_enteric + CO2eq_manure + CO2eq_N2O
+    )
+
+  # 5b. Functional Units and Emission Intensities
+  # Conversion: 1 Gg CO2e = 1e6 kg CO2e
+  co2e_total_kg <- final_summary$CO2eq_Total_Gg * 1e6
+  land_total_m2 <- final_summary$Land_m2
+
+  # 1) Per kg of Edible Protein (Universal nutritional FU)
+  prot_kg <- final_summary$total_protein_kg
+  ghg_protein <- dplyr::if_else(prot_kg > 0, round(co2e_total_kg / prot_kg, 3), NA_real_)
+  land_protein <- dplyr::if_else(prot_kg > 0, round(land_total_m2 / prot_kg, 2), NA_real_)
+
+  # 2) Per Animal Head / Year (Per capita physiological FU)
+  pop_n <- final_summary$population
+  ghg_head <- dplyr::if_else(pop_n > 0, round(co2e_total_kg / pop_n, 2), NA_real_)
+  land_head <- dplyr::if_else(pop_n > 0, round(land_total_m2 / pop_n, 1), NA_real_)
+
+  # 3) Per Commercial Product (IDF biophysical allocation for dairy, 100% for meat/egg)
+  milk_kg <- final_summary$milk_FPCM_kg
+  meat_kg <- final_summary$meat_carcass_weight_kg
+  egg_kg  <- final_summary$egg_fresh_kg
+
+  af_milk <- dplyr::case_when(
+    milk_kg > 0 & meat_kg > 0 ~ pmax(0.5, pmin(1.0, 1 - 5.7717 * (meat_kg / milk_kg))),
+    milk_kg > 0 ~ 1.0,
+    TRUE ~ 0.0
+  )
+
+  primary_prod <- dplyr::case_when(
+    milk_kg > 0 ~ "kg FPCM Milk",
+    egg_kg > 0 ~ "kg Fresh Eggs",
+    meat_kg > 0 ~ "kg Carcass Meat",
+    TRUE ~ "None"
+  )
+
+  prod_yield_kg <- dplyr::case_when(
+    milk_kg > 0 ~ milk_kg,
+    egg_kg > 0 ~ egg_kg,
+    meat_kg > 0 ~ meat_kg,
+    TRUE ~ 0.0
+  )
+
+  af_prod <- dplyr::case_when(
+    milk_kg > 0 ~ af_milk,
+    prod_yield_kg > 0 ~ 1.0,
+    TRUE ~ 0.0
+  )
+
+  ghg_product <- dplyr::if_else(prod_yield_kg > 0, round((co2e_total_kg * af_prod) / prod_yield_kg, 3), NA_real_)
+  land_product <- dplyr::if_else(prod_yield_kg > 0, round((land_total_m2 * af_prod) / prod_yield_kg, 2), NA_real_)
+
+  final_summary <- final_summary %>%
+    dplyr::mutate(
+      primary_product        = primary_prod,
+      GHG_intensity_protein  = ghg_protein,
+      Land_intensity_protein = land_protein,
+      GHG_intensity_head     = ghg_head,
+      Land_intensity_head    = land_head,
+      GHG_intensity_product  = ghg_product,
+      Land_intensity_product = land_product
+    )
 
   attr(final_summary, "gwp_report") <- gwp_choice
   attr(final_summary, "gwp_factors") <- gwp_vals

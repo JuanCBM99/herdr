@@ -113,6 +113,12 @@ if(getRversion() >= "2.15.1") {
     "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
     "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg",
     "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
-    "co2e_n2o_dir", "co2e_n2o_ind", "land_ha"
+    "co2e_n2o_dir", "co2e_n2o_ind", "land_ha", "land_val", "functional_unit",
+
+    # --- Functional Units and Intensities ---
+    "GHG_intensity_protein", "Land_intensity_protein",
+    "GHG_intensity_head", "Land_intensity_head",
+    "GHG_intensity_product", "Land_intensity_product",
+    "primary_product"
   ))
 }

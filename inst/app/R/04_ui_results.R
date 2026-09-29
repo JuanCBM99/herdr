@@ -15,7 +15,7 @@ build_results_panel <- function() {
           class = "row mb-3 p-3 rounded align-items-center",
           style = "background: var(--herdr-paper); border: 1px solid var(--herdr-border);",
           div(
-            class = "col-md-8",
+            class = "col-md-5",
             selectizeInput(
               "plot_groups",
               "Group Chart By:",
@@ -26,7 +26,21 @@ build_results_panel <- function() {
             )
           ),
           div(
-            class = "col-md-4 text-end",
+            class = "col-md-4",
+            selectInput(
+              "plot_functional_unit",
+              "Functional Unit / Metric:",
+              choices = c(
+                "Total Emissions & Land" = "total",
+                "Per kg Edible Protein"  = "protein",
+                "Per Commercial Product" = "product",
+                "Per Animal Head"        = "head"
+              ),
+              selected = "total"
+            )
+          ),
+          div(
+            class = "col-md-3 text-end",
             downloadButton("download_plot", "Download Chart", class = "btn btn-outline-secondary btn-sm")
           )
         ),
