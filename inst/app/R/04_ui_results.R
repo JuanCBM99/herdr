@@ -11,7 +11,6 @@ build_results_panel <- function() {
       uiOutput("results_placeholder"),
       div(
         class = "results-card",
-        uiOutput("results_kpis"),
         div(
           class = "row mb-3 p-3 rounded align-items-center",
           style = "background: var(--herdr-paper); border: 1px solid var(--herdr-border);",
@@ -34,7 +33,7 @@ build_results_panel <- function() {
         div(
           style = "margin-bottom: 1.5rem;",
           shinycssloaders::withSpinner(
-            plotOutput("main_plot", height = "420px"),
+            plotOutput("main_plot", height = "460px"),
             type = 6,
             color = "#2D5A38"
           )
