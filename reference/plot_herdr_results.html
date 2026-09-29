@@ -62,7 +62,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">plot_herdr_results</span><span class="op">(</span></span>
 <span>  <span class="va">df</span>,</span>
 <span>  group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_tag"</span>, <span class="st">"region"</span>, <span class="st">"subregion"</span>, <span class="st">"class_flex"</span><span class="op">)</span>,</span>
-<span>  func_name <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  func_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  gwp_report <span class="op">=</span> <span class="st">"AR5"</span>,</span>
+<span>  ar <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -80,6 +82,14 @@
 
 <dt id="arg-func-name">func_name<a class="anchor" aria-label="anchor" href="#arg-func-name"></a></dt>
 <dd><p>Name of the function that generated the data.</p></dd>
+
+
+<dt id="arg-gwp-report">gwp_report<a class="anchor" aria-label="anchor" href="#arg-gwp-report"></a></dt>
+<dd><p>Character string or named numeric vector. IPCC GWP standard used as fallback when GWP columns are not pre-calculated. Options: `"AR5"`, `"AR6"`, `"AR4"`, `"SAR"`. Default is `"AR5"`.</p></dd>
+
+
+<dt id="arg-ar">ar<a class="anchor" aria-label="anchor" href="#arg-ar"></a></dt>
+<dd><p>Optional alias for `gwp_report`.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -16,6 +16,8 @@ generate_impact_assessment(
   group_by_identification = TRUE,
   farm_country = "Spain",
   year = 2024,
+  gwp_report = "AR5",
+  ar = NULL,
   data_dir = "user_data"
 )
 ```
@@ -64,6 +66,19 @@ generate_impact_assessment(
 
   Numeric. The reference year for FAO trade data calculation if origins
   are missing. Default is 2022.
+
+- gwp_report:
+
+  Character string or named numeric vector. IPCC Assessment Report
+  version for Global Warming Potential (GWP100) factors. Options are
+  \`"AR5"\` (default, CH4=28, N2O=265), \`"AR6"\` (CH4=27, N2O=273),
+  \`"AR4"\` (CH4=25, N2O=298), or \`"SAR"\` (CH4=21, N2O=310).
+  Alternatively, a custom named vector like \`c(CH4 = 27, N2O = 273)\`
+  can be provided.
+
+- ar:
+
+  Optional shorthand alias for \`gwp_report\` (e.g., \`ar = "AR6"\`).
 
 - data_dir:
 
