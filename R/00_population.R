@@ -124,35 +124,35 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
       message("\U0001F403 Calculating populations for CATTLE...")
-      results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions_ruminant, weights = weights_df)
+      results_list$cattle <- calculate_population_cattle(df_cattle, rate_parameters, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3b. Sheep demographic modeling
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
       message("\U0001F411 Calculating populations for SHEEP...")
-      results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters, definitions_ruminant, weights = weights_df)
+      results_list$sheep <- calculate_population_sheep(df_sheep, rate_parameters, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3c. Goat demographic modeling
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
       message("\U0001F410 Calculating populations for GOAT...")
-      results_list$goat <- calculate_population_goat(df_goat, rate_parameters, definitions_ruminant, weights = weights_df)
+      results_list$goat <- calculate_population_goat(df_goat, rate_parameters, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3d. Swine demographic modeling
     df_swine <- census_base %>% dplyr::filter(tolower(animal_type) == "swine")
     if (nrow(df_swine) > 0) {
       message("\U0001F416 Calculating populations for SWINE...")
-      results_list$swine <- calculate_population_swine(df_swine, rate_parameters, definitions_monogastric, weights = weights_df)
+      results_list$swine <- calculate_population_swine(df_swine, rate_parameters, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
     # 3e. Poultry demographic modeling
     df_poultry <- census_base %>% dplyr::filter(tolower(animal_type) == "poultry")
     if (nrow(df_poultry) > 0) {
       message("\U0001F426 Calculating populations for POULTRY...")
-      results_list$poultry <- calculate_population_poultry(df_poultry, rate_parameters, definitions_monogastric, weights = weights_df)
+      results_list$poultry <- calculate_population_poultry(df_poultry, rate_parameters, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
     if (length(results_list) == 0) return(tibble::tibble())

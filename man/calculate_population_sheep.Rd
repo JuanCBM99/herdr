@@ -8,7 +8,8 @@ calculate_population_sheep(
   census_sheep,
   rate_parameters,
   definitions = NULL,
-  weights = NULL
+  weights = NULL,
+  data_dir = "user_data"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ calculate_population_sheep(
 \item{definitions}{Optional definitions table (e.g., ruminant_definitions) containing \code{pr_sheep_goat}.}
 
 \item{weights}{Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \value{
 A tibble with the modeled sheep population structure.

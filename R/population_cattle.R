@@ -17,10 +17,11 @@
 #' @param rate_parameters Reproduction and replacement rates table.
 #' @param definitions Optional definitions table (e.g., ruminant_definitions) containing \code{pregnancy_rate}.
 #' @param weights Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.
+#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #'
 #' @return A tibble with the modeled cattle population structure.
 #' @export
-calculate_population_cattle <- function(census_cattle, rate_parameters, definitions = NULL, weights = NULL) {
+calculate_population_cattle <- function(census_cattle, rate_parameters, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("\U0001F9EE Calculating populations for CATTLE...")
 
@@ -64,10 +65,13 @@ calculate_population_cattle <- function(census_cattle, rate_parameters, definiti
 
   weights_df <- if (!is.null(weights)) {
     weights
-  } else if (file.exists("user_data/livestock_weights.csv")) {
-    suppressMessages(readr::read_csv("user_data/livestock_weights.csv", show_col_types = FALSE))
   } else {
-    NULL
+    weights_path <- file.path(data_dir, "livestock_weights.csv")
+    if (file.exists(weights_path)) {
+      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+    } else {
+      NULL
+    }
   }
 
   get_period_days <- function(tag, default_days = 365) {

@@ -27,7 +27,11 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   country_area_code_max <- 5000
 
   # --- 1. Load reference data ---
-  fao_ds <- arrow::open_dataset(file.path(data_dir, "fao_crops.parquet"))
+  fao_crops_path <- herdr_get_fao_crops_path(data_dir)
+  if (is.null(fao_crops_path) || !file.exists(fao_crops_path)) {
+    stop("Could not locate fao_crops.parquet in '", data_dir, "' or user cache. Please verify your internet connection or supply the file.")
+  }
+  fao_ds <- arrow::open_dataset(fao_crops_path)
   fao_filtered <- dplyr::filter(fao_ds, Element == "Yield")
   if ("Area Code" %in% names(fao_ds)) {
     fao_filtered <- dplyr::filter(fao_filtered, `Area Code` < country_area_code_max)
@@ -38,12 +42,8 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::rename(Value = dplyr::all_of(year_col)) %>%
     dplyr::mutate(Year = as.numeric(year))
 
-  # Curated forage yields (MAPA 2024 / BC3); supports forages.parquet with legacy fallback
-  forage_path <- if (file.exists(file.path(data_dir, "forages.parquet"))) {
-    file.path(data_dir, "forages.parquet")
-  } else {
-    file.path(data_dir, "fao_forages.parquet")
-  }
+  # Curated forage yields (MAPA 2024 / BC3); supports forages.parquet with package fallback
+  forage_path <- herdr_get_forages_path(data_dir)
   forage_raw <- arrow::read_parquet(forage_path) %>%
     dplyr::rename(Value = Yield) %>%
     dplyr::mutate(Year = as.numeric(year))
@@ -139,29 +139,17 @@ calculate_land_use <- function(automatic_cycle = FALSE,
 
   if (any(is.na(diet_ingredients_raw$country_of_origin))) {
 
-    path_parquet_trade <- file.path(data_dir, "fao_trade_matrix.parquet")
-
-    # nocov start
-    if (!file.exists(path_parquet_trade)) {
-      message("\u23f3 FAO trade matrix not found locally.")
-      message("Downloading background database (187 MB)... This will only happen once.")
-      url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_trade_matrix.parquet"
-
-      tryCatch({
-        download.file(url_release, destfile = path_parquet_trade, mode = "wb")
-        message("\u2705 Download completed successfully.")
-      }, error = function(e) {
-        stop("Error downloading the trade matrix. Please check your internet connection: ", e$message)
-      })
+    path_parquet_trade <- herdr_get_fao_trade_matrix_path(data_dir)
+    if (is.null(path_parquet_trade) || !file.exists(path_parquet_trade)) {
+      stop("Could not locate or download fao_trade_matrix.parquet. Please check your internet connection.")
     }
-    # nocov end
 
     message(paste0("\u23f3 Missing countries of origin found. Tracing real origin (beyond re-export hubs) for ", farm_country, " (", year, ")..."))
 
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
     # --- 3a. Load global production & trade tables ONCE ---
-    global_prod_ds <- arrow::open_dataset(file.path(data_dir, "fao_crops.parquet"))
+    global_prod_ds <- arrow::open_dataset(fao_crops_path)
     global_prod_filtered <- dplyr::filter(
       global_prod_ds,
       Item %in% fao_items,

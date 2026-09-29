@@ -35,10 +35,10 @@ herdr_server <- function(input, output, session) {
   })
 
   observe({
-    parquet_path <- file.path(user_data_tmp, "fao_crops.parquet")
+    parquet_path <- herdr::herdr_get_fao_crops_path(user_data_tmp, download_if_missing = FALSE)
     fallback_countries <- c("Spain", "France", "Germany", "United States of America")
 
-    if (!file.exists(parquet_path)) {
+    if (is.null(parquet_path) || !file.exists(parquet_path)) {
       updateSelectInput(session, "farm_country", choices = fallback_countries)
       return(invisible(NULL))
     }

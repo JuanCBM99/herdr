@@ -1,5 +1,3 @@
-^Meta$
-^doc$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^READMEfigs$
@@ -36,3 +34,5 @@ fao_trade_matrix\.parquet$
 ^.*\.tar\.gz$
 ^.*\.Rcheck$
 ^CITATION\.cff$
+^doc$
+^Meta$

@@ -8,7 +8,8 @@ calculate_population_poultry(
   census_poultry,
   rate_parameters,
   definitions = NULL,
-  weights = NULL
+  weights = NULL,
+  data_dir = "user_data"
 )
 }
 \arguments{
@@ -19,6 +20,8 @@ calculate_population_poultry(
 \item{definitions}{Optional unified or monogastric definitions table.}
 
 \item{weights}{Optional weights table (e.g., livestock_weights) containing \code{productive_period_days}.}
+
+\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
 \value{
 A tibble with the modeled poultry population structure.

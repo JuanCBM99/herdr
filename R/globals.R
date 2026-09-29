@@ -111,6 +111,6 @@ if(getRversion() >= "2.15.1") {
 
     # --- Plotting and Graphics ---
     "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
-    "Land_Val", "tail", "download.file"
+    "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg"
   ))
 }
