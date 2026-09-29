@@ -379,11 +379,15 @@ html body table.htCore .htInvalid {
   color: var(--herdr-ink);
 }
 .kpi-label {
-  font-size: 0.76rem;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
+  font-size: 0.78rem;
+  letter-spacing: 0.01em;
   color: var(--herdr-muted);
   font-weight: 600;
+  line-height: 1.25;
+}
+.kpi-label sub {
+  font-size: 0.75em;
+  bottom: -0.15em;
 }
 
 /* --- Results Section --- */

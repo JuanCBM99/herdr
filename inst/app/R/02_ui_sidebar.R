@@ -34,8 +34,8 @@ build_herdr_sidebar <- function() {
       selectInput(
         "gwp_report", "IPCC GWP Standard:",
         choices = c(
-          "AR5 (CH4: 28, N2O: 265) - Default / UNFCCC" = "AR5",
           "AR6 (CH4: 27, N2O: 273)" = "AR6",
+          "AR5 (CH4: 28, N2O: 265)" = "AR5",
           "AR4 (CH4: 25, N2O: 298)" = "AR4",
           "SAR (CH4: 21, N2O: 310)" = "SAR"
         ),

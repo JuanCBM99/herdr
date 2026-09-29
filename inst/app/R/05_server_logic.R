@@ -637,7 +637,87 @@ herdr_server <- function(input, output, session) {
         div(
           class = "kpi-data",
           span(class = "kpi-value", format(round(total_co2, 3), big.mark = ",")),
-          span(class = "kpi-label", "Total GHG (Gg CO2eq)")
+          span(class = "kpi-label", HTML("Total GHG (Gg CO<sub>2</sub>e)"))
+        )
+      )
+    }
+
+    if ("CH4_enteric_Gg" %in% names(df)) {
+      ch4_ent <- sum(df$CH4_enteric_Gg, na.rm = TRUE)
+      if (ch4_ent > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card wheat",
+          div(class = "kpi-icon-wrap", icon("wind")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(ch4_ent, 3), big.mark = ",")),
+            span(class = "kpi-label", HTML("Enteric CH<sub>4</sub> (Gg)"))
+          )
+        )
+      }
+    } else if ("total_CH4_enteric_Ggyear" %in% names(df)) {
+      ch4_ent <- sum(df$total_CH4_enteric_Ggyear, na.rm = TRUE)
+      cards[[length(cards) + 1]] <- div(
+        class = "kpi-card pasture",
+        div(class = "kpi-icon-wrap", icon("wind")),
+        div(
+          class = "kpi-data",
+          span(class = "kpi-value", format(round(ch4_ent, 3), big.mark = ",")),
+          span(class = "kpi-label", HTML("Enteric CH<sub>4</sub> (Gg/year)"))
+        )
+      )
+    }
+
+    if ("CH4_manure_Gg" %in% names(df)) {
+      ch4_man <- sum(df$CH4_manure_Gg, na.rm = TRUE)
+      if (ch4_man > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card barn",
+          div(class = "kpi-icon-wrap", icon("cubes-stacked")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(ch4_man, 3), big.mark = ",")),
+            span(class = "kpi-label", HTML("Manure CH<sub>4</sub> (Gg)"))
+          )
+        )
+      }
+    } else if ("total_CH4_mm_kgyear" %in% names(df)) {
+      ch4_man <- sum(df$total_CH4_mm_kgyear, na.rm = TRUE) / 1e6
+      cards[[length(cards) + 1]] <- div(
+        class = "kpi-card barn",
+        div(class = "kpi-icon-wrap", icon("cubes-stacked")),
+        div(
+          class = "kpi-data",
+          span(class = "kpi-value", format(round(ch4_man, 3), big.mark = ",")),
+          span(class = "kpi-label", HTML("Manure CH<sub>4</sub> (Gg/year)"))
+        )
+      )
+    }
+
+    if ("N2O_direct_Gg" %in% names(df)) {
+      n2o_tot <- sum(df$N2O_direct_Gg +
+                     (if ("N2O_vol_Gg" %in% names(df)) df$N2O_vol_Gg else 0) +
+                     (if ("N2O_lea_Gg" %in% names(df)) df$N2O_lea_Gg else 0), na.rm = TRUE)
+      if (n2o_tot > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card pasture",
+          div(class = "kpi-icon-wrap", icon("cloud-rain")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(n2o_tot, 4), big.mark = ",")),
+            span(class = "kpi-label", HTML("Total N<sub>2</sub>O (Gg)"))
+          )
+        )
+      }
+    } else if ("direct_N2O_kgyear" %in% names(df)) {
+      n2o_dir <- sum(df$direct_N2O_kgyear, na.rm = TRUE) / 1e6
+      cards[[length(cards) + 1]] <- div(
+        class = "kpi-card wheat",
+        div(class = "kpi-icon-wrap", icon("cloud-rain")),
+        div(
+          class = "kpi-data",
+          span(class = "kpi-value", format(round(n2o_dir, 4), big.mark = ",")),
+          span(class = "kpi-label", HTML("Direct N<sub>2</sub>O (Gg/year)"))
         )
       )
     }
@@ -734,6 +814,36 @@ herdr_server <- function(input, output, session) {
             class = "kpi-data",
             span(class = "kpi-value", format(round(total_eggs, 1), big.mark = ",")),
             span(class = "kpi-label", "Fresh Eggs (kg)")
+          )
+        )
+      }
+    }
+
+    if ("DMI_kgday" %in% names(df)) {
+      avg_dmi <- mean(df$DMI_kgday, na.rm = TRUE)
+      if (avg_dmi > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card wheat",
+          div(class = "kpi-icon-wrap", icon("seedling")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(avg_dmi, 2), big.mark = ",")),
+            span(class = "kpi-label", "Mean DMI (kg DM/day)")
+          )
+        )
+      }
+    }
+
+    if ("GE_MJday" %in% names(df)) {
+      avg_ge <- mean(df$GE_MJday, na.rm = TRUE)
+      if (avg_ge > 0) {
+        cards[[length(cards) + 1]] <- div(
+          class = "kpi-card pasture",
+          div(class = "kpi-icon-wrap", icon("bolt")),
+          div(
+            class = "kpi-data",
+            span(class = "kpi-value", format(round(avg_ge, 1), big.mark = ",")),
+            span(class = "kpi-label", "Mean GE (MJ/day)")
           )
         )
       }
