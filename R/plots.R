@@ -3,13 +3,15 @@
 #' @param df Dataframe containing the results.
 #' @param group_cols Character vector of columns to group the plot by.
 #' @param func_name Name of the function that generated the data.
+#' @param gwp_report Character string or named numeric vector. IPCC GWP standard used as fallback when GWP columns are not pre-calculated. Options: `"AR5"`, `"AR6"`, `"AR4"`, `"SAR"`. Default is `"AR5"`.
+#' @param ar Optional alias for `gwp_report`.
 #' @return A ggplot2 object.
 #' @export
 #' @import ggplot2
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter select bind_rows
 #' @importFrom scales comma
-plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL) {
+plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL, gwp_report = "AR5", ar = NULL) {
   if (!is.data.frame(df) || nrow(df) == 0) return(NULL)
 
   valid_groups <- intersect(group_cols, names(df))
@@ -92,13 +94,41 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     all(c("CO2eq_enteric", "CO2eq_manure") %in% names(df_agg))
 
   if (is_impact_assessment) {
-    co2e_ch4_ent <- if ("CO2eq_enteric" %in% names(df_agg)) df_agg$CO2eq_enteric else df_agg$CH4_enteric_Gg * 28
-    co2e_ch4_man <- if ("CO2eq_manure" %in% names(df_agg)) df_agg$CO2eq_manure else df_agg$CH4_manure_Gg * 28
+    effective_gwp <- if (!is.null(ar)) ar else gwp_report
+    gwp_presets <- list(
+      AR6 = c(CH4 = 27, N2O = 273),
+      AR5 = c(CH4 = 28, N2O = 265),
+      AR4 = c(CH4 = 25, N2O = 298),
+      SAR = c(CH4 = 21, N2O = 310)
+    )
+    if (is.character(effective_gwp) && toupper(effective_gwp[1]) %in% names(gwp_presets)) {
+      default_factors <- gwp_presets[[toupper(effective_gwp[1])]]
+    } else if (is.numeric(effective_gwp) && all(c("CH4", "N2O") %in% names(effective_gwp))) {
+      default_factors <- effective_gwp
+    } else {
+      default_factors <- gwp_presets[["AR5"]]
+    }
+
+    co2e_ch4_ent <- if ("CO2eq_enteric" %in% names(df_agg)) {
+      df_agg$CO2eq_enteric
+    } else if ("CH4_enteric_Gg" %in% names(df_agg)) {
+      df_agg$CH4_enteric_Gg * default_factors[["CH4"]]
+    } else {
+      0
+    }
+
+    co2e_ch4_man <- if ("CO2eq_manure" %in% names(df_agg)) {
+      df_agg$CO2eq_manure
+    } else if ("CH4_manure_Gg" %in% names(df_agg)) {
+      df_agg$CH4_manure_Gg * default_factors[["CH4"]]
+    } else {
+      0
+    }
 
     co2e_n2o_dir <- if ("CO2eq_N2O_direct" %in% names(df_agg)) {
       df_agg$CO2eq_N2O_direct
     } else if ("N2O_direct_Gg" %in% names(df_agg)) {
-      df_agg$N2O_direct_Gg * 265
+      df_agg$N2O_direct_Gg * default_factors[["N2O"]]
     } else {
       0
     }
@@ -106,7 +136,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     co2e_n2o_ind <- if ("CO2eq_N2O_indirect" %in% names(df_agg)) {
       df_agg$CO2eq_N2O_indirect
     } else if (all(c("N2O_vol_Gg", "N2O_lea_Gg") %in% names(df_agg))) {
-      (df_agg$N2O_vol_Gg + df_agg$N2O_lea_Gg) * 265
+      (df_agg$N2O_vol_Gg + df_agg$N2O_lea_Gg) * default_factors[["N2O"]]
     } else if ("CO2eq_N2O" %in% names(df_agg)) {
       pmax(0, df_agg$CO2eq_N2O - co2e_n2o_dir)
     } else {

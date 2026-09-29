@@ -84,5 +84,43 @@ test_that("generate_impact_assessment creates a consistent final report safely",
   expect_s3_class(filtered_res, "data.frame")
   expect_true(all(filtered_res$animal_type == "cattle"))
   expect_true(file.exists("output/impact_assessment_summary.csv"))
+
+  # 7. GWP REPORT SELECTION (AR6, AR5, AR4, SAR, CUSTOM)
+  res_ar6 <- suppressWarnings(
+    generate_impact_assessment(
+      farm_country = "Spain",
+      year = 2022,
+      saveoutput = FALSE,
+      ar = "AR6"
+    )
+  )
+  expect_equal(attr(res_ar6, "gwp_report"), "AR6")
+  row_ar6 <- res_ar6[1, ]
+  exp_ar6 <- (row_ar6$CH4_enteric_Gg * 27) +
+    (row_ar6$CH4_manure_Gg * 27) +
+    ((row_ar6$N2O_direct_Gg + row_ar6$N2O_vol_Gg + row_ar6$N2O_lea_Gg) * 273)
+  expect_equal(row_ar6$CO2eq_Total_Gg, exp_ar6, tolerance = 0.01)
+
+  # Custom GWP vector
+  res_custom <- suppressWarnings(
+    generate_impact_assessment(
+      farm_country = "Spain",
+      year = 2022,
+      saveoutput = FALSE,
+      gwp_report = c(CH4 = 30, N2O = 250)
+    )
+  )
+  row_cust <- res_custom[1, ]
+  exp_cust <- (row_cust$CH4_enteric_Gg * 30) +
+    (row_cust$CH4_manure_Gg * 30) +
+    ((row_cust$N2O_direct_Gg + row_cust$N2O_vol_Gg + row_cust$N2O_lea_Gg) * 250)
+  expect_equal(row_cust$CO2eq_Total_Gg, exp_cust, tolerance = 0.01)
+
+  # Invalid GWP should stop with informative error
+  expect_error(
+    generate_impact_assessment(farm_country = "Spain", year = 2022, gwp_report = "INVALID"),
+    "Invalid GWP report"
+  )
 })
+
 

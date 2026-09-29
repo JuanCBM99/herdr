@@ -30,7 +30,17 @@ build_herdr_sidebar <- function() {
       ),
       hr(),
       selectInput("farm_country", "Farm Country / Area:", choices = c("Loading..." = "")),
-      numericInput("year", "FAO Reference Year:", value = 2022, step = 1)
+      numericInput("year", "FAO Reference Year:", value = 2022, step = 1),
+      selectInput(
+        "gwp_report", "IPCC GWP Standard:",
+        choices = c(
+          "AR5 (CH4: 28, N2O: 265) - Default / UNFCCC" = "AR5",
+          "AR6 (CH4: 27, N2O: 273)" = "AR6",
+          "AR4 (CH4: 25, N2O: 298)" = "AR4",
+          "SAR (CH4: 21, N2O: 310)" = "SAR"
+        ),
+        selected = "AR5"
+      )
     ),
 
     # --- STEP 3: CALCULATE ---

@@ -568,6 +568,7 @@ herdr_server <- function(input, output, session) {
             if ("farm_country" %in% func_args) args_to_pass$farm_country <- input$farm_country
             if ("year" %in% func_args) args_to_pass$year <- input$year
             if ("data_dir" %in% func_args) args_to_pass$data_dir <- user_data_tmp
+            if ("gwp_report" %in% func_args && !is.null(input$gwp_report)) args_to_pass$gwp_report <- input$gwp_report
 
             do.call(func, args_to_pass)
           },
@@ -748,7 +749,12 @@ herdr_server <- function(input, output, session) {
 
   current_plot <- reactive({
     req(model_data(), input$plot_groups)
-    herdr::plot_herdr_results(df = model_data(), group_cols = input$plot_groups, func_name = input$function_choice)
+    herdr::plot_herdr_results(
+      df = model_data(),
+      group_cols = input$plot_groups,
+      func_name = input$function_choice,
+      gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5"
+    )
   })
 
   output$main_plot <- renderPlot({

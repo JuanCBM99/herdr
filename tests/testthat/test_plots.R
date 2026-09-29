@@ -134,5 +134,8 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_true("GHG Emissions (Gg CO2e)" %in% levels(p_impact$data$panel))
   expect_true("CH4 Enteric" %in% levels(p_impact$data$component))
   expect_true("Land Use" %in% levels(p_impact$data$component))
+
+  p_impact_ar6 <- plot_herdr_results(impact_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", ar = "AR6")
+  expect_s3_class(p_impact_ar6, "ggplot")
 })
 
