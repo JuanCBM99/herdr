@@ -1,7 +1,7 @@
 diet_tag,ingredient_type,ingredient,ingredient_share,country_of_origin,custom_yield_kg_ha
-diet_random_goat,concentrate,corn_national,8,Spain,
-diet_random_goat,concentrate,barley_2_rows_national_11_3_cp,25,Spain,
-diet_random_goat,concentrate,wheat_soft_national_12_9_cp,5,Spain,
+diet_random_goat,concentrate,corn,8,Spain,
+diet_random_goat,concentrate,barley_2_rows_11_3_cp,25,Spain,
+diet_random_goat,concentrate,wheat_soft_12_9_cp,5,Spain,
 diet_random_goat,concentrate,soybean_meal_44_cp,10,,
 diet_random_goat,concentrate,wheat_bran_20_starch,30,,
 diet_random_goat,concentrate,barley_ddgs,0,,

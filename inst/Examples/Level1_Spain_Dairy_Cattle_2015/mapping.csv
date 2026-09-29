@@ -2,21 +2,21 @@ ingredient,yield_name,agribalyse_name,economic_allocation
 broken_rice,Rice,NA,1
 oats,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
 oats_decorticated,Oats,"Oat grain, national average, animal feed, at farm gate {FR} U",1
-barley_2_rows_national_11_3_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
-barley_2_rows_national_9_6_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
-rye_national,Rye,NA,1
+barley_2_rows_11_3_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+barley_2_rows_9_6_cp,Barley,"Barley, feed grain, conventional, national average, animal feed, at farm gate {FR} U",1
+rye,Rye,NA,1
 rye_german,Rye,NA,1
-corn_national,Maize (corn),"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
+corn,Maize (corn),"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
 high_oil_corn_grain,Mixed grain,"Maize grain, conventional, 28% moisture, national average, animal feed, at farm gate {FR} U",1
 white_sorghum_grain,Sorghum,"Sorghum grain, conventional, national average, animal feed, at farm gate {FR} U",1
-wheat_soft_national_12_9_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
-wheat_soft_national_11_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
-wheat_soft_national_10_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_12_9_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_11_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
+wheat_soft_10_2_cp,Wheat,"Soft wheat grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
 wheat_soft_english,Wheat,"Soft wheat grain, conventional, Great Britain, animal feed, at french port {FR} U",1
-wheat_hard_national,Wheat,NA,1
+wheat_hard,Wheat,NA,1
 triticale,Triticale,"Triticale grain, conventional, national average, animal feed, at farm gate, production {FR} U",1
 rice_cooked,Rice,NA,1
-corn_heat_processed_national,Wheat,NA,1
+corn_heat_processed,Wheat,NA,1
 white_sorghum_heat_processed,Wheat,NA,1
 rice_bran_14_ee,Rice,As wheat bran,0.0822
 rice_bran_high_fat_17_ee,Rice,As wheat bran,0.0822
@@ -55,7 +55,7 @@ cotton_seed_meal_38_cp,"Seed cotton, unginned",As sunflower meal without dehulli
 lupin_australian,Lupins,"Lupin, conventional, national average, at farm gate, production {FR} U",1
 peanut_meal_48_cp,"Groundnuts, excluding shelled",As sunflower meal without dehulling,0.189
 peanut_meal_52_cp,"Groundnuts, excluding shelled",As sunflower meal low dehulling,0.185
-camelina_meal_national,NA,As sunflower meal without dehulling,0.189
+camelina_meal,NA,As sunflower meal without dehulling,0.189
 camelina_meal_expeller,NA,As sunflower meal expeller with low dehulling,0.185
 rapeseed_meal_00,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
 rapeseed_meal_00_33_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
@@ -131,8 +131,8 @@ meat_meal_52_14_25,NA,NA,1
 meat_meal_57_13_24,NA,NA,1
 poultry_byproduct,NA,NA,1
 poultry_meat_meal,NA,NA,1
-fish_meal_national_59_9_21,NA,NA,1
-fish_meal_national_62_9_18,NA,NA,1
+fish_meal_59_9_21,NA,NA,1
+fish_meal_62_9_18,NA,NA,1
 fish_meal_67_10_15,NA,NA,1
 fish_meal_70_9_13,NA,NA,1
 feather_meal_hydrolyzed,NA,NA,0
@@ -164,7 +164,7 @@ animal_fat_9_12,NA,As tallow,1
 poultry_fat,NA,As tallow,1
 chilean_fish_oil,NA,NA,1
 nordic_fish_oil,NA,"Fish oil, with wastewater treatment, from Norway, at feed plant S {FR} U",1
-national_fish_oil,NA,NA,1
+fish_oil,NA,NA,1
 fish_acid_oil_oleins,NA,NA,1
 cotton_oil,"Seed cotton, unginned",NA,1
 corn_oil,Maize (corn),"Corn oil, national average, animal feed, at plant {FR} U",0.0715
