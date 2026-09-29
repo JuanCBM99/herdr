@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">herdr</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.3</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">1.0.4</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -64,7 +64,8 @@
 <span>  group_cols <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_tag"</span>, <span class="st">"region"</span>, <span class="st">"subregion"</span>, <span class="st">"class_flex"</span><span class="op">)</span>,</span>
 <span>  func_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gwp_report <span class="op">=</span> <span class="st">"AR5"</span>,</span>
-<span>  ar <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  ar <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"total"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -90,6 +91,10 @@
 
 <dt id="arg-ar">ar<a class="anchor" aria-label="anchor" href="#arg-ar"></a></dt>
 <dd><p>Optional alias for `gwp_report`.</p></dd>
+
+
+<dt id="arg-functional-unit">functional_unit<a class="anchor" aria-label="anchor" href="#arg-functional-unit"></a></dt>
+<dd><p>Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e and ha), `"protein"` (kg CO2e and m2 per kg edible protein), `"product"` (kg CO2e and m2 per kg commercial product), or `"head"` (kg CO2e and m2 per animal head). Default is `"total"`.</p></dd>
 
 </dl></div>
     <div class="section level2">

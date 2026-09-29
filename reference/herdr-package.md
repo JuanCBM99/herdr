@@ -22,9 +22,6 @@ Useful links:
 
 Authors:
 
-- Juan Carlos Baez <juancarlos.baez@bc3research.org>
-  ([ORCID](https://orcid.org/0000-0002-7067-265X))
-
 - Jon Sampedro <jon.sampedro@bc3research.org>
   ([ORCID](https://orcid.org/0000-0002-2277-1530))
 
