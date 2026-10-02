@@ -31,9 +31,9 @@
   - Added interactive Functional Unit dropdown in the Results tab to
     toggle dynamically between absolute footprint, intensities, and
     Mottet Protein FCR (with a red dashed reference line at 1.0).
-  - Added dynamic conditional dropdown to select specific commercial
+  - Added dynamic conditional dropdown to select dedicated commercial
     products (milk, meat, wool, egg) when evaluating per commercial
-    product.
+    product, removing redundant generic intensity columns.
   - Interactive preview table with sorted column previews and CSV/PNG
     download handlers.
 - **User-Defined Milk Protein Percentage (`protein_content_pct`)**:
