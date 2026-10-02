@@ -622,14 +622,52 @@ herdr_server <- function(input, output, session) {
     }
   })
 
+  # Dynamically adapt commercial product choices based on active model outputs
+  observeEvent(list(model_data(), input$function_choice), {
+    req(model_data())
+    df <- model_data()
+    if (!is.data.frame(df) || nrow(df) == 0 || input$function_choice != "generate_impact_assessment") return()
+
+    prod_choices <- c("Primary Product (Auto)" = "product")
+    if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
+      prod_choices <- c(prod_choices, "Milk (kg FPCM)" = "milk")
+    }
+    if (("meat_carcass_weight_kg" %in% names(df) && any(df$meat_carcass_weight_kg > 0, na.rm = TRUE)) ||
+        ("meat_live_weight_kg" %in% names(df) && any(df$meat_live_weight_kg > 0, na.rm = TRUE))) {
+      has_meat <- if ("AF_meat" %in% names(df)) any(df$AF_meat > 0, na.rm = TRUE) else TRUE
+      if (has_meat) {
+        prod_choices <- c(prod_choices, "Meat (kg Carcass)" = "meat")
+      }
+    }
+    if ("wool_kg" %in% names(df) && any(df$wool_kg > 0, na.rm = TRUE)) {
+      has_wool <- if ("AF_wool" %in% names(df)) any(df$AF_wool > 0, na.rm = TRUE) else TRUE
+      if (has_wool) {
+        prod_choices <- c(prod_choices, "Wool (kg Wool)" = "wool")
+      }
+    }
+    if ("egg_fresh_kg" %in% names(df) && any(df$egg_fresh_kg > 0, na.rm = TRUE)) {
+      prod_choices <- c(prod_choices, "Eggs (kg Fresh Eggs)" = "egg")
+    }
+
+    current_val <- input$plot_product_subchoice
+    sel <- if (!is.null(current_val) && current_val %in% unname(prod_choices)) current_val else "product"
+    updateSelectInput(session, "plot_product_subchoice", choices = prod_choices, selected = sel)
+  })
+
   current_plot <- reactive({
     req(model_data(), input$plot_groups)
+
+    fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
+    if (fu == "product" && !is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "") {
+      fu <- input$plot_product_subchoice
+    }
+
     herdr::plot_herdr_results(
       df = model_data(),
       group_cols = input$plot_groups,
       func_name = input$function_choice,
       gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5",
-      functional_unit = if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
+      functional_unit = fu
     )
   })
 

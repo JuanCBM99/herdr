@@ -138,6 +138,19 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   p_impact_ar6 <- plot_herdr_results(impact_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", ar = "AR6")
   expect_s3_class(p_impact_ar6, "ggplot")
 
+  # 11b. Assertions: Environmental Impact Assessment with Land Use breakdown
+  impact_breakdown_df <- impact_df %>%
+    dplyr::mutate(
+      Land_cropland_m2                = c(3000000, 1000000),
+      Land_grassland_convertible_m2   = c(1500000, 400000),
+      Land_grassland_unconvertible_m2 = c(500000, 100000)
+    )
+  p_impact_breakdown <- plot_herdr_results(impact_breakdown_df, group_cols = "animal_tag", func_name = "generate_impact_assessment")
+  expect_s3_class(p_impact_breakdown, "ggplot")
+  expect_true("Cropland" %in% levels(p_impact_breakdown$data$component))
+  expect_true("Grassland (Conv.)" %in% levels(p_impact_breakdown$data$component))
+  expect_true("Grassland (Unconv.)" %in% levels(p_impact_breakdown$data$component))
+
   # 12. Assertions: Functional unit plots (protein, product, head)
   impact_fu_df <- impact_df %>%
     dplyr::mutate(
@@ -162,5 +175,16 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_s3_class(p_fu_prod, "ggplot")
   expect_true("GHG Intensity (kg CO2e / kg product)" %in% levels(p_fu_prod$data$panel))
   expect_true("Land Footprint (m2 / kg product)" %in% levels(p_fu_prod$data$panel))
+
+  # 13. Assertions: Protein Feed Efficiency (Mottet FCR)
+  impact_fcr_df <- impact_fu_df %>%
+    dplyr::mutate(
+      feed_CP_total_kg    = c(910000, 320000),
+      feed_CP_cropland_kg = c(650000, 80000)
+    )
+  p_fu_fcr <- plot_herdr_results(impact_fcr_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "fcr")
+  expect_s3_class(p_fu_fcr, "ggplot")
+  expect_match(p_fu_fcr$labels$title, "Protein Feed Efficiency")
+  expect_true("Cropland Protein FCR (Human Competition)" %in% levels(p_fu_fcr$data$metric))
 })
 

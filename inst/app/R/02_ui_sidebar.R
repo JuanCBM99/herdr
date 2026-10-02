@@ -49,7 +49,7 @@ build_herdr_sidebar <- function() {
       div(class = "step-head", span("3", class = "step-tag"), h5("Calculate", class = "step-title m-0")),
       selectInput("function_choice", "Function to Run:", choices = list(
         "Overview & Assessment" = c(
-          "Full Assessment (All Emissions & Resources)" = "generate_impact_assessment"
+          "Full Assessment" = "generate_impact_assessment"
         ),
         "Herd Demography & Production" = c(
           "Population (AAP & Demography)" = "calculate_population",
