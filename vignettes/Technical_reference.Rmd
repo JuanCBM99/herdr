@@ -79,6 +79,7 @@ Links ruminant cohorts to IPCC Tier 2 metabolic equations, milk yields, and repr
 | `c` | character | — | Ruminant | Growth coefficient category (e.g. `females`, `castrates`, `bulls`). |
 | `milk_yield_kg_year` | numeric | kg/head/yr | Dairy | Annual average fresh milk yield per cow/ewe/doe. |
 | `fat_content_pct` | numeric | % | Dairy | Milk fat content percentage (e.g. `3.8`). |
+| `protein_content_pct` | numeric | % | Dairy | Milk crude protein percentage (e.g. `3.4`). If left blank or `0`, estimated via IPCC fat regression. |
 | `wool_yield_kg_year` | numeric | kg/head/yr | Sheep | Annual greasy wool shorn per head (e.g. `3.0`). |
 | `work_hours` | numeric | h/day | Working | Daily hours worked by draft animals (default: `0`). |
 | `pr_sheep_goat` | numeric | kids/litter | Sheep/Goats | Prolificacy: average kids or lambs born per litter (e.g. `1.5`). |

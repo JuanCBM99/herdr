@@ -7,11 +7,14 @@
 calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
 }
 \arguments{
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+\item{saveoutput}{Logical. If TRUE (default), the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
+\value{
+A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body weight (\% BW).
+}
 \description{
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED)
-for ruminants and metabolizable energy parameters (FEDNA) for poultry.
+for ruminants and metabolizable energy requirements (FEDNA / NRC) for monogastrics (swine and poultry).
 }

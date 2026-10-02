@@ -551,7 +551,7 @@ Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) 
 Total fresh milk is computed as:
 $$\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}$$
 
-Estimated milk protein content follows IPCC Tier 2:
+Milk crude protein content ($\text{Protein}_{\text{milk}}$) is entered directly by the user in `ruminant_definitions.csv` (`protein_content_pct`). When omitted or left at zero, it is estimated using the standard IPCC Tier 2 regression:
 $$\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)$$
 
 To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2015)** standard:
@@ -623,7 +623,7 @@ For specialized meat cohorts, $\text{AF}_{\text{meat}} = 1.0$; for laying hens, 
 
 ## 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
 
-Following the protein-to-protein framework of Mottet et al. (2017, *Global Food Security*, 14, 1-8), `herdr` evaluates feed conversion efficiency and human food security via three indicators:
+Following the protein-to-protein framework of Mottet et al. (2017, *Global Food Security*, 14, 1-8), `herdr` evaluates feed conversion efficiency and human food security via two key indicators:
 
 1. **Total Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{total}}$):**
    Evaluates system-wide biological nitrogen conversion efficiency by dividing total feed crude protein (CP) consumed by all edible animal protein produced:
@@ -636,10 +636,6 @@ Following the protein-to-protein framework of Mottet et al. (2017, *Global Food 
    * Feed sources tagged as `grassland_convertible` or `grassland_unconvertible` (permanent pastures, rangelands, native grasslands) and `none` (animal meals, urea/NPN, synthetic amino acids, minerals, and industrial coproducts requiring no dedicated arable land) are excluded from $\text{Feed}_{\text{CP, cropland}}$, reflecting zero direct competition for arable food crops.
    * When $\text{Protein\_FCR}_{\text{cropland}} < 1.0$, the livestock system is a **net producer** of protein for human consumption.
    * When $\text{Protein\_FCR}_{\text{cropland}} > 1.0$, the livestock system consumes more human-edible/cropland protein than it generates.
-
-3. **Net Protein Balance ($\text{Protein\_net\_balance}_{\text{kg}}$):**
-   Quantifies absolute net protein gain or loss:
-   $$\text{Protein\_net\_balance}_{\text{kg}} = \text{Protein}_{\text{total}} - \text{Feed}_{\text{CP, cropland}} \quad (\text{kg protein})$$
 
 ## 3. Standardized Functional Units
 

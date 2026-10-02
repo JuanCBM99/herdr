@@ -148,6 +148,8 @@ build_dictionary_panel <- function() {
                 tags$dd(class = "col-sm-9", "Annual milk yield per head (kg/head/year). Leave 0 for non-milking cohorts."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("fat_content_pct")),
                 tags$dd(class = "col-sm-9", "Milk fat content percentage (e.g., 3.7 for 3.7%)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("protein_content_pct")),
+                tags$dd(class = "col-sm-9", "Milk crude protein percentage (e.g., 3.3 for 3.3%). If left blank or 0, estimated via IPCC fat regression."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("wool_yield_kg_year")),
                 tags$dd(class = "col-sm-9", "Annual wool production per head (kg/head/year) for sheep."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("work_hours")),

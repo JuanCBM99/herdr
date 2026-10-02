@@ -1,9 +1,13 @@
 #' Calculate Dry Matter Intake (DMI)
 #'
 #' Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED)
-#' for ruminants and metabolizable energy parameters (FEDNA) for poultry.
-#' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' for ruminants and metabolizable energy requirements (FEDNA / NRC) for monogastrics (swine and poultry).
+#'
+#' @param saveoutput Logical. If TRUE (default), the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @return A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body weight (\% BW).
+#' @name calculate_DMI
+#' @rdname calculate_DMI
 #' @export
 calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data") {
 

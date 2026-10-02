@@ -110,6 +110,7 @@ modal_tooltips <- list(
   c_pregnancy              = "IPCC coefficient used to calculate the extra energy needed during pregnancy.",
   milk_yield_kg_year       = "Total milk produced by one average animal in a full year (in kg).",
   fat_content_pct          = "Percentage of fat in the milk (e.g., type 4.0 for 4%).",
+  protein_content_pct      = "Percentage of crude protein in the milk (e.g., type 3.3 for 3.3%). If left blank or 0, estimated via IPCC fat regression.",
   wool_yield_kg_year       = "Total wool produced by one animal in a year (in kg).",
   work_hours               = "Number of hours per day the animal is used for physical draft/work.",
   animal_type              = "Broad species category (e.g., 'cattle', 'sheep', 'swine').",

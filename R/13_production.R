@@ -45,10 +45,14 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       )
     }
 
+    if (!"protein_content_pct" %in% names(ruminants)) {
+      ruminants$protein_content_pct <- 0
+    }
+
     ruminants_clean <- ruminants %>%
-      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year, production_role) %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year, production_role) %>%
       dplyr::mutate(
-        dplyr::across(c(milk_yield_kg_year, fat_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+        dplyr::across(c(milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
         egg_mass_g_day = 0
       )
   } else {
@@ -77,6 +81,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         egg_mass_g_day = tidyr::replace_na(suppressWarnings(as.numeric(egg_mass_g_day)), 0),
         milk_yield_kg_year = 0,
         fat_content_pct = 0,
+        protein_content_pct = 0,
         wool_yield_kg_year = 0
       )
   } else {
@@ -130,7 +135,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::mutate(
       has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),
       dplyr::across(
-        c(population, milk_yield_kg_year, fat_content_pct, wool_yield_kg_year,
+        c(population, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year,
           egg_mass_g_day, replacement_rate, productive_period_days, adult_weight_kg,
           final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
@@ -165,8 +170,12 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
 
       # --- A) MILK PRODUCTION ---
       milk_fresh_kg = population * milk_yield_kg_year,
-      # Real protein percentage per IPCC (or GLEAM default if fat content unavailable)
-      milk_prot_pct = dplyr::if_else(fat_content_pct > 0, (1.9 + 0.4 * fat_content_pct) / 100, MILK_prot_def),
+      # Real milk protein percentage: User input preferred; fallback to IPCC fat regression, then GLEAM default
+      milk_prot_pct = dplyr::case_when(
+        protein_content_pct > 0 ~ protein_content_pct / 100,
+        fat_content_pct > 0     ~ (1.9 + 0.4 * fat_content_pct) / 100,
+        TRUE                    ~ MILK_prot_def
+      ),
       milk_protein_kg = milk_fresh_kg * milk_prot_pct,
       # FPCM (Fat and Protein Corrected Milk - IDF)
       milk_FPCM_kg = dplyr::if_else(
@@ -192,7 +201,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg
     ) %>%
     dplyr::select(
-      dplyr::all_of(join_keys), animal_type, animal_subtype, production_role, fat_content_pct, population, N_exit,
+      dplyr::all_of(join_keys), animal_type, animal_subtype, production_role, fat_content_pct, protein_content_pct, population, N_exit,
       # Commercial products
       milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
       # Edible protein (GLEAM)

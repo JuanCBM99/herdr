@@ -1,5 +1,5 @@
 Package: herdr
-Title: herdr
+Title: Livestock Greenhouse Gas Emissions and Land Footprint Accounting
 Version: 1.0.4
 Authors@R: c(
     person("Juan Carlos", "Baez", 
@@ -19,13 +19,14 @@ Authors@R: c(
            role = "aut", 
            comment = c(ORCID = "0000-0003-3895-4478"))
   )
-Description: Provides a comprehensive set of tools for calculating livestock 
-    greenhouse gas emissions based on Spanish national standards. The package 
-    includes functions to process animal census data for cattle, sheep, and 
-    goats, integrating specific emission factors and rate parameters. It 
-    facilitates the estimation of direct and indirect emissions, such as 
-    methane and nitrous oxide, following standardized methodologies for 
-    environmental reporting.
+Description: Provides a comprehensive set of tools for estimating livestock
+    greenhouse gas emissions, feed-related land use footprints, and animal
+    production based on IPCC Tier 2 methodologies and nutritional guidelines.
+    The package processes census, herd demography, and diet data for ruminants
+    (cattle, sheep, goats) and monogastrics (swine, poultry), calculating
+    gross energy, dry matter intake, volatile solids, enteric and manure methane,
+    direct and indirect nitrous oxide emissions, feed land use, and protein
+    feed conversion ratios.
 URL: https://juancbm99.github.io/herdr
 Depends: 
     R (>= 4.1.0)

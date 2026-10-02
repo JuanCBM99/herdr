@@ -45,7 +45,7 @@ Most existing calculators evaluate emissions or feed land requirements in isolat
 3. **Animal Productivity & Edible Human Protein:**
    Implements the **FAO GLEAM v3.0** methodology to translate herd throughput into physical commodities (Fat and Protein Corrected Milk, cold dressed carcass weight, boneless meat, and fresh eggs) and total digestible human protein (kg protein/year).
 4. **Biophysical Co-Product Allocation & Protein Feed Efficiency (Mottet et al., 2017):**
-   Applies the updated **International Dairy Federation (IDF Bulletin 520/2022)** Net Energy physical allocation and reports protein conversion and human food competition metrics (`Protein_FCR_total`, `Protein_FCR_cropland`, and `Protein_net_balance_kg`).
+   Applies the updated **International Dairy Federation (IDF Bulletin 520/2022)** Net Energy physical allocation and reports protein conversion and human food competition metrics (`Protein_FCR_total` and `Protein_FCR_cropland`).
 
 ---
 

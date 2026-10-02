@@ -65,7 +65,7 @@ test_that("generate_impact_assessment creates a consistent final report safely",
     "GHG_intensity_wool", "Land_intensity_wool",
     "GHG_intensity_egg", "Land_intensity_egg",
     # Mottet et al. (2017) Protein Feed Conversion
-    "Protein_FCR_total", "Protein_FCR_cropland", "Protein_net_balance_kg"
+    "Protein_FCR_total", "Protein_FCR_cropland"
   )
   for (col in expected_cols) {
     expect_true(col %in% colnames(results))
@@ -99,9 +99,6 @@ test_that("generate_impact_assessment creates a consistent final report safely",
     }
     if (!is.na(sample_row$Protein_FCR_cropland)) {
       expect_true(sample_row$Protein_FCR_cropland >= 0)
-    }
-    if (!is.na(sample_row$Protein_net_balance_kg)) {
-      expect_true(is.numeric(sample_row$Protein_net_balance_kg))
     }
 
     # Allocation factors sum to 1.0 (or 0 for non-milking/rearing)

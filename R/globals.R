@@ -15,7 +15,7 @@ if(getRversion() >= "2.15.1") {
 
     # --- Energy and Physical Parameters ---
     "initial_weight_kg", "final_weight_kg", "adult_weight_kg",
-    "productive_period_days", "milk_yield_kg_year", "fat_content_pct",
+    "productive_period_days", "milk_yield_kg_year", "fat_content_pct", "protein_content_pct",
     "wool_yield_kg_year", "work_hours", "a", "b", "C_val", "A_val", "B_val",
     "cfi", "cfi_value", "ca", "ca_value", "c_pregnancy", "c_value", "pr",
     "C_preg_factor", "REM", "REG", "de_safe", "de_percent", "frac_fat_pct",
@@ -24,7 +24,7 @@ if(getRversion() >= "2.15.1") {
 
     # --- Nutrition and Intake (DMI) ---
     "GE_MJday", "GE_feed_kcal_kg", "DE_pct", "CP_pct", "NDF_pct", "ASH_pct",
-    "DMI_kgday", "DMI_bw_pct", "forage_share", "concentrate_share",
+    "DMI_kgday", "DMI_bw_pct", "weight_factor", "forage_share", "concentrate_share",
     "milk_share", "milk_replacer_share", "total_diet", "total_ing",
     "ingredient", "ingredient_share", "ingredient_type", "forage_pct",
     "poultry_ME_kcal_kg", "EM_total_kcal_day", "EM_mant_kcal", "EM_crec_kcal",
@@ -135,7 +135,7 @@ if(getRversion() >= "2.15.1") {
     "GHG_intensity_egg", "Land_intensity_egg",
 
     # --- Protein Feed Efficiency and Human Food Security (Mottet et al. 2017) ---
-    "Protein_FCR_total", "Protein_FCR_cropland", "Protein_net_balance_kg",
+    "Protein_FCR_total", "Protein_FCR_cropland",
     "fcr_total", "fcr_cropland", "metric_raw", "metric"
   ))
 }

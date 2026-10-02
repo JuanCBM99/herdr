@@ -93,8 +93,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     ) %>%
 
     dplyr::left_join(
-      cat_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct),
+      (if ("protein_content_pct" %in% names(cat_csv)) {
+        cat_csv %>% dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct, protein_content_pct)
+      } else {
+        cat_csv %>% dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct) %>% dplyr::mutate(protein_content_pct = 0)
+      }),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
 
@@ -142,7 +145,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     # --- 4. Calculations ---
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct,
+        c(GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct, protein_content_pct,
           initial_weight_kg, final_weight_kg, productive_period_days, sows_gestation_days, sows_lactation_days,
           piglets_born, egg_mass_g_day, piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg, NEg_MJday, allocation, EF3),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
@@ -156,7 +159,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         0
       ),
 
-      milk_protein = 1.9 + 0.4 * fat_content_pct,
+      milk_protein = dplyr::case_when(
+        protein_content_pct > 0 ~ protein_content_pct,
+        fat_content_pct > 0     ~ 1.9 + 0.4 * fat_content_pct,
+        TRUE                    ~ 3.3
+      ),
 
       # [IPCC 2019] Dynamic Ngain growth factor selector based on final body weight (Table 10.20B)
       ipcc_swine_n_gain_factor = dplyr::case_when(

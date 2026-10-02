@@ -149,7 +149,7 @@ ui <- bslib::page_sidebar(
       ),
       div(
         class = "herdr-header-actions",
-        tags$span(class = "herdr-version-pill", "v1.0.3"),
+        tags$span(class = "herdr-version-pill", "v1.0.4"),
         tags$a(href = "https://juancbm99.github.io/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("book"), "Docs"),
         tags$a(href = "https://github.com/JuanCBM99/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("github"), "GitHub"),
         bslib::input_dark_mode(id = "dark_mode", mode = "light")

@@ -309,7 +309,6 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   protein_fcr_total    <- dplyr::if_else(valid_prot, round(feed_cp_tot / prot_kg, 2), NA_real_)
   protein_fcr_cropland <- dplyr::if_else(valid_prot, round(feed_cp_crop / prot_kg, 2), NA_real_)
-  protein_net_balance  <- dplyr::if_else(valid_prot, round(prot_kg - feed_cp_crop, 1), NA_real_)
 
   final_summary <- final_summary %>%
     dplyr::mutate(
@@ -349,8 +348,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
       # Protein Feed Conversion and Human Food Security (Mottet et al. 2017)
       Protein_FCR_total      = protein_fcr_total,
-      Protein_FCR_cropland   = protein_fcr_cropland,
-      Protein_net_balance_kg = protein_net_balance
+      Protein_FCR_cropland   = protein_fcr_cropland
     ) %>%
     dplyr::select(-dplyr::any_of(c("energy_milk_mj", "energy_meat_mj", "energy_wool_mj")))
 

@@ -73,7 +73,7 @@ Once your farm data is completely filled out and validated, proceed to calculate
         *   *Per Commercial Product:* Commercial footprint per kg FPCM milk, carcass meat, or fresh eggs (applying IDF 2022 Net Energy physical allocation for dairy herds).
         *   *Per Animal Head:* Annual impact per live head (kg CO2e and m2 per animal per year).
         *   *Protein Feed Efficiency (Mottet FCR):* Dual-bar comparison of Total Biological Protein FCR vs Cropland Protein FCR (with dashed red 1.0 threshold line separating net food producers from competitors).
-    *   **Detailed Output Table:** Inspect the interactive preview table below the chart. In addition to GHG gas breakdowns, the table reports species-level feed protein efficiency and food security metrics (`feed_CP_total_kg`, `feed_CP_cropland_kg`, `Protein_FCR_total`, `Protein_FCR_cropland`, `Protein_net_balance_kg`) and complete agroecological land use partitioning (`Land_cropland_m2`, `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`, `Land_other_m2`). Click any column header to sort or select cells to copy.
+    *   **Detailed Output Table:** Inspect the interactive preview table below the chart. In addition to GHG gas breakdowns, the table reports species-level feed protein efficiency and food security metrics (`feed_CP_total_kg`, `feed_CP_cropland_kg`, `Protein_FCR_total`, `Protein_FCR_cropland`) and complete agroecological land use partitioning (`Land_cropland_m2`, `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`, `Land_other_m2`). Click any column header to sort or select cells to copy.
 
 ---
 

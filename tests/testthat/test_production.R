@@ -155,3 +155,45 @@ test_that("calculate_production succeeds gracefully when optional tables are mis
   expect_s3_class(res_missing, "data.frame")
   expect_true("milk_fresh_kg" %in% names(res_missing))
 })
+
+test_that("calculate_production correctly uses protein_content_pct when provided and falls back to IPCC formula when 0", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+
+  source_data <- if (dir.exists(test_path("test_data/user_data"))) {
+    test_path("test_data/user_data")
+  } else {
+    "user_data"
+  }
+  file.copy(from = source_data, to = temp_test_dir, recursive = TRUE)
+
+  rum_file <- file.path(temp_test_dir, "user_data", "ruminant_definitions.csv")
+  rum_df <- readr::read_csv(rum_file, show_col_types = FALSE)
+
+  # Scenario 1: custom protein_content_pct = 4.5%
+  rum_df$protein_content_pct <- 4.5
+  readr::write_csv(rum_df, rum_file)
+
+  res_custom <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = file.path(temp_test_dir, "user_data")
+  ))
+  dairy_custom <- res_custom %>% dplyr::filter(animal_tag == "mature_dairy_cattle")
+  expected_custom_prot <- round(dairy_custom$milk_fresh_kg[1] * 0.045, 2)
+  expect_equal(dairy_custom$milk_protein_kg[1], expected_custom_prot)
+
+  # Scenario 2: protein_content_pct = 0 -> fallback to IPCC (1.9 + 0.4 * fat_content_pct) / 100
+  rum_df$protein_content_pct <- 0
+  readr::write_csv(rum_df, rum_file)
+
+  res_fallback <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = file.path(temp_test_dir, "user_data")
+  ))
+  dairy_fallback <- res_fallback %>% dplyr::filter(animal_tag == "mature_dairy_cattle")
+  ipcc_prot_pct <- (1.9 + 0.4 * dairy_fallback$fat_content_pct[1]) / 100
+  expected_fallback_prot <- round(dairy_fallback$milk_fresh_kg[1] * ipcc_prot_pct, 2)
+  expect_equal(dairy_fallback$milk_protein_kg[1], expected_fallback_prot)
+})
