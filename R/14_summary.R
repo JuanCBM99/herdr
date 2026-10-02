@@ -273,34 +273,6 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   ghg_egg   <- dplyr::if_else(egg_kg > 0, round((co2e_total_kg * af_egg) / egg_kg, 3), NA_real_)
   land_egg  <- dplyr::if_else(egg_kg > 0, round((land_total_m2 * af_egg) / egg_kg, 2), NA_real_)
 
-  # E) Primary Product (for backwards compatibility)
-  primary_prod <- dplyr::case_when(
-    milk_kg > 0 ~ "kg FPCM Milk",
-    is_non_milking_dairy ~ "None (Dry/Rearing)",
-    egg_kg > 0 ~ "kg Fresh Eggs",
-    meat_kg > 0 ~ "kg Carcass Meat",
-    wool_kg > 0 & af_wool > 0 ~ "kg Greasy Wool",
-    TRUE ~ "None"
-  )
-
-  ghg_product <- dplyr::case_when(
-    is_non_milking_dairy      ~ NA_real_,
-    milk_kg > 0               ~ ghg_milk,
-    egg_kg > 0                ~ ghg_egg,
-    meat_kg > 0               ~ ghg_meat,
-    wool_kg > 0 & af_wool > 0 ~ ghg_wool,
-    TRUE                      ~ NA_real_
-  )
-
-  land_product <- dplyr::case_when(
-    is_non_milking_dairy      ~ NA_real_,
-    milk_kg > 0               ~ land_milk,
-    egg_kg > 0                ~ land_egg,
-    meat_kg > 0               ~ land_meat,
-    wool_kg > 0 & af_wool > 0 ~ land_wool,
-    TRUE                      ~ NA_real_
-  )
-
   # 4) Protein Feed Conversion and Human Food Security (Mottet et al. 2017)
   feed_cp_tot  <- final_summary$feed_CP_total_kg
   feed_cp_crop <- final_summary$feed_CP_cropland_kg
@@ -312,7 +284,6 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   final_summary <- final_summary %>%
     dplyr::mutate(
-      primary_product        = primary_prod,
       feed_intake_kg         = round(feed_total_kg, 1),
       feed_CP_total_kg       = round(feed_cp_tot, 1),
       feed_CP_cropland_kg    = round(feed_cp_crop, 1),
@@ -335,10 +306,6 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
       GHG_intensity_egg      = ghg_egg,
       Land_intensity_egg     = land_egg,
-
-      # Primary product intensities
-      GHG_intensity_product  = ghg_product,
-      Land_intensity_product = land_product,
 
       # Universal Nutritional and Per-Head FUs
       GHG_intensity_protein  = ghg_protein,

@@ -122,8 +122,7 @@ if(getRversion() >= "2.15.1") {
     # --- Functional Units and Intensities ---
     "GHG_intensity_protein", "Land_intensity_protein",
     "GHG_intensity_head", "Land_intensity_head",
-    "GHG_intensity_product", "Land_intensity_product",
-    "primary_product", "feed_intake_kg",
+    "feed_intake_kg",
     "feed_CP_total_kg", "feed_CP_cropland_kg", "CP_cropland_pct",
 
     # --- Enfoque A (IDF Bulletin 520 / 2022) Biophysical Allocation ---

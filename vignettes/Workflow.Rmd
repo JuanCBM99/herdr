@@ -119,9 +119,9 @@ head(results)
 ### Key Output Metrics Returned:
 * **Greenhouse Gas Emissions (Gg CO2e):** `CO2eq_enteric`, `CO2eq_manure`, `CO2eq_N2O_direct`, `CO2eq_N2O_indirect`, and `CO2eq_Total_Gg`.
 * **Agroecological Land Footprint (m2):** `Land_cropland_m2`, `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`, `Land_other_m2`, and `Land_m2`.
-* **Physical & Edible Protein Production:** `milk_FPCM_kg`, `meat_carcass_weight_kg`, `egg_fresh_kg`, and `total_protein_kg`.
+* **Physical & Edible Protein Production:** `milk_FPCM_kg`, `meat_carcass_weight_kg`, `egg_fresh_kg`, `wool_kg`, and `total_protein_kg`.
 * **Protein Feed Conversion & Food Security (Mottet et al. 2017):** `Protein_FCR_total` (total CP intake / edible protein) and `Protein_FCR_cropland` (cropland CP intake / edible protein).
-* **Intensities across Functional Units:** `GHG_intensity_protein`, `Land_intensity_protein`, `GHG_intensity_product`, `Land_intensity_product`, `GHG_intensity_head`, and `Land_intensity_head`.
+* **Intensities across Functional Units:** `GHG_intensity_protein`, `Land_intensity_protein`, product-specific intensities (`GHG_intensity_milk`, `GHG_intensity_meat`, `GHG_intensity_wool`, `GHG_intensity_egg` and their respective land footprints), `GHG_intensity_head`, and `Land_intensity_head`.
 
 ---
 

@@ -628,7 +628,7 @@ herdr_server <- function(input, output, session) {
     df <- model_data()
     if (!is.data.frame(df) || nrow(df) == 0 || input$function_choice != "generate_impact_assessment") return()
 
-    prod_choices <- c("Primary Product (Auto)" = "product")
+    prod_choices <- c()
     if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
       prod_choices <- c(prod_choices, "Milk (kg FPCM)" = "milk")
     }
@@ -648,9 +648,12 @@ herdr_server <- function(input, output, session) {
     if ("egg_fresh_kg" %in% names(df) && any(df$egg_fresh_kg > 0, na.rm = TRUE)) {
       prod_choices <- c(prod_choices, "Eggs (kg Fresh Eggs)" = "egg")
     }
+    if (length(prod_choices) == 0) {
+      prod_choices <- c("Milk (kg FPCM)" = "milk", "Meat (kg Carcass)" = "meat")
+    }
 
     current_val <- input$plot_product_subchoice
-    sel <- if (!is.null(current_val) && current_val %in% unname(prod_choices)) current_val else "product"
+    sel <- if (!is.null(current_val) && current_val %in% unname(prod_choices)) current_val else unname(prod_choices)[1]
     updateSelectInput(session, "plot_product_subchoice", choices = prod_choices, selected = sel)
   })
 
@@ -658,8 +661,17 @@ herdr_server <- function(input, output, session) {
     req(model_data(), input$plot_groups)
 
     fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
-    if (fu == "product" && !is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "") {
-      fu <- input$plot_product_subchoice
+    if (fu == "product") {
+      if (!is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "" && input$plot_product_subchoice != "product") {
+        fu <- input$plot_product_subchoice
+      } else {
+        df <- model_data()
+        if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
+          fu <- "milk"
+        } else {
+          fu <- "meat"
+        }
+      }
     }
 
     herdr::plot_herdr_results(

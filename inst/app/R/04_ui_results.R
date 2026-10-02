@@ -48,13 +48,12 @@ build_results_panel <- function() {
               "plot_product_subchoice",
               "Commercial Product:",
               choices = c(
-                "Primary / All Products" = "product",
                 "Milk (kg FPCM)"         = "milk",
                 "Meat (kg Carcass)"      = "meat",
                 "Wool (kg Greasy Wool)"  = "wool",
                 "Eggs (kg Fresh Eggs)"   = "egg"
               ),
-              selected = "product"
+              selected = "milk"
             )
           ),
           div(
