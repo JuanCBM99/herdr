@@ -16,7 +16,6 @@ Absolute path to forages parquet file.
 Checks in order:
 \enumerate{
   \item Local data directory (\code{file.path(data_dir, "forages.parquet")})
-  \item Legacy name in local directory (\code{file.path(data_dir, "fao_forages.parquet")})
   \item Package bundled extdata (\code{system.file("extdata", "forages.parquet", package = "herdr")})
 }
 }

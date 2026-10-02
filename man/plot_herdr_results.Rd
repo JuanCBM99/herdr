@@ -24,7 +24,7 @@ plot_herdr_results(
 
 \item{ar}{Optional alias for `gwp_report`.}
 
-\item{functional_unit}{Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e and ha), `"protein"` (kg CO2e and m2 per kg edible protein), `"product"` (kg CO2e and m2 per kg commercial product), or `"head"` (kg CO2e and m2 per animal head). Default is `"total"`.}
+\item{functional_unit}{Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e and ha), `"protein"` (kg CO2e and m2 per kg edible protein), `"product"` (kg CO2e and m2 per kg commercial product), `"fcr"` (Mottet et al. 2017 Protein Feed Conversion Ratio and human food competition), `"milk"`, `"meat"`, `"wool"`, `"egg"`, or `"head"` (kg CO2e and m2 per animal head). Default is `"total"`.}
 }
 \value{
 A ggplot2 object.
