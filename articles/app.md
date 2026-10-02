@@ -153,11 +153,11 @@ calculate the impacts:
     below the chart. In addition to GHG gas breakdowns, the table
     reports species-level feed protein efficiency and food security
     metrics (`feed_CP_total_kg`, `feed_CP_cropland_kg`,
-    `Protein_FCR_total`, `Protein_FCR_cropland`,
-    `Protein_net_balance_kg`) and complete agroecological land use
-    partitioning (`Land_cropland_m2`, `Land_grassland_convertible_m2`,
-    `Land_grassland_unconvertible_m2`, `Land_other_m2`). Click any
-    column header to sort or select cells to copy.
+    `Protein_FCR_total`, `Protein_FCR_cropland`) and complete
+    agroecological land use partitioning (`Land_cropland_m2`,
+    `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`,
+    `Land_other_m2`). Click any column header to sort or select cells to
+    copy.
 
 ------------------------------------------------------------------------
 

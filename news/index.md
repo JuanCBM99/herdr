@@ -19,8 +19,8 @@
   - Implemented the **Mottet et al. (2017)** Protein Feed Efficiency and
     Human Food Security framework: replaced legacy dry-matter FCRs with
     `feed_CP_total_kg`, `feed_CP_cropland_kg`, `Protein_FCR_total`
-    (biological nitrogen efficiency), `Protein_FCR_cropland` (cropland
-    human food competition ratio), and `Protein_net_balance_kg`.
+    (biological nitrogen efficiency), and `Protein_FCR_cropland`
+    (cropland human food competition ratio).
   - Enhanced land use reporting with complete agroecological
     partitioning: `Land_cropland_m2`, `Land_grassland_convertible_m2`,
     `Land_grassland_unconvertible_m2`, and `Land_other_m2`.
@@ -36,6 +36,12 @@
     product.
   - Interactive preview table with sorted column previews and CSV/PNG
     download handlers.
+- **User-Defined Milk Protein Percentage (`protein_content_pct`)**:
+  Added support for entering explicit milk crude protein percentage in
+  `ruminant_definitions.csv` alongside `fat_content_pct` (particularly
+  relevant for dairy sheep and goats where fat:protein ratios diverge
+  from cattle), while maintaining automatic fallback to IPCC fat
+  regression when omitted or set to 0.
 
 ### Bug Fixes and Improvements
 

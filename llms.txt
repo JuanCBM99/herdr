@@ -103,6 +103,8 @@ Simple guide that explains how to do a concrete example (3 included)
 
 - [`calculate_CH4_manure()`](https://juancbm99.github.io/herdr/reference/calculate_CH4_manure.md)
   : Calculate CH4 Emissions from Manure Management
+- [`calculate_DMI()`](https://juancbm99.github.io/herdr/reference/calculate_DMI.md)
+  : Calculate Dry Matter Intake (DMI)
 - [`calculate_N2O_direct_manure()`](https://juancbm99.github.io/herdr/reference/calculate_N2O_direct_manure.md)
   : Calculate direct N2O emissions from manure
 - [`calculate_N2O_indirect_leaching()`](https://juancbm99.github.io/herdr/reference/calculate_N2O_indirect_leaching.md)
@@ -123,8 +125,6 @@ Simple guide that explains how to do a concrete example (3 included)
   : Calculate Net Energy for Lactation (NEl)
 - [`calculate_NEm()`](https://juancbm99.github.io/herdr/reference/calculate_NEm.md)
   : Calculate Net Energy for Maintenance (NEm)
-- [`calculate_DMI()`](https://juancbm99.github.io/herdr/reference/calculate_dmi.md)
-  : Calculate Dry Matter Intake (DMI)
 - [`calculate_emissions_enteric()`](https://juancbm99.github.io/herdr/reference/calculate_emissions_enteric.md)
   : Calculate methane emissions from enteric fermentation
 - [`calculate_ge()`](https://juancbm99.github.io/herdr/reference/calculate_ge.md)

@@ -140,10 +140,8 @@ head(results)
 - **Physical & Edible Protein Production:** `milk_FPCM_kg`,
   `meat_carcass_weight_kg`, `egg_fresh_kg`, and `total_protein_kg`.
 - **Protein Feed Conversion & Food Security (Mottet et al. 2017):**
-  `Protein_FCR_total` (total CP intake / edible protein),
-  `Protein_FCR_cropland` (cropland CP intake / edible protein), and
-  `Protein_net_balance_kg` (edible protein produced - cropland CP
-  consumed).
+  `Protein_FCR_total` (total CP intake / edible protein) and
+  `Protein_FCR_cropland` (cropland CP intake / edible protein).
 - **Intensities across Functional Units:** `GHG_intensity_protein`,
   `Land_intensity_protein`, `GHG_intensity_product`,
   `Land_intensity_product`, `GHG_intensity_head`, and

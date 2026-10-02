@@ -89,9 +89,9 @@ Tier 2 equations — each of `cfi`, `ca`, `c`, and `c_pregnancy_cattle` is
 a separate lookup into `ipcc_coefficients.csv`, so use the **exact
 description** for each as it appears there.
 
-| animal_tag | region | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
-|:---|:---|:---|:---|:---|:---|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,894.38 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
+| animal_tag | region | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
+|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|:---|:---|
+| `mature_dairy_cattle` | `spain` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,894.38 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
 
 ------------------------------------------------------------------------
 

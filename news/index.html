@@ -64,7 +64,7 @@
 <strong>Consolidated Impact Assessment &amp; Functional Units (<code>generate_impact_assessment</code>)</strong>:
 <ul><li>Implemented 5 standardized functional units across modeling and graphics (<code>plot_herdr_results</code>): <code>total</code> (absolute inventory in Gg CO2e and ha), <code>protein</code> (intensities per kg edible human protein), <code>product</code> (intensities per kg commercial product), <code>head</code> (per animal head per year), and <code>fcr</code> (Protein Feed Conversion Ratio and human food competition).</li>
 <li>Adopted the updated <strong>IDF Bulletin 520/2022</strong> physical Net Energy allocation method for dairy systems (3.1 MJ/kg FPCM milk vs. 15.0 MJ/kg live weight gain) to partition impacts and feed intake between milk and surplus meat co-products.</li>
-<li>Implemented the <strong>Mottet et al. (2017)</strong> Protein Feed Efficiency and Human Food Security framework: replaced legacy dry-matter FCRs with <code>feed_CP_total_kg</code>, <code>feed_CP_cropland_kg</code>, <code>Protein_FCR_total</code> (biological nitrogen efficiency), <code>Protein_FCR_cropland</code> (cropland human food competition ratio), and <code>Protein_net_balance_kg</code>.</li>
+<li>Implemented the <strong>Mottet et al. (2017)</strong> Protein Feed Efficiency and Human Food Security framework: replaced legacy dry-matter FCRs with <code>feed_CP_total_kg</code>, <code>feed_CP_cropland_kg</code>, <code>Protein_FCR_total</code> (biological nitrogen efficiency), and <code>Protein_FCR_cropland</code> (cropland human food competition ratio).</li>
 <li>Enhanced land use reporting with complete agroecological partitioning: <code>Land_cropland_m2</code>, <code>Land_grassland_convertible_m2</code>, <code>Land_grassland_unconvertible_m2</code>, and <code>Land_other_m2</code>.</li>
 </ul></li>
 <li>
@@ -74,6 +74,8 @@
 <li>Added dynamic conditional dropdown to select specific commercial products (milk, meat, wool, egg) when evaluating per commercial product.</li>
 <li>Interactive preview table with sorted column previews and CSV/PNG download handlers.</li>
 </ul></li>
+<li>
+<strong>User-Defined Milk Protein Percentage (<code>protein_content_pct</code>)</strong>: Added support for entering explicit milk crude protein percentage in <code>ruminant_definitions.csv</code> alongside <code>fat_content_pct</code> (particularly relevant for dairy sheep and goats where fat:protein ratios diverge from cattle), while maintaining automatic fallback to IPCC fat regression when omitted or set to 0.</li>
 </ul></div>
 <div class="section level3">
 <h3 id="bug-fixes-and-improvements-1-0-4">Bug Fixes and Improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-1-0-4"></a></h3>

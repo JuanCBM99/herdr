@@ -93,12 +93,12 @@ This is the most technical file — it determines energy requirements
 under IPCC Tier 2. Notice how `milk_yield_kg_year` and `cfi` change
 between phases.
 
-| animal_tag | region | subregion | class_flex | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
-|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `diet_dairy_mature_north_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | `diet_dairy_mature_north_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | `diet_dairy_mature_south_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044 | 3.73 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `diet_dairy_mature_south_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
+| animal_tag | region | subregion | class_flex | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
+|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|:---|:---|
+| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `diet_dairy_mature_north_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | `diet_dairy_mature_north_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | `diet_dairy_mature_south_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
+| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `diet_dairy_mature_south_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
 
 ------------------------------------------------------------------------
 

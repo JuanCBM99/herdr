@@ -1511,7 +1511,11 @@ based on functional cohort roles:</p>
 </h3>
 <p>Total fresh milk is computed as:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">milk_yield_kg_year</mtext></mrow><annotation encoding="application/x-tex">\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}</annotation></semantics></math></p>
-<p>Estimated milk protein content follows IPCC Tier 2:
+<p>Milk crude protein content
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><annotation encoding="application/x-tex">\text{Protein}_{\text{milk}}</annotation></semantics></math>)
+is entered directly by the user in <code>ruminant_definitions.csv</code>
+(<code>protein_content_pct</code>). When omitted or left at zero, it is
+estimated using the standard IPCC Tier 2 regression:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1.9</mn><mo>+</mo><mn>0.4</mn><mo>×</mo><msub><mtext mathvariant="normal">Fat</mtext><mtext mathvariant="normal">content</mtext></msub><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)</annotation></semantics></math></p>
 <p>To standardize milk across breeds and diets, Fat and Protein
 Corrected Milk (FPCM) is calculated following the <strong>IDF
@@ -1678,7 +1682,7 @@ al., 2017)<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-a
 </h3>
 <p>Following the protein-to-protein framework of Mottet et al. (2017,
 <em>Global Food Security</em>, 14, 1-8), <code>herdr</code> evaluates
-feed conversion efficiency and human food security via three
+feed conversion efficiency and human food security via two key
 indicators:</p>
 <ol style="list-style-type: decimal">
 <li><p><strong>Total Protein Feed Conversion Ratio
@@ -1717,10 +1721,6 @@ the livestock system consumes more human-edible/cropland protein than it
 generates.</li>
 </ul>
 </li>
-<li><p><strong>Net Protein Balance
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_net_balance</mtext><mtext mathvariant="normal">kg</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_net\_balance}_{\text{kg}}</annotation></semantics></math>):</strong>
-Quantifies absolute net protein gain or loss:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_net_balance</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>−</mo><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_net\_balance}_{\text{kg}} = \text{Protein}_{\text{total}} - \text{Feed}_{\text{CP, cropland}} \quad (\text{kg protein})</annotation></semantics></math></p></li>
 </ol>
 </div>
 <div class="section level3">

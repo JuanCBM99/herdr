@@ -722,7 +722,10 @@ Total fresh milk is computed as:
 \text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}
 ```
 
-Estimated milk protein content follows IPCC Tier 2:
+Milk crude protein content ($`\text{Protein}_{\text{milk}}`$) is entered
+directly by the user in `ruminant_definitions.csv`
+(`protein_content_pct`). When omitted or left at zero, it is estimated
+using the standard IPCC Tier 2 regression:
 ``` math
 \text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)
 ```
@@ -847,7 +850,7 @@ laying hens, $`\text{AF}_{\text{egg}} = 1.0`$.
 
 Following the protein-to-protein framework of Mottet et al. (2017,
 *Global Food Security*, 14, 1-8), `herdr` evaluates feed conversion
-efficiency and human food security via three indicators:
+efficiency and human food security via two key indicators:
 
 1.  **Total Protein Feed Conversion Ratio
     ($`\text{Protein\_FCR}_{\text{total}}`$):** Evaluates system-wide
@@ -882,13 +885,6 @@ efficiency and human food security via three indicators:
     - When $`\text{Protein\_FCR}_{\text{cropland}} > 1.0`$, the
       livestock system consumes more human-edible/cropland protein than
       it generates.
-
-3.  **Net Protein Balance
-    ($`\text{Protein\_net\_balance}_{\text{kg}}`$):** Quantifies
-    absolute net protein gain or loss:
-    ``` math
-    \text{Protein\_net\_balance}_{\text{kg}} = \text{Protein}_{\text{total}} - \text{Feed}_{\text{CP, cropland}} \quad (\text{kg protein})
-    ```
 
 ### 3. Standardized Functional Units
 

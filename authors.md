@@ -14,11 +14,12 @@
 
 ## Citation
 
-Baez J, Sampedro J, Pardo G, del Prado A (2026). *herdr: herdr*. R
-package version 1.0.4, <https://juancbm99.github.io/herdr>.
+Baez J, Sampedro J, Pardo G, del Prado A (2026). *herdr: Livestock
+Greenhouse Gas Emissions and Land Footprint Accounting*. R package
+version 1.0.4, <https://juancbm99.github.io/herdr>.
 
     @Manual{,
-      title = {herdr: herdr},
+      title = {herdr: Livestock Greenhouse Gas Emissions and Land Footprint Accounting},
       author = {Juan Carlos Baez and Jon Sampedro and Guillermo Pardo and Agustín {del Prado}},
       year = {2026},
       note = {R package version 1.0.4},

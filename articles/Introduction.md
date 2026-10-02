@@ -46,8 +46,7 @@ flows into a **single, internally consistent modeling engine**.
     (Mottet et al., 2017):** Applies the updated **International Dairy
     Federation (IDF Bulletin 520/2022)** Net Energy physical allocation
     and reports protein conversion and human food competition metrics
-    (`Protein_FCR_total`, `Protein_FCR_cropland`, and
-    `Protein_net_balance_kg`).
+    (`Protein_FCR_total` and `Protein_FCR_cropland`).
 
 ------------------------------------------------------------------------
 
