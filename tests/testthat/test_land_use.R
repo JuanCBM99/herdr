@@ -204,23 +204,4 @@ test_that("calculate_land_use works with normalized diets without region/subregi
   expect_true(nrow(results) > 0)
 })
 
-test_that("calculate_land_use supports backward compatibility with legacy fao_forages.parquet", {
-  temp_test_dir <- tempfile()
-  dir.create(temp_test_dir)
-  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
-  withr::local_dir(temp_test_dir)
-
-  dir.create("user_data", showWarnings = FALSE)
-
-  dummy_crops <- data.frame(Area = "Spain", Item = "Maize", Element = "Yield", Y2022 = 10)
-  arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
-
-  dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5)
-  # Explicitly write legacy name only and remove modern name if present
-  arrow::write_parquet(dummy_forages, "user_data/fao_forages.parquet")
-  if (file.exists("user_data/forages.parquet")) file.remove("user_data/forages.parquet")
-
-  results <- suppressWarnings(calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE))
-  expect_s3_class(results, "data.frame")
-})
 

@@ -49,11 +49,23 @@ test_that("generate_impact_assessment creates a consistent final report safely",
   # Verify that all important columns have been joined and calculated
   expected_cols <- c(
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg",
-    "N2O_vol_Gg", "N2O_lea_Gg", "Land_m2", "CO2eq_Total_Gg",
+    "N2O_vol_Gg", "N2O_lea_Gg", "Land_m2",
+    "Land_cropland_m2", "Land_grassland_convertible_m2", "Land_grassland_unconvertible_m2", "Land_other_m2",
+    "CO2eq_Total_Gg",
     "total_protein_kg", "population", "primary_product",
+    "DMI_kgday", "feed_intake_kg",
+    "feed_CP_total_kg", "feed_CP_cropland_kg",
     "GHG_intensity_protein", "Land_intensity_protein",
     "GHG_intensity_head", "Land_intensity_head",
-    "GHG_intensity_product", "Land_intensity_product"
+    "GHG_intensity_product", "Land_intensity_product",
+    # Enfoque A (IDF Bulletin 520 / 2022) biophysical allocation
+    "AF_milk", "AF_meat", "AF_wool", "AF_egg",
+    "GHG_intensity_milk", "Land_intensity_milk",
+    "GHG_intensity_meat", "Land_intensity_meat",
+    "GHG_intensity_wool", "Land_intensity_wool",
+    "GHG_intensity_egg", "Land_intensity_egg",
+    # Mottet et al. (2017) Protein Feed Conversion
+    "Protein_FCR_total", "Protein_FCR_cropland", "Protein_net_balance_kg"
   )
   for (col in expected_cols) {
     expect_true(col %in% colnames(results))
@@ -64,6 +76,13 @@ test_that("generate_impact_assessment creates a consistent final report safely",
     # Emissions and land use cannot be negative
     expect_true(all(results$CO2eq_Total_Gg >= 0))
     expect_true(all(results$Land_m2 >= 0))
+    expect_true(all(results$Land_cropland_m2 >= 0))
+    expect_true(all(results$Land_grassland_convertible_m2 >= 0))
+    expect_true(all(results$Land_grassland_unconvertible_m2 >= 0))
+    expect_true(all(results$Land_other_m2 >= 0))
+    expect_equal(results$Land_m2, results$Land_cropland_m2 + results$Land_grassland_convertible_m2 + results$Land_grassland_unconvertible_m2 + results$Land_other_m2, tolerance = 1e-4)
+    expect_true(all(results$feed_intake_kg >= 0))
+    expect_true(all(results$DMI_kgday >= 0))
 
     # Check that the IPCC mathematical formula for CO2eq has been applied correctly:
     # (CH4_ent + CH4_man)*28 + (N2Os)*265
@@ -73,6 +92,23 @@ test_that("generate_impact_assessment creates a consistent final report safely",
       ((sample_row$N2O_direct_Gg + sample_row$N2O_vol_Gg + sample_row$N2O_lea_Gg) * 265)
 
     expect_equal(sample_row$CO2eq_Total_Gg, calculated_co2, tolerance = 0.01)
+
+    # Check Protein FCR metrics
+    if (!is.na(sample_row$Protein_FCR_total)) {
+      expect_true(sample_row$Protein_FCR_total > 0)
+    }
+    if (!is.na(sample_row$Protein_FCR_cropland)) {
+      expect_true(sample_row$Protein_FCR_cropland >= 0)
+    }
+    if (!is.na(sample_row$Protein_net_balance_kg)) {
+      expect_true(is.numeric(sample_row$Protein_net_balance_kg))
+    }
+
+    # Allocation factors sum to 1.0 (or 0 for non-milking/rearing)
+    af_sum <- sample_row$AF_milk + sample_row$AF_meat + sample_row$AF_wool + sample_row$AF_egg
+    if (af_sum > 0) {
+      expect_equal(af_sum, 1.0, tolerance = 1e-3)
+    }
   }
 
   # 6. FILTERING AND AGGREGATION OPTIONS

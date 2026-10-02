@@ -192,7 +192,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg
     ) %>%
     dplyr::select(
-      dplyr::all_of(join_keys), animal_type, animal_subtype, population, N_exit,
+      dplyr::all_of(join_keys), animal_type, animal_subtype, production_role, fat_content_pct, population, N_exit,
       # Commercial products
       milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
       # Edible protein (GLEAM)

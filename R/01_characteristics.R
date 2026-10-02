@@ -73,6 +73,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
       forage_pct = dplyr::first(forage_share),
       dplyr::across(c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
                     ~ sum(. * weight_factor, na.rm = TRUE)),
+      CP_cropland_pct = sum(dplyr::if_else(!is.na(land_type) & land_type == "cropland", CP_pct, 0) * weight_factor, na.rm = TRUE),
       .groups = "drop"
     )
 
@@ -130,7 +131,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
-      DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
+      DE_pct, CP_pct, CP_cropland_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
     )
 
   if (isTRUE(saveoutput)) {

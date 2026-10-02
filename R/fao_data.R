@@ -116,7 +116,6 @@ herdr_get_fao_trade_matrix_path <- function(data_dir = "user_data", download_if_
 #' Checks in order:
 #' \enumerate{
 #'   \item Local data directory (\code{file.path(data_dir, "forages.parquet")})
-#'   \item Legacy name in local directory (\code{file.path(data_dir, "fao_forages.parquet")})
 #'   \item Package bundled extdata (\code{system.file("extdata", "forages.parquet", package = "herdr")})
 #' }
 #'
@@ -128,11 +127,7 @@ herdr_get_forages_path <- function(data_dir = "user_data") {
   local_path <- file.path(data_dir, "forages.parquet")
   if (file.exists(local_path)) return(local_path)
 
-  # 2. Legacy name fallback in local directory
-  local_legacy <- file.path(data_dir, "fao_forages.parquet")
-  if (file.exists(local_legacy)) return(local_legacy)
-
-  # 3. Bundled extdata inside the package
+  # 2. Bundled extdata inside the package
   bundled <- system.file("extdata", "forages.parquet", package = "herdr")
   if (nzchar(bundled) && file.exists(bundled)) return(bundled)
 

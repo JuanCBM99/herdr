@@ -108,18 +108,34 @@ if(getRversion() >= "2.15.1") {
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
     "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
     "CO2eq_N2O_direct", "CO2eq_N2O_indirect", "CO2eq_Total_Gg", "Land_m2",
+    "Land_cropland_m2", "Land_grassland_convertible_m2", "Land_grassland_unconvertible_m2",
+    "Land_other_m2",
 
     # --- Plotting and Graphics ---
     "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
     "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg",
     "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
     "co2e_n2o_dir", "co2e_n2o_ind", "land_ha", "land_val", "functional_unit",
-    "total_val", "label_text",
+    "total_val", "label_text", "land_crop", "land_g_conv", "land_g_unco",
+    "land_other", "s",
 
     # --- Functional Units and Intensities ---
     "GHG_intensity_protein", "Land_intensity_protein",
     "GHG_intensity_head", "Land_intensity_head",
     "GHG_intensity_product", "Land_intensity_product",
-    "primary_product"
+    "primary_product", "feed_intake_kg",
+    "feed_CP_total_kg", "feed_CP_cropland_kg", "CP_cropland_pct",
+
+    # --- Enfoque A (IDF Bulletin 520 / 2022) Biophysical Allocation ---
+    "neg_mj_kg", "energy_milk_mj", "energy_meat_mj", "energy_wool_mj",
+    "AF_milk", "AF_meat", "AF_wool", "AF_egg",
+    "GHG_intensity_milk", "Land_intensity_milk",
+    "GHG_intensity_meat", "Land_intensity_meat",
+    "GHG_intensity_wool", "Land_intensity_wool",
+    "GHG_intensity_egg", "Land_intensity_egg",
+
+    # --- Protein Feed Efficiency and Human Food Security (Mottet et al. 2017) ---
+    "Protein_FCR_total", "Protein_FCR_cropland", "Protein_net_balance_kg",
+    "fcr_total", "fcr_cropland", "metric_raw", "metric"
   ))
 }
