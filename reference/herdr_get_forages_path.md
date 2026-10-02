@@ -4,10 +4,7 @@ Checks in order:
 
 1.  Local data directory (`file.path(data_dir, "forages.parquet")`)
 
-2.  Legacy name in local directory
-    (`file.path(data_dir, "fao_forages.parquet")`)
-
-3.  Package bundled extdata
+2.  Package bundled extdata
     (`system.file("extdata", "forages.parquet", package = "herdr")`)
 
 ## Usage

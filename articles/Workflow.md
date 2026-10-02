@@ -2,350 +2,276 @@
 
 ## Introduction
 
-The **`herdr`** package provides a modular computational framework for
-estimating greenhouse gas (GHG) emissions, energy requirements, and
-agricultural land use across livestock production systems.
+This guide walks you through building and executing a complete livestock
+environmental and nutritional assessment in R from scratch using
+**`herdr`**.
 
-This guide explains how to build a complete project in R from scratch
-using reproducible scripts and CSV templates. Whether you are running
-national inventories, farm-scale assessments, or research scenarios,
-following this structured workflow ensures full consistency across all
-calculation tiers.
+Whether you are modeling a single dairy farm, an intensive swine
+operation, or a national inventory across regions, following this
+structured workflow ensures full consistency across IPCC Tier 2
+greenhouse gases, agroecological land competition, and edible protein
+outputs.
 
 ------------------------------------------------------------------------
 
 ## 1. Installation & Environment Setup
 
-### Step 1: Install the Package
+### Step 1: Install and Load `herdr`
 
-You can install the development version of `herdr` directly from GitHub
-using `remotes`:
+Install the package directly from GitHub:
 
 ``` r
 
-# Install remotes if not already installed
 if (!requireNamespace("remotes", quietly = TRUE)) {
   install.packages("remotes")
 }
 
-# Install herdr from GitHub
 remotes::install_github("JuanCBM99/herdr")
-
-# Load library
 library(herdr)
 ```
 
-### Step 2: Create a Dedicated R Project
-
-Working within an isolated R project (`.Rproj`) ensures relative file
-paths resolve cleanly and keeps your data organized:
-
-``` r
-
-# Create and switch to a new project directory
-usethis::create_project("My_Livestock_Project")
-```
-
-### Step 3: Initialize the Project Structure
+### Step 2: Initialize Your Working Directory
 
 Run
 [`herdr_init()`](https://juancbm99.github.io/herdr/reference/herdr_init.md)
-to generate the standard folder hierarchy and default templates:
+in your R console or project root:
 
 ``` r
 
 herdr_init()
 ```
 
-This function creates three primary directories:
+This generates three standard folders:
 
 - **`user_data/`**: The active working directory containing editable CSV
-  templates and local reference databases (`fao_crops.parquet`,
-  `forages.parquet`).
-- **`Examples/`**: Pre-configured baseline datasets (e.g., dairy cattle,
-  beef cattle, swine, sheep) ready to use as templates.
+  scenario templates and reference libraries (`ipcc_coefficients.csv`,
+  `ipcc_mm.csv`, `feed_characteristics.csv`, `mapping.csv`). Background
+  databases (`forages.parquet`, `fao_crops.parquet`,
+  `fao_trade_matrix.parquet`) are resolved automatically via bundled
+  assets and central cache.
+- **`Examples/`**: Pre-configured baseline datasets across species
+  (dairy cattle, beef cattle, swine, sheep) ready to use as templates.
 - **`output/`**: Destination directory where results, emission
-  inventories, and land-use summaries are saved.
+  inventories, and land-use summaries are automatically saved.
 
 ------------------------------------------------------------------------
 
 ## 2. Project Architecture & Demographic Keys
 
-All data tables in `herdr` are connected using **four standardized
-cohort keys**:
+All data tables in `herdr` are linked using **four standardized
+demographic keys**:
 
 ``` text
 ┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                                PRIMARY COHORT KEYS                                     │
+│                              PRIMARY DEMOGRAPHIC COHORT KEYS                           │
 ├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
 │  animal_tag     │  region      │  subregion      │  class_flex                         │
 │  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
-│  e.g., "dairy"  │  e.g., Spain │  e.g., Euskadi  │  e.g., "lactating", "dry", "starter"│
+│  e.g., "dairy"  │  e.g., spain │  e.g., galicia  │  e.g., "lactation_phase"            │
 └─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘
 ```
 
-> ⚠️ **Critical Rule:** Every unique combination of `animal_tag`,
-> `region`, `subregion`, and `class_flex` declared in the census must
-> match the definition, weight, and manure tables exactly.
+> ⚠️ **Critical Join Rule:** Every unique combination of `animal_tag`,
+> `region`, `subregion`, and `class_flex` declared in
+> `livestock_census.csv` must match the definition, weight, and manure
+> tables exactly. Identifiers are **strictly lowercase** with
+> **underscores** (no spaces or uppercase letters).
 
 ------------------------------------------------------------------------
 
 ## 3. Preparing Input Tables (`user_data/`)
 
 You can edit the CSV templates located in `user_data/` using any
-spreadsheet software (Excel, LibreOffice) or programmatically within R.
+spreadsheet editor (Excel, LibreOffice) or programmatically in R. For
+the full column-by-column schema, see the [Technical Data
+Dictionary](https://juancbm99.github.io/herdr/articles/Technical_reference.md).
+
+#### Summary of Required Input Tables:
+
+[TABLE]
+
+#### Two Golden Rules for Diets & Manure:
+
+1.  **Diet Proportions:** In `diet_profiles.csv`, forage + concentrate +
+    milk + milk_replacer must sum to **100%**. In
+    `diet_ingredients.csv`, ingredient shares must sum to **100%**
+    within each category.
+2.  **Manure Allocations:** In `manure_management.csv`, the sum of
+    `allocation` for each unique cohort must equal exactly **1.0**
+    (100%).
 
 ------------------------------------------------------------------------
 
-### 3.1. Herd Census (`livestock_census.csv`)
+## 4. Executing the Environmental Assessment
 
-Defines the size and categories of your livestock population.
+### 4.1. Consolidated Pipeline (`generate_impact_assessment`)
 
-| Column | Description | Example |
-|:---|:---|:---|
-| `animal_tag` | Unique cohort identifier | `mature_dairy_cattle` |
-| `region` | Broad geographical region | `spain` |
-| `subregion` | Farm identifier or administrative subdivision | `north` |
-| `class_flex` | Physiological status, breed, or life stage | `lactation_phase` |
-| `population` | Number of live animals in this exact cohort | `448921.13` |
-
-#### Population Modes:
-
-- **Manual Mode (`automatic_cycle = FALSE`):** Every single cohort and
-  head count is explicitly declared. *Recommended*
-- **Automatic Herd Cycle (`automatic_cycle = TRUE`):** Only adult
-  breeding stock (e.g., mature cows, breeding sows) or initial barn
-  places are entered. The package uses reproduction parameters
-  (`reproduction_parameters.csv`) and productive period durations
-  (`productive_period_days`) to compute offspring, replacement cohorts,
-  fattening batches, and mortalities automatically across ruminant
-  (cattle, sheep, goats), swine, and poultry systems. See the [Herd
-  Demography & Population
-  Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
-  guide for the complete decision matrix.
-
-------------------------------------------------------------------------
-
-### 3.2. Body Weights & Growth (`livestock_weights.csv`)
-
-Defines the physical characteristics and production cycles required to
-compute maintenance energy ($`NE_m`$) and feed intake boundaries:
-
-- `initial_weight_kg`: Live weight at the beginning of the evaluated
-  production phase.
-- `final_weight_kg`: Live weight at the end of the period.
-- `adult_weight_kg`: Average mature body weight of an adult animal (kg).
-- `productive_period_days`: Biological cycle duration in days, defined
-  according to animal class:
-  - **Adult breeding females (except laying hens):** The
-    **inter-parturition interval** in days between consecutive births
-    (calving, lambing, kidding, or farrowing interval; e.g., `365` to
-    `400` days for cows, `200` to `365` days for ewes/does, `149` days
-    for sows). This defines annual reproductive frequency
-    ($`365 / \text{productive\_period\_days}`$).
-  - **Laying hens & breeder poultry:** The **commercial laying cycle
-    duration** in the barn until depopulation (e.g., `511` days for
-    commercial layers, `301` days for meat breeders).
-  - **All other cohorts (growing, fattening, and replacement animals):**
-    Their **life cycle / life-stage duration** (days on feed or days
-    from birth/weaning to slaughter/exit; e.g., `42` days for broilers,
-    `110` days for fattening pigs, `70` days for feedlot lambs). This
-    determines Average Daily Gain (ADG) and translates annual meat
-    throughput into standing barn places using the IPCC Average Annual
-    Population (AAP) formula.
-
-------------------------------------------------------------------------
-
-### 3.3. Nutrition & Feed Formulation
-
-Feed intake and land use are parameterized through two complementary
-tables:
-
-#### A. Diet Profiles (`diet_profiles.csv`)
-
-Specifies the macro-distribution of the ration. The four proportions
-must sum to **100%**:
-
-``` math
-\text{forage\_share} + \text{concentrate\_share} + \text{milk\_share} + \text{milk\_replacer\_share} = 100\%
-```
-
-#### B. Diet Ingredients (`diet_ingredients.csv`)
-
-Defines the individual feedstuffs composing each category:
-
-- `ingredient`: Specific name matching `feed_characteristics.csv` (e.g.,
-  `corn_silage`, `barley_grain`, `soybean_meal`).
-- `ingredient_type`: Feed category (`forage`, `concentrate`, `milk`, or
-  `milk_replacer`).
-- `ingredient_share`: Proportion (%) within that specific category (must
-  sum to **100%** per ingredient_type).
-- `custom_yield_kg_ha`: *(Optional)* User-defined crop/forage yield (kg
-  DM/ha). When filled, the model overrides national FAO averages and
-  tags the origin as `"Custom Data"`.
-- `country_of_origin`: *(Optional)* Cultivation country. If left blank
-  (`NA`), `herdr` applies its dynamic FAO trade balance engine (70%
-  self-sufficiency rule) to allocate origins automatically.
-
-------------------------------------------------------------------------
-
-### 3.4. Physiological Definitions
-
-Connects cohorts with species-specific constants and production targets:
-
-- **Ruminants (`ruminant_definitions.csv`):** Maintenance coefficient
-  ($`c_{fi}`$), feeding activity ($`c_a`$), growth constants ($`C`$,
-  $`a`$, $`b`$), pregnancy coefficient ($`c_{pregnancy}`$), annual milk
-  yield (kg/year), milk fat percentage, and wool yield (kg/year).
-- **Monogastrics (`monogastric_definitions.csv`):** Exponent
-  ($`\alpha`$), protein and fat tissue retention fractions, sow
-  gestation/lactation lengths, litter sizes, and egg production
-  parameters (`eggs_per_year`, `egg_weight_g`).
-
-------------------------------------------------------------------------
-
-### 3.5. Manure Management (`manure_management.csv`)
-
-Specifies waste storage pathways and regional environmental conditions:
-
-- `system_base` & `system_variant`: Storage or grazing system (e.g.,
-  `liquid_slurry`, `solid_storage`, `pasture_range_paddock`).
-- `climate_zone` & `climate_moisture`: Climate classification (e.g.,
-  `cool`, `temperate`, `warm`, `wet`, `dry`).
-- `allocation`: Fraction of manure managed by the system
-  ($`0.0 \text{ to } 1.0`$). If manure is split across multiple systems
-  (e.g., housing vs. pasture), create multiple rows for that cohort
-  ensuring total allocations sum to **1.0**.
-
-### Check [Manure Management Guide](https://juancbm99.github.io/herdr/articles/Manure.md) for available combinations of different systems and climates.
-
-## 4. Running the Environmental Assessment
-
-### 4.1. Full Integrated Assessment
-
-To execute the entire modeling pipeline (energy balance, enteric
-fermentation, volatile solids, manure emissions, and land use) in a
-single command:
+The fastest and most reliable way to run the model is
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md).
+It executes the entire upstream chain (energy balance, DMI, enteric
+fermentation, manure management, land use, and GLEAM production) and
+compiles multi-metric outputs in one call:
 
 ``` r
 
 library(herdr)
 
+# Run full assessment for reference year 2024
 results <- generate_impact_assessment(
-  automatic_cycle = FALSE,
   farm_country    = "Spain",
   year            = 2024,
+  automatic_cycle = FALSE,
+  gwp_report      = "AR5",
   saveoutput      = TRUE
 )
 
-# Inspect the first rows of the results table
+# Preview generated summary table
 head(results)
 ```
 
-#### Argument Reference:
+#### Key Output Metrics Returned:
 
-- `automatic_cycle`: Set to `TRUE` to use reproductive cycle dynamics,
-  or `FALSE` for manual populations (*Recommended*).
-- `farm_country`: The reference country used to query crop yields and
-  bilateral FAO trade matrices.
-- `year`: The reference statistical year for FAO data queries (e.g.,
-  `2024`).
-- `saveoutput`: If `TRUE`, writes individual module tables and summary
-  reports directly to `output/`.
+- **Greenhouse Gas Emissions (Gg CO2e):** `CO2eq_enteric`,
+  `CO2eq_manure`, `CO2eq_N2O_direct`, `CO2eq_N2O_indirect`, and
+  `CO2eq_Total_Gg`.
+- **Agroecological Land Footprint (m2):** `Land_cropland_m2`,
+  `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`,
+  `Land_other_m2`, and `Land_m2`.
+- **Physical & Edible Protein Production:** `milk_FPCM_kg`,
+  `meat_carcass_weight_kg`, `egg_fresh_kg`, and `total_protein_kg`.
+- **Protein Feed Conversion & Food Security (Mottet et al. 2017):**
+  `Protein_FCR_total` (total CP intake / edible protein),
+  `Protein_FCR_cropland` (cropland CP intake / edible protein), and
+  `Protein_net_balance_kg` (edible protein produced - cropland CP
+  consumed).
+- **Intensities across Functional Units:** `GHG_intensity_protein`,
+  `Land_intensity_protein`, `GHG_intensity_product`,
+  `Land_intensity_product`, `GHG_intensity_head`, and
+  `Land_intensity_head`.
 
 ------------------------------------------------------------------------
 
-### 4.2. Running Modular Functions Individually
+### 4.2. Modular Step-by-Step Execution
 
-You can also run specific computational modules independently for
-debugging, calibration, or sensitivity analyses:
+Researchers seeking intermediate physiological outputs can run
+individual modules sequentially:
 
 ``` r
 
-# 1. Calculate Demographics & Population Dynamics
-pop_results <- calculate_population(automatic_cycle = FALSE)
+# 1. Animal Demography & Population Balance
+pop_data <- calculate_population(automatic_cycle = FALSE)
 
-# 2. Calculate Gross Energy intake (GE)
-ge_results <- calculate_ge(saveoutput = FALSE)
+# 2. Weighted Nutritional Diet Characteristics
+feed_vars <- calculate_weighted_variable()
 
-# 3. Calculate Dry Matter Intake (DMI)
-dmi_results <- calculate_DMI(saveoutput = FALSE)
+# 3. Gross Energy Intake (GE)
+ge_data <- calculate_ge()
 
-# 4. Calculate Enteric Methane (CH4)
-enteric_results <- calculate_emissions_enteric(saveoutput = FALSE)
+# 4. Dry Matter Intake (DMI)
+dmi_data <- calculate_DMI()
 
-# 5. Calculate Feed-Related Land Use (m2)
-land_results <- calculate_land_use(
-  farm_country = "Spain", 
-  year = 2024, 
-  saveoutput = FALSE
-)
+# 5. Enteric Methane Emissions (CH4)
+enteric_emiss <- calculate_emissions_enteric()
 
-# 6. Calculate Animal Production & Edible Protein (GLEAM)
-prod_results <- calculate_production(saveoutput = FALSE)
+# 6. Manure Methane & Nitrous Oxide (CH4, Direct & Indirect N2O)
+manure_ch4 <- calculate_CH4_manure()
+manure_n2o_dir <- calculate_N2O_direct_manure()
+manure_n2o_vol <- calculate_N2O_indirect_volatilization()
+manure_n2o_lea <- calculate_N2O_indirect_leaching()
+
+# 7. Feed Land Use Footprint & FAO Trade Origin
+land_data <- calculate_land_use(farm_country = "Spain", year = 2024)
+
+# 8. Animal Productivity & Edible Human Protein (GLEAM)
+prod_data <- calculate_production()
 ```
 
 ------------------------------------------------------------------------
 
-## 5. Visualizing & Exporting Results
-
-### Visualizing Cohort Emissions
+## 5. Visualizing & Benchmarking Results
 
 Use
 [`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
-to generate publication-ready ggplot2 charts grouped by demographic
-variables:
+to generate publication-ready stacked ggplot2 charts. The function
+allows dynamic aggregation across any demographic or species grouping,
+and supports **five standardized functional units**:
 
 ``` r
 
-# Generate stacked bar chart grouped by animal cohort and region
-p <- plot_herdr_results(
-  df         = results,
-  group_cols = c("animal_tag", "region"),
-  func_name  = "generate_impact_assessment"
+# 1. Absolute whole-inventory footprint (Gg CO2e and ha)
+p_total <- plot_herdr_results(
+  df              = results,
+  group_cols      = c("animal_type", "region"),
+  func_name       = "generate_impact_assessment",
+  functional_unit = "total"
+)
+
+# 2. Commercial product intensity (kg CO2e and m2 per kg milk, carcass meat, or eggs)
+# Applying IDF Bulletin 520/2022 physical Net Energy allocation for dairy herds
+p_product <- plot_herdr_results(
+  df              = results,
+  group_cols      = c("animal_type", "animal_subtype"),
+  func_name       = "generate_impact_assessment",
+  functional_unit = "product"
+)
+
+# 3. Nutritional edible protein intensity (kg CO2e and m2 per kg human protein)
+p_protein <- plot_herdr_results(
+  df              = results,
+  group_cols      = c("animal_tag"),
+  func_name       = "generate_impact_assessment",
+  functional_unit = "protein"
+)
+
+# 4. Per animal head footprint (kg CO2e and m2 per head per year)
+p_head <- plot_herdr_results(
+  df              = results,
+  group_cols      = c("animal_type"),
+  func_name       = "generate_impact_assessment",
+  functional_unit = "head"
+)
+
+# 5. Protein Feed Conversion & Human Food Competition (Mottet et al. 2017)
+# Renders dual bars: Biological FCR vs Cropland FCR with a 1.0 food producer threshold line
+p_fcr <- plot_herdr_results(
+  df              = results,
+  group_cols      = c("animal_type", "animal_subtype"),
+  func_name       = "generate_impact_assessment",
+  functional_unit = "fcr"
 )
 
 # Display chart
-print(p)
+print(p_product)
 
-# Save chart to disk
-ggplot2::ggsave("output/emissions_chart.png", plot = p, width = 10, height = 6, dpi = 300)
+# Export chart to disk
+ggplot2::ggsave("output/product_intensity_chart.png", plot = p_product, width = 10, height = 6, dpi = 300)
 ```
 
 ------------------------------------------------------------------------
 
 ## 6. Common Issues & Troubleshooting
 
-| Issue / Warning | Cause | Solution |
+| Issue / Alert | Cause | Solution |
 |:---|:---|:---|
-| **Missing Cohorts Warning** | An `animal_tag` in Census is missing in definitions or weights. | Ensure all four keys (`animal_tag`, `region`, `subregion`, `class_flex`) match across all tables. |
+| **Missing Cohorts Warning** | An `animal_tag` in Census is missing in definitions, weights, or manure tables. | Ensure all four keys (`animal_tag`, `region`, `subregion`, `class_flex`) match across all input tables. |
 | **Shares do not sum to 100%** | Diet category or ingredient proportions do not sum to 100. | Adjust `forage_share`, `concentrate_share`, etc. in `diet_profiles.csv`, or ingredient shares in `diet_ingredients.csv`. |
-| **Manure allocation $`\neq 1.0`$** | Allocations for a cohort do not sum to 1.0. | Adjust `allocation` values in `manure_management.csv` so their sum equals exactly 1.0 per cohort. |
-| **Unknown Ingredient** | An ingredient in diets is missing in reference libraries. | Add the ingredient to `feed_characteristics.csv` and `mapping.csv`. |
+| **Manure allocation != 1.0** | Allocations for a cohort do not sum to 1.0. | Adjust `allocation` values in `manure_management.csv` so their sum equals exactly 1.0 per cohort. |
+| **Unknown Ingredient** | An ingredient in diets is missing in reference libraries. | Add the ingredient to `feed_characteristics.csv` and `mapping.csv` (see [Adding a New Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)). |
 
 ------------------------------------------------------------------------
 
 ## Next Steps
 
-For mathematical details, parameter lookup tables, and scientific
-references, consult the companion guides:
-
+- [Technical Data
+  Dictionary](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+  — detailed column-by-column schema and database connectors.
+- [Interactive Shiny
+  App](https://juancbm99.github.io/herdr/articles/app.md) — walk through
+  the graphical interface.
 - [Herd Demography & Population
   Dynamics](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
-  — Population dynamics, biological cycles, and herd structure across
-  species.
-- [Technical
-  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
-  — detailed CSV column descriptions and database connectors.
-- [Adding a New
-  Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)
-  — guide to extending feed and LCA databases.
-- [Manure Management
-  Guide](https://juancbm99.github.io/herdr/articles/Manure.md) — climate
-  and storage pathway definitions.
-- [Land Use
-  Methodology](https://juancbm99.github.io/herdr/articles/land_use.md) —
-  land competition and international trade flows.
-- [Theoretical Basis: IPCC Tier
-  2](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) —
-  complete mathematical formulation.
+  — reproductive cycles, AAP rules, and automatic closures.
+- [Theoretical
+  Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md)
+  — complete mathematical formulation (IPCC Tier 2, GLEAM, and IDF
+  2022).

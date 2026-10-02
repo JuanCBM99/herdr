@@ -16,27 +16,31 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto"><li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows"><li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book-open"></span> Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started"><li><a class="dropdown-item" href="../articles/Introduction.html">Overview &amp; Features</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">R Scripting Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">Interactive Shiny App</a></li>
   </ul></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-guides"><li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
-    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-to-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> How-To Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-to-guides"><li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-cases"><li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-tools"></span> Case Studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies"><li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Variations (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Intensive Multi-Cohort AAP (Advanced)</a></li>
   </ul></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-database"></span> Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference"><li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Data Dictionary</a></li>
+    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis (IPCC Tier 2 &amp; GLEAM)</a></li>
+    <li><a class="dropdown-item" href="../reference/index.html">Function Reference (R API)</a></li>
+  </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
 <li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
@@ -52,6 +56,37 @@
 
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="1.0.4" id="herdr-104">herdr 1.0.4<a class="anchor" aria-label="anchor" href="#herdr-104"></a></h2>
+<div class="section level3">
+<h3 id="new-features-1-0-4">New Features<a class="anchor" aria-label="anchor" href="#new-features-1-0-4"></a></h3>
+<ul><li>
+<strong>Consolidated Impact Assessment &amp; Functional Units (<code>generate_impact_assessment</code>)</strong>:
+<ul><li>Implemented 5 standardized functional units across modeling and graphics (<code>plot_herdr_results</code>): <code>total</code> (absolute inventory in Gg CO2e and ha), <code>protein</code> (intensities per kg edible human protein), <code>product</code> (intensities per kg commercial product), <code>head</code> (per animal head per year), and <code>fcr</code> (Protein Feed Conversion Ratio and human food competition).</li>
+<li>Adopted the updated <strong>IDF Bulletin 520/2022</strong> physical Net Energy allocation method for dairy systems (3.1 MJ/kg FPCM milk vs. 15.0 MJ/kg live weight gain) to partition impacts and feed intake between milk and surplus meat co-products.</li>
+<li>Implemented the <strong>Mottet et al. (2017)</strong> Protein Feed Efficiency and Human Food Security framework: replaced legacy dry-matter FCRs with <code>feed_CP_total_kg</code>, <code>feed_CP_cropland_kg</code>, <code>Protein_FCR_total</code> (biological nitrogen efficiency), <code>Protein_FCR_cropland</code> (cropland human food competition ratio), and <code>Protein_net_balance_kg</code>.</li>
+<li>Enhanced land use reporting with complete agroecological partitioning: <code>Land_cropland_m2</code>, <code>Land_grassland_convertible_m2</code>, <code>Land_grassland_unconvertible_m2</code>, and <code>Land_other_m2</code>.</li>
+</ul></li>
+<li>
+<strong>Enhanced Interactive Shiny Application</strong>:
+<ul><li>Added dynamic grouping selector supporting species (<code>animal_type</code>) and production subtype (<code>animal_subtype</code>) alongside cohort and regional keys.</li>
+<li>Added interactive Functional Unit dropdown in the Results tab to toggle dynamically between absolute footprint, intensities, and Mottet Protein FCR (with a red dashed reference line at 1.0).</li>
+<li>Added dynamic conditional dropdown to select specific commercial products (milk, meat, wool, egg) when evaluating per commercial product.</li>
+<li>Interactive preview table with sorted column previews and CSV/PNG download handlers.</li>
+</ul></li>
+</ul></div>
+<div class="section level3">
+<h3 id="bug-fixes-and-improvements-1-0-4">Bug Fixes and Improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-1-0-4"></a></h3>
+<ul><li>
+<strong>Dry Phase Meat Allocation Fix</strong>: Corrected non-milking dairy cohorts (<code>is_non_milking_dairy</code>, e.g. <code>dry_phase</code> where <code>milk_FPCM_kg == 0</code>), setting <code>AF_meat = 0</code>, <code>AF_milk = 0</code>, and intensities to <code>NA</code> (rendered as empty bars in charts) to avoid 100% allocation of dry-period emissions to cull meat.</li>
+<li>Resolved factor level duplication error in <code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> when grouping solely by species (<code>animal_type</code>).</li>
+<li>Decoupled dairy cohort detection in aggregation routines to support arbitrary demographic grouping combinations without losing co-product allocation rules.</li>
+<li>Cleaned up forage data lookup in <code>R/fao_data.R</code>, deprecating legacy <code>fao_forages.parquet</code> in favor of standard <code>forages.parquet</code>.</li>
+<li>Fully registered package global variables to ensure 0 notes and clean R CMD check execution.</li>
+<li>Comprehensive test suite expansion to 359 unit tests with 100% pass rate.</li>
+<li>Reorganized and updated all documentation vignettes (<code>Introduction.Rmd</code>, <code>Manure.Rmd</code>, <code>Technical_reference.Rmd</code>, <code>Theoretical_basis.Rmd</code>, <code>Workflow.Rmd</code>, <code>app.Rmd</code>, <code>land_use.Rmd</code>) and modernized <code>_pkgdown.yml</code>.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="1.0.3" id="herdr-103">herdr 1.0.3<a class="anchor" aria-label="anchor" href="#herdr-103"></a></h2>
 <div class="section level3">

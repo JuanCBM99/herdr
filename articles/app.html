@@ -35,33 +35,39 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
-<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book-open"></span> Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+<li><a class="dropdown-item" href="../articles/Introduction.html">Overview &amp; Features</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">R Scripting Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">Interactive Shiny App</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
-    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-to-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> How-To Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-to-guides">
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-cases">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-tools"></span> Case Studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
 <li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Variations (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Intensive Multi-Cohort AAP (Advanced)</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-database"></span> Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Data Dictionary</a></li>
+    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis (IPCC Tier 2 &amp; GLEAM)</a></li>
+    <li><a class="dropdown-item" href="../reference/index.html">Function Reference (R API)</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
@@ -169,6 +175,15 @@ database, you can either input a specific nation in the
 <code>country_of_origin</code> column, or bypass FAO statistics entirely
 by entering an exact farm yield into the <code>custom_yield_kg_ha</code>
 column.</li>
+<li>
+<em>Note on background databases:</em> The bilateral trade database
+(<code>fao_trade_matrix.parquet</code>, ~187 MB) is downloaded
+automatically from GitHub Releases the first time an assessment requires
+trade resolution – see <a href="Technical_reference.html#fao_trade_matrix">Technical
+Reference</a>. Similarly, statutory crop yields
+(<code>fao_crops.parquet</code>, ~24 MB) are downloaded automatically to
+the central user cache when required, ensuring the core package download
+remains lightweight.</li>
 </ul>
 </li>
 <li>
@@ -245,10 +260,55 @@ physiological module (e.g., Land Use, Enteric CH4). Click the
 <li>
 <strong>Analyze the output:</strong> The interface will
 automatically switch to the <strong>Results</strong> tab once the
-calculation finishes. Inspect the generated data table and use the
-interactive grouping tool to aggregate the visual charts by cohort,
-region, or physiological class. This allows you to easily identify
-emission hotspots.</li>
+calculation finishes:
+<ul>
+<li>
+<strong>Dynamic Grouping:</strong> Use the <strong>Group Chart
+By</strong> selector to aggregate visual bars by broad species category
+(<code>animal_type</code>), production subtype
+(<code>animal_subtype</code>), individual cohort
+(<code>animal_tag</code>), or administrative region
+(<code>region</code>, <code>subregion</code>,
+<code>class_flex</code>).</li>
+<li>
+<strong>Functional Unit Toggle:</strong> When evaluating a full
+assessment, choose your preferred benchmarking metric from the
+<strong>Functional Unit / Metric</strong> dropdown:
+<ul>
+<li>
+<em>Total Emissions &amp; Land:</em> Absolute inventory (Gg CO2e and
+ha).</li>
+<li>
+<em>Per kg Edible Protein:</em> Nutritional efficiency (kg CO2e and
+m2 per kg human edible protein).</li>
+<li>
+<em>Per Commercial Product:</em> Commercial footprint per kg FPCM
+milk, carcass meat, or fresh eggs (applying IDF 2022 Net Energy physical
+allocation for dairy herds).</li>
+<li>
+<em>Per Animal Head:</em> Annual impact per live head (kg CO2e and
+m2 per animal per year).</li>
+<li>
+<em>Protein Feed Efficiency (Mottet FCR):</em> Dual-bar comparison
+of Total Biological Protein FCR vs Cropland Protein FCR (with dashed red
+1.0 threshold line separating net food producers from competitors).</li>
+</ul>
+</li>
+<li>
+<strong>Detailed Output Table:</strong> Inspect the interactive
+preview table below the chart. In addition to GHG gas breakdowns, the
+table reports species-level feed protein efficiency and food security
+metrics (<code>feed_CP_total_kg</code>,
+<code>feed_CP_cropland_kg</code>, <code>Protein_FCR_total</code>,
+<code>Protein_FCR_cropland</code>, <code>Protein_net_balance_kg</code>)
+and complete agroecological land use partitioning
+(<code>Land_cropland_m2</code>,
+<code>Land_grassland_convertible_m2</code>,
+<code>Land_grassland_unconvertible_m2</code>,
+<code>Land_other_m2</code>). Click any column header to sort or select
+cells to copy.</li>
+</ul>
+</li>
 </ul>
 <hr>
 </div>
@@ -312,20 +372,13 @@ in <code>Census</code>.</td>
 the Census table.</td>
 </tr>
 <tr class="odd">
-<td align="left">🔴 <strong>Red Table Cells</strong>
-</td>
-<td align="left">Non-numeric text was typed into a numeric column.</td>
-<td align="left">Correct the cell to contain valid numbers or leave
-blank where appropriate.</td>
-</tr>
-<tr class="even">
 <td align="left"><strong>Sum of Shares / Allocations Error</strong></td>
 <td align="left">Diet proportions do not sum to 100%, or manure
 allocations do not sum to 1.0.</td>
 <td align="left">Adjust the percentage values so that their sum equals
 exactly 100% (diets) or 1.0 (manure).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><strong>Ignored CSV Upload</strong></td>
 <td align="left">The uploaded file has a modified filename.</td>
 <td align="left">Ensure filenames inside your ZIP match standard

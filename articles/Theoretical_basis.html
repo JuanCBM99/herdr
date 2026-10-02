@@ -35,33 +35,39 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
-<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book-open"></span> Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+<li><a class="dropdown-item" href="../articles/Introduction.html">Overview &amp; Features</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">R Scripting Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">Interactive Shiny App</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
-    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-to-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> How-To Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-to-guides">
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-cases">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-tools"></span> Case Studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
 <li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Variations (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Intensive Multi-Cohort AAP (Advanced)</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-database"></span> Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Data Dictionary</a></li>
+    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis (IPCC Tier 2 &amp; GLEAM)</a></li>
+    <li><a class="dropdown-item" href="../reference/index.html">Function Reference (R API)</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
@@ -1363,7 +1369,111 @@ factor for leaching</td>
 </div>
 </div>
 <div class="section level2">
-<h2 id="v--animal-productivity-edible-protein-engine-faogleam">V. Animal Productivity &amp; Edible Protein Engine (FAO/GLEAM)<a class="anchor" aria-label="anchor" href="#v--animal-productivity-edible-protein-engine-faogleam"></a>
+<h2 id="v--feed-related-land-use-footprint-agroecological-competition">V. Feed-Related Land Use Footprint &amp; Agroecological
+Competition<a class="anchor" aria-label="anchor" href="#v--feed-related-land-use-footprint-agroecological-competition"></a>
+</h2>
+<p>In addition to greenhouse gases, <code>herdr</code> estimates the
+feed-related agricultural land footprint paired with the human food
+security competition framework of <strong>Mottet et
+al. (2017)</strong>.</p>
+<div class="section level3">
+<h3 id="agroecological-soil-classification">1. Agroecological Soil Classification<a class="anchor" aria-label="anchor" href="#agroecological-soil-classification"></a>
+</h3>
+<p>Every feedstuff is classified via the <code>land_type</code> column
+in <code>feed_characteristics.csv</code>:</p>
+<ul>
+<li>
+<strong><code>cropland</code>:</strong> Cultivated arable soils
+suitable for direct human food production (cereals, pulses, oilseeds,
+and arable silages).</li>
+<li>
+<strong><code>grassland_convertible</code>:</strong> Fertile
+grasslands agronomically convertible to arable crop cultivation.</li>
+<li>
+<strong><code>grassland_unconvertible</code>:</strong> Native
+permanent pastures, upland scrub, and marginal rangelands unsuitable for
+arable cultivation.</li>
+<li>
+<strong><code>none</code>:</strong> Inputs with zero direct land
+footprint (minerals, vitamins, synthetic amino acids, post-consumer
+fats, and marine by-products).</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="mathematical-formulation">2. Mathematical Formulation<a class="anchor" aria-label="anchor" href="#mathematical-formulation"></a>
+</h3>
+<p>For each ingredient
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+in diet category
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">cat</annotation></semantics></math>:</p>
+<div class="section level4">
+<h4 id="a--dry-matter-crop-yield-yield_i">A. Dry Matter Crop Yield
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#a--dry-matter-crop-yield-yield_i"></a>
+</h4>
+<ul>
+<li>
+<strong>Arable crops (<code>fao_crops.parquet</code>):</strong>
+Converted from fresh harvest yield
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">RawYield_i</annotation></semantics></math>)
+to 100% dry matter basis using ingredient dry matter percentage
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">DM\_pct_i</annotation></semantics></math>):
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>=</mo><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg DM / ha</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Yield_i = RawYield_i \times \left( \frac{DM\_pct_i}{100} \right) \quad (\text{kg DM / ha})</annotation></semantics></math>
+</li>
+<li>
+<strong>Curated forages (<code>forages.parquet</code>) &amp; Custom
+yields (<code>custom_yield_kg_ha</code>):</strong> Already reported on a
+100% dry matter basis
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub><mo>=</mo><mi>R</mi><mi>a</mi><mi>w</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i = RawYield_i</annotation></semantics></math>).</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="b--economic-allocation-adjustment">B. Economic Allocation Adjustment<a class="anchor" aria-label="anchor" href="#b--economic-allocation-adjustment"></a>
+</h4>
+<p>Attributing the entire crop area to co-products (e.g. soybean meal
+vs. soybean oil) would overstate impacts. <code>herdr</code> applies the
+<code>economic_allocation</code> factor from <code>mapping.csv</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">EA_i \in [0, 1]</annotation></semantics></math>):
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">ha / kg DM</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times EA_i \quad (\text{ha / kg DM})</annotation></semantics></math>
+For non-land inputs (<code>none</code>),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = 0</annotation></semantics></math>.</p>
+</div>
+<div class="section level4">
+<h4 id="c--annual-cohort-intake-footprint">C. Annual Cohort Intake &amp; Footprint<a class="anchor" aria-label="anchor" href="#c--annual-cohort-intake-footprint"></a>
+</h4>
+<p>Annual consumption of ingredient
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+is derived from dry matter intake
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">DMI</annotation></semantics></math>),
+ration macro-share
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Share_{cat}</annotation></semantics></math>),
+and ingredient share
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Share_i</annotation></semantics></math>):
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mi>D</mi><mi>M</mi><msub><mi>I</mi><mtext mathvariant="normal">kg/day</mtext></msub><mo>×</mo><mn>365</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mrow><mi>c</mi><mi>a</mi><mi>t</mi></mrow></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>S</mi><mi>h</mi><mi>a</mi><mi>r</mi><msub><mi>e</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg DM / head / year</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">AnnualConsumption_i = (DMI_{\text{kg/day}} \times 365) \times \left(\frac{Share_{cat}}{100}\right) \times \left(\frac{Share_i}{100}\right) \quad (\text{kg DM / head / year})</annotation></semantics></math></p>
+<p>The cohort footprint in square meters
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> ha</mtext></mrow><mo>=</mo><mn>10</mn><mo>,</mo><mn>000</mn><msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">1\text{ ha} = 10{,}000\text{ m}^2</annotation></semantics></math>)
+is:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mi>/</mi><mtext mathvariant="normal">head</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>×</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mn>10</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUsePerAnimal_i \; (\text{m}^2/\text{head}) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times AAP</annotation></semantics></math></p>
+</div>
+</div>
+<div class="section level3">
+<h3 id="dynamic-international-trade-traceback">3. Dynamic International Trade Traceback<a class="anchor" aria-label="anchor" href="#dynamic-international-trade-traceback"></a>
+</h3>
+<p>When <code>country_of_origin</code> is unspecified (<code>NA</code>),
+<code>herdr</code> resolves production nations dynamically: 1.
+<strong>Self-Sufficiency Ratio (SSR):</strong> Assesses domestic
+production against apparent consumption:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>+</mo><mi>I</mi><mi>m</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo>−</mo><mi>E</mi><mi>x</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">ApparentConsumption = \max(1, Production + Imports - Exports)</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>=</mo><mfrac><mrow><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">SSR = \frac{Production}{ApparentConsumption}</annotation></semantics></math>
+2. <strong>Recursive Traceback:</strong> If
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>&lt;</mo><mn>0.70</mn></mrow><annotation encoding="application/x-tex">SSR &lt; 0.70</annotation></semantics></math>
+(70%), the crop is inferred as imported and traced recursively through
+bilateral trade flows (<code>fao_trade_matrix.parquet</code>) to
+identify primary producing origins beyond transit hubs
+(e.g. Rotterdam).</p>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="vi--animal-productivity-edible-protein-engine-faogleam">VI. Animal Productivity &amp; Edible Protein Engine (FAO/GLEAM)<a class="anchor" aria-label="anchor" href="#vi--animal-productivity-edible-protein-engine-faogleam"></a>
 </h2>
 <p>In addition to greenhouse gas emissions and land use,
 <code>herdr</code> computes physical livestock productivity and
@@ -1507,7 +1617,7 @@ is the boneless fraction of carcass meat.</li>
 </div>
 </div>
 <div class="section level2">
-<h2 id="vi--demographic-herd-dynamics-aap-rule">VI. Demographic &amp; Herd Dynamics (AAP Rule)<a class="anchor" aria-label="anchor" href="#vi--demographic-herd-dynamics-aap-rule"></a>
+<h2 id="vii--demographic-herd-dynamics-aap-rule">VII. Demographic &amp; Herd Dynamics (AAP Rule)<a class="anchor" aria-label="anchor" href="#vii--demographic-herd-dynamics-aap-rule"></a>
 </h2>
 <p>For fast-growing and batch-reared cohorts, the census standing
 population in <code>livestock_census.csv</code> must always represent
@@ -1526,6 +1636,183 @@ of finished animals produced by a fixed barn capacity
 operated continuously is:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Annual Batches Produced</mtext><mo>=</mo><mi>C</mi><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>365</mn><mrow><mtext mathvariant="normal">productive_period_days</mtext><mo>+</mo><mtext mathvariant="normal">empty_period_days</mtext></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_period\_days} + \text{empty\_period\_days}} \right)</annotation></semantics></math></p>
 <hr>
+</div>
+<div class="section level2">
+<h2 id="viii--consolidated-assessment-biophysical-allocation-feed-efficiency">VIII. Consolidated Assessment, Biophysical Allocation &amp; Feed
+Efficiency<a class="anchor" aria-label="anchor" href="#viii--consolidated-assessment-biophysical-allocation-feed-efficiency"></a>
+</h2>
+<p>The consolidated assessment engine in <code>herdr</code>
+(<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) integrates all upstream Tier
+2 GHG emissions, agroecological land footprints, and physical production
+outputs into multi-metric indicators.</p>
+<div class="section level3">
+<h3 id="biophysical-allocation-for-dairy-systems-idf-bulletin-5202022">1. Biophysical Allocation for Dairy Systems (IDF Bulletin
+520/2022)<a class="anchor" aria-label="anchor" href="#biophysical-allocation-for-dairy-systems-idf-bulletin-5202022"></a>
+</h3>
+<p>Dairy farming produces both milk and meat (from culled cows and
+surplus calves). To allocate emissions, land occupation, and feed intake
+between milk and meat co-products based on underlying physical
+relationships (ISO 14044 Step 2), <code>herdr</code> implements the
+updated <strong>International Dairy Federation (IDF) physical Net Energy
+allocation</strong> method (Bulletin 520/2022):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">MJ</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{NEL}_{\text{total}} = 3.1 \times \text{Milk}_{\text{FPCM}} \quad (\text{MJ})</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NEG</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">MJ</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{NEG}_{\text{total}} = 15.0 \times \text{Meat}_{\text{LW}} \quad (\text{MJ})</annotation></semantics></math></p>
+<p>Where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><annotation encoding="application/x-tex">\text{Milk}_{\text{FPCM}}</annotation></semantics></math>
+is Fat and Protein Corrected Milk (kg),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}}</annotation></semantics></math>
+is annual live weight sold (kg),
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.1</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">3.1 \text{ MJ/kg}</annotation></semantics></math>
+is the net energy content of standard milk, and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0 \text{ MJ/kg}</annotation></semantics></math>
+is the net energy content of live weight gain.</p>
+<p>The allocation factors are:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mrow><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">NEG</mtext><mtext mathvariant="normal">total</mtext></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mrow><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mo>+</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \frac{\text{NEL}_{\text{total}}}{\text{NEL}_{\text{total}} + \text{NEG}_{\text{total}}} = \frac{3.1 \times \text{Milk}_{\text{FPCM}}}{3.1 \times \text{Milk}_{\text{FPCM}} + 15.0 \times \text{Meat}_{\text{LW}}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}</annotation></semantics></math></p>
+<p>For specialized meat cohorts,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1.0</annotation></semantics></math>;
+for laying hens,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{egg}} = 1.0</annotation></semantics></math>.</p>
+</div>
+<div class="section level3">
+<h3 id="protein-feed-conversion-and-human-food-competition-mottet-et-al--2017">2. Protein Feed Conversion and Human Food Competition (Mottet et
+al., 2017)<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-and-human-food-competition-mottet-et-al--2017"></a>
+</h3>
+<p>Following the protein-to-protein framework of Mottet et al. (2017,
+<em>Global Food Security</em>, 14, 1-8), <code>herdr</code> evaluates
+feed conversion efficiency and human food security via three
+indicators:</p>
+<ol style="list-style-type: decimal">
+<li><p><strong>Total Protein Feed Conversion Ratio
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}}</annotation></semantics></math>):</strong>
+Evaluates system-wide biological nitrogen conversion efficiency by
+dividing total feed crude protein (CP) consumed by all edible animal
+protein produced:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math></p></li>
+<li>
+<p><strong>Cropland Protein Feed Conversion Ratio
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}}</annotation></semantics></math>):</strong>
+Measures direct competition with human food by considering only crude
+protein derived from arable cropland crops:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg cropland feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})</annotation></semantics></math></p>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>
+is calculated strictly from feed ingredients tagged as
+<code>land_type == "cropland"</code> in
+<code>feed_characteristics.csv</code> (e.g., cereals, oilseeds, pulses,
+and arable forage crops).</li>
+<li>Feed sources tagged as <code>grassland_convertible</code> or
+<code>grassland_unconvertible</code> (permanent pastures, rangelands,
+native grasslands) and <code>none</code> (animal meals, urea/NPN,
+synthetic amino acids, minerals, and industrial coproducts requiring no
+dedicated arable land) are excluded from
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>,
+reflecting zero direct competition for arable food crops.</li>
+<li>When
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &lt; 1.0</annotation></semantics></math>,
+the livestock system is a <strong>net producer</strong> of protein for
+human consumption.</li>
+<li>When
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&gt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &gt; 1.0</annotation></semantics></math>,
+the livestock system consumes more human-edible/cropland protein than it
+generates.</li>
+</ul>
+</li>
+<li><p><strong>Net Protein Balance
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_net_balance</mtext><mtext mathvariant="normal">kg</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_net\_balance}_{\text{kg}}</annotation></semantics></math>):</strong>
+Quantifies absolute net protein gain or loss:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_net_balance</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>−</mo><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_net\_balance}_{\text{kg}} = \text{Protein}_{\text{total}} - \text{Feed}_{\text{CP, cropland}} \quad (\text{kg protein})</annotation></semantics></math></p></li>
+</ol>
+</div>
+<div class="section level3">
+<h3 id="standardized-functional-units">3. Standardized Functional Units<a class="anchor" aria-label="anchor" href="#standardized-functional-units"></a>
+</h3>
+<p><code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code> and
+<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> support five functional units for
+benchmarking:</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Functional Unit (<code>functional_unit</code>)</th>
+<th align="left">GHG Emissions Metric</th>
+<th align="left">Land Footprint Metric</th>
+<th align="left">Allocation / Normalization</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<strong><code>total</code></strong> (Default)</td>
+<td align="left">Absolute Gg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
+</td>
+<td align="left">Absolute hectares (ha)</td>
+<td align="left">Whole-inventory absolute footprint</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><code>product</code></strong></td>
+<td align="left">kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
+/ kg commercial product</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
+/ kg commercial product</td>
+<td align="left">IDF Net Energy physical allocation for dairy</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong><code>protein</code></strong></td>
+<td align="left">kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
+/ kg edible protein</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
+/ kg edible protein</td>
+<td align="left">Total human edible protein output</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><code>head</code></strong></td>
+<td align="left">kg
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
+/ head / year</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
+/ head / year</td>
+<td align="left">Annual average population (AAP)</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong><code>fcr</code></strong></td>
+<td align="left">Total Protein FCR (Biological)</td>
+<td align="left">Cropland Protein FCR (Human Competition)</td>
+<td align="left">Mottet et al. (2017) feed protein conversion ratio
+(threshold line at 1.0)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level3">
+<h3 id="agroecological-land-footprint-breakdown">4. Agroecological Land Footprint Breakdown<a class="anchor" aria-label="anchor" href="#agroecological-land-footprint-breakdown"></a>
+</h3>
+<p>Land use requirement is partitioned into four agroecological
+categories based on the feed competition framework (Mottet et al.,
+2017):</p>
+<ul>
+<li>
+<strong><code>Land_cropland_m2</code>:</strong> Cultivated arable
+land suitable for direct human food production.</li>
+<li>
+<strong><code>Land_grassland_convertible_m2</code>:</strong>
+Pastures on fertile soils convertible to arable cropping.</li>
+<li>
+<strong><code>Land_grassland_unconvertible_m2</code>:</strong>
+Permanent native rangelands and marginal/upland terrain.</li>
+<li>
+<strong><code>Land_other_m2</code>:</strong> Silvopastoral zones,
+fallow, farm infrastructure, or unclassified land.</li>
+</ul>
+<hr>
 <div class="section level4">
 <h4 id="references">📚 References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h4>
@@ -1538,7 +1825,15 @@ of the United Nations, Rome.</li>
 <li>IDF (2015). <em>A common carbon footprint approach for the dairy
 sector: The green house gas emissions from dairy and beef
 production</em>. International Dairy Federation Bulletin 479/2015.</li>
+<li>IDF (2022). <em>The C-footprint of dairy: Updated IDF standard for
+carbon footprinting of the dairy sector</em>. International Dairy
+Federation Bulletin 520/2022.</li>
+<li>Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., &amp;
+Gerber, P. (2017). <em>More fuel than food: Global food security and the
+role of livestock feed</em>. <strong>Global Food Security</strong>, 14,
+1–8.</li>
 </ul>
+</div>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

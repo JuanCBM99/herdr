@@ -45,7 +45,9 @@ plot_herdr_results(
   Character string specifying the functional unit for impact assessment
   plots: \`"total"\` (Gg CO2e and ha), \`"protein"\` (kg CO2e and m2 per
   kg edible protein), \`"product"\` (kg CO2e and m2 per kg commercial
-  product), or \`"head"\` (kg CO2e and m2 per animal head). Default is
+  product), \`"fcr"\` (Mottet et al. 2017 Protein Feed Conversion Ratio
+  and human food competition), \`"milk"\`, \`"meat"\`, \`"wool"\`,
+  \`"egg"\`, or \`"head"\` (kg CO2e and m2 per animal head). Default is
   \`"total"\`.
 
 ## Value

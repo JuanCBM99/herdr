@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Technical Reference: Files &amp; Parameters • herdr</title>
+<title>Technical Data Dictionary: Input Files &amp; Databases • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Technical Reference: Files &amp; Parameters">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Technical Data Dictionary: Input Files &amp; Databases">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -35,33 +35,39 @@
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
 <li class="nav-item"><a class="nav-link" href="../index.html"><span class="fa fa-home"></span></a></li>
-<li class="nav-item"><a class="nav-link" href="../articles/Introduction.html"><span class="fa fas fa-book-open"></span> Introduction</a></li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-workflows" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-route"></span> Workflows</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-workflows">
-<li><a class="dropdown-item" href="../articles/Workflow.html">R Workflow</a></li>
-    <li><a class="dropdown-item" href="../articles/app.html">App Workflow</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-getting-started" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-book-open"></span> Getting Started</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-getting-started">
+<li><a class="dropdown-item" href="../articles/Introduction.html">Overview &amp; Features</a></li>
+    <li><a class="dropdown-item" href="../articles/Workflow.html">R Scripting Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/app.html">Interactive Shiny App</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> Guides</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-guides">
-<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography</a></li>
-    <li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical File Reference</a></li>
-    <li><a class="dropdown-item" href="../articles/Manure.html">Manure System Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/land_use.html">Land use Guide</a></li>
-    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a new ingredient</a></li>
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-how-to-guides" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-map-signs"></span> How-To Guides</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-how-to-guides">
+<li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
+    <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
+    <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul>
 </li>
 <li class="nav-item dropdown">
-  <button class="nav-link dropdown-toggle" type="button" id="dropdown-cases" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fa-tools"></span> Cases</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-cases">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-case-studies" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-tools"></span> Case Studies</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-case-studies">
 <li><a class="dropdown-item" href="../articles/Easy_Example.html">1. Dairy Cattle (Basic)</a></li>
-    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Differences (Moderate)</a></li>
-    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Life Stages (Advanced)</a></li>
+    <li><a class="dropdown-item" href="../articles/Moderate_Example.html">2. Regional Variations (Moderate)</a></li>
+    <li><a class="dropdown-item" href="../articles/Difficult_Example.html">3. Intensive Multi-Cohort AAP (Advanced)</a></li>
   </ul>
 </li>
-<li class="nav-item"><a class="nav-link" href="../articles/Theoretical_basis.html"><span class="fa fas fa-scroll"></span> Theoretical: IPCC Tier 2</a></li>
+<li class="nav-item dropdown">
+  <button class="nav-link dropdown-toggle" type="button" id="dropdown-reference" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true"><span class="fa fas fa-database"></span> Reference</button>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-reference">
+<li><a class="dropdown-item" href="../articles/Technical_reference.html">Technical Data Dictionary</a></li>
+    <li><a class="dropdown-item" href="../articles/Theoretical_basis.html">Theoretical Basis (IPCC Tier 2 &amp; GLEAM)</a></li>
+    <li><a class="dropdown-item" href="../reference/index.html">Function Reference (R API)</a></li>
+  </ul>
+</li>
       </ul>
 <ul class="navbar-nav">
 <li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
@@ -80,7 +86,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Technical Reference: Files &amp; Parameters</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Technical Data Dictionary: Input Files &amp; Databases</h1>
             
       
 
@@ -89,444 +95,936 @@
 
     
     
-<p><code>herdr</code> operates on a data-driven approach. To ensure the
-model works correctly, files are divided into two categories:</p>
-<ul>
+<div class="section level2">
+<h2 id="overview-architecture">Overview &amp; Architecture<a class="anchor" aria-label="anchor" href="#overview-architecture"></a>
+</h2>
+<p><code>herdr</code> operates on a structured, file-based data engine.
+All project data is separated into two categories:</p>
+<ol style="list-style-type: decimal">
 <li>
-<strong>User Inputs</strong> — files you fill in under
-<code>user_data/</code>.</li>
+<strong>User Input Tables (<code>user_data/</code>):</strong> CSV
+templates that you create or edit to describe your specific livestock
+scenario.</li>
 <li>
-<strong>Reference Libraries</strong> — internal files you consult
-(but do not normally edit).</li>
-</ul>
+<strong>Reference Libraries:</strong> Package-bundled reference
+databases (<code>.csv</code> and <code>.parquet</code>) providing
+official IPCC coefficients, nutritional tables (FEDNA), crop
+productivities (FAOSTAT / MAPA), and bilateral trade flows.</li>
+</ol>
+<pre class="text"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
+│                              PRIMARY DEMOGRAPHIC COHORT KEYS                           │
+├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
+│  animal_tag     │  region      │  subregion      │  class_flex                         │
+│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
+│  e.g., "dairy"  │  e.g., spain │  e.g., galicia  │  e.g., "lactation_phase"            │
+└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘</code></pre>
 <blockquote>
-<p>⚠️ <strong>Naming convention:</strong> the model is case-sensitive
-and does not tolerate spaces. Always use <strong>lowercase</strong> and
-<strong>underscores</strong> in every identifier you type into a CSV
-(e.g., <code>maize_silage</code>, not <code>Maize Silage</code>). This
-is the single most common source of “unrecognized” errors — keep it in
-mind as you fill in every file below.</p>
+<p>⚠️ <strong>Critical Rule on Identifiers:</strong> All table joins
+rely on exact string matching across the four demographic keys.
+Identifiers are <strong>strictly lowercase</strong> and use
+<strong>underscores</strong> instead of spaces (e.g.,
+<code>mature_dairy_cattle</code>, NOT
+<code>Mature Dairy Cattle</code>).</p>
 </blockquote>
 <hr>
+</div>
+<div class="section level2">
+<h2 id="i--user-input-schema-user_data">I. User Input Schema (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-schema-user_data"></a>
+</h2>
 <div class="section level3">
-<h3 id="i--user-input-files-user_data">I. User Input Files (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#i--user-input-files-user_data"></a>
+<h3 id="herd-census-livestock_census-csv">1. Herd Census (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#herd-census-livestock_census-csv"></a>
 </h3>
-<p>These are the templates you must complete to run your specific
-analysis. Follow the <a href="Workflow.html">Workflow Guide</a> for
-step-by-step instructions.</p>
-<div class="section level4">
-<h4 id="population-metrics">Population &amp; Metrics<a class="anchor" aria-label="anchor" href="#population-metrics"></a>
-</h4>
-<table class="table">
+<p>Declares the standing population count for each animal group.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">File</th>
-<th align="left">Purpose</th>
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>livestock_census.csv</code></td>
-<td align="left">Defines the <code>animal_tag</code>, location
-(<code>region</code>), and the number of heads
-(<code>population</code>).</td>
+<td align="left"><code>animal_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Primary cohort identifier (e.g.,
+<code>mature_dairy_cattle</code>, <code>fattening_pigs</code>).</td>
 </tr>
 <tr class="even">
-<td align="left"><code>livestock_weights.csv</code></td>
-<td align="left">Defines animal weights (<code>adult_weight_kg</code>,
-<code>initial_weight_kg</code>, <code>final_weight_kg</code>) and
-<code>productive_period_days</code> (for adult breeding females except
-hens: inter-parturition interval; for laying hens: laying cycle
-duration; for all other cohorts: life cycle / days on feed). Also
-contains breeder swine parameters.</td>
+<td align="left"><code>region</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">No</td>
+<td align="left">Broad geographic stratum or country (e.g.,
+<code>spain</code>).</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>ruminant_definitions.csv</code></td>
-<td align="left">Bridge file for <strong>ruminant</strong> animals.
-Links each <code>animal_tag</code> to a <code>diet_tag</code> and an
-IPCC description. Includes key reproductive parameters like pregnancy
-rate (<code>pregnancy_rate</code>) and prolificacy
-(<code>pr_sheep_goat</code>).</td>
+<td align="left"><code>subregion</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">No</td>
+<td align="left">Administrative province, autonomous community, or farm
+ID.</td>
 </tr>
 <tr class="even">
-<td align="left"><code>monogastric_definitions.csv</code></td>
-<td align="left">Bridge file for <strong>monogastric</strong> animals.
-Links each <code>animal_tag</code> to a <code>diet_tag</code> and
-species-specific parameters for swine (litter sizes, gestation/lactation
-durations) and poultry (egg production via <code>eggs_per_year</code>
-and <code>egg_weight_g</code>).</td>
+<td align="left"><code>class_flex</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">No</td>
+<td align="left">Physiological status, life stage, or management
+variant.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>population</code></td>
+<td align="center">numeric</td>
+<td align="center">head</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Annual Average Population (AAP) of live animals present
+on farm.</td>
 </tr>
 </tbody>
 </table>
+<hr>
 </div>
-<div class="section level4">
-<h4 id="nutrition-diets">Nutrition &amp; Diets<a class="anchor" aria-label="anchor" href="#nutrition-diets"></a>
-</h4>
-<table class="table">
+<div class="section level3">
+<h3 id="body-weights-biological-cycles-livestock_weights-csv">2. Body Weights &amp; Biological Cycles
+(<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#body-weights-biological-cycles-livestock_weights-csv"></a>
+</h3>
+<p>Defines the weight boundaries and life cycle durations used for
+maintenance energy, growth, and throughput modeling.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">File</th>
-<th align="left">Purpose</th>
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>diet_profiles.csv</code></td>
-<td align="left">Sets the high-level percentage balance between
-<code>forage</code>, <code>concentrate</code>, <code>milk</code>, and
-<code>milk_replacer</code>.</td>
+<td align="left">
+<code>animal_tag</code>, <code>region</code>,
+<code>subregion</code>, <code>class_flex</code>
+</td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Demographic keys matching
+<code>livestock_census.csv</code>.</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_ingredients.csv</code></td>
-<td align="left">Micro-breakdown of exactly which ingredients make up
-each macro category. You can optionally use the
-<code>custom_yield_kg_ha</code> column to enter a specific farm yield,
-which will override the default FAO/national yield averages for the
-land-use footprint.</td>
+<td align="left"><code>adult_weight_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Average mature live weight of an adult animal of this
+breed/species.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>productive_period_days</code></td>
+<td align="center">numeric</td>
+<td align="center">days</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Life cycle or biological interval: <br>•
+<strong>Breeding females (cows, sows, ewes, does):</strong>
+Inter-parturition interval (e.g. <code>365</code> d for cows,
+<code>149</code> d for sows). <br>• <strong>Laying hens:</strong>
+Commercial laying cycle duration (e.g. <code>511</code> d). <br>•
+<strong>Growing/fattening stock:</strong> Life cycle / days on feed
+(e.g. <code>42</code> d for broilers, <code>110</code> d for pigs).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>initial_weight_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Live body weight at the start of this specific
+production phase.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>final_weight_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Live body weight at the end of this phase
+(e.g. slaughter weight).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>sows_gestation_days</code></td>
+<td align="center">numeric</td>
+<td align="center">days</td>
+<td align="center">Swine</td>
+<td align="left">Gestation duration for breeding sows (default:
+<code>115</code> days).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>sows_lactation_days</code></td>
+<td align="center">numeric</td>
+<td align="center">days</td>
+<td align="center">Swine</td>
+<td align="left">Lactation duration for breeding sows (default:
+<code>28</code> days).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>piglet_birth_weight_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center">Swine</td>
+<td align="left">Average live weight of newborn piglet (default:
+<code>1.4</code> kg).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>piglet_weaning_weight_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center">Swine</td>
+<td align="left">Average live weight of piglet at weaning (default:
+<code>6.5</code> kg).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>sow_reserve_gain_kg</code></td>
+<td align="center">numeric</td>
+<td align="center">kg</td>
+<td align="center">Swine</td>
+<td align="left">Net maternal tissue reserve recovery during gestation
+(default: <code>15.0</code> kg).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="ruminant-definitions-ruminant_definitions-csv">3. Ruminant Definitions (<code>ruminant_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#ruminant-definitions-ruminant_definitions-csv"></a>
+</h3>
+<p>Links ruminant cohorts to IPCC Tier 2 metabolic equations, milk
+yields, and reproductive traits.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<code>animal_tag</code>, <code>region</code>,
+<code>subregion</code>, <code>class_flex</code>
+</td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Demographic keys matching
+<code>livestock_census.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>animal_type</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Broad species: <code>cattle</code>, <code>sheep</code>,
+or <code>goat</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>animal_subtype</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Production target: <code>dairy</code> or
+<code>meat</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>production_role</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Functional role: <code>mature</code>,
+<code>replacement</code>, or <code>slaughter</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>diet_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Ration identifier matching
+<code>diet_profiles.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>cfi</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Maintenance coefficient descriptor matching
+<code>ipcc_coefficients.csv</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>ca</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Feeding activity coefficient descriptor matching
+<code>ipcc_coefficients.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>c</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Ruminant</td>
+<td align="left">Growth coefficient category (e.g. <code>females</code>,
+<code>castrates</code>, <code>bulls</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>milk_yield_kg_year</code></td>
+<td align="center">numeric</td>
+<td align="center">kg/head/yr</td>
+<td align="center">Dairy</td>
+<td align="left">Annual average fresh milk yield per cow/ewe/doe.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>fat_content_pct</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center">Dairy</td>
+<td align="left">Milk fat content percentage
+(e.g. <code>3.8</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>wool_yield_kg_year</code></td>
+<td align="center">numeric</td>
+<td align="center">kg/head/yr</td>
+<td align="center">Sheep</td>
+<td align="left">Annual greasy wool shorn per head
+(e.g. <code>3.0</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>work_hours</code></td>
+<td align="center">numeric</td>
+<td align="center">h/day</td>
+<td align="center">Working</td>
+<td align="left">Daily hours worked by draft animals (default:
+<code>0</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>pr_sheep_goat</code></td>
+<td align="center">numeric</td>
+<td align="center">kids/litter</td>
+<td align="center">Sheep/Goats</td>
+<td align="left">Prolificacy: average kids or lambs born per litter
+(e.g. <code>1.5</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>pregnancy_rate</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="center">Cattle</td>
+<td align="left">Annual calving or pregnancy rate
+(e.g. <code>0.90</code> for 90%).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="monogastric-definitions-monogastric_definitions-csv">4. Monogastric Definitions
+(<code>monogastric_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#monogastric-definitions-monogastric_definitions-csv"></a>
+</h3>
+<p>Configures swine and poultry cohorts following FEDNA and MAPA
+nutritional standards.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<code>animal_tag</code>, <code>region</code>,
+<code>subregion</code>, <code>class_flex</code>
+</td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Demographic keys matching
+<code>livestock_census.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>animal_type</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Broad species: <code>swine</code> or
+<code>poultry</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>animal_subtype</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Subtype: <code>meat</code> (swine, broilers) or
+<code>layer</code> (laying hens).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>production_role</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Functional role: <code>mature</code>,
+<code>replacement</code>, or <code>slaughter</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>diet_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Ration identifier matching
+<code>diet_profiles.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>cfi_maintenance</code></td>
+<td align="center">numeric</td>
+<td align="center">kcal/kg^0.75</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Daily net energy maintenance requirement
+(e.g. <code>106</code> for swine).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>frac_fat_pct</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center">Monogastric</td>
+<td align="left">Percentage of live weight gain deposited as fat
+tissue.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>frac_protein_pct</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center">Monogastric</td>
+<td align="left">Percentage of live weight gain deposited as protein
+tissue.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>eggs_per_year</code></td>
+<td align="center">numeric</td>
+<td align="center">eggs/hen/yr</td>
+<td align="center">Poultry</td>
+<td align="left">Annual egg production per hen
+(e.g. <code>310</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>egg_weight_g</code></td>
+<td align="center">numeric</td>
+<td align="center">g/egg</td>
+<td align="center">Poultry</td>
+<td align="left">Average weight of one fresh egg
+(e.g. <code>62.5</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>fertility_rate</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="center">Breeders</td>
+<td align="left">Hatching / fertility success rate in breeder flocks
+(e.g. <code>0.85</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>piglets_born</code></td>
+<td align="center">numeric</td>
+<td align="center">piglets/litter</td>
+<td align="center">Swine Sows</td>
+<td align="left">Total piglets born per farrowing
+(e.g. <code>14.5</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>piglets_suckling</code></td>
+<td align="center">numeric</td>
+<td align="center">piglets/litter</td>
+<td align="center">Swine Sows</td>
+<td align="left">Piglets weaned per farrowing litter
+(e.g. <code>12.5</code>).</td>
+</tr>
+</tbody>
+</table>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="diet-profiles-diet_profiles-csv">5. Diet Profiles (<code>diet_profiles.csv</code>)<a class="anchor" aria-label="anchor" href="#diet-profiles-diet_profiles-csv"></a>
+</h3>
+<p>Specifies the macro-composition of each feeding ration.</p>
+<table style="width:100%;" class="table">
+<colgroup>
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>diet_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Unique diet identifier (e.g.,
+<code>diet_lactating_cows</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>forage_share</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Forage proportion of diet dry matter.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>concentrate_share</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Concentrate / grain proportion of diet dry matter.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>milk_share</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Whole fresh milk proportion (suckling young
+animals).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>milk_replacer_share</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Commercial milk replacer powder proportion.</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p><strong>Note on <code>country_of_origin</code>:</strong> if you don’t
-know where a feed ingredient comes from, leave the
-<code>country_of_origin</code> column as <code>NA</code>. The package
-will automatically resolve it using international trade data (see <a href="#fao_trade_matrix"><code>fao_trade_matrix.parquet</code></a>
-below).</p>
+<p>⚠️ <strong>Sum Rule:</strong> For every <code>diet_tag</code>, the
+four shares must sum to exactly <strong>100%</strong>:<br><code>forage_share + concentrate_share + milk_share + milk_replacer_share = 100.0</code></p>
 </blockquote>
+<hr>
 </div>
-<div class="section level4">
-<h4 id="manure-management">Manure Management<a class="anchor" aria-label="anchor" href="#manure-management"></a>
-</h4>
-<table class="table">
+<div class="section level3">
+<h3 id="diet-ingredients-diet_ingredients-csv">6. Diet Ingredients (<code>diet_ingredients.csv</code>)<a class="anchor" aria-label="anchor" href="#diet-ingredients-diet_ingredients-csv"></a>
+</h3>
+<p>Disaggregates each diet macro-category into specific crops and
+feedstuffs.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">File</th>
-<th align="left">Purpose</th>
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
 </tr></thead>
-<tbody><tr class="odd">
-<td align="left"><code>manure_management.csv</code></td>
-<td align="left">Defines how waste is handled: system, climate, and
-<code>allocation</code> (0 to 1) — the share of that cohort’s manure
-assigned to this management system.</td>
-</tr></tbody>
+<tbody>
+<tr class="odd">
+<td align="left"><code>diet_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Diet identifier linking to
+<code>diet_profiles.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>ingredient_type</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Category: <code>forage</code>,
+<code>concentrate</code>, <code>milk</code>, or
+<code>milk_replacer</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>ingredient</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Name matching <code>feed_characteristics.csv</code>
+exactly (e.g. <code>corn_silage</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>ingredient_share</code></td>
+<td align="center">numeric</td>
+<td align="center">%</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Proportion within that specific
+<code>ingredient_type</code> (must sum to <strong>100%</strong> per
+category).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>country_of_origin</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">No</td>
+<td align="left">Cultivation country. If left <code>NA</code>, the model
+traces origin via bilateral FAO trade matrices.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>custom_yield_kg_ha</code></td>
+<td align="center">numeric</td>
+<td align="center">kg DM/ha</td>
+<td align="center">No</td>
+<td align="left">Optional farm-measured yield. Overrides national FAO
+statistics and tags origin as <code>"Custom Data"</code>.</td>
+</tr>
+</tbody>
 </table>
+<hr>
 </div>
-<div class="section level4">
-<h4 id="reproduction-parameters">Reproduction Parameters<a class="anchor" aria-label="anchor" href="#reproduction-parameters"></a>
-</h4>
-<table class="table">
+<div class="section level3">
+<h3 id="manure-management-manure_management-csv">7. Manure Management (<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#manure-management-manure_management-csv"></a>
+</h3>
+<p>Specifies housing, waste storage, and pasture deposition systems.</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="50%">
-<col width="50%">
+<col width="17%">
+<col width="21%">
+<col width="21%">
+<col width="21%">
+<col width="17%">
 </colgroup>
 <thead><tr class="header">
-<th align="left">File</th>
-<th align="left">Purpose</th>
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="center">Required?</th>
+<th align="left">Description &amp; Valid Values</th>
 </tr></thead>
-<tbody><tr class="odd">
-<td align="left"><code>reproduction_parameters.csv</code></td>
-<td align="left">Default offspring and replacement rates (including
-cattle, sheep, goats, swine, and poultry via
-<code>replacement_rate_laying_hens</code> and
-<code>replacement_rate_breeder_hens</code>), used to estimate missing
-animal categories under the automatic herd cycle.</td>
-</tr></tbody>
+<tbody>
+<tr class="odd">
+<td align="left">
+<code>animal_tag</code>, <code>region</code>,
+<code>subregion</code>, <code>class_flex</code>
+</td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Demographic keys matching
+<code>livestock_census.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>system_base</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">IPCC base system (e.g. <code>liquid_slurry</code>,
+<code>solid_storage</code>, <code>pasture_range_paddock</code>).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>system_variant</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Varies</td>
+<td align="left">System subtype (e.g. <code>with_cover</code>,
+<code>without_cover</code>, <code>compacted</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>management_months</code></td>
+<td align="center">integer</td>
+<td align="center">months</td>
+<td align="center">Varies</td>
+<td align="left">Storage duration in months (<code>1</code>,
+<code>3</code>, <code>4</code>, <code>6</code>, or <code>12</code> for
+slurry).</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>system_climate</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Climate temperature: <code>cool</code>,
+<code>temperate</code>, or <code>warm</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>system_subclimate</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Varies</td>
+<td align="left">Sub-climate: <code>boreal</code>,
+<code>temperate</code>, or <code>tropical</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>climate_zone</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Varies</td>
+<td align="left">Moisture zone: <code>zone_dry</code>,
+<code>zone_moist</code>, or <code>zone_wet</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>climate_moisture</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Moisture level: <code>dry</code>, <code>wet</code>, or
+<code>default</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>b_0</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Maximum Methane Producing Capacity descriptor in
+<code>ipcc_coefficients.csv</code>.</td>
+</tr>
+<tr class="even">
+<td align="left"><code>allocation</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Fraction of cohort manure handled by this system. Must
+sum to <strong>1.0</strong> per cohort.</td>
+</tr>
+</tbody>
 </table>
-<p>Only needs editing if the population of some animal categories is
-unknown, or if offspring/replacement rates need adjusting for a specific
-study.</p>
+<p>Check the <a href="Manure.html">Manure Management Guide</a> for all
+valid IPCC combinations.</p>
+<hr>
+</div>
+<div class="section level3">
+<h3 id="reproduction-parameters-reproduction_parameters-csv">8. Reproduction Parameters
+(<code>reproduction_parameters.csv</code>)<a class="anchor" aria-label="anchor" href="#reproduction-parameters-reproduction_parameters-csv"></a>
+</h3>
+<p>Defines replacement rates used when running under automatic
+demographic closure (<code>automatic_cycle = TRUE</code>).</p>
+<table class="table">
+<colgroup>
+<col width="22%">
+<col width="27%">
+<col width="27%">
+<col width="22%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Column</th>
+<th align="center">Type</th>
+<th align="center">Unit</th>
+<th align="left">Description</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><code>animal_tag</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="left">Adult breeding female tag
+(e.g. <code>mature_dairy_cattle</code>, <code>breeder_sows</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>parameter</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="left">Parameter name: <code>replacement_rate</code>.</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>value</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="left">Annual replacement fraction (e.g. <code>0.27</code> for
+27% replacement).</td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 </div>
 <div class="section level2">
 <h2 id="ii--reference-libraries-consult-only">II. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#ii--reference-libraries-consult-only"></a>
 </h2>
-<p>These files are the “brain” of the package. You should
-<strong>not</strong> edit them unless you are an advanced user — but you
-must <strong>consult them</strong> to copy the exact names required in
-your input files.</p>
+<p>These internal datasets supply standard constants and parameters.
+<strong>Do not modify these files</strong> unless adding custom research
+extensions.</p>
 <div class="section level4">
-<h4 id="feed_characteristics-csv-nutritional-values">
-<code>feed_characteristics.csv</code> — Nutritional Values<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-values"></a>
+<h4 id="feed_characteristics-csv-nutritional-reference-table">1. <code>feed_characteristics.csv</code> — Nutritional Reference
+Table<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-reference-table"></a>
 </h4>
-<p>Consult this library to find the correct ingredient names for
-<code>diet_ingredients.csv</code>.</p>
+<p>Comprehensive nutritional composition library derived from
+<strong>FEDNA (2019)</strong> and Feedipedia: * <code>ingredient</code>:
+Canonical identifier (lowercase with underscores). *
+<code>land_type</code>: Agroecological land category:
+<code>cropland</code>, <code>grassland_convertible</code>,
+<code>grassland_unconvertible</code>, or <code>none</code>. *
+<code>DM_pct</code>: Dry matter content percentage (% as-fed). *
+<code>CP_pct</code>, <code>NDF_pct</code>, <code>ASH_pct</code>,
+<code>EE_pct</code>: Crude Protein, Neutral Detergent Fiber, Ash, and
+Ether Extract (% DM). * <code>DE_pct</code>: Energy digestibility
+percentage (% DE). * <code>GE_feed_kcal_kg</code>: Gross energy content
+(kcal/kg DM). * <code>swine_DE_kcal_kg</code>,
+<code>swine_ME_kcal_kg</code>: Digestible and metabolizable energy for
+pigs. * <code>poultry_ME_kcal_kg</code>: Metabolizable energy for
+poultry.</p>
 </div>
 <div class="section level4">
-<h4 id="key-columns">Key columns<a class="anchor" aria-label="anchor" href="#key-columns"></a>
+<h4 id="mapping-csv-agricultural-lca-connector">2. <code>mapping.csv</code> — Agricultural &amp; LCA Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-agricultural-lca-connector"></a>
 </h4>
-<table class="table">
-<colgroup>
-<col width="50%">
-<col width="50%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Column</th>
-<th align="left">Meaning</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>ingredient</code></td>
-<td align="left">Unique ingredient identifier (lowercase with
-underscores)</td>
-</tr>
-<tr class="even">
-<td align="left"><code>ingredient_type</code></td>
-<td align="left">Category: <code>forage</code>,
-<code>concentrate</code>, <code>milk</code>, or
-<code>milk_replacer</code>
-</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>land_type</code></td>
-<td align="left">Agroecological land competition: <code>cropland</code>,
-<code>grassland_convertible</code>,
-<code>grassland_unconvertible</code>, or <code>none</code>
-</td>
-</tr>
-<tr class="even">
-<td align="left"><code>DM_pct</code></td>
-<td align="left">Dry Matter, % as-fed (also scales fresh FAO crop yields
-to DM)</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>ASH_pct</code></td>
-<td align="left">Ash, % DM</td>
-</tr>
-<tr class="even">
-<td align="left"><code>CP_pct</code></td>
-<td align="left">Crude Protein, % DM</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>EE_pct</code></td>
-<td align="left">Ether Extract, % DM</td>
-</tr>
-<tr class="even">
-<td align="left"><code>NDF_pct</code></td>
-<td align="left">Neutral Detergent Fiber, % DM</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>DE_pct</code></td>
-<td align="left">Digestible Energy, %</td>
-</tr>
-<tr class="even">
-<td align="left"><code>source_DE</code></td>
-<td align="left">Source or methodology for the Digestible Energy
-value</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>GE_feed_kcal_kg</code></td>
-<td align="left">Gross Energy, kcal/kg DM</td>
-</tr>
-<tr class="even">
-<td align="left"><code>swine_DE_kcal_kg</code></td>
-<td align="left">Digestible Energy for swine, kcal/kg DM</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>swine_ME_kcal_kg</code></td>
-<td align="left">Metabolizable Energy for swine, kcal/kg DM</td>
-</tr>
-<tr class="even">
-<td align="left"><code>poultry_ME_kcal_kg</code></td>
-<td align="left">Metabolizable Energy for poultry, kcal/kg DM</td>
-</tr>
-</tbody>
-</table>
+<p>Connects diet ingredients to statutory crop yield statistics and Life
+Cycle Assessment databases: * <code>ingredient</code>: Name in
+<code>feed_characteristics.csv</code>. * <code>yield_name</code>: Item
+name in FAOSTAT (<code>fao_crops.parquet</code>) or forage database
+(<code>forages.parquet</code>). * <code>agribalyse_name</code>: Matching
+process in the Agribalyse v3.1 LCA database. *
+<code>economic_allocation</code>: Fraction (0.0 to 1.0) of crop
+cultivation area allocated to this co-product (e.g. 0.80 for cereal
+grain vs. 0.20 for straw).</p>
 </div>
 <div class="section level4">
-<h4 id="sources">Sources<a class="anchor" aria-label="anchor" href="#sources"></a>
+<h4 id="forages-parquet-curated-national-forage-database">3. <code>forages.parquet</code> — Curated National Forage
+Database<a class="anchor" aria-label="anchor" href="#forages-parquet-curated-national-forage-database"></a>
 </h4>
-<ul>
-<li>Most nutritional values come from the <strong>FEDNA Tables
-(2019)</strong>.</li>
-<li>
-<code>DE_pct</code> values are typically taken from
-<strong>Feedipedia</strong>, or specifically tracked via the
-<code>source_DE</code> column.</li>
-<li>
-<strong>Forages (<code>DE_pct</code>)</strong>: Forage ingredients
-often lack standard values. Following the reference methodology, Energy
-Digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Ed</annotation></semantics></math>,
-equivalent to <code>DE_pct</code>) is derived from Organic Matter
-digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>).
-First,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>
-is estimated from Acid Detergent Fiber
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">ADF</annotation></semantics></math>):</li>
-</ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi><mo>=</mo><mn>74.13</mn><mo>−</mo><mn>1.364</mn><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>A</mi><mi>D</mi><mi>F</mi><mo>−</mo><mn>29.83</mn><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">OMd = 74.13 - 1.364 \times (ADF - 29.83)</annotation></semantics></math></p>
-<p>Then,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Ed</annotation></semantics></math>
-is calculated using the full regression equation:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi><mo>=</mo><mi>O</mi><mi>M</mi><mi>d</mi><mo>−</mo><mn>3.94</mn><mo>+</mo><mn>0.104</mn><mo>×</mo><mi>C</mi><mi>P</mi><mo>+</mo><mn>0.149</mn><mo>×</mo><mi>E</mi><mi>E</mi><mo>+</mo><mn>0.022</mn><mo>×</mo><mi>N</mi><mi>D</mi><mi>F</mi><mo>−</mo><mn>0.244</mn><mo>×</mo><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ed = OMd - 3.94 + 0.104 \times CP + 0.149 \times EE + 0.022 \times NDF - 0.244 \times Ash</annotation></semantics></math></p>
-<ul>
-<li>
-<code>GE_feed_kcal_kg</code> is calculated using the <strong>NRC
-(1989) Ewan equation</strong>:</li>
-</ul>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>E</mi><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kcal/kg DM</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>4140</mn><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>56</mn><mo>×</mo><mi>E</mi><mi>E</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>15</mn><mo>×</mo><mi>C</mi><mi>P</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>−</mo><mo stretchy="false" form="prefix">(</mo><mn>44</mn><mo>×</mo><mi>A</mi><mi>S</mi><mi>H</mi><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">GE\;(\text{kcal/kg DM}) = 4140 + (56 \times EE\%) + (15 \times CP\%) - (44 \times ASH\%)</annotation></semantics></math></p>
-<p>where <code>EE%</code>, <code>CP%</code>, and <code>ASH%</code>
-correspond to the <code>EE_pct</code>, <code>CP_pct</code>, and
-<code>ASH_pct</code> columns above.</p>
+<p>Official national forage productivities from the Spanish Ministry of
+Agriculture (<strong>MAPA 2024</strong>, Anuario de Estadística Agraria)
+and BC3 research: * Contains real dry matter yields (kg DM/ha) for
+Atlantic, Mediterranean, and Mountain pastures, annual silages, and
+hays. * Serves as statutory proxy fallback when international studies
+lack local pasture productivity data.</p>
 </div>
 <div class="section level4">
-<h4 id="ipcc_coefficients-csv-metabolic-constants">
-<code>ipcc_coefficients.csv</code> — Metabolic Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients-csv-metabolic-constants"></a>
+<h4 id="fao_crops">4. <code>fao_crops.parquet</code> — Statutory Crop Yields
+(Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_crops"></a>
 </h4>
-<p>Consult this file to find the <code>description</code> you need to
-copy into <code>ruminant_definitions.csv</code>. It holds the Tier 2
-constants — indexed by <code>description</code> and
-<code>coefficient</code>
-(e.g. <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>f</mi><mi>i</mi></mrow></msub><annotation encoding="application/x-tex">C_{fi}</annotation></semantics></math>)
-with their corresponding <code>value</code> — that define energy needs
-for maintenance, pregnancy, and lactation, as well as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>
-(Maximum Methane Producing Capacity) for the manure management
-calculations.</p>
+<p>Auto-downloaded crop productivity database (~24 MB) queried from
+FAOSTAT Production statistics across countries and reporting years (kg
+fresh weight/ha, automatically converted to dry matter via
+<code>DM_pct</code>). Downloaded automatically from GitHub Releases to
+the central user cache upon first requirement to keep the core package
+lightweight.</p>
 </div>
 <div class="section level4">
-<h4 id="ipcc_mm-csv-manure-reference">
-<code>ipcc_mm.csv</code> — Manure Reference<a class="anchor" aria-label="anchor" href="#ipcc_mm-csv-manure-reference"></a>
-</h4>
-<p>The master list of every valid manure management combination:
-<code>system_base</code>, <code>system_variant</code>,
-<code>climate_zone</code>, and <code>management_months</code>. Your
-entry in <code>manure_management.csv</code> must match a row here
-exactly — otherwise the model silently returns zero emissions for that
-cohort instead of raising an error, so it’s worth double-checking
-against this file first if a result looks off.</p>
-</div>
-<div class="section level4">
-<h4 id="mapping-csv-database-connector">
-<code>mapping.csv</code> — Database Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-database-connector"></a>
-</h4>
-<p>The bridge between your diet ingredients and the agricultural yield
-and life-cycle-assessment databases, built around four columns:
-<code>ingredient</code>, <code>yield_name</code>,
-<code>agribalyse_name</code>, and <code>economic_allocation</code>.
-<code>yield_name</code> tells the model which crop productivity to use
-for the land-use footprint, <code>agribalyse_name</code> links the
-ingredient to its LCA database entry, and
-<code>economic_allocation</code> (0–1) is the share of that crop’s value
-attributed to this specific ingredient rather than its co-products —
-e.g. 0.80 for cereal grain versus the straw left over.</p>
-<p>Note that this <code>economic_allocation</code> column is
-conceptually different from the <code>allocation</code> column in
-<code>manure_management.csv</code>: both are 0–1 shares, but one splits
-a cohort’s manure across management systems, while the other splits a
-crop’s environmental burden across its co-products.</p>
-</div>
-<div class="section level4">
-<h4 id="forages-parquet-grass-silage-data-mapa-2024-bc3">
-<code>forages.parquet</code> — Grass &amp; Silage Data (MAPA 2024 /
-BC3)<a class="anchor" aria-label="anchor" href="#forages-parquet-grass-silage-data-mapa-2024-bc3"></a>
-</h4>
-<p>Curated forage and pasture database, incorporating official Spanish
-national statistics from MAPA (2024, Anuario de Estadística Agraria) and
-BC3 research, giving dry matter yields (<code>Area</code>,
-<code>Item</code>, <code>Value</code> in kg DM/ha) for grazing, natural
-pastures, and forage silages/hays — filling the gaps where international
-FAOSTAT records lack forage data.</p>
-</div>
-<div class="section level4">
-<h4 id="fao_crops-parquet-official-statutory-yields">
-<code>fao_crops.parquet</code> — Official Statutory Yields<a class="anchor" aria-label="anchor" href="#fao_crops-parquet-official-statutory-yields"></a>
-</h4>
-<p>Direct yield data for grains and pulses from FAOSTAT (2024), with the
-same <code>Area</code> / <code>Item</code> / <code>Value</code> (kg
-DM/ha) structure plus a <code>Year</code> column. This sets the
-international standard used to calculate the land footprint (m²) of
-concentrate feeds and commercial crops.</p>
-</div>
-<div class="section level4">
-<h4 id="fao_trade_matrix">
-<code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
+<h4 id="fao_trade_matrix">5. <code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
 (Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_trade_matrix"></a>
 </h4>
-<p>Unlike the other libraries, this file is <strong>not</strong> tracked
-in the repository, due to its size (~187 MB). It’s downloaded
-automatically from GitHub Releases the first time <code>herdr</code>
-encounters an <code>NA</code> in the <code>country_of_origin</code>
-column of your diets, and it powers the background allocation engine
-that estimates missing feed origins from FAO production and trade data
-under a 70% self-sufficiency rule.</p>
-<hr>
+<p>Auto-downloaded international bilateral trade matrix (~187 MB)
+recording export and import flows. Downloaded automatically from GitHub
+Releases to the central user cache the first time an assessment requires
+trade resolution. Powers the recursive traceback algorithm to allocate
+feed consumption back to primary producing nations under a 70%
+self-sufficiency threshold.</p>
 </div>
-<div class="section level3">
-<h3 id="iii--quick-reference-table">III. Quick Reference Table<a class="anchor" aria-label="anchor" href="#iii--quick-reference-table"></a>
-</h3>
-<p>Use this table to know where to look when filling out your data:</p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">If you want to…</th>
-<th align="left">Consult this library</th>
-<th align="left">To fill this input file</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">Identify an animal type</td>
-<td align="left"><code>ipcc_coefficients.csv</code></td>
-<td align="left"><code>ruminant_definitions.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left">Pick a feed ingredient</td>
-<td align="left"><code>feed_characteristics.csv</code></td>
-<td align="left"><code>diet_ingredients.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left">Choose a manure system</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-<td align="left"><code>manure_management.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left">Add a custom crop</td>
-<td align="left">
-<code>mapping.csv</code>, <code>forages.parquet</code>,
-<code>fao_crops.parquet</code>
-</td>
-<td align="left"><code>feed_characteristics.csv</code></td>
-</tr>
-</tbody>
-</table>
-<hr>
+<div class="section level4">
+<h4 id="ipcc_coefficients">6. <code>ipcc_coefficients.csv</code> — IPCC Biological &amp; Tier 2
+Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients"></a>
+</h4>
+<p>Statutory biological constants from IPCC (2019 Refinement / 2006
+Guidelines) Chapter 10 (Livestock): * <code>description</code>:
+Canonical descriptor matched against user inputs in
+<code>ruminant_definitions.csv</code> and
+<code>manure_management.csv</code> (e.g. <code>pasture</code>,
+<code>stall</code>, <code>cattle/buffalo</code>,
+<code>dairy cattle_high_productivity</code>). * <code>value</code>:
+Numerical Tier 2 constant. * <code>coefficient</code>: Biological
+parameter symbol: * <code>cfi</code>: Net energy coefficient for
+maintenance
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>f</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Cf_i</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">MJ/day/kg</mtext><annotation encoding="application/x-tex">\text{MJ/day/kg}</annotation></semantics></math>).
+* <code>ca</code>: Feeding situation activity coefficient
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
+dimensionless or
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">MJ/day/kg</mtext><annotation encoding="application/x-tex">\text{MJ/day/kg}</annotation></semantics></math>).
+* <code>c</code>: Growth energy coefficient for cattle
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>).
+* <code>c_pregnancy</code>: Gestation energy coefficient
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mtext mathvariant="normal">pregnancy</mtext></msub><annotation encoding="application/x-tex">C_{\text{pregnancy}}</annotation></semantics></math>).
+* <code>b_0</code>: Maximum methane producing capacity
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> CH</mtext></mrow><mn>4</mn></msub><mtext mathvariant="normal">/kg VS</mtext></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ CH}_4\text{/kg VS}</annotation></semantics></math>).
+* <code>units</code>: Measurement units
+(e.g. <code>Dimensionless</code>, <code>MJ/day/kg</code>,
+<code>m³ CH₄/kg VS</code>).</p>
 </div>
-<div class="section level3">
-<h3 id="next-steps">Next steps<a class="anchor" aria-label="anchor" href="#next-steps"></a>
-</h3>
-<ul>
-<li>
-<a href="Herd_Demography.html">Herd Demography &amp; Population
-Dynamics</a> — Population dynamics, biological cycles, and herd
-structure across species.</li>
-<li>
-<a href="Workflow.html">General Workflow</a> — how these files fit
-into a full assessment, step by step.</li>
-<li>
-<a href="land_use.html">Land Use Methodology</a> — the full
-self-sufficiency and trade-allocation engine behind
-<code>fao_trade_matrix.parquet</code>.</li>
-<li>
-<a href="Manure.html">Manure Management Guide</a> — every supported
-combination in <code>ipcc_mm.csv</code>, explained.</li>
-<li>
-<a href="Theoretical_basis.html">Theoretical Basis: IPCC Tier 2</a>
-— complete mathematical formulation.</li>
-</ul>
+<div class="section level4">
+<h4 id="ipcc_mm">7. <code>ipcc_mm.csv</code> — IPCC Manure Management Reference
+Matrix<a class="anchor" aria-label="anchor" href="#ipcc_mm"></a>
+</h4>
+<p>Complete statutory master matrix defining valid combinations of
+manure management systems, climate zones, and emission parameters: *
+<code>system_base</code>: Base manure storage/treatment technology
+(e.g. <code>liquid_slurry</code>, <code>solid_storage</code>,
+<code>pasture_range_paddock</code>, <code>daily_spread</code>,
+<code>anaerobic_lagoon</code>, <code>pit_storage</code>,
+<code>composting</code>, <code>deep_bedding</code>,
+<code>aerobic_treatment</code>, <code>incineration</code>,
+<code>poultry_manure</code>). * <code>system_variant</code>: Storage
+variant or crust cover (e.g. <code>with_natural_crust_cover</code>,
+<code>without_natural_crust_cover</code>, <code>uncovered</code>,
+<code>covered</code>, <code>in_vessel</code>). *
+<code>management_months</code>: Storage duration in months (for liquid
+slurry systems with crust or cover). * <code>climate_zone</code> &amp;
+<code>climate_moisture</code>: Agroclimatic classification
+(<code>zone_moist</code>, <code>zone_dry</code>,
+<code>zone_montane</code>, <code>wet</code>, <code>dry</code>). *
+<code>animal_type</code> &amp; <code>animal_subtype</code>: Target
+animal species and category (<code>cattle</code>, <code>swine</code>,
+<code>sheep</code>, <code>goat</code>, <code>poultry</code>,
+<code>dairy</code>, <code>other</code>). * <code>MCF_pct</code>: Methane
+Conversion Factor (% of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>
+realized as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">CH</mtext><mn>4</mn></msub><annotation encoding="application/x-tex">\text{CH}_4</annotation></semantics></math>).
+* <code>EF3</code>: Direct
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O</mtext></mrow><annotation encoding="application/x-tex">\text{N}_2\text{O}</annotation></semantics></math>
+emission factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">kg N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O-N / kg N</mtext></mrow><annotation encoding="application/x-tex">\text{kg N}_2\text{O-N / kg N}</annotation></semantics></math>).
+* <code>frac_gas</code>: Fraction of manure N volatilized as
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NH</mtext><mn>3</mn></msub><mo>+</mo><msub><mtext mathvariant="normal">NO</mtext><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">\text{NH}_3 + \text{NO}_x</annotation></semantics></math>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Frac</mtext><mtext mathvariant="normal">GasMS</mtext></msub><annotation encoding="application/x-tex">\text{Frac}_{\text{GasMS}}</annotation></semantics></math>).
+* <code>frac_leach</code>: Fraction of manure N lost via leaching and
+runoff
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Frac</mtext><mtext mathvariant="normal">LeachMS</mtext></msub><annotation encoding="application/x-tex">\text{Frac}_{\text{LeachMS}}</annotation></semantics></math>).
+* <code>EF4</code> &amp; <code>EF5</code>: Indirect
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O</mtext></mrow><annotation encoding="application/x-tex">\text{N}_2\text{O}</annotation></semantics></math>
+emission factors for atmospheric deposition (0.010) and aquatic leaching
+(0.011).</p>
+<p><em>See the <a href="Manure.html">Manure Management Guide</a> for a
+complete visual walkthrough and decision flowchart of every supported
+combination.</em></p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

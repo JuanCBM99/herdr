@@ -187,9 +187,6 @@ order:
       yield as a proxy fallback and emits an informative warning
       disclaimer. Users can provide local forage yields at any time via
       `custom_yield_kg_ha`.
-    - **Backward compatibility:** For existing projects, the engine
-      automatically checks for `forages.parquet` and gracefully accepts
-      `fao_forages.parquet` if present.
 5.  **Global mix fallback:** If an arable crop has no recorded yield in
     the resolved country for that reference year, `herdr` computes a
     production-weighted mean yield from the top 3 global producing
