@@ -124,7 +124,6 @@ $$
 3. **FAOSTAT crop yields:** Arable crop productivities are queried from `fao_crops.parquet` for the resolved country and reporting year (filtering out regional aggregate areas where `Area Code >= 5000`).
 4. **Curated forage database (`forages.parquet`):** Because FAOSTAT does not provide consistent national forage productivities across countries, `herdr` bundles `forages.parquet`, containing official national statistics for Spain (**MAPA 2024**, Anuario de Estadística Agraria), covering pastures (Atlantic, Mediterranean, Mountain), annual silages, and hays:
    * **Proxy fallback for international studies:** When analyzing a farm outside Spain whose diets contain bundled forages without `custom_yield_kg_ha`, `herdr` applies the Spanish national forage yield as a proxy fallback and emits an informative warning disclaimer. Users can provide local forage yields at any time via `custom_yield_kg_ha`.
-   * **Backward compatibility:** For existing projects, the engine automatically checks for `forages.parquet` and gracefully accepts `fao_forages.parquet` if present.
 5. **Global mix fallback:** If an arable crop has no recorded yield in the resolved country for that reference year, `herdr` computes a production-weighted mean yield from the top 3 global producing countries of that crop, tagged as `"Global Mix (Top 3 Producers)"`:
 
 $$

@@ -14,6 +14,7 @@
 
 # Output files from R CMD build
 /*.tar.gz
+Rplots.pdf
 
 # Output files from R CMD check
 /*.Rcheck/

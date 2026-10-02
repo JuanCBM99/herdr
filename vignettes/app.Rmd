@@ -40,6 +40,7 @@ Navigate left-to-right through the top data tabs. Follow this sequence to accura
 *   **Specify feed items (`Diet Ingredients`):** Detail the exact crops or forages consumed by mapping them to your `diet_tag`. 
     * Add a row for each ingredient (e.g., 'Corn silage') and specify its `ingredient_share` within its ingredient_type (e.g., 100% of the forage fraction).
     * Leave both the `custom_yield_kg_ha` and `country_of_origin` columns blank to let the model dynamically trace the feed using FAO trade data. To override the database, you can either input a specific nation in the `country_of_origin` column, or bypass FAO statistics entirely by entering an exact farm yield into the `custom_yield_kg_ha` column.
+    * *Note on background databases:* The bilateral trade database (`fao_trade_matrix.parquet`, ~187 MB) is downloaded automatically from GitHub Releases the first time an assessment requires trade resolution – see [Technical Reference](Technical_reference.html#fao_trade_matrix). Similarly, statutory crop yields (`fao_crops.parquet`, ~24 MB) are downloaded automatically to the central user cache when required, ensuring the core package download remains lightweight.
 *   **Input productive traits (`Definitions` & `Weights`):** Navigate to the ruminant/monogastric definitions and weights tabs to enter performance metrics for your cohorts. 
     * **Weights:** You must provide starting, ending, and adult mature body weights, as well as `productive_period_days` (for adult breeding females except laying hens: the inter-parturition interval, e.g. 365 days; for laying hens: the commercial laying cycle duration; for all other cohorts: their life cycle / days on feed, e.g. 110 days for fattening pigs).
     * **Definitions:** Enter species-specific yields (such as milk kg/year, wool, or eggs) and select the appropriate IPCC coefficients from the dropdown menus to accurately calculate energy requirements.
@@ -64,7 +65,15 @@ While entering data, take advantage of the grid's interactive features to preven
 Once your farm data is completely filled out and validated, proceed to calculate the impacts:
 
 *   **Run the model:** Go to the **Step 3: Calculate** panel in the sidebar. Select either a complete impact assessment (`generate_impact_assessment`) or a specific physiological module (e.g., Land Use, Enteric CH4). Click the **Run Selected** button.
-*   **Analyze the output:** The interface will automatically switch to the **Results** tab once the calculation finishes. Inspect the generated data table and use the interactive grouping tool to aggregate the visual charts by cohort, region, or physiological class. This allows you to easily identify emission hotspots.
+*   **Analyze the output:** The interface will automatically switch to the **Results** tab once the calculation finishes:
+    *   **Dynamic Grouping:** Use the **Group Chart By** selector to aggregate visual bars by broad species category (`animal_type`), production subtype (`animal_subtype`), individual cohort (`animal_tag`), or administrative region (`region`, `subregion`, `class_flex`).
+    *   **Functional Unit Toggle:** When evaluating a full assessment, choose your preferred benchmarking metric from the **Functional Unit / Metric** dropdown:
+        *   *Total Emissions & Land:* Absolute inventory (Gg CO2e and ha).
+        *   *Per kg Edible Protein:* Nutritional efficiency (kg CO2e and m2 per kg human edible protein).
+        *   *Per Commercial Product:* Commercial footprint per kg FPCM milk, carcass meat, or fresh eggs (applying IDF 2022 Net Energy physical allocation for dairy herds).
+        *   *Per Animal Head:* Annual impact per live head (kg CO2e and m2 per animal per year).
+        *   *Protein Feed Efficiency (Mottet FCR):* Dual-bar comparison of Total Biological Protein FCR vs Cropland Protein FCR (with dashed red 1.0 threshold line separating net food producers from competitors).
+    *   **Detailed Output Table:** Inspect the interactive preview table below the chart. In addition to GHG gas breakdowns, the table reports species-level feed protein efficiency and food security metrics (`feed_CP_total_kg`, `feed_CP_cropland_kg`, `Protein_FCR_total`, `Protein_FCR_cropland`, `Protein_net_balance_kg`) and complete agroecological land use partitioning (`Land_cropland_m2`, `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`, `Land_other_m2`). Click any column header to sort or select cells to copy.
 
 ---
 
@@ -85,6 +94,5 @@ If you encounter issues during your workflow, consult this quick reference:
 |:---|:---|:---|
 | 🔴 **Red Banner: Missing Cohorts** | An `animal_tag` in `Census` is absent from definitions, weights, or manure tables. | Add a matching row with identical `animal_tag`, `region`, `subregion`, and `class_flex` keys in the required tab. |
 | 🟡 **Yellow Banner: Unrecognized Cohorts** | A row in a definition table has no corresponding entry in `Census`. | Correct spelling typos in the tag or add the cohort to the Census table. |
-| 🔴 **Red Table Cells** | Non-numeric text was typed into a numeric column. | Correct the cell to contain valid numbers or leave blank where appropriate. |
 | **Sum of Shares / Allocations Error** | Diet proportions do not sum to 100%, or manure allocations do not sum to 1.0. | Adjust the percentage values so that their sum equals exactly 100% (diets) or 1.0 (manure). |
 | **Ignored CSV Upload** | The uploaded file has a modified filename. | Ensure filenames inside your ZIP match standard templates (e.g., `livestock_census.csv`). |

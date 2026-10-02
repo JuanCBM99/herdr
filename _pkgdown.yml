@@ -2,53 +2,53 @@ url: https://juancbm99.github.io/herdr/
 
 title: "herdr"
 
-
 template:
   bootstrap: 5
   bootswatch: yeti
-
 
 navbar:
   type: inverse
   left:
     - icon: fa-home
       href: index.html
-    - text: "Introduction"
+    - text: "Getting Started"
       icon: fas fa-book-open
-      href: articles/Introduction.html
-    - text: "Workflows"
-      icon: fas fa-route
       menu:
-        - text: "R Workflow"
+        - text: "Overview & Features"
+          href: articles/Introduction.html
+        - text: "R Scripting Workflow"
           href: articles/Workflow.html
-        - text: "App Workflow"
+        - text: "Interactive Shiny App"
           href: articles/app.html
-    - text: "Guides"
+    - text: "How-To Guides"
       icon: fas fa-map-signs
       menu:
-        - text: "Herd Demography"
+        - text: "Herd Demography & Life Cycles"
           href: articles/Herd_Demography.html
-        - text: "Technical File Reference"
-          href: articles/Technical_reference.html
-        - text: "Manure System Guide"
+        - text: "Manure Management Pathways"
           href: articles/Manure.html
-        - text: "Land use Guide"
+        - text: "Feed Land Competition & Trade"
           href: articles/land_use.html
-        - text: "Adding a new ingredient"
+        - text: "Adding a Custom Feed Ingredient"
           href: articles/Adding_Ingredient.html
-
-    - text: "Cases"
-      icon: fa-tools
+    - text: "Case Studies"
+      icon: fas fa-tools
       menu:
         - text: "1. Dairy Cattle (Basic)"
           href: articles/Easy_Example.html
-        - text: "2. Regional Differences (Moderate)"
+        - text: "2. Regional Variations (Moderate)"
           href: articles/Moderate_Example.html
-        - text: "3. Life Stages (Advanced)"
+        - text: "3. Intensive Multi-Cohort AAP (Advanced)"
           href: articles/Difficult_Example.html
-    - text: "Theoretical: IPCC Tier 2"
-      icon: fas fa-scroll
-      href: articles/Theoretical_basis.html
+    - text: "Reference"
+      icon: fas fa-database
+      menu:
+        - text: "Technical Data Dictionary"
+          href: articles/Technical_reference.html
+        - text: "Theoretical Basis (IPCC Tier 2 & GLEAM)"
+          href: articles/Theoretical_basis.html
+        - text: "Function Reference (R API)"
+          href: reference/index.html
 
   right:
     - icon: fa-file-code-o
@@ -60,14 +60,38 @@ navbar:
     - icon: fa-youtube
       href: https://www.youtube.com/@JuanCBM9
 
-# Table of contents
+articles:
+  - title: "Getting Started"
+    desc: "Essential guides to get up and running with herdr in R or through the web GUI."
+    contents:
+      - Introduction
+      - Workflow
+      - app
+  - title: "How-To Guides"
+    desc: "Problem-oriented guides explaining key biological, spatial, and nutritional modules."
+    contents:
+      - Herd_Demography
+      - Manure
+      - land_use
+      - Adding_Ingredient
+  - title: "Case Studies"
+    desc: "Step-by-step reproducible examples from farm-scale to complex multi-cohort systems."
+    contents:
+      - Easy_Example
+      - Moderate_Example
+      - Difficult_Example
+  - title: "Methodology & Reference"
+    desc: "Complete mathematical formulations, data schemas, and database dictionaries."
+    contents:
+      - Technical_reference
+      - Theoretical_basis
+
 toc:
   depth: 3
 
-# Logo y meta
 logo:
   image: man_logo.png
 favicon: favicon.ico
 
 meta:
-  description: "herdr: calculation of CH4 and N2O emissions and land use for livestock."
+  description: "herdr: Integrated livestock GHG emissions, land competition, and nutritional protein modeling in R."

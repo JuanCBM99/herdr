@@ -487,7 +487,51 @@ $$N_{leach-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{LeachMS} \
 
 ---
 
-# V. Animal Productivity & Edible Protein Engine (FAO/GLEAM)
+# V. Feed-Related Land Use Footprint & Agroecological Competition
+
+In addition to greenhouse gases, `herdr` estimates the feed-related agricultural land footprint paired with the human food security competition framework of **Mottet et al. (2017)**.
+
+## 1. Agroecological Soil Classification
+
+Every feedstuff is classified via the `land_type` column in `feed_characteristics.csv`:
+
+* **`cropland`:** Cultivated arable soils suitable for direct human food production (cereals, pulses, oilseeds, and arable silages).
+* **`grassland_convertible`:** Fertile grasslands agronomically convertible to arable crop cultivation.
+* **`grassland_unconvertible`:** Native permanent pastures, upland scrub, and marginal rangelands unsuitable for arable cultivation.
+* **`none`:** Inputs with zero direct land footprint (minerals, vitamins, synthetic amino acids, post-consumer fats, and marine by-products).
+
+## 2. Mathematical Formulation
+
+For each ingredient $i$ in diet category $cat$:
+
+### A. Dry Matter Crop Yield ($Yield_i$)
+* **Arable crops (`fao_crops.parquet`):** Converted from fresh harvest yield ($RawYield_i$) to 100% dry matter basis using ingredient dry matter percentage ($DM\_pct_i$):
+  $$Yield_i = RawYield_i \times \left( \frac{DM\_pct_i}{100} \right) \quad (\text{kg DM / ha})$$
+* **Curated forages (`forages.parquet`) & Custom yields (`custom_yield_kg_ha`):** Already reported on a 100% dry matter basis ($Yield_i = RawYield_i$).
+
+### B. Economic Allocation Adjustment
+Attributing the entire crop area to co-products (e.g. soybean meal vs. soybean oil) would overstate impacts. `herdr` applies the `economic_allocation` factor from `mapping.csv` ($EA_i \in [0, 1]$):
+$$AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times EA_i \quad (\text{ha / kg DM})$$
+For non-land inputs (`none`), $AdjustedLandPerKg_i = 0$.
+
+### C. Annual Cohort Intake & Footprint
+Annual consumption of ingredient $i$ is derived from dry matter intake ($DMI$), ration macro-share ($Share_{cat}$), and ingredient share ($Share_i$):
+$$AnnualConsumption_i = (DMI_{\text{kg/day}} \times 365) \times \left(\frac{Share_{cat}}{100}\right) \times \left(\frac{Share_i}{100}\right) \quad (\text{kg DM / head / year})$$
+
+The cohort footprint in square meters ($1\text{ ha} = 10{,}000\text{ m}^2$) is:
+$$LandUsePerAnimal_i \; (\text{m}^2/\text{head}) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000$$
+$$TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times AAP$$
+
+## 3. Dynamic International Trade Traceback
+When `country_of_origin` is unspecified (`NA`), `herdr` resolves production nations dynamically:
+1. **Self-Sufficiency Ratio (SSR):** Assesses domestic production against apparent consumption:
+   $$ApparentConsumption = \max(1, Production + Imports - Exports)$$
+   $$SSR = \frac{Production}{ApparentConsumption}$$
+2. **Recursive Traceback:** If $SSR < 0.70$ (70%), the crop is inferred as imported and traced recursively through bilateral trade flows (`fao_trade_matrix.parquet`) to identify primary producing origins beyond transit hubs (e.g. Rotterdam).
+
+---
+
+# VI. Animal Productivity & Edible Protein Engine (FAO/GLEAM)
 
 In addition to greenhouse gas emissions and land use, `herdr` computes physical livestock productivity and nutritional protein output using the **FAO Global Livestock Environmental Assessment Model (GLEAM v3.0)** framework and International Dairy Federation (IDF) standards.
 
@@ -548,7 +592,7 @@ $$\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_
 
 ---
 
-# VI. Demographic & Herd Dynamics (AAP Rule)
+# VII. Demographic & Herd Dynamics (AAP Rule)
 
 For fast-growing and batch-reared cohorts, the census standing population in `livestock_census.csv` must always represent the **Annual Average Population ($AAP$)**:
 $$AAP = \frac{\sum_{i=1}^{M} N_i \times D_i}{365}$$
@@ -558,7 +602,71 @@ $$\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_
 
 ---
 
+# VIII. Consolidated Assessment, Biophysical Allocation & Feed Efficiency
+
+The consolidated assessment engine in `herdr` (`generate_impact_assessment()`) integrates all upstream Tier 2 GHG emissions, agroecological land footprints, and physical production outputs into multi-metric indicators.
+
+## 1. Biophysical Allocation for Dairy Systems (IDF Bulletin 520/2022)
+
+Dairy farming produces both milk and meat (from culled cows and surplus calves). To allocate emissions, land occupation, and feed intake between milk and meat co-products based on underlying physical relationships (ISO 14044 Step 2), `herdr` implements the updated **International Dairy Federation (IDF) physical Net Energy allocation** method (Bulletin 520/2022):
+
+$$\text{NEL}_{\text{total}} = 3.1 \times \text{Milk}_{\text{FPCM}} \quad (\text{MJ})$$
+$$\text{NEG}_{\text{total}} = 15.0 \times \text{Meat}_{\text{LW}} \quad (\text{MJ})$$
+
+Where $\text{Milk}_{\text{FPCM}}$ is Fat and Protein Corrected Milk (kg), $\text{Meat}_{\text{LW}}$ is annual live weight sold (kg), $3.1 \text{ MJ/kg}$ is the net energy content of standard milk, and $15.0 \text{ MJ/kg}$ is the net energy content of live weight gain.
+
+The allocation factors are:
+$$\text{AF}_{\text{milk}} = \frac{\text{NEL}_{\text{total}}}{\text{NEL}_{\text{total}} + \text{NEG}_{\text{total}}} = \frac{3.1 \times \text{Milk}_{\text{FPCM}}}{3.1 \times \text{Milk}_{\text{FPCM}} + 15.0 \times \text{Meat}_{\text{LW}}}$$
+$$\text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}$$
+
+For specialized meat cohorts, $\text{AF}_{\text{meat}} = 1.0$; for laying hens, $\text{AF}_{\text{egg}} = 1.0$.
+
+## 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
+
+Following the protein-to-protein framework of Mottet et al. (2017, *Global Food Security*, 14, 1-8), `herdr` evaluates feed conversion efficiency and human food security via three indicators:
+
+1. **Total Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{total}}$):**
+   Evaluates system-wide biological nitrogen conversion efficiency by dividing total feed crude protein (CP) consumed by all edible animal protein produced:
+   $$\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})$$
+
+2. **Cropland Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{cropland}}$):**
+   Measures direct competition with human food by considering only crude protein derived from arable cropland crops:
+   $$\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})$$
+   * $\text{Feed}_{\text{CP, cropland}}$ is calculated strictly from feed ingredients tagged as `land_type == "cropland"` in `feed_characteristics.csv` (e.g., cereals, oilseeds, pulses, and arable forage crops).
+   * Feed sources tagged as `grassland_convertible` or `grassland_unconvertible` (permanent pastures, rangelands, native grasslands) and `none` (animal meals, urea/NPN, synthetic amino acids, minerals, and industrial coproducts requiring no dedicated arable land) are excluded from $\text{Feed}_{\text{CP, cropland}}$, reflecting zero direct competition for arable food crops.
+   * When $\text{Protein\_FCR}_{\text{cropland}} < 1.0$, the livestock system is a **net producer** of protein for human consumption.
+   * When $\text{Protein\_FCR}_{\text{cropland}} > 1.0$, the livestock system consumes more human-edible/cropland protein than it generates.
+
+3. **Net Protein Balance ($\text{Protein\_net\_balance}_{\text{kg}}$):**
+   Quantifies absolute net protein gain or loss:
+   $$\text{Protein\_net\_balance}_{\text{kg}} = \text{Protein}_{\text{total}} - \text{Feed}_{\text{CP, cropland}} \quad (\text{kg protein})$$
+
+## 3. Standardized Functional Units
+
+`generate_impact_assessment()` and `plot_herdr_results()` support five functional units for benchmarking:
+
+| Functional Unit (`functional_unit`) | GHG Emissions Metric | Land Footprint Metric | Allocation / Normalization |
+|:---|:---|:---|:---|
+| **`total`** (Default) | Absolute Gg $\text{CO}_2\text{e}$ | Absolute hectares (ha) | Whole-inventory absolute footprint |
+| **`product`** | kg $\text{CO}_2\text{e}$ / kg commercial product | $\text{m}^2$ / kg commercial product | IDF Net Energy physical allocation for dairy |
+| **`protein`** | kg $\text{CO}_2\text{e}$ / kg edible protein | $\text{m}^2$ / kg edible protein | Total human edible protein output |
+| **`head`** | kg $\text{CO}_2\text{e}$ / head / year | $\text{m}^2$ / head / year | Annual average population (AAP) |
+| **`fcr`** | Total Protein FCR (Biological) | Cropland Protein FCR (Human Competition) | Mottet et al. (2017) feed protein conversion ratio (threshold line at 1.0) |
+
+## 4. Agroecological Land Footprint Breakdown
+
+Land use requirement is partitioned into four agroecological categories based on the feed competition framework (Mottet et al., 2017):
+
+* **`Land_cropland_m2`:** Cultivated arable land suitable for direct human food production.
+* **`Land_grassland_convertible_m2`:** Pastures on fertile soils convertible to arable cropping.
+* **`Land_grassland_unconvertible_m2`:** Permanent native rangelands and marginal/upland terrain.
+* **`Land_other_m2`:** Silvopastoral zones, fallow, farm infrastructure, or unclassified land.
+
+---
+
 ### 📚 References
 * IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
 * FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM) v3.0: Model description*. Food and Agriculture Organization of the United Nations, Rome.
 * IDF (2015). *A common carbon footprint approach for the dairy sector: The green house gas emissions from dairy and beef production*. International Dairy Federation Bulletin 479/2015.
+* IDF (2022). *The C-footprint of dairy: Updated IDF standard for carbon footprinting of the dairy sector*. International Dairy Federation Bulletin 520/2022.
+* Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., & Gerber, P. (2017). *More fuel than food: Global food security and the role of livestock feed*. **Global Food Security**, 14, 1–8.
