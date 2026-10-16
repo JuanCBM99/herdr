@@ -1671,10 +1671,21 @@ is the net energy content of standard milk, and
 is the net energy content of live weight gain.</p>
 <p>The allocation factors are:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mrow><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">NEG</mtext><mtext mathvariant="normal">total</mtext></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mrow><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mo>+</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \frac{\text{NEL}_{\text{total}}}{\text{NEL}_{\text{total}} + \text{NEG}_{\text{total}}} = \frac{3.1 \times \text{Milk}_{\text{FPCM}}}{3.1 \times \text{Milk}_{\text{FPCM}} + 15.0 \times \text{Meat}_{\text{LW}}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}</annotation></semantics></math></p>
-<p>For specialized meat cohorts,
+<p>For specialized meat cohorts (including feedlot calves or lambs
+originating from dairy breeding herds where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}} &gt; 0</annotation></semantics></math>),
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1.0</annotation></semantics></math>;
 for laying hens,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{egg}} = 1.0</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{egg}} = 1.0</annotation></semantics></math>.
+Conversely, non-milking and non-meat maintenance phases (such as
+<code>dry_phase</code> cows where both milk and meat outputs are zero)
+have
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = 0</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 0</annotation></semantics></math>,
+leaving product intensities as <code>NA</code> (displayed as empty bars
+in charts) to avoid erroneously attributing dry-period emissions
+entirely to cull meat.</p>
 </div>
 <div class="section level3">
 <h3 id="protein-feed-conversion-and-human-food-competition-mottet-et-al--2017">2. Protein Feed Conversion and Human Food Competition (Mottet et

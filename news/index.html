@@ -80,13 +80,17 @@
 <div class="section level3">
 <h3 id="bug-fixes-and-improvements-1-0-4">Bug Fixes and Improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-1-0-4"></a></h3>
 <ul><li>
-<strong>Dry Phase Meat Allocation Fix</strong>: Corrected non-milking dairy cohorts (<code>is_non_milking_dairy</code>, e.g. <code>dry_phase</code> where <code>milk_FPCM_kg == 0</code>), setting <code>AF_meat = 0</code>, <code>AF_milk = 0</code>, and intensities to <code>NA</code> (rendered as empty bars in charts) to avoid 100% allocation of dry-period emissions to cull meat.</li>
+<strong>Consolidation of <code>replacement_rate</code></strong>: Streamlined user input definitions by integrating <code>replacement_rate</code> directly as a parameter column in <code>ruminant_definitions.csv</code> and <code>monogastric_definitions.csv</code>, completely deprecating the separate <code>reproduction_parameters.csv</code> file across all demographic modeling functions, vignettes, example files, and the Shiny application data dictionary.</li>
+<li>
+<strong>Dairy Feedlot Meat Accounting</strong>: Refined <code>is_non_milking_dairy</code> detection in <code>R/14_summary.R</code> and <code>R/plots.R</code> to check <code>(animal_subtype == "dairy") &amp; (milk_kg == 0) &amp; (meat_kg == 0)</code>. Cohorts born from dairy herds that yield meat (e.g. <code>feedlot_calves_male</code>, <code>feedlot_calves_female</code>) are no longer excluded as non-milking phases, ensuring their meat yields, greenhouse gas and land use intensities, and Mottet FCR are fully accounted for and displayed in summary outputs and plots.</li>
+<li>
+<strong>Dry Phase Meat Allocation</strong>: True non-milking, non-meat phases (e.g. <code>dry_phase</code> where both milk and meat are 0) have <code>AF_meat = 0</code>, <code>AF_milk = 0</code>, and intensities set to <code>NA</code> (rendered as empty bars in charts) to avoid 100% allocation of dry-period emissions to cull meat.</li>
 <li>Resolved factor level duplication error in <code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> when grouping solely by species (<code>animal_type</code>).</li>
 <li>Decoupled dairy cohort detection in aggregation routines to support arbitrary demographic grouping combinations without losing co-product allocation rules.</li>
 <li>Cleaned up forage data lookup in <code>R/fao_data.R</code>, deprecating legacy <code>fao_forages.parquet</code> in favor of standard <code>forages.parquet</code>.</li>
 <li>Fully registered package global variables to ensure 0 notes and clean R CMD check execution.</li>
-<li>Comprehensive test suite expansion to 359 unit tests with 100% pass rate.</li>
-<li>Reorganized and updated all documentation vignettes (<code>Introduction.Rmd</code>, <code>Manure.Rmd</code>, <code>Technical_reference.Rmd</code>, <code>Theoretical_basis.Rmd</code>, <code>Workflow.Rmd</code>, <code>app.Rmd</code>, <code>land_use.Rmd</code>) and modernized <code>_pkgdown.yml</code>.</li>
+<li>Comprehensive test suite expansion to 356 unit tests with 100% pass rate.</li>
+<li>Reorganized and updated all documentation vignettes (<code>Introduction.Rmd</code>, <code>Herd_Demography.Rmd</code>, <code>Manure.Rmd</code>, <code>Technical_reference.Rmd</code>, <code>Theoretical_basis.Rmd</code>, <code>Workflow.Rmd</code>, <code>app.Rmd</code>, <code>land_use.Rmd</code>) and modernized <code>_pkgdown.yml</code>.</li>
 </ul></div>
 </div>
     <div class="section level2">

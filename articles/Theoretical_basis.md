@@ -843,8 +843,15 @@ The allocation factors are:
 \text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}
 ```
 
-For specialized meat cohorts, $`\text{AF}_{\text{meat}} = 1.0`$; for
-laying hens, $`\text{AF}_{\text{egg}} = 1.0`$.
+For specialized meat cohorts (including feedlot calves or lambs
+originating from dairy breeding herds where
+$`\text{Meat}_{\text{LW}} > 0`$), $`\text{AF}_{\text{meat}} = 1.0`$; for
+laying hens, $`\text{AF}_{\text{egg}} = 1.0`$. Conversely, non-milking
+and non-meat maintenance phases (such as `dry_phase` cows where both
+milk and meat outputs are zero) have $`\text{AF}_{\text{milk}} = 0`$ and
+$`\text{AF}_{\text{meat}} = 0`$, leaving product intensities as `NA`
+(displayed as empty bars in charts) to avoid erroneously attributing
+dry-period emissions entirely to cull meat.
 
 ### 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
 

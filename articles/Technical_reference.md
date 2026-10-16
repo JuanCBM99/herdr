@@ -76,6 +76,7 @@ and reproductive traits.
 | `work_hours` | numeric | h/day | Working | Daily hours worked by draft animals (default: `0`). |
 | `pr_sheep_goat` | numeric | kids/litter | Sheep/Goats | Prolificacy: average kids or lambs born per litter (e.g. `1.5`). |
 | `pregnancy_rate` | numeric | 0.0–1.0 | Cattle | Annual calving or pregnancy rate (e.g. `0.90` for 90%). |
+| `replacement_rate` | numeric | 0.0–1.0 | Breeding | Annual replacement or culling fraction (e.g. `0.27` for 27% replacement). Used in demographic closure and adult meat culling. |
 
 ------------------------------------------------------------------------
 
@@ -99,6 +100,7 @@ nutritional standards.
 | `fertility_rate` | numeric | 0.0–1.0 | Breeders | Hatching / fertility success rate in breeder flocks (e.g. `0.85`). |
 | `piglets_born` | numeric | piglets/litter | Swine Sows | Total piglets born per farrowing (e.g. `14.5`). |
 | `piglets_suckling` | numeric | piglets/litter | Swine Sows | Piglets weaned per farrowing litter (e.g. `12.5`). |
+| `replacement_rate` | numeric | 0.0–1.0 | Breeding | Annual replacement or culling fraction (e.g. `0.25` for sows, or custom layer replacement). |
 
 ------------------------------------------------------------------------
 
@@ -156,19 +158,6 @@ Specifies housing, waste storage, and pasture deposition systems.
 Check the [Manure Management
 Guide](https://juancbm99.github.io/herdr/articles/Manure.md) for all
 valid IPCC combinations.
-
-------------------------------------------------------------------------
-
-### 8. Reproduction Parameters (`reproduction_parameters.csv`)
-
-Defines replacement rates used when running under automatic demographic
-closure (`automatic_cycle = TRUE`).
-
-| Column | Type | Unit | Description |
-|:---|:--:|:--:|:---|
-| `animal_tag` | character | — | Adult breeding female tag (e.g. `mature_dairy_cattle`, `breeder_sows`). |
-| `parameter` | character | — | Parameter name: `replacement_rate`. |
-| `value` | numeric | 0.0–1.0 | Annual replacement fraction (e.g. `0.27` for 27% replacement). |
 
 ------------------------------------------------------------------------
 

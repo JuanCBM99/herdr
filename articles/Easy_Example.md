@@ -16,7 +16,6 @@ finish.
 | Category | Files |
 |:---|:---|
 | **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
-| **If using the automatic herd cycle** | `reproduction_parameters.csv` |
 | **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
 
 Full details on every file above are in the [Technical

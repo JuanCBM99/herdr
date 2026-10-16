@@ -452,6 +452,15 @@ If left blank or <code>0</code>, estimated via IPCC fat regression.</td>
 <td align="left">Annual calving or pregnancy rate
 (e.g. <code>0.90</code> for 90%).</td>
 </tr>
+<tr class="even">
+<td align="left"><code>replacement_rate</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="center">Breeding</td>
+<td align="left">Annual replacement or culling fraction
+(e.g. <code>0.27</code> for 27% replacement). Used in demographic
+closure and adult meat culling.</td>
+</tr>
 </tbody>
 </table>
 <hr>
@@ -584,6 +593,14 @@ tissue.</td>
 <td align="center">Swine Sows</td>
 <td align="left">Piglets weaned per farrowing litter
 (e.g. <code>12.5</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>replacement_rate</code></td>
+<td align="center">numeric</td>
+<td align="center">0.0–1.0</td>
+<td align="center">Breeding</td>
+<td align="left">Annual replacement or culling fraction
+(e.g. <code>0.25</code> for sows, or custom layer replacement).</td>
 </tr>
 </tbody>
 </table>
@@ -837,50 +854,6 @@ sum to <strong>1.0</strong> per cohort.</td>
 </table>
 <p>Check the <a href="Manure.html">Manure Management Guide</a> for all
 valid IPCC combinations.</p>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="reproduction-parameters-reproduction_parameters-csv">8. Reproduction Parameters
-(<code>reproduction_parameters.csv</code>)<a class="anchor" aria-label="anchor" href="#reproduction-parameters-reproduction_parameters-csv"></a>
-</h3>
-<p>Defines replacement rates used when running under automatic
-demographic closure (<code>automatic_cycle = TRUE</code>).</p>
-<table class="table">
-<colgroup>
-<col width="22%">
-<col width="27%">
-<col width="27%">
-<col width="22%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Column</th>
-<th align="center">Type</th>
-<th align="center">Unit</th>
-<th align="left">Description</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>animal_tag</code></td>
-<td align="center">character</td>
-<td align="center">—</td>
-<td align="left">Adult breeding female tag
-(e.g. <code>mature_dairy_cattle</code>, <code>breeder_sows</code>).</td>
-</tr>
-<tr class="even">
-<td align="left"><code>parameter</code></td>
-<td align="center">character</td>
-<td align="center">—</td>
-<td align="left">Parameter name: <code>replacement_rate</code>.</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>value</code></td>
-<td align="center">numeric</td>
-<td align="center">0.0–1.0</td>
-<td align="left">Annual replacement fraction (e.g. <code>0.27</code> for
-27% replacement).</td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 </div>
