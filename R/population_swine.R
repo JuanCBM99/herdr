@@ -21,9 +21,19 @@
 #'
 #' @return A tibble with the modeled swine population structure.
 #' @export
-calculate_population_swine <- function(census_swine, rate_parameters, definitions = NULL, weights = NULL, data_dir = "user_data") {
+calculate_population_swine <- function(census_swine, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("\U0001F416 Calculating populations for SWINE...")
+
+  # Handle flexible parameter positioning
+  if (!is.null(rate_parameters)) {
+    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
+      if (is.null(definitions)) {
+        definitions <- rate_parameters
+      }
+      rate_parameters <- NULL
+    }
+  }
 
   # =========================================================================
   # Step 1: Identify Base Mature Cohorts & Valid Tags
@@ -59,19 +69,19 @@ calculate_population_swine <- function(census_swine, rate_parameters, definition
       dplyr::pull(!!rlang::sym(col))
     if (length(val) > 0 && !is.na(val[1])) {
       num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
     }
     return(default_val)
   }
 
   get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0) return(default_val)
+    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
     val <- rate_parameters %>%
       dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
       dplyr::pull(value)
     if (length(val) > 0 && !is.na(val[1])) {
       num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
     }
     return(default_val)
   }
@@ -103,8 +113,9 @@ calculate_population_swine <- function(census_swine, rate_parameters, definition
   sow_cycle_days <- get_period_days("breeder_sows", default_days = 148.9)
   fattening_days <- get_period_days("fattening_pigs", default_days = 110)
 
-  # 2c. Sow replacement rate (priority: rate_parameters -> default 25%)
-  sow_replacement_rate <- get_rate("replacement_rate", "breeder_sows", default_val = 0.25)
+  # 2c. Sow replacement rate (priority: definitions -> rate_parameters -> default 25%)
+  sow_replacement_rate <- get_def_val("replacement_rate", "breeder_sows",
+                                      default_val = get_rate("replacement_rate", "breeder_sows", default_val = 0.25))
 
   # 2d. Farrowing index (litters per sow per year: reproductive cycle turnover 365 / productive_period_days)
   farrowing_rate <- if (sow_cycle_days > 0) (365 / sow_cycle_days) else 2.45

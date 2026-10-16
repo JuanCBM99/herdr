@@ -13,10 +13,14 @@
 #' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter select bind_rows
 #' @importFrom scales comma
 plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL, gwp_report = "AR5", ar = NULL, functional_unit = "total") {
-  if (!is.data.frame(df) || nrow(df) == 0) return(NULL)
+  if (!is.data.frame(df) || nrow(df) == 0) {
+    return(NULL)
+  }
 
   valid_groups <- intersect(group_cols, names(df))
-  if (length(valid_groups) == 0) return(NULL)
+  if (length(valid_groups) == 0) {
+    return(NULL)
+  }
 
   num_cols <- names(df)[vapply(df, is.numeric, logical(1))]
   exclude_cols <- c("year", "fixed_coef", "weight_kg", "management_months")
@@ -40,17 +44,19 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # 2. Build a single readable label per row from the grouping columns
   df_agg$plot_label <- apply(df_agg[, valid_groups, drop = FALSE], 1, function(x) {
     valid_vals <- x[!is.na(x) & trimws(x) != ""]
-    if (length(valid_vals) == 0) return("Unknown")
+    if (length(valid_vals) == 0) {
+      return("Unknown")
+    }
     paste(valid_vals, collapse = " - ")
   })
 
   # =================================================================
   # VISUAL THEME
   # =================================================================
-  grid_color   <- "#EEF0F3"
-  text_dark    <- "#111827"
-  text_mid     <- "#4B5563"
-  text_light   <- "#9CA3AF"
+  grid_color <- "#EEF0F3"
+  text_dark <- "#111827"
+  text_mid <- "#4B5563"
+  text_light <- "#9CA3AF"
 
   theme_herdr_plot <- function() {
     theme_minimal(base_size = 14, base_family = "sans") +
@@ -147,10 +153,10 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     if (!fu %in% c("protein", "product", "head", "milk", "meat", "wool", "egg", "fcr", "protein_fcr")) fu <- "total"
 
     emiss_scale <- rep(1, nrow(df_agg))
-    land_scale  <- rep(1 / 10000, nrow(df_agg)) # m2 to ha
+    land_scale <- rep(1 / 10000, nrow(df_agg)) # m2 to ha
     emiss_panel <- "GHG Emissions (Gg CO2e)"
-    land_panel  <- "Land Footprint (ha)"
-    sub_title   <- "Greenhouse gas emissions breakdown (Gg CO2e) and land footprint (ha)"
+    land_panel <- "Land Footprint (ha)"
+    sub_title <- "Greenhouse gas emissions breakdown (Gg CO2e) and land footprint (ha)"
 
     # Pre-identify dairy animal_tags from input df if animal_subtype is not in grouped df_agg
     dairy_tags <- if (all(c("animal_tag", "animal_subtype") %in% names(df))) {
@@ -168,21 +174,23 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       } else {
         FALSE
       }
-      is_non_milking_dairy <- is_dairy & (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE)
+      is_non_milking_dairy <- is_dairy &
+        (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE) &
+        (if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg == 0 else TRUE)
 
       has_direct_fcr <- "Protein_FCR_total" %in% names(df_agg) && "Protein_FCR_cropland" %in% names(df_agg)
-      has_raw_cp     <- all(c("feed_CP_total_kg", "feed_CP_cropland_kg", "total_protein_kg") %in% names(df_agg))
+      has_raw_cp <- all(c("feed_CP_total_kg", "feed_CP_cropland_kg", "total_protein_kg") %in% names(df_agg))
 
       valid_prot <- (df_agg$total_protein_kg > 0) & !is_non_milking_dairy
 
       if (has_raw_cp) {
-        df_agg$fcr_total    <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_total_kg / df_agg$total_protein_kg, 0)
+        df_agg$fcr_total <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_total_kg / df_agg$total_protein_kg, 0)
         df_agg$fcr_cropland <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_cropland_kg / df_agg$total_protein_kg, 0)
       } else if (has_direct_fcr) {
-        df_agg$fcr_total    <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_total, 0), 0)
+        df_agg$fcr_total <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_total, 0), 0)
         df_agg$fcr_cropland <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_cropland, 0), 0)
       } else {
-        df_agg$fcr_total    <- 0
+        df_agg$fcr_total <- 0
         df_agg$fcr_cropland <- 0
       }
 
@@ -252,107 +260,107 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       } else {
         FALSE
       }
-      is_dairy_dry <- is_dairy & (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE)
+      is_dairy_dry <- is_dairy &
+        (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE) &
+        (if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg == 0 else TRUE)
       valid <- prot > 0 & !is_dairy_dry
       emiss_scale <- ifelse(valid, 1e6 / prot, 0)
-      land_scale  <- ifelse(valid, 1 / prot, 0)
+      land_scale <- ifelse(valid, 1 / prot, 0)
       emiss_panel <- "GHG Intensity (kg CO2e / kg protein)"
-      land_panel  <- "Land Footprint (m2 / kg protein)"
-      sub_title   <- "Emissions intensity and land use per kg of edible protein"
+      land_panel <- "Land Footprint (m2 / kg protein)"
+      sub_title <- "Emissions intensity and land use per kg of edible protein"
     } else if (fu == "head" && "population" %in% names(df_agg)) {
       pop <- df_agg$population
       valid <- pop > 0
       emiss_scale <- ifelse(valid, 1e6 / pop, 0)
-      land_scale  <- ifelse(valid, 1 / pop, 0)
+      land_scale <- ifelse(valid, 1 / pop, 0)
       emiss_panel <- "GHG per Head (kg CO2e / head)"
-      land_panel  <- "Land per Head (m2 / head)"
-      sub_title   <- "Emissions and land use per animal head per year"
+      land_panel <- "Land per Head (m2 / head)"
+      sub_title <- "Emissions and land use per animal head per year"
     } else if (fu %in% c("product", "milk", "meat", "wool", "egg") && any(c("milk_FPCM_kg", "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg") %in% names(df_agg))) {
-      milk_kg      <- if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg else 0
-      meat_kg      <- if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg else 0
+      milk_kg <- if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg else 0
+      meat_kg <- if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg else 0
       meat_live_kg <- if ("meat_live_weight_kg" %in% names(df_agg)) df_agg$meat_live_weight_kg else (if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg / 0.54 else 0)
-      egg_kg       <- if ("egg_fresh_kg" %in% names(df_agg)) df_agg$egg_fresh_kg else 0
-      wool_kg      <- if ("wool_kg" %in% names(df_agg)) df_agg$wool_kg else 0
+      egg_kg <- if ("egg_fresh_kg" %in% names(df_agg)) df_agg$egg_fresh_kg else 0
+      wool_kg <- if ("wool_kg" %in% names(df_agg)) df_agg$wool_kg else 0
 
-      is_dairy     <- if ("animal_subtype" %in% names(df_agg)) {
+      is_dairy <- if ("animal_subtype" %in% names(df_agg)) {
         df_agg$animal_subtype %in% "dairy"
       } else if ("animal_tag" %in% names(df_agg)) {
         df_agg$animal_tag %in% dairy_tags
       } else {
         FALSE
       }
-      is_non_milking_dairy <- is_dairy & (milk_kg == 0)
+      is_non_milking_dairy <- is_dairy & (milk_kg == 0) & (meat_kg == 0)
 
       # Pre-calculated allocation factors if present, or Enfoque A Net Energy fallback
       nel_total_mj <- 3.1 * milk_kg
       neg_total_mj <- ifelse(egg_kg > 0 | is_non_milking_dairy, 0, 15.0 * meat_live_kg)
-      e_wool_mj    <- if ("animal_subtype" %in% names(df_agg)) ifelse(df_agg$animal_subtype == "meat", 24.0 * wool_kg, 0) else 0
-      e_tot_mj     <- nel_total_mj + neg_total_mj + e_wool_mj
+      e_wool_mj <- if ("animal_subtype" %in% names(df_agg)) ifelse(df_agg$animal_subtype == "meat", 24.0 * wool_kg, 0) else 0
+      e_tot_mj <- nel_total_mj + neg_total_mj + e_wool_mj
 
       af_milk_calc <- if ("AF_milk" %in% names(df_agg)) df_agg$AF_milk else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, nel_total_mj / e_tot_mj, ifelse(milk_kg > 0, 1, 0))
       af_meat_calc <- if ("AF_meat" %in% names(df_agg)) df_agg$AF_meat else ifelse(egg_kg > 0 | is_non_milking_dairy, 0, ifelse(e_tot_mj > 0, neg_total_mj / e_tot_mj, ifelse(meat_kg > 0, 1, 0)))
       af_wool_calc <- if ("AF_wool" %in% names(df_agg)) df_agg$AF_wool else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, e_wool_mj / e_tot_mj, 0)
-      af_egg_calc  <- if ("AF_egg" %in% names(df_agg))  df_agg$AF_egg  else ifelse(egg_kg > 0, 1, 0)
+      af_egg_calc <- if ("AF_egg" %in% names(df_agg)) df_agg$AF_egg else ifelse(egg_kg > 0, 1, 0)
 
       if (fu == "milk") {
-        prod_yield  <- ifelse(is_non_milking_dairy, 0, milk_kg)
-        af          <- ifelse(is_non_milking_dairy, 0, af_milk_calc)
+        prod_yield <- ifelse(is_non_milking_dairy, 0, milk_kg)
+        af <- ifelse(is_non_milking_dairy, 0, af_milk_calc)
         emiss_panel <- "GHG Intensity (kg CO2e / kg FPCM milk)"
-        land_panel  <- "Land Footprint (m2 / kg FPCM milk)"
-        sub_title   <- "Emissions intensity and land use per kg of FPCM milk (IDF allocation)"
+        land_panel <- "Land Footprint (m2 / kg FPCM milk)"
+        sub_title <- "Emissions intensity and land use per kg of FPCM milk (IDF allocation)"
       } else if (fu == "meat") {
-        prod_yield  <- ifelse(is_non_milking_dairy, 0, meat_kg)
-        af          <- ifelse(is_non_milking_dairy, 0, af_meat_calc)
+        prod_yield <- ifelse(is_non_milking_dairy, 0, meat_kg)
+        af <- ifelse(is_non_milking_dairy, 0, af_meat_calc)
         emiss_panel <- "GHG Intensity (kg CO2e / kg carcass meat)"
-        land_panel  <- "Land Footprint (m2 / kg carcass meat)"
-        sub_title   <- "Emissions intensity and land use per kg of carcass meat (IDF allocation)"
+        land_panel <- "Land Footprint (m2 / kg carcass meat)"
+        sub_title <- "Emissions intensity and land use per kg of carcass meat (IDF allocation)"
       } else if (fu == "wool") {
-        prod_yield  <- ifelse(is_non_milking_dairy, 0, wool_kg)
-        af          <- ifelse(is_non_milking_dairy, 0, af_wool_calc)
+        prod_yield <- ifelse(is_non_milking_dairy, 0, wool_kg)
+        af <- ifelse(is_non_milking_dairy, 0, af_wool_calc)
         emiss_panel <- "GHG Intensity (kg CO2e / kg wool)"
-        land_panel  <- "Land Footprint (m2 / kg wool)"
-        sub_title   <- "Emissions intensity and land use per kg of wool (IPCC allocation)"
+        land_panel <- "Land Footprint (m2 / kg wool)"
+        sub_title <- "Emissions intensity and land use per kg of wool (IPCC allocation)"
       } else if (fu == "egg") {
-        prod_yield  <- egg_kg
-        af          <- af_egg_calc
+        prod_yield <- egg_kg
+        af <- af_egg_calc
         emiss_panel <- "GHG Intensity (kg CO2e / kg egg)"
-        land_panel  <- "Land Footprint (m2 / kg egg)"
-        sub_title   <- "Emissions intensity and land use per kg of fresh eggs"
+        land_panel <- "Land Footprint (m2 / kg egg)"
+        sub_title <- "Emissions intensity and land use per kg of fresh eggs"
       } else {
         # Default fu == "product" (primary product)
         prod_yield <- dplyr::case_when(
-          is_non_milking_dairy           ~ 0,
-          milk_kg > 0                    ~ milk_kg,
-          is_dairy                       ~ 0,
-          egg_kg > 0                     ~ egg_kg,
-          meat_kg > 0                    ~ meat_kg,
+          is_non_milking_dairy ~ 0,
+          milk_kg > 0 ~ milk_kg,
+          meat_kg > 0 ~ meat_kg,
+          egg_kg > 0 ~ egg_kg,
           wool_kg > 0 & af_wool_calc > 0 ~ wool_kg,
           TRUE ~ 0
         )
         af <- dplyr::case_when(
-          is_non_milking_dairy           ~ 0,
-          milk_kg > 0                    ~ af_milk_calc,
-          is_dairy                       ~ 0,
-          egg_kg > 0                     ~ af_egg_calc,
-          meat_kg > 0                    ~ af_meat_calc,
+          is_non_milking_dairy ~ 0,
+          milk_kg > 0 ~ af_milk_calc,
+          meat_kg > 0 ~ af_meat_calc,
+          egg_kg > 0 ~ af_egg_calc,
           wool_kg > 0 & af_wool_calc > 0 ~ af_wool_calc,
           TRUE ~ 0
         )
         emiss_panel <- "GHG Intensity (kg CO2e / kg product)"
-        land_panel  <- "Land Footprint (m2 / kg product)"
-        sub_title   <- "Emissions intensity and land use per kg of commercial product"
+        land_panel <- "Land Footprint (m2 / kg product)"
+        sub_title <- "Emissions intensity and land use per kg of commercial product"
       }
 
       valid <- prod_yield > 0 & af > 0
       emiss_scale <- ifelse(valid, (1e6 * af) / prod_yield, 0)
-      land_scale  <- ifelse(valid, af / prod_yield, 0)
+      land_scale <- ifelse(valid, af / prod_yield, 0)
     }
 
     df_agg$co2e_ch4_ent <- co2e_ch4_ent * emiss_scale
     df_agg$co2e_ch4_man <- co2e_ch4_man * emiss_scale
     df_agg$co2e_n2o_dir <- co2e_n2o_dir * emiss_scale
     df_agg$co2e_n2o_ind <- co2e_n2o_ind * emiss_scale
-    df_agg$total_co2e   <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir + df_agg$co2e_n2o_ind
+    df_agg$total_co2e <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir + df_agg$co2e_n2o_ind
 
     has_land <- "Land_m2" %in% names(df_agg) && any(df_agg$Land_m2 > 0, na.rm = TRUE)
     has_land_breakdown <- all(c("Land_cropland_m2", "Land_grassland_convertible_m2", "Land_grassland_unconvertible_m2") %in% names(df_agg))
@@ -360,7 +368,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     if (has_land) {
       df_agg$land_val <- df_agg$Land_m2 * land_scale
       if (has_land_breakdown) {
-        df_agg$land_crop   <- df_agg$Land_cropland_m2 * land_scale
+        df_agg$land_crop <- df_agg$Land_cropland_m2 * land_scale
         df_agg$land_g_conv <- df_agg$Land_grassland_convertible_m2 * land_scale
         df_agg$land_g_unco <- df_agg$Land_grassland_unconvertible_m2 * land_scale
         if ("Land_other_m2" %in% names(df_agg)) {
@@ -396,21 +404,21 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     )
 
     palette_impact <- c(
-      "CH4 Enteric"         = "#38BDF8",  # Sky blue
-      "CH4 Manure"          = "#1E40AF",  # Dark navy blue
-      "N2O Direct"          = "#7E22CE",  # Deep royal purple
-      "N2O Indirect"        = "#C084FC",  # Lavender / light purple
-      "Cropland"            = "#D97706",  # Warm amber arable
-      "Grassland (Conv.)"   = "#16A34A",  # Meadow green
-      "Grassland (Unconv.)" = "#15803D",  # Deep forest green
-      "Land Other"          = "#9CA3AF",  # Neutral gray
-      "Land Use"            = "#15803D"   # Forest / emerald green fallback
+      "CH4 Enteric"         = "#38BDF8", # Sky blue
+      "CH4 Manure"          = "#1E40AF", # Dark navy blue
+      "N2O Direct"          = "#7E22CE", # Deep royal purple
+      "N2O Indirect"        = "#C084FC", # Lavender / light purple
+      "Cropland"            = "#D97706", # Warm amber arable
+      "Grassland (Conv.)"   = "#16A34A", # Meadow green
+      "Grassland (Unconv.)" = "#15803D", # Deep forest green
+      "Land Other"          = "#9CA3AF", # Neutral gray
+      "Land Use"            = "#15803D" # Forest / emerald green fallback
     )
 
     if (has_land) {
       if (has_land_breakdown) {
-        has_other     <- "land_other" %in% names(df_agg) && any(df_agg$land_other > 0, na.rm = TRUE)
-        cols_to_use   <- if (has_other) c("land_crop", "land_g_conv", "land_g_unco", "land_other") else c("land_crop", "land_g_conv", "land_g_unco")
+        has_other <- "land_other" %in% names(df_agg) && any(df_agg$land_other > 0, na.rm = TRUE)
+        cols_to_use <- if (has_other) c("land_crop", "land_g_conv", "land_g_unco", "land_other") else c("land_crop", "land_g_conv", "land_g_unco")
         labels_to_use <- if (has_other) c("Cropland", "Grassland (Conv.)", "Grassland (Unconv.)", "Land Other") else c("Cropland", "Grassland (Conv.)", "Grassland (Unconv.)")
 
         land_df <- df_agg %>%
@@ -441,7 +449,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       }
 
       emissions_df$component <- factor(emissions_df$component, levels = all_impact_levels)
-      land_df$component      <- factor(land_df$component, levels = all_impact_levels)
+      land_df$component <- factor(land_df$component, levels = all_impact_levels)
 
       plot_data <- dplyr::bind_rows(
         emissions_df %>% dplyr::select(plot_label, value, panel, component),
@@ -467,9 +475,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         dplyr::mutate(
           label_text = dplyr::case_when(
             total_val >= 1000 ~ scales::comma(total_val, accuracy = 1),
-            total_val >= 10   ~ formatC(total_val, digits = 1, format = "f"),
-            total_val >= 1    ~ formatC(total_val, digits = 2, format = "f"),
-            TRUE              ~ formatC(total_val, digits = 3, format = "f")
+            total_val >= 10 ~ formatC(total_val, digits = 1, format = "f"),
+            total_val >= 1 ~ formatC(total_val, digits = 2, format = "f"),
+            TRUE ~ formatC(total_val, digits = 3, format = "f")
           )
         )
 
@@ -484,7 +492,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
           fontface = "bold",
           color = "#1F2937"
         ) +
-        facet_wrap(~ panel, scales = "free_x") +
+        facet_wrap(~panel, scales = "free_x") +
         theme_herdr_plot() +
         scale_x_continuous(expand = expansion(mult = c(0, 0.20)), labels = scales::comma) +
         scale_fill_manual(values = palette_impact, drop = TRUE) +
@@ -512,9 +520,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         dplyr::mutate(
           label_text = dplyr::case_when(
             total_val >= 1000 ~ scales::comma(total_val, accuracy = 1),
-            total_val >= 10   ~ formatC(total_val, digits = 1, format = "f"),
-            total_val >= 1    ~ formatC(total_val, digits = 2, format = "f"),
-            TRUE              ~ formatC(total_val, digits = 3, format = "f")
+            total_val >= 10 ~ formatC(total_val, digits = 1, format = "f"),
+            total_val >= 1 ~ formatC(total_val, digits = 2, format = "f"),
+            TRUE ~ formatC(total_val, digits = 3, format = "f")
           )
         )
 
@@ -610,7 +618,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
 
       df_land_agg$plot_label <- apply(df_land_agg[, valid_groups, drop = FALSE], 1, function(x) {
         valid_vals <- x[!is.na(x) & trimws(x) != ""]
-        if (length(valid_vals) == 0) return("Unknown")
+        if (length(valid_vals) == 0) {
+          return("Unknown")
+        }
         paste(valid_vals, collapse = " - ")
       })
 
@@ -621,9 +631,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
 
       totals$label_text <- dplyr::case_when(
         totals$Land_Val >= 1000 ~ scales::comma(totals$Land_Val, accuracy = 1),
-        totals$Land_Val >= 10   ~ formatC(totals$Land_Val, digits = 1, format = "f"),
-        totals$Land_Val >= 1    ~ formatC(totals$Land_Val, digits = 2, format = "f"),
-        TRUE                    ~ formatC(totals$Land_Val, digits = 3, format = "f")
+        totals$Land_Val >= 10 ~ formatC(totals$Land_Val, digits = 1, format = "f"),
+        totals$Land_Val >= 1 ~ formatC(totals$Land_Val, digits = 2, format = "f"),
+        TRUE ~ formatC(totals$Land_Val, digits = 3, format = "f")
       )
 
       palette_land <- c(
@@ -746,7 +756,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     if (length(found_vars) > 0) main_var <- found_vars[1]
   }
   if (is.null(main_var)) {
-    if (length(target_cols) == 0) return(NULL)
+    if (length(target_cols) == 0) {
+      return(NULL)
+    }
     main_var <- tail(target_cols, 1)
   }
 

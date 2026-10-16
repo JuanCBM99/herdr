@@ -4,7 +4,7 @@ library(readr)
 library(dplyr)
 
 path_census <- test_path("test_data", "user_data/livestock_census.csv")
-path_rates  <- test_path("test_data", "user_data/reproduction_parameters.csv")
+path_defs   <- test_path("test_data", "user_data/ruminant_definitions.csv")
 
 test_that("population math follows biological sex-ratio and replacement rules", {
 
@@ -12,15 +12,14 @@ test_that("population math follows biological sex-ratio and replacement rules", 
     filter(animal_tag == "mature_dairy_cattle") %>%
     mutate(population = 1000, class_flex = "lactation")
 
-  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(animal_tag == "mature_dairy_cattle") %>%
-    mutate(value = case_when(
-      parameter == "pregnancy_rate" ~ 1.0,
-      parameter == "replacement_rate" ~ 0.1,
-      TRUE ~ value
-    ))
+    mutate(
+      pregnancy_rate = 1.0,
+      replacement_rate = 0.1
+    )
 
-  res <- calculate_population_cattle(mock_census, mock_rates)
+  res <- calculate_population_cattle(mock_census, mock_defs)
 
   males <- res %>% filter(animal_tag == "feedlot_calves_male") %>% pull(population)
   expect_equal(males, 500)
@@ -35,10 +34,10 @@ test_that("class_flex is preserved for mature animals and NA for offspring", {
     filter(animal_tag == "mature_dairy_cattle") %>%
     mutate(class_flex = "grazing_test")
 
-  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(animal_tag == "mature_dairy_cattle")
 
-  res <- calculate_population_cattle(mock_census, mock_rates)
+  res <- calculate_population_cattle(mock_census, mock_defs)
 
   mature_entry <- res %>% filter(animal_tag == "mature_dairy_cattle")
   expect_equal(mature_entry$class_flex[1], "grazing_test")

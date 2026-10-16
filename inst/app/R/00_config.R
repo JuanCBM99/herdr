@@ -11,7 +11,6 @@ tables_info <- list(
   mono      = list(file = "monogastric_definitions.csv", fixed = 4, icon = "drumstick-bite", label = "Monogastrics"),
   weights   = list(file = "livestock_weights.csv", fixed = 4, icon = "weight-hanging", label = "Weights"),
   manure    = list(file = "manure_management.csv", fixed = 4, icon = "recycle", label = "Manure"),
-  repro     = list(file = "reproduction_parameters.csv", fixed = 0, icon = "dna", label = "Reproduction"),
   feed_char = list(file = "feed_characteristics.csv", fixed = 1, icon = "flask", label = "Feed Char."),
   ipcc_coef = list(file = "ipcc_coefficients.csv", fixed = 2, icon = "square-root-variable", label = "IPCC Coefficients"),
   ipcc_mm   = list(file = "ipcc_mm.csv", fixed = 2, icon = "warehouse", label = "IPCC Manure Mgt."),
@@ -57,10 +56,6 @@ dynamic_dropdowns <- list(
     climate_zone      = list(source_table = "ipcc_mm", extract_column = "climate_zone"),
     climate_moisture  = list(source_table = "ipcc_mm", extract_column = "climate_moisture"),
     b_0               = list(source_table = "ipcc_coef", filter_column = "coefficient", filter_value = "b_0", extract_column = "description", type = "dropdown", strict = FALSE)
-  ),
-  repro = list(
-    animal_tag        = list(source_table = "census", extract_column = "animal_tag", type = "dropdown", strict = FALSE),
-    parameter         = list(choices = c("pregnancy_rate", "replacement_rate", "pr_sheep_goat", "fertility_rate"), type = "dropdown", strict = FALSE)
   ),
   diet_prof = list(
     diet_tag          = list(source_table = "diet_prof", extract_column = "diet_tag", type = "dropdown", strict = FALSE)
@@ -167,7 +162,7 @@ modal_tooltips <- list(
   description              = "Descriptive category or condition for the coefficient."
 )
 
-standard_ids <- c("census", "diet_prof", "diet_ingr", "def", "mono", "weights", "manure", "repro")
+standard_ids <- c("census", "diet_prof", "diet_ingr", "def", "mono", "weights", "manure")
 advanced_ids <- c("feed_char", "ipcc_coef", "ipcc_mm", "mapping")
 
 # --- Bootstrap Theme Definition ---

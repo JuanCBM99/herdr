@@ -24,9 +24,19 @@
 #'
 #' @return A tibble with the modeled sheep population structure.
 #' @export
-calculate_population_sheep <- function(census_sheep, rate_parameters, definitions = NULL, weights = NULL, data_dir = "user_data") {
+calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("\U0001F9EE Calculating populations for SHEEP...")
+
+  # Handle flexible parameter positioning
+  if (!is.null(rate_parameters)) {
+    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
+      if (is.null(definitions)) {
+        definitions <- rate_parameters
+      }
+      rate_parameters <- NULL
+    }
+  }
 
   # =========================================================================
   # Step 1: Identify Base Mature Cohorts & Valid Tags
@@ -50,19 +60,19 @@ calculate_population_sheep <- function(census_sheep, rate_parameters, definition
       dplyr::pull(!!rlang::sym(col))
     if (length(val) > 0 && !is.na(val[1])) {
       num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
     }
     return(default_val)
   }
 
   get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0) return(default_val)
+    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
     val <- rate_parameters %>%
       dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
       dplyr::pull(value)
     if (length(val) > 0 && !is.na(val[1])) {
       num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
     }
     return(default_val)
   }
@@ -107,11 +117,11 @@ calculate_population_sheep <- function(census_sheep, rate_parameters, definition
   meat_lambing_def  <- get_def_val("pr_sheep_goat", "mature_sheep_female_meat", default_val = 0)
   meat_lambing      <- if (meat_lambing_def > 0) meat_lambing_def else get_rate("pr_sheep_goat", "mature_sheep_female_meat", default_val = 1.0)
 
-  # 2d. Replacement rates (priority: rate_parameters -> definitions -> defaults)
-  dairy_male_repl   <- get_rate("replacement_rate", "mature_sheep_male_dairy", default_val = get_def_val("replacement_rate", "mature_sheep_male_dairy", default_val = 0.23))
-  dairy_female_repl <- get_rate("replacement_rate", "mature_sheep_female_dairy", default_val = get_def_val("replacement_rate", "mature_sheep_female_dairy", default_val = 0.30))
-  meat_male_repl    <- get_rate("replacement_rate", "mature_sheep_male_meat", default_val = get_def_val("replacement_rate", "mature_sheep_male_meat", default_val = 0.25))
-  meat_female_repl  <- get_rate("replacement_rate", "mature_sheep_female_meat", default_val = get_def_val("replacement_rate", "mature_sheep_female_meat", default_val = 0.30))
+  # 2d. Replacement rates (priority: definitions -> rate_parameters -> defaults)
+  dairy_male_repl   <- get_def_val("replacement_rate", "mature_sheep_male_dairy", default_val = get_rate("replacement_rate", "mature_sheep_male_dairy", default_val = 0.23))
+  dairy_female_repl <- get_def_val("replacement_rate", "mature_sheep_female_dairy", default_val = get_rate("replacement_rate", "mature_sheep_female_dairy", default_val = 0.30))
+  meat_male_repl    <- get_def_val("replacement_rate", "mature_sheep_male_meat", default_val = get_rate("replacement_rate", "mature_sheep_male_meat", default_val = 0.25))
+  meat_female_repl  <- get_def_val("replacement_rate", "mature_sheep_female_meat", default_val = get_rate("replacement_rate", "mature_sheep_female_meat", default_val = 0.30))
 
   # =========================================================================
   # Step 3: Pivot Mature Base Populations (Wide Format)

@@ -48,16 +48,10 @@ test_that("calculate_population populates animal_type and animal_subtype even wh
   expect_true(all(calves$animal_subtype %in% c("dairy", "beef", "feedlot")))
 })
 
-test_that("calculate_population retrieves birth/calving rates directly from definitions", {
+test_that("calculate_population retrieves replacement rates directly from definitions", {
   temp_dir <- tempfile()
   dir.create(file.path(temp_dir, "user_data"), recursive = TRUE)
   file.copy(list.files(test_path("test_data/user_data"), full.names = TRUE), file.path(temp_dir, "user_data"))
-
-  # Keep ONLY replacement_rate in reproduction_parameters.csv
-  repro_path <- file.path(temp_dir, "user_data/reproduction_parameters.csv")
-  repro <- read_csv(repro_path, show_col_types = FALSE) %>%
-    filter(parameter == "replacement_rate")
-  write_csv(repro, repro_path)
 
   withr::with_dir(temp_dir, {
     res <- calculate_population(automatic_cycle = TRUE, saveoutput = FALSE)

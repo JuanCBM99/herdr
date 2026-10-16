@@ -4,7 +4,7 @@ library(readr)
 library(dplyr)
 
 path_census <- test_path("test_data", "user_data/livestock_census.csv")
-path_rates  <- test_path("test_data", "user_data/reproduction_parameters.csv")
+path_defs   <- test_path("test_data", "user_data/ruminant_definitions.csv")
 
 test_that("calculate_population_goat returns correct structure", {
 
@@ -16,10 +16,10 @@ test_that("calculate_population_goat returns correct structure", {
       TRUE ~ 0
     ))
 
-  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(grepl("goat", animal_tag))
 
-  results <- calculate_population_goat(mock_census, mock_rates)
+  results <- calculate_population_goat(mock_census, mock_defs)
 
   expect_s3_class(results, "data.frame")
   expect_true(any(grepl("kid", results$animal_tag)))
@@ -36,16 +36,18 @@ test_that("goat population correctly calculates replacement cohorts", {
       TRUE ~ 0
     ), class_flex = "grazing")
 
-  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(grepl("goat", animal_tag)) %>%
-    mutate(value = case_when(
-      animal_tag == "mature_goat_female_dairy" & parameter == "pr_sheep_goat"     ~ 1.5,
-      animal_tag == "mature_goat_female_dairy" & parameter == "replacement_rate" ~ 0.2,
-      animal_tag == "mature_goat_male_dairy"   & parameter == "replacement_rate" ~ 0.1,
-      TRUE ~ 0
-    ))
+    mutate(
+      pr_sheep_goat = ifelse(animal_tag == "mature_goat_female_dairy", 1.5, 0),
+      replacement_rate = case_when(
+        animal_tag == "mature_goat_female_dairy" ~ 0.2,
+        animal_tag == "mature_goat_male_dairy"   ~ 0.1,
+        TRUE ~ 0
+      )
+    )
 
-  res <- calculate_population_goat(mock_census, mock_rates)
+  res <- calculate_population_goat(mock_census, mock_defs)
 
   f_repl <- res %>% filter(animal_tag == "kid_goat_female_dairy_replacement") %>% pull(population)
   m_repl <- res %>% filter(animal_tag == "kid_goat_male_dairy_replacement") %>% pull(population)
@@ -62,11 +64,11 @@ test_that("goat function filters zero populations automatically", {
     filter(grepl("goat", animal_tag)) %>%
     mutate(population = ifelse(animal_tag == "mature_goat_female_dairy", 100, 0))
 
-  mock_rates <- read_csv(path_rates, show_col_types = FALSE) %>%
+  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(grepl("goat", animal_tag)) %>%
-    mutate(value = 0.5)
+    mutate(replacement_rate = 0.5, pr_sheep_goat = 1.0)
 
-  res <- calculate_population_goat(mock_census, mock_rates)
+  res <- calculate_population_goat(mock_census, mock_defs)
 
   expect_true(all(res$population > 0))
   expect_false(any(grepl("_meat", res$animal_tag)))

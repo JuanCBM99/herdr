@@ -110,11 +110,11 @@ test_that("calculate_production correctly produces N_exit = 0 when replacement_r
   file.copy(from = source_data, to = temp_test_dir, recursive = TRUE)
 
   # Explicitly set replacement_rate to 0 for mature_dairy_cattle
-  repro_file <- file.path(temp_test_dir, "user_data", "reproduction_parameters.csv")
-  repro_df <- readr::read_csv(repro_file, show_col_types = FALSE)
-  repro_df <- repro_df %>%
-    dplyr::mutate(value = dplyr::if_else(animal_tag == "mature_dairy_cattle" & parameter == "replacement_rate", 0, value))
-  readr::write_csv(repro_df, repro_file)
+  rum_file <- file.path(temp_test_dir, "user_data", "ruminant_definitions.csv")
+  rum_df <- readr::read_csv(rum_file, show_col_types = FALSE)
+  rum_df <- rum_df %>%
+    dplyr::mutate(replacement_rate = dplyr::if_else(animal_tag == "mature_dairy_cattle", 0, replacement_rate))
+  readr::write_csv(rum_df, rum_file)
 
   res_zero <- suppressMessages(calculate_production(
     automatic_cycle = FALSE,

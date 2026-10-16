@@ -26,9 +26,6 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   weights_file <- file.path(data_dir, "livestock_weights.csv")
   weights  <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
 
-  repro_file <- file.path(data_dir, "reproduction_parameters.csv")
-  repro    <- if (file.exists(repro_file)) readr::read_csv(repro_file, show_col_types = FALSE) else tibble::tibble(animal_tag = character(), parameter = character(), value = numeric())
-
   ruminants_file <- file.path(data_dir, "ruminant_definitions.csv")
   ruminants <- if (file.exists(ruminants_file)) readr::read_csv(ruminants_file, show_col_types = FALSE) else tibble::tibble()
 
@@ -49,9 +46,15 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       ruminants$protein_content_pct <- 0
     }
 
+    if (!"replacement_rate" %in% names(ruminants)) {
+      ruminants$replacement_rate <- NA_real_
+    }
+
     ruminants_clean <- ruminants %>%
-      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year, production_role) %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year, production_role, replacement_rate) %>%
       dplyr::mutate(
+        replacement_rate = suppressWarnings(as.numeric(replacement_rate)),
+        has_replacement_rate = !is.na(replacement_rate),
         dplyr::across(c(milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
         egg_mass_g_day = 0
       )
@@ -75,9 +78,15 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     eggs_yr <- dplyr::coalesce(eggs_yr, 0)
     monogastrics$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
 
+    if (!"replacement_rate" %in% names(monogastrics)) {
+      monogastrics$replacement_rate <- NA_real_
+    }
+
     monogastrics_clean <- monogastrics %>%
-      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, egg_mass_g_day, production_role) %>%
+      dplyr::select(dplyr::all_of(join_keys), animal_type, animal_subtype, egg_mass_g_day, production_role, replacement_rate) %>%
       dplyr::mutate(
+        replacement_rate = suppressWarnings(as.numeric(replacement_rate)),
+        has_replacement_rate = !is.na(replacement_rate),
         egg_mass_g_day = tidyr::replace_na(suppressWarnings(as.numeric(egg_mass_g_day)), 0),
         milk_yield_kg_year = 0,
         fat_content_pct = 0,
@@ -93,20 +102,6 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (nrow(animal_defs) > 0) {
     animal_defs <- animal_defs %>%
       dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
-  }
-
-  # Replacement rate lookup
-  repro_repl <- if (nrow(repro) > 0 && "parameter" %in% names(repro) && "value" %in% names(repro)) {
-    repro %>%
-      dplyr::filter(tolower(parameter) == "replacement_rate") %>%
-      dplyr::select(animal_tag, replacement_rate = value) %>%
-      dplyr::mutate(
-        replacement_rate = suppressWarnings(as.numeric(replacement_rate)),
-        has_replacement_rate = TRUE
-      ) %>%
-      dplyr::distinct(animal_tag, .keep_all = TRUE)
-  } else {
-    tibble::tibble(animal_tag = character(), replacement_rate = numeric(), has_replacement_rate = logical())
   }
 
   # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) ---
@@ -130,7 +125,6 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     results <- results %>% dplyr::left_join(weights, by = intersect(names(weights), join_keys))
   }
   results <- results %>%
-    dplyr::left_join(repro_repl, by = "animal_tag") %>%
     dplyr::left_join(production_constants, by = "animal_type") %>%
     dplyr::mutate(
       has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),

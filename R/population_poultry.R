@@ -26,9 +26,19 @@
 #'
 #' @return A tibble with the modeled poultry population structure.
 #' @export
-calculate_population_poultry <- function(census_poultry, rate_parameters, definitions = NULL, weights = NULL, data_dir = "user_data") {
+calculate_population_poultry <- function(census_poultry, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("\U0001F426 Calculating populations for POULTRY...")
+
+  # Handle flexible parameter positioning
+  if (!is.null(rate_parameters)) {
+    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
+      if (is.null(definitions)) {
+        definitions <- rate_parameters
+      }
+      rate_parameters <- NULL
+    }
+  }
 
   # =========================================================================
   # Step 1: Identify Base Mature Cohorts & Valid Tags
@@ -75,17 +85,21 @@ calculate_population_poultry <- function(census_poultry, rate_parameters, defini
       dplyr::pull(!!rlang::sym(col))
     if (length(val) > 0 && !is.na(val[1])) {
       num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
     }
     return(default_val)
   }
 
-  get_rate <- function(param, tag, default_val) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0) return(default_val)
+  get_rate <- function(param, tag, default_val = 0) {
+    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
     val <- rate_parameters %>%
       dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
       dplyr::pull(value)
-    if (length(val) > 0 && !is.na(val[1])) as.numeric(val[1]) else default_val
+    if (length(val) > 0 && !is.na(val[1])) {
+      num_val <- suppressWarnings(as.numeric(val[1]))
+      if (!is.na(num_val) && num_val >= 0) return(num_val)
+    }
+    return(default_val)
   }
 
   weights_df <- if (!is.null(weights)) {
@@ -128,8 +142,8 @@ calculate_population_poultry <- function(census_poultry, rate_parameters, defini
   # 2d. Replacement rate dynamics: user-specified value takes precedence,
   # otherwise estimated from all-in all-out cycle turnover (365 / productive_period_days)
   get_repl_rate <- function(tag, cycle_days) {
-    user_val <- get_rate("replacement_rate", tag, default_val = NA_real_)
-    if (!is.na(user_val) && user_val > 0) return(user_val)
+    user_val <- get_def_val("replacement_rate", tag, default_val = get_rate("replacement_rate", tag, default_val = NA_real_))
+    if (!is.na(user_val) && user_val >= 0) return(user_val)
     if (cycle_days > 0) (365 / cycle_days) else 1.0
   }
 

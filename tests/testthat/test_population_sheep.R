@@ -4,7 +4,7 @@ library(readr)
 library(dplyr)
 
 path_census <- test_path("test_data", "user_data/livestock_census.csv")
-path_rates  <- test_path("test_data", "user_data/reproduction_parameters.csv")
+path_defs   <- test_path("test_data", "user_data/ruminant_definitions.csv")
 
 test_that("calculate_population_sheep returns correct structure and math from CSV", {
 
@@ -16,17 +16,16 @@ test_that("calculate_population_sheep returns correct structure and math from CS
     filter(grepl("sheep", animal_tag)) %>%
     mutate(population = ifelse(animal_tag == "mature_sheep_female_meat", 1000, 0))
 
-  rates_raw <- read_csv(path_rates, show_col_types = FALSE)
+  defs_raw <- read_csv(path_defs, show_col_types = FALSE)
 
-  mock_rates <- rates_raw %>%
+  mock_defs <- defs_raw %>%
     filter(grepl("sheep", animal_tag)) %>%
-    mutate(value = case_when(
-      animal_tag == "mature_sheep_female_meat" & parameter == "pr_sheep_goat"     ~ 1.5,
-      animal_tag == "mature_sheep_female_meat" & parameter == "replacement_rate" ~ 0.2,
-      TRUE ~ 0
-    ))
+    mutate(
+      pr_sheep_goat = ifelse(animal_tag == "mature_sheep_female_meat", 1.5, 0),
+      replacement_rate = ifelse(animal_tag == "mature_sheep_female_meat", 0.2, 0)
+    )
 
-  results <- calculate_population_sheep(mock_census, mock_rates)
+  results <- calculate_population_sheep(mock_census, mock_defs)
 
   expect_s3_class(results, "data.frame")
   expect_true(all(c("region", "subregion", "animal_tag", "population") %in% colnames(results)))
@@ -41,17 +40,17 @@ test_that("calculate_population_sheep returns correct structure and math from CS
 test_that("calculate_population_sheep filters out zero populations using CSV structure", {
 
   census_raw <- read_csv(path_census, show_col_types = FALSE)
-  rates_raw  <- read_csv(path_rates, show_col_types = FALSE)
+  defs_raw   <- read_csv(path_defs, show_col_types = FALSE)
 
   mock_census <- census_raw %>%
     filter(grepl("sheep", animal_tag)) %>%
     mutate(population = ifelse(animal_tag == "mature_sheep_female_meat", 100, 0))
 
-  mock_rates <- rates_raw %>%
+  mock_defs <- defs_raw %>%
     filter(grepl("sheep", animal_tag)) %>%
-    mutate(value = 0.1)
+    mutate(replacement_rate = 0.1, pr_sheep_goat = 1.0)
 
-  res <- calculate_population_sheep(mock_census, mock_rates)
+  res <- calculate_population_sheep(mock_census, mock_defs)
 
   expect_true(all(res$population > 0))
   expect_false("lamb_dairy_slaughter" %in% res$animal_tag)

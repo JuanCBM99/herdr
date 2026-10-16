@@ -22,7 +22,6 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
                                        gwp_report = "AR5",
                                        ar = NULL,
                                        data_dir = "user_data") {
-
   # 0. Validate GWP report upfront
   gwp_presets <- list(
     AR6 = c(CH4 = 27, N2O = 273),
@@ -36,8 +35,10 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   if (is.character(effective_gwp)) {
     gwp_choice <- toupper(effective_gwp[1])
     if (!gwp_choice %in% names(gwp_presets)) {
-      stop(sprintf("Invalid GWP report '%s'. Must be one of: %s, or a named vector c(CH4 = ..., N2O = ...)",
-                   effective_gwp[1], paste(names(gwp_presets), collapse = ", ")))
+      stop(sprintf(
+        "Invalid GWP report '%s'. Must be one of: %s, or a named vector c(CH4 = ..., N2O = ...)",
+        effective_gwp[1], paste(names(gwp_presets), collapse = ", ")
+      ))
     }
     gwp_vals <- gwp_presets[[gwp_choice]]
   } else if (is.numeric(effective_gwp) && all(c("CH4", "N2O") %in% names(effective_gwp))) {
@@ -74,7 +75,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  land_u  <- calculate_land_use(
+  land_u <- calculate_land_use(
     automatic_cycle = automatic_cycle,
     saveoutput = FALSE,
     farm_country = farm_country,
@@ -83,14 +84,14 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
-      Land_m2                         = sum(total_land_use_m2, na.rm = TRUE),
-      Land_cropland_m2                = sum(total_land_use_m2[!is.na(land_type) & land_type == "cropland"], na.rm = TRUE),
-      Land_grassland_convertible_m2   = sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_convertible"], na.rm = TRUE),
+      Land_m2 = sum(total_land_use_m2, na.rm = TRUE),
+      Land_cropland_m2 = sum(total_land_use_m2[!is.na(land_type) & land_type == "cropland"], na.rm = TRUE),
+      Land_grassland_convertible_m2 = sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_convertible"], na.rm = TRUE),
       Land_grassland_unconvertible_m2 = sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_unconvertible"], na.rm = TRUE),
-      Land_other_m2                   = pmax(0, sum(total_land_use_m2, na.rm = TRUE) - (
+      Land_other_m2 = pmax(0, sum(total_land_use_m2, na.rm = TRUE) - (
         sum(total_land_use_m2[!is.na(land_type) & land_type == "cropland"], na.rm = TRUE) +
-        sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_convertible"], na.rm = TRUE) +
-        sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_unconvertible"], na.rm = TRUE)
+          sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_convertible"], na.rm = TRUE) +
+          sum(total_land_use_m2[!is.na(land_type) & land_type == "grassland_unconvertible"], na.rm = TRUE)
       )),
       .groups = "drop"
     )
@@ -99,7 +100,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   cp_data <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
-      CP_pct          = mean(CP_pct, na.rm = TRUE),
+      CP_pct = mean(CP_pct, na.rm = TRUE),
       CP_cropland_pct = mean(CP_cropland_pct, na.rm = TRUE),
       .groups = "drop"
     )
@@ -113,26 +114,26 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   prod_data <- suppressMessages(calculate_production(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
-      population             = sum(population, na.rm = TRUE),
-      milk_fresh_kg          = sum(milk_fresh_kg, na.rm = TRUE),
-      milk_FPCM_kg           = sum(milk_FPCM_kg, na.rm = TRUE),
-      meat_live_weight_kg    = sum(meat_live_weight_kg, na.rm = TRUE),
+      population = sum(population, na.rm = TRUE),
+      milk_fresh_kg = sum(milk_fresh_kg, na.rm = TRUE),
+      milk_FPCM_kg = sum(milk_FPCM_kg, na.rm = TRUE),
+      meat_live_weight_kg = sum(meat_live_weight_kg, na.rm = TRUE),
       meat_carcass_weight_kg = sum(meat_carcass_weight_kg, na.rm = TRUE),
-      egg_fresh_kg           = sum(egg_fresh_kg, na.rm = TRUE),
-      wool_kg                = sum(wool_kg, na.rm = TRUE),
-      total_protein_kg       = sum(total_protein_kg, na.rm = TRUE),
-      fat_content_pct        = mean(fat_content_pct, na.rm = TRUE),
-      production_role        = dplyr::first(production_role),
+      egg_fresh_kg = sum(egg_fresh_kg, na.rm = TRUE),
+      wool_kg = sum(wool_kg, na.rm = TRUE),
+      total_protein_kg = sum(total_protein_kg, na.rm = TRUE),
+      fat_content_pct = mean(fat_content_pct, na.rm = TRUE),
+      production_role = dplyr::first(production_role),
       .groups = "drop"
     ) %>%
     dplyr::left_join(dmi_data, by = join_keys) %>%
     dplyr::left_join(cp_data, by = join_keys) %>%
     dplyr::mutate(
-      DMI_kgday           = tidyr::replace_na(DMI_kgday, 0),
-      CP_pct              = tidyr::replace_na(CP_pct, 0),
-      CP_cropland_pct     = tidyr::replace_na(CP_cropland_pct, 0),
-      feed_intake_kg      = population * DMI_kgday * 365,
-      feed_CP_total_kg    = feed_intake_kg * (CP_pct / 100),
+      DMI_kgday = tidyr::replace_na(DMI_kgday, 0),
+      CP_pct = tidyr::replace_na(CP_pct, 0),
+      CP_cropland_pct = tidyr::replace_na(CP_cropland_pct, 0),
+      feed_intake_kg = population * DMI_kgday * 365,
+      feed_CP_total_kg = feed_intake_kg * (CP_pct / 100),
       feed_CP_cropland_kg = feed_intake_kg * (CP_cropland_pct / 100),
 
       # Gross Biophysical Energies (IDF Bulletin 520 / 2022 & IPCC 2019)
@@ -140,8 +141,8 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       # 3.1 MJ / kg FPCM for cattle; 4.6 MJ/kg for dairy sheep; 3.0 MJ/kg for dairy goats.
       energy_milk_mj = dplyr::case_when(
         animal_type == "sheep" ~ 4.6 * milk_fresh_kg,
-        animal_type == "goat"  ~ 3.0 * milk_fresh_kg,
-        TRUE                   ~ 3.1 * milk_FPCM_kg
+        animal_type == "goat" ~ 3.0 * milk_fresh_kg,
+        TRUE ~ 3.1 * milk_FPCM_kg
       ),
 
       # 2. Meat Net Energy for Growth/Weight (NEG, IDF Bulletin 520 p. 86):
@@ -149,7 +150,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       # For laying hens (egg_fresh_kg > 0), meat is not counted (100% burden goes to eggs).
       neg_mj_kg = dplyr::case_when(
         production_role == "mature" ~ 15.0,
-        TRUE                        ~ 11.0
+        TRUE ~ 11.0
       ),
       energy_meat_mj = dplyr::if_else(
         egg_fresh_kg > 0,
@@ -174,10 +175,10 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   # 3. Apply Filters
   final_summary <- complete_summary
-  if (!is.null(region))     final_summary <- final_summary %>% dplyr::filter(region %in% .env$region)
-  if (!is.null(subregion))  final_summary <- final_summary %>% dplyr::filter(subregion %in% .env$subregion)
-  if (!is.null(animal))     final_summary <- final_summary %>% dplyr::filter(animal_type %in% .env$animal)
-  if (!is.null(type))       final_summary <- final_summary %>% dplyr::filter(animal_subtype %in% .env$type)
+  if (!is.null(region)) final_summary <- final_summary %>% dplyr::filter(region %in% .env$region)
+  if (!is.null(subregion)) final_summary <- final_summary %>% dplyr::filter(subregion %in% .env$subregion)
+  if (!is.null(animal)) final_summary <- final_summary %>% dplyr::filter(animal_type %in% .env$animal)
+  if (!is.null(type)) final_summary <- final_summary %>% dplyr::filter(animal_subtype %in% .env$type)
   if (!is.null(class_flex)) final_summary <- final_summary %>% dplyr::filter(class_flex %in% .env$class_flex)
 
   # 4. Aggregation
@@ -210,30 +211,32 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   land_total_m2 <- final_summary$Land_m2
   feed_total_kg <- final_summary$feed_intake_kg
 
-  milk_kg      <- final_summary$milk_FPCM_kg
-  meat_kg      <- final_summary$meat_carcass_weight_kg
+  milk_kg <- final_summary$milk_FPCM_kg
+  meat_kg <- final_summary$meat_carcass_weight_kg
   meat_live_kg <- final_summary$meat_live_weight_kg
-  wool_kg      <- final_summary$wool_kg
-  egg_kg       <- final_summary$egg_fresh_kg
+  wool_kg <- final_summary$wool_kg
+  egg_kg <- final_summary$egg_fresh_kg
 
   # Flag non-milking dairy phases (e.g. dry_phase, replacement heifers)
-  is_non_milking_dairy <- (final_summary$animal_subtype %in% "dairy") & (milk_kg == 0)
+  is_non_milking_dairy <- (final_summary$animal_subtype == "dairy") &
+    (milk_kg == 0) &
+    (meat_kg == 0)
 
   # 1) Per kg of Edible Protein (Universal nutritional FU)
-  prot_kg      <- final_summary$total_protein_kg
-  ghg_protein  <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(co2e_total_kg / prot_kg, 3), NA_real_)
+  prot_kg <- final_summary$total_protein_kg
+  ghg_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(co2e_total_kg / prot_kg, 3), NA_real_)
   land_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(land_total_m2 / prot_kg, 2), NA_real_)
 
   # 2) Per Animal Head / Year (Per capita physiological FU)
-  pop_n     <- final_summary$population
-  ghg_head  <- dplyr::if_else(pop_n > 0, round(co2e_total_kg / pop_n, 2), NA_real_)
+  pop_n <- final_summary$population
+  ghg_head <- dplyr::if_else(pop_n > 0, round(co2e_total_kg / pop_n, 2), NA_real_)
   land_head <- dplyr::if_else(pop_n > 0, round(land_total_m2 / pop_n, 1), NA_real_)
 
   # 3) Per Commercial Product (IDF Bulletin 520 / 2022 Biophysical Allocation)
   # Total biophysical energy across co-products in multi-output systems (MJ)
   energy_total_mj <- final_summary$energy_milk_mj +
-                     final_summary$energy_meat_mj +
-                     final_summary$energy_wool_mj
+    final_summary$energy_meat_mj +
+    final_summary$energy_wool_mj
 
   has_energy <- energy_total_mj > 0
 
@@ -243,43 +246,43 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
   # For ruminants and non-egg systems:
   af_milk <- dplyr::case_when(
-    is_non_milking_dairy     ~ 0.0,
+    is_non_milking_dairy ~ 0.0,
     has_energy & egg_kg == 0 ~ final_summary$energy_milk_mj / energy_total_mj,
-    TRUE                     ~ 0.0
+    TRUE ~ 0.0
   )
   af_meat <- dplyr::case_when(
-    egg_kg > 0           ~ 0.0,
+    egg_kg > 0 ~ 0.0,
     is_non_milking_dairy ~ 0.0,
-    has_energy           ~ final_summary$energy_meat_mj / energy_total_mj,
-    meat_kg > 0          ~ 1.0,
-    TRUE                 ~ 0.0
+    has_energy ~ final_summary$energy_meat_mj / energy_total_mj,
+    meat_kg > 0 ~ 1.0,
+    TRUE ~ 0.0
   )
   af_wool <- dplyr::if_else(has_energy & egg_kg == 0 & !is_non_milking_dairy, final_summary$energy_wool_mj / energy_total_mj, 0.0)
 
   # Dedicated Product Intensities
   # A) Milk
-  ghg_milk  <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_milk) / milk_kg, 3), NA_real_)
+  ghg_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_milk) / milk_kg, 3), NA_real_)
   land_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((land_total_m2 * af_milk) / milk_kg, 2), NA_real_)
 
   # B) Meat
-  ghg_meat  <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_meat) / meat_kg, 3), NA_real_)
+  ghg_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_meat) / meat_kg, 3), NA_real_)
   land_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((land_total_m2 * af_meat) / meat_kg, 2), NA_real_)
 
   # C) Wool (only meat sheep breeds)
-  ghg_wool  <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((co2e_total_kg * af_wool) / wool_kg, 3), NA_real_)
+  ghg_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((co2e_total_kg * af_wool) / wool_kg, 3), NA_real_)
   land_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((land_total_m2 * af_wool) / wool_kg, 2), NA_real_)
 
   # D) Eggs
-  ghg_egg   <- dplyr::if_else(egg_kg > 0, round((co2e_total_kg * af_egg) / egg_kg, 3), NA_real_)
-  land_egg  <- dplyr::if_else(egg_kg > 0, round((land_total_m2 * af_egg) / egg_kg, 2), NA_real_)
+  ghg_egg <- dplyr::if_else(egg_kg > 0, round((co2e_total_kg * af_egg) / egg_kg, 3), NA_real_)
+  land_egg <- dplyr::if_else(egg_kg > 0, round((land_total_m2 * af_egg) / egg_kg, 2), NA_real_)
 
   # 4) Protein Feed Conversion and Human Food Security (Mottet et al. 2017)
-  feed_cp_tot  <- final_summary$feed_CP_total_kg
+  feed_cp_tot <- final_summary$feed_CP_total_kg
   feed_cp_crop <- final_summary$feed_CP_cropland_kg
 
   valid_prot <- prot_kg > 0 & !is_non_milking_dairy
 
-  protein_fcr_total    <- dplyr::if_else(valid_prot, round(feed_cp_tot / prot_kg, 2), NA_real_)
+  protein_fcr_total <- dplyr::if_else(valid_prot, round(feed_cp_tot / prot_kg, 2), NA_real_)
   protein_fcr_cropland <- dplyr::if_else(valid_prot, round(feed_cp_crop / prot_kg, 2), NA_real_)
 
   final_summary <- final_summary %>%
@@ -297,13 +300,10 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       # Product-specific intensities
       GHG_intensity_milk     = ghg_milk,
       Land_intensity_milk    = land_milk,
-
       GHG_intensity_meat     = ghg_meat,
       Land_intensity_meat    = land_meat,
-
       GHG_intensity_wool     = ghg_wool,
       Land_intensity_wool    = land_wool,
-
       GHG_intensity_egg      = ghg_egg,
       Land_intensity_egg     = land_egg,
 
