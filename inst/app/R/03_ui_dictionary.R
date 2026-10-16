@@ -27,11 +27,10 @@ build_dictionary_panel <- function() {
             tags$a(href = "#dict-mono", class = "badge bg-secondary text-decoration-none py-2 px-2", "5. Monogastrics"),
             tags$a(href = "#dict-weights", class = "badge bg-secondary text-decoration-none py-2 px-2", "6. Weights"),
             tags$a(href = "#dict-manure", class = "badge bg-secondary text-decoration-none py-2 px-2", "7. Manure"),
-            tags$a(href = "#dict-repro", class = "badge bg-secondary text-decoration-none py-2 px-2", "8. Reproduction"),
-            tags$a(href = "#dict-feed_char", class = "badge bg-secondary text-decoration-none py-2 px-2", "9. Feed Characteristics"),
-            tags$a(href = "#dict-ipcc_coef", class = "badge bg-secondary text-decoration-none py-2 px-2", "10. IPCC Coefficients"),
-            tags$a(href = "#dict-ipcc_mm", class = "badge bg-secondary text-decoration-none py-2 px-2", "11. IPCC Manure Mgt."),
-            tags$a(href = "#dict-mapping", class = "badge bg-secondary text-decoration-none py-2 px-2", "12. Mapping")
+            tags$a(href = "#dict-feed_char", class = "badge bg-secondary text-decoration-none py-2 px-2", "8. Feed Characteristics"),
+            tags$a(href = "#dict-ipcc_coef", class = "badge bg-secondary text-decoration-none py-2 px-2", "9. IPCC Coefficients"),
+            tags$a(href = "#dict-ipcc_mm", class = "badge bg-secondary text-decoration-none py-2 px-2", "10. IPCC Manure Mgt."),
+            tags$a(href = "#dict-mapping", class = "badge bg-secondary text-decoration-none py-2 px-2", "11. Mapping")
           ),
 
           div(
@@ -159,7 +158,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("c_pregnancy_cattle")),
                 tags$dd(class = "col-sm-9", "IPCC pregnancy coefficient descriptor for cattle."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("pregnancy_rate")),
-                tags$dd(class = "col-sm-9", "Proportion of mature females pregnant in a year (bounded between 0 and 1).")
+                tags$dd(class = "col-sm-9", "Proportion of mature females pregnant in a year (bounded between 0 and 1)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("replacement_rate")),
+                tags$dd(class = "col-sm-9", "Annual replacement rate for mature breeding stock (e.g., 0.27 for 27% in dairy cows, 0.15 in beef cows, 0.20–0.30 in sheep/goats).")
               )
             ),
 
@@ -206,7 +207,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("piglets_born")),
                 tags$dd(class = "col-sm-9", "Average number of live piglets born per litter (for breeding sows)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("piglets_suckling")),
-                tags$dd(class = "col-sm-9", "Average number of piglets actively suckled per sow during lactation.")
+                tags$dd(class = "col-sm-9", "Average number of piglets actively suckled per sow during lactation."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("replacement_rate")),
+                tags$dd(class = "col-sm-9", "Annual replacement rate for mature breeding stock (e.g., 0.25 to 0.35 for breeding sows, or custom rate for layers).")
               )
             ),
 
@@ -281,31 +284,12 @@ build_dictionary_panel <- function() {
             ),
 
             # ==================================================================
-            # 8. REPRODUCTION (reproduction_parameters.csv)
-            # ==================================================================
-            div(
-              id = "dict-repro",
-              class = "mb-4",
-              h5(tagList(icon("dna"), " 8. Reproduction (reproduction_parameters.csv)"), class = "fw-bold text-success border-bottom pb-2"),
-              p(class = "text-muted small mb-3", "Replacement, pregnancy, and fertility rates used to calculate demography and young-stock replacement burdens."),
-              tags$dl(
-                class = "row small",
-                tags$dt(class = "col-sm-3 text-monospace", tags$code("animal_tag")),
-                tags$dd(class = "col-sm-9", "Cohort identifier matching Census."),
-                tags$dt(class = "col-sm-3 text-monospace", tags$code("parameter")),
-                tags$dd(class = "col-sm-9", "Name of the parameter: 'replacement_rate'."),
-                tags$dt(class = "col-sm-3 text-monospace", tags$code("value")),
-                tags$dd(class = "col-sm-9", "Numeric value of the parameter (proportion between 0 and 1).")
-              )
-            ),
-
-            # ==================================================================
-            # 9. FEED CHARACTERISTICS (feed_characteristics.csv)
+            # 8. FEED CHARACTERISTICS (feed_characteristics.csv)
             # ==================================================================
             div(
               id = "dict-feed_char",
               class = "mb-4",
-              h5(tagList(icon("flask"), " 9. Feed Characteristics (feed_characteristics.csv)"), class = "fw-bold text-info border-bottom pb-2"),
+              h5(tagList(icon("flask"), " 8. Feed Characteristics (feed_characteristics.csv)"), class = "fw-bold text-info border-bottom pb-2"),
               p(class = "text-muted small mb-3", "Nutritional library containing 370 standardized feeds with chemical compositions, dry matter, gross energy, and species-specific digestibilities."),
               tags$dl(
                 class = "row small",
@@ -339,12 +323,12 @@ build_dictionary_panel <- function() {
             ),
 
             # ==================================================================
-            # 10. IPCC COEFFICIENTS (ipcc_coefficients.csv)
+            # 9. IPCC COEFFICIENTS (ipcc_coefficients.csv)
             # ==================================================================
             div(
               id = "dict-ipcc_coef",
               class = "mb-4",
-              h5(tagList(icon("square-root-variable"), " 10. IPCC Coefficients (ipcc_coefficients.csv)"), class = "fw-bold text-info border-bottom pb-2"),
+              h5(tagList(icon("square-root-variable"), " 9. IPCC Coefficients (ipcc_coefficients.csv)"), class = "fw-bold text-info border-bottom pb-2"),
               p(class = "text-muted small mb-3", "Standard Tier 2 coefficients defined in 2006 and 2019 Refinement IPCC Guidelines for National Greenhouse Gas Inventories."),
               tags$dl(
                 class = "row small",
@@ -360,12 +344,12 @@ build_dictionary_panel <- function() {
             ),
 
             # ==================================================================
-            # 11. IPCC MANURE MGT. (ipcc_mm.csv)
+            # 10. IPCC MANURE MGT. (ipcc_mm.csv)
             # ==================================================================
             div(
               id = "dict-ipcc_mm",
               class = "mb-4",
-              h5(tagList(icon("warehouse"), " 11. IPCC Manure Mgt. (ipcc_mm.csv)"), class = "fw-bold text-info border-bottom pb-2"),
+              h5(tagList(icon("warehouse"), " 10. IPCC Manure Mgt. (ipcc_mm.csv)"), class = "fw-bold text-info border-bottom pb-2"),
               p(class = "text-muted small mb-3", "Lookup database of emission factors and nitrogen loss fractions across thousands of IPCC manure management configurations."),
               tags$dl(
                 class = "row small",
@@ -387,12 +371,12 @@ build_dictionary_panel <- function() {
             ),
 
             # ==================================================================
-            # 12. MAPPING (mapping.csv)
+            # 11. MAPPING (mapping.csv)
             # ==================================================================
             div(
               id = "dict-mapping",
               class = "mb-4",
-              h5(tagList(icon("diagram-project"), " 12. Mapping (mapping.csv)"), class = "fw-bold text-info border-bottom pb-2"),
+              h5(tagList(icon("diagram-project"), " 11. Mapping (mapping.csv)"), class = "fw-bold text-info border-bottom pb-2"),
               p(class = "text-muted small mb-3", "Cross-database links connecting internal feed ingredients with international databases (FAOSTAT and AGRIBALYSE v3.1 LCA)."),
               tags$dl(
                 class = "row small",

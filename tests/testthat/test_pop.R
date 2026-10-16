@@ -12,7 +12,6 @@ test_that("calculate_population automatic cycle works with cleaned test data", {
   # - livestock_census.csv
   # - ruminant_definitions.csv
   # - monogastric_definitions.csv
-  # - reproduction_parameters.csv
 
   # Run orchestration
   results <- calculate_population(

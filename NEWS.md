@@ -15,13 +15,16 @@
 - **User-Defined Milk Protein Percentage (`protein_content_pct`)**: Added support for entering explicit milk crude protein percentage in `ruminant_definitions.csv` alongside `fat_content_pct` (particularly relevant for dairy sheep and goats where fat:protein ratios diverge from cattle), while maintaining automatic fallback to IPCC fat regression when omitted or set to 0.
 
 ## Bug Fixes and Improvements
-- **Dry Phase Meat Allocation Fix**: Corrected non-milking dairy cohorts (`is_non_milking_dairy`, e.g. `dry_phase` where `milk_FPCM_kg == 0`), setting `AF_meat = 0`, `AF_milk = 0`, and intensities to `NA` (rendered as empty bars in charts) to avoid 100% allocation of dry-period emissions to cull meat.
+- **Consolidation of `replacement_rate`**: Streamlined user input definitions by integrating `replacement_rate` directly as a parameter column in `ruminant_definitions.csv` and `monogastric_definitions.csv`, completely deprecating the separate `reproduction_parameters.csv` file across all demographic modeling functions, vignettes, example files, and the Shiny application data dictionary.
+- **Dairy Feedlot Meat Accounting**: Refined `is_non_milking_dairy` detection in `R/14_summary.R` and `R/plots.R` to check `(animal_subtype == "dairy") & (milk_kg == 0) & (meat_kg == 0)`. Cohorts born from dairy herds that yield meat (e.g. `feedlot_calves_male`, `feedlot_calves_female`) are no longer excluded as non-milking phases, ensuring their meat yields, greenhouse gas and land use intensities, and Mottet FCR are fully accounted for and displayed in summary outputs and plots.
+- **Dry Phase Meat Allocation**: True non-milking, non-meat phases (e.g. `dry_phase` where both milk and meat are 0) have `AF_meat = 0`, `AF_milk = 0`, and intensities set to `NA` (rendered as empty bars in charts) to avoid 100% allocation of dry-period emissions to cull meat.
 - Resolved factor level duplication error in `plot_herdr_results()` when grouping solely by species (`animal_type`).
 - Decoupled dairy cohort detection in aggregation routines to support arbitrary demographic grouping combinations without losing co-product allocation rules.
 - Cleaned up forage data lookup in `R/fao_data.R`, deprecating legacy `fao_forages.parquet` in favor of standard `forages.parquet`.
 - Fully registered package global variables to ensure 0 notes and clean R CMD check execution.
-- Comprehensive test suite expansion to 359 unit tests with 100% pass rate.
-- Reorganized and updated all documentation vignettes (`Introduction.Rmd`, `Manure.Rmd`, `Technical_reference.Rmd`, `Theoretical_basis.Rmd`, `Workflow.Rmd`, `app.Rmd`, `land_use.Rmd`) and modernized `_pkgdown.yml`.
+- Comprehensive test suite expansion to 356 unit tests with 100% pass rate.
+- Reorganized and updated all documentation vignettes (`Introduction.Rmd`, `Herd_Demography.Rmd`, `Manure.Rmd`, `Technical_reference.Rmd`, `Theoretical_basis.Rmd`, `Workflow.Rmd`, `app.Rmd`, `land_use.Rmd`) and modernized `_pkgdown.yml`.
+
 
 # herdr 1.0.3
 

@@ -21,7 +21,7 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   for (f in files_to_fix) {
     path <- file.path("user_data", f)
     if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE, lazy = FALSE) %>%
         mutate(across(everything(), trimws)) %>%
         write_csv(path)
     }

@@ -142,8 +142,7 @@ test_that("calculate_production succeeds gracefully when optional tables are mis
   }
   file.copy(from = source_data, to = temp_test_dir, recursive = TRUE)
 
-  # Remove optional reproduction_parameters and monogastric_definitions
-  unlink(file.path(temp_test_dir, "user_data", "reproduction_parameters.csv"))
+  # Remove optional monogastric_definitions
   unlink(file.path(temp_test_dir, "user_data", "monogastric_definitions.csv"))
 
   res_missing <- suppressMessages(calculate_production(
