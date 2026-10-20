@@ -66,7 +66,7 @@ dynamic_dropdowns <- list(
   ),
   feed_char = list(
     ingredient_type   = list(choices = c("forage", "concentrate", "milk", "milk_replacer"), type = "dropdown", strict = FALSE),
-    land_type         = list(choices = c("arable", "grassland", "none", "no_land"), type = "dropdown", strict = FALSE)
+    land_type         = list(choices = c("cropland", "grassland_convertible", "grassland_unconvertible", "none", "no_land"), type = "dropdown", strict = FALSE)
   )
 )
 
@@ -135,6 +135,7 @@ modal_tooltips <- list(
   climate_moisture         = "Moisture level of your region's climate (e.g., 'Dry' or 'Wet').",
   b_0                      = "Maximum methane-producing capacity (B0). Select the description that matches your animal type.",
   allocation               = "Fraction of the total manure managed in this specific system (between 0 and 1). All systems for an animal must sum to 1.",
+  land_type                = "Agroecological land category: 'cropland', 'grassland_convertible', 'grassland_unconvertible', or 'none'.",
   DM_pct                   = "Dry Matter (%): The portion of the feed that remains after all water is removed.",
   CP_pct                   = "Crude Protein (%): Protein content, essential for muscle growth and milk production.",
   NDF_pct                  = "Neutral Detergent Fiber (%): Total structural fiber that gives bulk to the diet.",

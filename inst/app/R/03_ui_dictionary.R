@@ -298,7 +298,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient")),
                 tags$dd(class = "col-sm-9", "Standardized name of the feed item."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("land_type")),
-                tags$dd(class = "col-sm-9", "Land requirement type: 'cropland', 'grassland', or 'none'."),
+                tags$dd(class = "col-sm-9", "Land requirement type: 'cropland', 'grassland_convertible', 'grassland_unconvertible', or 'none'."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("DM_pct")),
                 tags$dd(class = "col-sm-9", "Dry Matter percentage (%)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ASH_pct")),
