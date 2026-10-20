@@ -4,12 +4,27 @@
 \alias{calculate_DMI}
 \title{Calculate Dry Matter Intake (DMI)}
 \usage{
-calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
+calculate_DMI(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  ge_req = NULL,
+  diet_char = NULL,
+  mono = NULL,
+  weights = NULL
+)
 }
 \arguments{
 \item{saveoutput}{Logical. If TRUE (default), the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{ge_req}{Optional precalculated Gross Energy dataframe.}
+
+\item{diet_char}{Optional precalculated weighted nutritional variables dataframe.}
+
+\item{mono}{Optional precalculated monogastric energy dataframe.}
+
+\item{weights}{Optional preloaded livestock weights dataframe.}
 }
 \value{
 A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body weight (\% BW).

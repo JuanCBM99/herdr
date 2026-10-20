@@ -54,24 +54,49 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   message("\U0001f7e2 Starting impact assessment summary (GWP standard: ", gwp_choice, ")...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
-  # 1. Pipeline calls and unit standardization (Gg)
-  CH4_ent <- calculate_emissions_enteric(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
+  # 1. Base components computed ONCE in memory
+  pop_data  <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  cp_data   <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  ge_data   <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir, de_df = cp_data))
+  mono_data <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
+  dmi_data  <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir, ge_req = ge_data, diet_char = cp_data, mono = mono_data))
+  vs_data   <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir, ge_data = ge_data, dmi_data = dmi_data, diet_char = cp_data))
+
+  CH4_ent <- calculate_emissions_enteric(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    diet_vars = cp_data, ge_df = ge_data, pop_df = pop_data
+  ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(CH4_enteric_Gg = sum(total_CH4_enteric_Ggyear, na.rm = TRUE), .groups = "drop")
 
-  CH4_man <- calculate_CH4_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
+  CH4_man <- calculate_CH4_manure(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    vs_df = vs_data, pop_df = pop_data
+  ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_kgyear / 1e6, na.rm = TRUE), .groups = "drop")
 
-  N2O_dir <- calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
+  neg_data <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
+  N2O_dir_raw <- calculate_N2O_direct_manure(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    ge_df = ge_data, cp_df = cp_data, pop_df = pop_data, neg_df = neg_data, dmi_df = dmi_data
+  )
+
+  N2O_dir <- N2O_dir_raw %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_direct_Gg = sum(direct_N2O_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_vol <- calculate_N2O_indirect_volatilization(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
+  N2O_vol <- calculate_N2O_indirect_volatilization(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    direct_N2O_df = N2O_dir_raw, pop_df = pop_data
+  ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_vol_Gg = sum(N2O_vol_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_lea <- calculate_N2O_indirect_leaching(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir) %>%
+  N2O_lea <- calculate_N2O_indirect_leaching(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    direct_N2O_df = N2O_dir_raw, pop_df = pop_data
+  ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
@@ -80,7 +105,9 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     saveoutput = FALSE,
     farm_country = farm_country,
     year = year,
-    data_dir = data_dir
+    data_dir = data_dir,
+    DMI_df = dmi_data,
+    population_df = pop_data
   ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
@@ -97,7 +124,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     )
 
   # Nutritional variables (CP and Cropland CP)
-  cp_data <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir)) %>%
+  cp_summary <- cp_data %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
       CP_pct = mean(CP_pct, na.rm = TRUE),
@@ -106,12 +133,15 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     )
 
   # Dry matter intake (DMI) and feed consumption
-  dmi_data <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir)) %>%
+  dmi_summary <- dmi_data %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(DMI_kgday = mean(DMI_kgday, na.rm = TRUE), .groups = "drop")
 
   # Production outputs for functional units and feed conversion
-  prod_data <- suppressMessages(calculate_production(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+  prod_data <- suppressMessages(calculate_production(
+    automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
+    pop_df = pop_data
+  )) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(
       population = sum(population, na.rm = TRUE),
@@ -126,8 +156,8 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       production_role = dplyr::first(production_role),
       .groups = "drop"
     ) %>%
-    dplyr::left_join(dmi_data, by = join_keys) %>%
-    dplyr::left_join(cp_data, by = join_keys) %>%
+    dplyr::left_join(dmi_summary, by = join_keys) %>%
+    dplyr::left_join(cp_summary, by = join_keys) %>%
     dplyr::mutate(
       DMI_kgday = tidyr::replace_na(DMI_kgday, 0),
       CP_pct = tidyr::replace_na(CP_pct, 0),

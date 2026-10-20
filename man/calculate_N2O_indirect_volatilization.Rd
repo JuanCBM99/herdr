@@ -7,15 +7,21 @@
 calculate_N2O_indirect_volatilization(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  direct_N2O_df = NULL,
+  pop_df = NULL
 )
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+\item{saveoutput}{Logical. If TRUE (default), results are saved to output folder.}
 
 \item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
+
+\item{direct_N2O_df}{Optional precalculated direct N2O manure dataframe.}
+
+\item{pop_df}{Optional precalculated population dataframe.}
 }
 \description{
 Computes indirect N2O emissions derived from volatilization of excreted nitrogen (IPCC Eq 10.26 and 10.28).

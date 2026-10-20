@@ -3,10 +3,16 @@
 #' Computes direct N2O emissions based on nitrogen excretion logic,
 #' emission factors, management system, and climate (IPCC Eq 10.25).
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
+#' @param saveoutput Logical. If TRUE (default), results are saved to output folder.
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
-#' @param saveoutput If TRUE (default) the results are saved in the output folder.
+#' @param ge_df Optional precalculated Gross Energy dataframe.
+#' @param cp_df Optional precalculated weighted nutritional variables dataframe.
+#' @param pop_df Optional precalculated population dataframe.
+#' @param neg_df Optional precalculated NEg dataframe.
+#' @param dmi_df Optional precalculated DMI dataframe.
 #' @export
-calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
+calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
+                                        ge_df = NULL, cp_df = NULL, pop_df = NULL, neg_df = NULL, dmi_df = NULL) {
 
   message("\U0001f7e2 Calculating direct N2O emissions from manure...")
 
@@ -24,11 +30,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   eggs_yr <- dplyr::coalesce(eggs_yr, 0)
   mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
 
-  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
-  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
-  neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
-  dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(cp_df))  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(ge_df))  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir, de_df = cp_df))
+  if (is.null(pop_df)) pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(neg_df)) neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(dmi_df)) dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir, ge_req = ge_df, diet_char = cp_df))
 
   # --- 2. Validations (Asserts) ---
 

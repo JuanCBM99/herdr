@@ -7,10 +7,12 @@
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput Logical. If TRUE (default), results are saved to output folder.
-#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
+#' @param pop_df Optional precalculated population dataframe.
 #' @return Tibble with animal production summary.
 #' @export
-calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
+calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
+                                 pop_df = NULL) {
 
   message("\U0001f9c3 Calculating total livestock production (physical products & protein)...")
 
@@ -19,7 +21,10 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   # --- 1. Load Data Assets ---
 
   # FIX: Select only necessary columns from population to prevent .x and .y suffixes later
-  pop_df   <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+  if (is.null(pop_df)) {
+    pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  }
+  pop_df <- pop_df %>%
     dplyr::select(dplyr::all_of(join_keys), population) %>%
     dplyr::distinct()
 

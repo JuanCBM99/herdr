@@ -4,12 +4,39 @@
 \alias{calculate_ge}
 \title{Calculate Gross Energy (GE)}
 \usage{
-calculate_ge(saveoutput = TRUE, data_dir = "user_data")
+calculate_ge(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  de_df = NULL,
+  NEm_df = NULL,
+  NEa_df = NULL,
+  NEg_df = NULL,
+  NEl_df = NULL,
+  NE_work_df = NULL,
+  NE_pregnancy_df = NULL,
+  NE_wool_df = NULL
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{de_df}{Optional precalculated weighted variable dataframe (with DE_pct).}
+
+\item{NEm_df}{Optional precalculated NEm dataframe.}
+
+\item{NEa_df}{Optional precalculated NEa dataframe.}
+
+\item{NEg_df}{Optional precalculated NEg dataframe.}
+
+\item{NEl_df}{Optional precalculated NEl dataframe.}
+
+\item{NE_work_df}{Optional precalculated NE_work dataframe.}
+
+\item{NE_pregnancy_df}{Optional precalculated NE_pregnancy dataframe.}
+
+\item{NE_wool_df}{Optional precalculated NE_wool dataframe.}
 }
 \description{
 Computes gross energy requirements by aggregating Net Energy (NE) components.

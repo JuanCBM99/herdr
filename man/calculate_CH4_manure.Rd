@@ -7,7 +7,9 @@
 calculate_CH4_manure(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  vs_df = NULL,
+  pop_df = NULL
 )
 }
 \arguments{
@@ -15,7 +17,11 @@ calculate_CH4_manure(
 
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
-\item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to "user_data".}
+
+\item{vs_df}{Optional precalculated Volatile Solids dataframe.}
+
+\item{pop_df}{Optional precalculated population dataframe.}
 }
 \description{
 Computes CH4 emissions from manure based on Volatile Solids (VS),

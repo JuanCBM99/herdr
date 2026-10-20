@@ -4,12 +4,14 @@
 \alias{calculate_NE_work}
 \title{Calculate Net Energy for Work (NE_work)}
 \usage{
-calculate_NE_work(saveoutput = TRUE, data_dir = "user_data")
+calculate_NE_work(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{nem_df}{Optional precalculated NEm dataframe to avoid recomputation.}
 }
 \description{
 Computes NE_work based on NEm and hours of activity.

@@ -9,7 +9,9 @@
 #'   trade data, this caps how many countries the algorithm will follow through re-export hubs. Default is 4.
 #' @param ssr_threshold Numeric. Self-Sufficiency Ratio (Production / Apparent Consumption)
 #'   above which a country is considered a genuine producer. Default is 0.70.
-#' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
+#' @param DMI_df Optional precalculated DMI dataframe.
+#' @param population_df Optional precalculated population dataframe.
 #' @export
 calculate_land_use <- function(automatic_cycle = FALSE,
                                saveoutput = TRUE,
@@ -17,7 +19,9 @@ calculate_land_use <- function(automatic_cycle = FALSE,
                                year = 2024,
                                max_trace_hops = 4,
                                ssr_threshold = 0.70,
-                               data_dir = "user_data") {
+                               data_dir = "user_data",
+                               DMI_df = NULL,
+                               population_df = NULL) {
 
   message("\U0001f7e2 Calculating land use...")
 
@@ -102,7 +106,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::distinct(ingredient, .keep_all = TRUE)
 
   # --- 3. Load operational data & Handle Hybrid Country Origins ---
-  DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir)) %>%
+  if (is.null(DMI_df)) {
+    DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
+  }
+  DMI_df <- DMI_df %>%
     dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
 
   diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
@@ -285,7 +292,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::mutate(fallback_yield = NA_real_)
   }
 
-  population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+  if (is.null(population_df)) {
+    population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  }
+  population_df <- population_df %>%
     dplyr::distinct(animal_tag, region, subregion, class_flex, population)
 
   # --- 4. Validate ingredient shares ---

@@ -5,19 +5,24 @@
 #'
 #' @param saveoutput Logical. If TRUE (default), the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param ge_req Optional precalculated Gross Energy dataframe.
+#' @param diet_char Optional precalculated weighted nutritional variables dataframe.
+#' @param mono Optional precalculated monogastric energy dataframe.
+#' @param weights Optional preloaded livestock weights dataframe.
 #' @return A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body weight (\% BW).
 #' @name calculate_DMI
 #' @rdname calculate_DMI
 #' @export
-calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data") {
+calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
+                          ge_req = NULL, diet_char = NULL, mono = NULL, weights = NULL) {
 
   message("\U0001f37d Calculating Dry Matter Intake (DMI)...")
 
   # --- 1. Load Dependencies and Inputs ---
-  ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
-  diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  weights   <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  mono      <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(ge_req))    ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(diet_char)) diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(weights))   weights   <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(mono))      mono      <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 

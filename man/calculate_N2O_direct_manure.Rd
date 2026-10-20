@@ -7,15 +7,30 @@
 calculate_N2O_direct_manure(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  ge_df = NULL,
+  cp_df = NULL,
+  pop_df = NULL,
+  neg_df = NULL,
+  dmi_df = NULL
 )
 }
 \arguments{
 \item{automatic_cycle}{Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.}
 
-\item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
+\item{saveoutput}{Logical. If TRUE (default), results are saved to output folder.}
 
 \item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
+
+\item{ge_df}{Optional precalculated Gross Energy dataframe.}
+
+\item{cp_df}{Optional precalculated weighted nutritional variables dataframe.}
+
+\item{pop_df}{Optional precalculated population dataframe.}
+
+\item{neg_df}{Optional precalculated NEg dataframe.}
+
+\item{dmi_df}{Optional precalculated DMI dataframe.}
 }
 \description{
 Computes direct N2O emissions based on nitrogen excretion logic,

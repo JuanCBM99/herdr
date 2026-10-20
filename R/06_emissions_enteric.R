@@ -6,16 +6,20 @@
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
-#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
+#' @param diet_vars Optional precalculated weighted nutritional variables dataframe.
+#' @param ge_df Optional precalculated Gross Energy dataframe.
+#' @param pop_df Optional precalculated population dataframe.
 #' @export
-calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
+calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
+                                        diet_vars = NULL, ge_df = NULL, pop_df = NULL) {
 
   message("\U0001f7e2 Calculating enteric fermentation emissions...")
 
   # --- 1. Data Loading and Propagation ---
-  diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
-  pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(diet_vars)) diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(ge_df))     ge_df     <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir, de_df = diet_vars))
+  if (is.null(pop_df))    pop_df    <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   ruminant_file <- file.path(data_dir, "ruminant_definitions.csv")
   livestock_definitions <- if (file.exists(ruminant_file)) {
     suppressMessages(readr::read_csv(ruminant_file, show_col_types = FALSE))

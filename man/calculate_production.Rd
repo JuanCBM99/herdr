@@ -7,7 +7,8 @@
 calculate_production(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  pop_df = NULL
 )
 }
 \arguments{
@@ -15,7 +16,9 @@ calculate_production(
 
 \item{saveoutput}{Logical. If TRUE (default), results are saved to output folder.}
 
-\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
+\item{data_dir}{Path to the directory containing input CSV/data files. Defaults to "user_data".}
+
+\item{pop_df}{Optional precalculated population dataframe.}
 }
 \value{
 Tibble with animal production summary.

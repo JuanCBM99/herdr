@@ -4,9 +4,12 @@
 #' population, and management factors (B0, MCF, AWMS) using IPCC Eq 10.23.
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
-#' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
+#' @param vs_df Optional precalculated Volatile Solids dataframe.
+#' @param pop_df Optional precalculated population dataframe.
 #' @export
-calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
+calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
+                                 vs_df = NULL, pop_df = NULL) {
 
   message("\U0001f7e2 Calculating CH4 emissions from manure management...")
 
@@ -61,12 +64,19 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
+  if (is.null(vs_df)) {
+    vs_df <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir))
+  }
+  if (is.null(pop_df)) {
+    pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
+  }
+
   # --- 3. Processing and Joins ---
-  results <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir)) %>%
+  results <- vs_df %>%
     dplyr::select(dplyr::all_of(join_keys), VS_kgday) %>%
 
     dplyr::left_join(
-      suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir)) %>%
+      pop_df %>%
         dplyr::select(dplyr::all_of(join_keys), population),
       by = join_keys
     ) %>%
