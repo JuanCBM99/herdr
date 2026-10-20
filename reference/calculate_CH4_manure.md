@@ -9,7 +9,9 @@ population, and management factors (B0, MCF, AWMS) using IPCC Eq 10.23.
 calculate_CH4_manure(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  vs_df = NULL,
+  pop_df = NULL
 )
 ```
 
@@ -26,5 +28,13 @@ calculate_CH4_manure(
 
 - data_dir:
 
-  Character. Path to the folder containing input CSV files. Default is
-  `"user_data"`.
+  Path to the directory containing input CSV/data files. Defaults to
+  "user_data".
+
+- vs_df:
+
+  Optional precalculated Volatile Solids dataframe.
+
+- pop_df:
+
+  Optional precalculated population dataframe.

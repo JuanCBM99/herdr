@@ -7,7 +7,14 @@ ruminants, and DMI/Energy ratios for poultry.
 ## Usage
 
 ``` r
-calculate_vs(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data")
+calculate_vs(
+  urinary_energy = 0.04,
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  ge_data = NULL,
+  dmi_data = NULL,
+  diet_char = NULL
+)
 ```
 
 ## Arguments
@@ -22,8 +29,20 @@ calculate_vs(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data")
 
 - data_dir:
 
-  Character. Path to the folder containing input CSV files. Default is
-  `"user_data"`.
+  Path to the directory containing input CSV/data files. Defaults to
+  "user_data".
+
+- ge_data:
+
+  Optional precalculated Gross Energy dataframe.
+
+- dmi_data:
+
+  Optional precalculated DMI dataframe.
+
+- diet_char:
+
+  Optional precalculated weighted nutritional variables dataframe.
 
 ## Value
 

@@ -11,7 +11,10 @@ ruminants, and IPCC Tier 1 with metabolic weight scaling for swine
 calculate_emissions_enteric(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  diet_vars = NULL,
+  ge_df = NULL,
+  pop_df = NULL
 )
 ```
 
@@ -28,5 +31,17 @@ calculate_emissions_enteric(
 
 - data_dir:
 
-  Character. Path to the folder containing input CSV files. Default is
-  `"user_data"`.
+  Path to the directory containing input CSV/data files. Defaults to
+  "user_data".
+
+- diet_vars:
+
+  Optional precalculated weighted nutritional variables dataframe.
+
+- ge_df:
+
+  Optional precalculated Gross Energy dataframe.
+
+- pop_df:
+
+  Optional precalculated population dataframe.

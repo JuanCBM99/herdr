@@ -66,7 +66,9 @@
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculate_N2O_indirect_leaching</span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span></span>
+<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span>,</span>
+<span>  direct_N2O_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  pop_df <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -79,11 +81,19 @@
 
 
 <dt id="arg-saveoutput">saveoutput<a class="anchor" aria-label="anchor" href="#arg-saveoutput"></a></dt>
-<dd><p>If TRUE (default) the results are saved in the output folder.</p></dd>
+<dd><p>Logical. If TRUE (default), results are saved to output folder.</p></dd>
 
 
 <dt id="arg-data-dir">data_dir<a class="anchor" aria-label="anchor" href="#arg-data-dir"></a></dt>
 <dd><p>Path to the directory containing input CSV/data files. Defaults to `"user_data"`.</p></dd>
+
+
+<dt id="arg-direct-n-o-df">direct_N2O_df<a class="anchor" aria-label="anchor" href="#arg-direct-n-o-df"></a></dt>
+<dd><p>Optional precalculated direct N2O manure dataframe.</p></dd>
+
+
+<dt id="arg-pop-df">pop_df<a class="anchor" aria-label="anchor" href="#arg-pop-df"></a></dt>
+<dd><p>Optional precalculated population dataframe.</p></dd>
 
 </dl></div>
 

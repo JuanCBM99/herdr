@@ -75,7 +75,8 @@ and IDF standards.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">calculate_production</span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  saveoutput <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span></span>
+<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span>,</span>
+<span>  pop_df <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -92,7 +93,11 @@ and IDF standards.</p>
 
 
 <dt id="arg-data-dir">data_dir<a class="anchor" aria-label="anchor" href="#arg-data-dir"></a></dt>
-<dd><p>Path to the directory containing input CSV/data files. Defaults to `"user_data"`.</p></dd>
+<dd><p>Path to the directory containing input CSV/data files. Defaults to "user_data".</p></dd>
+
+
+<dt id="arg-pop-df">pop_df<a class="anchor" aria-label="anchor" href="#arg-pop-df"></a></dt>
+<dd><p>Optional precalculated population dataframe.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -13,7 +13,9 @@ calculate_land_use(
   year = 2024,
   max_trace_hops = 4,
   ssr_threshold = 0.7,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  DMI_df = NULL,
+  population_df = NULL
 )
 ```
 
@@ -53,4 +55,12 @@ calculate_land_use(
 - data_dir:
 
   Path to the directory containing input CSV/data files. Defaults to
-  \`"user_data"\`.
+  "user_data".
+
+- DMI_df:
+
+  Optional precalculated DMI dataframe.
+
+- population_df:
+
+  Optional precalculated population dataframe.

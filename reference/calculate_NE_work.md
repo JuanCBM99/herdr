@@ -5,7 +5,7 @@ Computes NE_work based on NEm and hours of activity.
 ## Usage
 
 ``` r
-calculate_NE_work(saveoutput = TRUE, data_dir = "user_data")
+calculate_NE_work(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
 ```
 
 ## Arguments
@@ -18,3 +18,7 @@ calculate_NE_work(saveoutput = TRUE, data_dir = "user_data")
 
   Character. Path to the folder containing input CSV files. Default is
   `"user_data"`.
+
+- nem_df:
+
+  Optional precalculated NEm dataframe to avoid recomputation.

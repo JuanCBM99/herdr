@@ -7,7 +7,14 @@ NRC) for monogastrics (swine and poultry).
 ## Usage
 
 ``` r
-calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
+calculate_DMI(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  ge_req = NULL,
+  diet_char = NULL,
+  mono = NULL,
+  weights = NULL
+)
 ```
 
 ## Arguments
@@ -21,6 +28,22 @@ calculate_DMI(saveoutput = TRUE, data_dir = "user_data")
 
   Character. Path to the folder containing input CSV files. Default is
   `"user_data"`.
+
+- ge_req:
+
+  Optional precalculated Gross Energy dataframe.
+
+- diet_char:
+
+  Optional precalculated weighted nutritional variables dataframe.
+
+- mono:
+
+  Optional precalculated monogastric energy dataframe.
+
+- weights:
+
+  Optional preloaded livestock weights dataframe.
 
 ## Value
 

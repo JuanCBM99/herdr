@@ -9,7 +9,9 @@ Computes indirect N2O emissions derived from nitrogen leaching (IPCC Eq
 calculate_N2O_indirect_leaching(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  direct_N2O_df = NULL,
+  pop_df = NULL
 )
 ```
 
@@ -22,9 +24,17 @@ calculate_N2O_indirect_leaching(
 
 - saveoutput:
 
-  If TRUE (default) the results are saved in the output folder.
+  Logical. If TRUE (default), results are saved to output folder.
 
 - data_dir:
 
   Path to the directory containing input CSV/data files. Defaults to
   \`"user_data"\`.
+
+- direct_N2O_df:
+
+  Optional precalculated direct N2O manure dataframe.
+
+- pop_df:
+
+  Optional precalculated population dataframe.

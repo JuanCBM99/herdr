@@ -11,7 +11,8 @@ to 9.5) and IDF standards.
 calculate_production(
   automatic_cycle = FALSE,
   saveoutput = TRUE,
-  data_dir = "user_data"
+  data_dir = "user_data",
+  pop_df = NULL
 )
 ```
 
@@ -29,7 +30,11 @@ calculate_production(
 - data_dir:
 
   Path to the directory containing input CSV/data files. Defaults to
-  \`"user_data"\`.
+  "user_data".
+
+- pop_df:
+
+  Optional precalculated population dataframe.
 
 ## Value
 

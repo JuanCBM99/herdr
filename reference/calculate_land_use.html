@@ -70,7 +70,9 @@
 <span>  year <span class="op">=</span> <span class="fl">2024</span>,</span>
 <span>  max_trace_hops <span class="op">=</span> <span class="fl">4</span>,</span>
 <span>  ssr_threshold <span class="op">=</span> <span class="fl">0.7</span>,</span>
-<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span></span>
+<span>  data_dir <span class="op">=</span> <span class="st">"user_data"</span>,</span>
+<span>  DMI_df <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  population_df <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -105,7 +107,15 @@ above which a country is considered a genuine producer. Default is 0.70.</p></dd
 
 
 <dt id="arg-data-dir">data_dir<a class="anchor" aria-label="anchor" href="#arg-data-dir"></a></dt>
-<dd><p>Path to the directory containing input CSV/data files. Defaults to `"user_data"`.</p></dd>
+<dd><p>Path to the directory containing input CSV/data files. Defaults to "user_data".</p></dd>
+
+
+<dt id="arg-dmi-df">DMI_df<a class="anchor" aria-label="anchor" href="#arg-dmi-df"></a></dt>
+<dd><p>Optional precalculated DMI dataframe.</p></dd>
+
+
+<dt id="arg-population-df">population_df<a class="anchor" aria-label="anchor" href="#arg-population-df"></a></dt>
+<dd><p>Optional precalculated population dataframe.</p></dd>
 
 </dl></div>
 
