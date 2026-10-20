@@ -56,6 +56,9 @@ herdr_get_fao_crops_path <- function(data_dir = "user_data", download_if_missing
   if (download_if_missing) {
     url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_crops.parquet"
     message("\u23f3 FAO crops dataset not found locally. Downloading to central cache (24 MB)...")
+    old_timeout <- getOption("timeout")
+    on.exit(options(timeout = old_timeout), add = TRUE)
+    options(timeout = max(300, old_timeout))
     tryCatch({
       utils::download.file(url_release, destfile = cache_file, mode = "wb")
       message("\u2705 Download completed successfully.")
@@ -98,6 +101,9 @@ herdr_get_fao_trade_matrix_path <- function(data_dir = "user_data", download_if_
     url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_trade_matrix.parquet"
     message("\u23f3 FAO trade matrix not found locally.")
     message("Downloading background database (187 MB) to central cache... This will only happen once.")
+    old_timeout <- getOption("timeout")
+    on.exit(options(timeout = old_timeout), add = TRUE)
+    options(timeout = max(600, old_timeout))
     tryCatch({
       utils::download.file(url_release, destfile = cache_file, mode = "wb")
       message("\u2705 Download completed successfully.")
