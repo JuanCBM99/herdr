@@ -1,9 +1,9 @@
-#' FAO and Reference Data Cache Management
+#' Reference and External Datasets Management
 #'
-#' Functions to locate, cache, and manage large reference datasets (e.g., FAO crops,
-#' trade matrices, forages) in a user-level central cache directory.
+#' Functions to locate, cache, and manage external reference datasets
+#' (e.g., FAO crops, FAO trade matrices, MAPA forages, and ECOALIM feed LCA).
 #'
-#' @name fao_data_cache
+#' @name reference_data_cache
 #' @keywords internal
 NULL
 
@@ -138,4 +138,30 @@ herdr_get_forages_path <- function(data_dir = "user_data") {
   if (nzchar(bundled) && file.exists(bundled)) return(bundled)
 
   stop("Could not locate forages.parquet. Please provide it in '", data_dir, "' or reinstall herdr.")
+}
+
+#' Locate the ECOALIM feed LCA dataset (ecoalim.parquet)
+#'
+#' Checks in order:
+#' \enumerate{
+#'   \item Local data directory (\code{file.path(data_dir, "ecoalim.parquet")})
+#'   \item Package bundled extdata (\code{system.file("extdata", "ecoalim.parquet", package = "herdr")})
+#' }
+#'
+#' @source INRAE, ADEME, GIS REVALIM (2024). ECOALIM V9 dataset (EF 3.1).
+#'   Distributed under Licence Ouverte / Open Licence Etalab 2.0.
+#'   URL: \url{https://ecoalim.hub.inrae.fr/}
+#' @param data_dir Character. Path to the user data directory. Default is \code{"user_data"}.
+#' @return Absolute path to ECOALIM parquet file.
+#' @export
+herdr_get_ecoalim_path <- function(data_dir = "user_data") {
+  # 1. Local data directory
+  local_path <- file.path(data_dir, "ecoalim.parquet")
+  if (file.exists(local_path)) return(local_path)
+
+  # 2. Bundled extdata inside the package
+  bundled <- system.file("extdata", "ecoalim.parquet", package = "herdr")
+  if (nzchar(bundled) && file.exists(bundled)) return(bundled)
+
+  stop("Could not locate ecoalim.parquet. Please provide it in '", data_dir, "' or reinstall herdr.")
 }

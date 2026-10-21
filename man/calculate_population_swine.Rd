@@ -6,7 +6,7 @@
 \usage{
 calculate_population_swine(
   census_swine,
-  rate_parameters,
+  rate_parameters = NULL,
   definitions = NULL,
   weights = NULL,
   data_dir = "user_data"

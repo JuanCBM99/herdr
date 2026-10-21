@@ -6,7 +6,7 @@
 \usage{
 calculate_population_poultry(
   census_poultry,
-  rate_parameters,
+  rate_parameters = NULL,
   definitions = NULL,
   weights = NULL,
   data_dir = "user_data"

@@ -18,17 +18,17 @@ triticale,Triticale,"Triticale grain, conventional, national average, animal fee
 rice_cooked,Rice,NA,1
 corn_heat_processed,Wheat,NA,1
 white_sorghum_heat_processed,Wheat,NA,1
-rice_bran_14_ee,Rice,As wheat bran,0.0822
-rice_bran_high_fat_17_ee,Rice,As wheat bran,0.0822
-rice_bran_defatted,Rice,As wheat bran,0.0822
-barley_ddgs,Barley,As wheat ddgs,1
+rice_bran_14_ee,Rice,NA,0.0822
+rice_bran_high_fat_17_ee,Rice,NA,0.0822
+rice_bran_defatted,Rice,NA,0.0822
+barley_ddgs,Barley,NA,1
 corn_ddgs_7_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
 corn_ddgs_12_5_ee_3_5_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
 corn_ddgs_12_5_ee_6_8_starch,Maize (corn),"DDGS, dehydrated, from corn, animal feed, at plant {FR} U",1
-sorghum_ddgs,Sorghum,As wheat ddgs,1
+sorghum_ddgs,Sorghum,NA,1
 wheat_ddgs,Wheat,"DDGS, dehydrated, from wheat distillation, animal feed, at plant {FR} U",1
 brewers_grains,Grapes,NA,0
-corn_flour_6_ee,Maize (corn),As corn/maize,1
+corn_flour_6_ee,Maize (corn),"Maize starch, national average, animal feed, at plant {FR} U",1
 corn_gluten_feed_19_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
 corn_gluten_feed_20_5_cp,Maize (corn),"Corn gluten feed, national average, animal feed, at plant {FR} U",0.0878
 corn_gluten_meal_60,Maize (corn),"Corn gluten meal (gluten 60), national average, animal feed, at plant {FR} U",0.0832
@@ -36,34 +36,34 @@ wheat_bran_15_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {
 wheat_bran_20_starch,Wheat,"Wheat bran, from wheat starch extraction, at plant {FR} U",0.0822
 wheat_middlings_25_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
 wheat_middlings_30_starch,Wheat,"Wheat middlings, animal feed, at plant {FR} U",0.0077
-bakery_byproduct_2_5_ash,Wheat,As wheat,1
-bakery_byproduct_6_ash,Wheat,As wheat,1
-bread_byproduct,Wheat,As wheat,1
+bakery_byproduct_2_5_ash,Wheat,"Biscuit meal, animal feed, at retailer gate {FR} U",1
+bakery_byproduct_6_ash,Wheat,"Biscuit meal, animal feed, at retailer gate {FR} U",1
+bread_byproduct,Wheat,"Bread meal, animal feed, at retailer gate {FR} U",1
 malt_rootlets_barley_sprouts,Barley,NA,0
 whole_acorn,NA,NA,1
 acorn_decorticated,NA,NA,1
 tapioca_62_5,"Cassava, fresh",NA,1
 tapioca_65,"Cassava, fresh",NA,1
 tapioca_70,"Cassava, fresh",NA,1
-molasses_sugarcane,Sugar cane,As beet molasses,0.066
+molasses_sugarcane,Sugar cane,"Molasses, from sugarcane, from Brazil, at feed plant S {FR} U",0.066
 molasses_beet,Sugar beet,"Molasses, from sugar beet, animal feed, at plant {FR} U",0.066
 vinasses_beet,Sugar beet,"Vinasse, from sugar beet molasses, animal feed, at plant {FR} U",0.1476
 potato_dehydrated,Potatoes,NA,1
 sweet_potato_dehydrated,Sweet potatoes,NA,1
-cotton_seed_whole,"Seed cotton, unginned","Manually assigned (USA, FAO 2023 data)",0.2736
-cotton_seed_meal_38_cp,"Seed cotton, unginned",As sunflower meal without dehulling,0.189
+cotton_seed_whole,"Seed cotton, unginned",NA,0.2736
+cotton_seed_meal_38_cp,"Seed cotton, unginned",NA,0.189
 lupin_australian,Lupins,"Lupin, conventional, national average, at farm gate, production {FR} U",1
-peanut_meal_48_cp,"Groundnuts, excluding shelled",As sunflower meal without dehulling,0.189
-peanut_meal_52_cp,"Groundnuts, excluding shelled",As sunflower meal low dehulling,0.185
-camelina_meal,NA,As sunflower meal without dehulling,0.189
-camelina_meal_expeller,NA,As sunflower meal expeller with low dehulling,0.185
+peanut_meal_48_cp,"Groundnuts, excluding shelled","Groundnut meal, manual extraction, from Indonesia, at feed plant S {FR} U",0.189
+peanut_meal_52_cp,"Groundnuts, excluding shelled","Groundnut meal, manual extraction, from Indonesia, at feed plant S {FR} U",0.185
+camelina_meal,NA,NA,0.189
+camelina_meal_expeller,NA,NA,0.185
 rapeseed_meal_00,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
 rapeseed_meal_00_33_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
 rapeseed_meal_00_36_cp,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
 rapeseed_meal_00_expeller_7_3_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
 rapeseed_meal_00_expeller_12_7_ee,Rape or colza seed,"Rapeseed meal, conventional, animal feed, at plant {FR} U",0.217
-coprah_meal,"Coconuts, in shell",As sunflower meal without dehulling,0.189
-coprah_expeller,"Coconuts, in shell",As sunflower meal expeller with low dehulling,0.185
+coprah_meal,"Coconuts, in shell",NA,0.189
+coprah_expeller,"Coconuts, in shell",NA,0.185
 sunflower_seed,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
 sunflower_seed_high_oileic,Sunflower seed,"Sunflower grain, conventional, 9% moisture, national average, animal feed, at farm gate, production {FR} U",1
 sunflower_meal_28_cp,Sunflower seed,"Sunflower meal without dehulling, conventional, animal feed, at transformation plant {FR} U",0.189
@@ -77,8 +77,8 @@ horse_bean_white_flower_variety,"Broad beans and horse beans, dry",NA,1
 horse_bean_white_flower_variety_dehulled,"Broad beans and horse beans, dry",NA,1
 lentils,"Lentils, dry",NA,1
 linseed,Linseed,NA,1
-linseed_meal_expeller,Linseed,As sunflower meal expeller with low dehulling,0.185
-linseed_meal,Linseed,As sunflower meal without dehulling,0.189
+linseed_meal_expeller,Linseed,"Flaxseed meal, animal feed, at plant {FR} U",0.185
+linseed_meal,Linseed,"Flaxseed meal, animal feed, at plant {FR} U",0.189
 palm_kernel_expeller,Palm kernels,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
 palm_kernel_expeller_2,Palm kernels,"Palm kernel meal MY, animal feed, at french port, average {FR} U",0.0672
 roasted_soybeans,Soya beans,"Soybean toasted BR, animal feed, at french transformation plant {FR} U",1
@@ -103,13 +103,13 @@ alfalfa_hay_dehydrated,Alfalfa for forage and silage,"Alfalfa, conventional, for
 alfalfa_meal_17_5_cp,Alfalfa for forage and silage,NA,1
 alfalfa_meal_15_cp,Alfalfa for forage and silage,NA,1
 forage_meal_mix_12_5_cp,Alfalfa for forage and silage,NA,1
-cottonseed_hulls,"Seed cotton, unginned",As sunflower hulls,0.03
-rise_hulls,Rice,As sunflower hulls,0.03
-oat_hulls,Oats,As sunflower hulls,0.03
+cottonseed_hulls,"Seed cotton, unginned",NA,0.03
+rise_hulls,Rice,NA,0.03
+oat_hulls,Oats,NA,0.03
 sunflower_hulls,Sunflower seed,NA,0.03
-horse_bean_hulls_low_in_tannins,"Broad beans and horse beans, dry",As sunflower hulls,0.03
-soybean_hulls_10_cp,Soya beans,As sunflower hulls,0.03
-soybean_hulls_12_cp,Soya beans,As sunflower hulls,0.03
+horse_bean_hulls_low_in_tannins,"Broad beans and horse beans, dry",NA,0.03
+soybean_hulls_10_cp,Soya beans,NA,0.03
+soybean_hulls_12_cp,Soya beans,NA,0.03
 carob_bean,Locust beans (carobs),NA,0
 olive_leaves,Olives,NA,0
 olive_pulp,Olives,NA,0
@@ -158,10 +158,10 @@ whey_permeate,NA,"Whey, at plant {FR} U",0.0282
 butterfat,NA,NA,1
 tallow,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
 lard,NA,"Lard, from pig, animal feed, at retailer gate {FR} U",1
-animal_fat_3_5,NA,As tallow,1
-animal_fat_5_9,NA,As tallow,1
-animal_fat_9_12,NA,As tallow,1
-poultry_fat,NA,As tallow,1
+animal_fat_3_5,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+animal_fat_5_9,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+animal_fat_9_12,NA,"Tallow, from beef, animal feed, at retailer gate {FR} U",1
+poultry_fat,NA,"Fat, from broiler, animal feed, at retailer gate {FR} U",1
 chilean_fish_oil,NA,NA,1
 nordic_fish_oil,NA,"Fish oil, with wastewater treatment, from Norway, at feed plant S {FR} U",1
 fish_oil,NA,NA,1
@@ -171,12 +171,12 @@ corn_oil,Maize (corn),"Corn oil, national average, animal feed, at plant {FR} U"
 soybean_oil,Soya beans,"Soybean oil BR, crushing in France, animal feed, at french mill, average {FR} U",0.3854
 rapeseed_oil,Rape or colza seed,NA,1
 sunflower_oil,Sunflower seed,"Sunflower oil without dehulling, crude, conventional, animal feed, at transformation plant {FR} U",0.811
-high_oleic_sunflower_oil,Sunflower seed,As sunflower oil,0.811
+high_oleic_sunflower_oil,Sunflower seed,"Sunflower oil with high dehulling, crude, animal feed, at transformation plant {FR} U",0.811
 olive_oil,Olives,NA,NA
 palm_oil,Oil palm fruit,"Crude palm oil MY, animal feed, at french port, average {FR} U",0.9328
 coconut_oil,"Coconuts, in shell","Crude coconut oil, from Philippines, at feed plant {FR} U",1
 palm_stearin,Oil palm fruit,NA,1
-palm_kernel_oil,Oil palm fruit,As crude palm oil MY,0.9328
+palm_kernel_oil,Oil palm fruit,"Crude palm oil MY, animal feed, at french port, average {FR} U",0.9328
 linseed_oil,Linseed,NA,1
 peanut_oil,"Groundnuts, excluding shelled",NA,1
 crude_soybean_lecithins,Soya beans,NA,0

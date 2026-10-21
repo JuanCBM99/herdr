@@ -117,7 +117,8 @@ if(getRversion() >= "2.15.1") {
     "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
     "co2e_n2o_dir", "co2e_n2o_ind", "land_ha", "land_val", "functional_unit",
     "total_val", "label_text", "land_crop", "land_g_conv", "land_g_unco",
-    "land_other", "s",
+    "land_other", "s", "co2e_feed_fossil", "co2e_feed_luc", "total_cradle_co2e",
+    "fossil_val", "luc_val", "water_val", "total_ghg",
 
     # --- Functional Units and Intensities ---
     "GHG_intensity_protein", "Land_intensity_protein",
@@ -135,6 +136,26 @@ if(getRversion() >= "2.15.1") {
 
     # --- Protein Feed Efficiency and Human Food Security (Mottet et al. 2017) ---
     "Protein_FCR_total", "Protein_FCR_cropland",
-    "fcr_total", "fcr_cropland", "metric_raw", "metric"
+    "fcr_total", "fcr_cropland", "metric_raw", "metric",
+
+    # --- Feed LCA & Cradle-to-Farm Footprints (ECOALIM V9 & EF 3.1) ---
+    "feed_intake_fresh_kg", "CO2eq_feed_Gg", "CO2eq_feed_fossil_Gg", "CO2eq_feed_luc_Gg",
+    "Water_feed_m3", "CO2eq_cradle_to_farm_Gg",
+    "GHG_cradle_to_farm_milk", "Water_intensity_milk",
+    "GHG_cradle_to_farm_meat", "Water_intensity_meat",
+    "GHG_cradle_to_farm_wool", "Water_intensity_wool",
+    "GHG_cradle_to_farm_egg", "Water_intensity_egg",
+    "GHG_cradle_to_farm_protein", "Water_intensity_protein",
+    "GHG_cradle_to_farm_head", "Water_intensity_head",
+
+    # --- ECOALIM Feed Calculation Columns ---
+    "Feedstuff", "Simapro LCI name", "Types of feedstuffs for livestock",
+    "Climate change - EF 3.1 (kg CO2 eq)", "Climate change - Fossil (kg CO2 eq/kg)",
+    "Climate change - Land use and LU change (kg CO2 eq/kg)", "Water use (m3 depriv.)",
+    "annual_dmi_kg_head", "annual_dmi_kg_herd", "annual_fresh_kg_head", "annual_fresh_kg_herd",
+    "ecoalim_feedstuff", "ef_climate_fossil", "ef_climate_luc", "ef_climate_total", "ef_water",
+    "feed_CO2e_fossil_herd_kg", "feed_CO2e_fossil_kg_year", "feed_CO2e_herd_kg",
+    "feed_CO2e_luc_herd_kg", "feed_CO2e_luc_kg_year", "feed_CO2e_total_kg_year",
+    "feed_fresh_kg_year", "feed_water_herd_m3", "feed_water_m3_year"
   ))
 }

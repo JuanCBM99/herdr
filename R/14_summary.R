@@ -123,6 +123,23 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       .groups = "drop"
     )
 
+  feed_emiss <- calculate_feed_emissions(
+    automatic_cycle = automatic_cycle,
+    saveoutput = FALSE,
+    data_dir = data_dir,
+    DMI_df = dmi_data,
+    population_df = pop_data
+  ) %>%
+    dplyr::group_by(across(all_of(join_keys))) %>%
+    dplyr::summarise(
+      feed_intake_fresh_kg = sum(feed_fresh_kg_year, na.rm = TRUE),
+      CO2eq_feed_Gg = sum(feed_CO2e_total_kg_year, na.rm = TRUE) / 1e6,
+      CO2eq_feed_fossil_Gg = sum(feed_CO2e_fossil_kg_year, na.rm = TRUE) / 1e6,
+      CO2eq_feed_luc_Gg = sum(feed_CO2e_luc_kg_year, na.rm = TRUE) / 1e6,
+      Water_feed_m3 = sum(feed_water_m3_year, na.rm = TRUE),
+      .groups = "drop"
+    )
+
   # Nutritional variables (CP and Cropland CP)
   cp_summary <- cp_data %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
@@ -199,7 +216,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::select(-DMI_kgday, -neg_mj_kg, -fat_content_pct, -production_role, -CP_pct, -CP_cropland_pct)
 
   # 2. Consolidation
-  complete_summary <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u, prod_data) %>%
+  complete_summary <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u, feed_emiss, prod_data) %>%
     purrr::reduce(dplyr::full_join, by = join_keys) %>%
     dplyr::mutate(across(where(is.numeric), ~ tidyr::replace_na(., 0)))
 
@@ -232,12 +249,15 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       CO2eq_N2O_direct   = N2O_direct_Gg * n2o_factor,
       CO2eq_N2O_indirect = (N2O_vol_Gg + N2O_lea_Gg) * n2o_factor,
       CO2eq_N2O          = CO2eq_N2O_direct + CO2eq_N2O_indirect,
-      CO2eq_Total_Gg     = CO2eq_enteric + CO2eq_manure + CO2eq_N2O
+      CO2eq_Total_Gg     = CO2eq_enteric + CO2eq_manure + CO2eq_N2O,
+      CO2eq_cradle_to_farm_Gg = CO2eq_Total_Gg + CO2eq_feed_Gg
     )
 
   # 5b. Functional Units and Emission Intensities
   # Conversion: 1 Gg CO2e = 1e6 kg CO2e
   co2e_total_kg <- final_summary$CO2eq_Total_Gg * 1e6
+  co2e_cradle_kg <- final_summary$CO2eq_cradle_to_farm_Gg * 1e6
+  water_total_m3 <- final_summary$Water_feed_m3
   land_total_m2 <- final_summary$Land_m2
   feed_total_kg <- final_summary$feed_intake_kg
 
@@ -293,18 +313,38 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   # A) Milk
   ghg_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_milk) / milk_kg, 3), NA_real_)
   land_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((land_total_m2 * af_milk) / milk_kg, 2), NA_real_)
+  ghg_c2f_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((co2e_cradle_kg * af_milk) / milk_kg, 3), NA_real_)
+  water_milk <- dplyr::if_else(milk_kg > 0 & !is_non_milking_dairy, round((water_total_m3 * af_milk) / milk_kg, 3), NA_real_)
 
   # B) Meat
   ghg_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((co2e_total_kg * af_meat) / meat_kg, 3), NA_real_)
   land_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((land_total_m2 * af_meat) / meat_kg, 2), NA_real_)
+  ghg_c2f_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((co2e_cradle_kg * af_meat) / meat_kg, 3), NA_real_)
+  water_meat <- dplyr::if_else(meat_kg > 0 & !is_non_milking_dairy, round((water_total_m3 * af_meat) / meat_kg, 3), NA_real_)
 
   # C) Wool (only meat sheep breeds)
   ghg_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((co2e_total_kg * af_wool) / wool_kg, 3), NA_real_)
   land_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((land_total_m2 * af_wool) / wool_kg, 2), NA_real_)
+  ghg_c2f_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((co2e_cradle_kg * af_wool) / wool_kg, 3), NA_real_)
+  water_wool <- dplyr::if_else(wool_kg > 0 & af_wool > 0, round((water_total_m3 * af_wool) / wool_kg, 3), NA_real_)
 
   # D) Eggs
   ghg_egg <- dplyr::if_else(egg_kg > 0, round((co2e_total_kg * af_egg) / egg_kg, 3), NA_real_)
   land_egg <- dplyr::if_else(egg_kg > 0, round((land_total_m2 * af_egg) / egg_kg, 2), NA_real_)
+  ghg_c2f_egg <- dplyr::if_else(egg_kg > 0, round((co2e_cradle_kg * af_egg) / egg_kg, 3), NA_real_)
+  water_egg <- dplyr::if_else(egg_kg > 0, round((water_total_m3 * af_egg) / egg_kg, 3), NA_real_)
+
+  # Universal Nutritional and Per-Head FUs
+  ghg_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(co2e_total_kg / prot_kg, 3), NA_real_)
+  land_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(land_total_m2 / prot_kg, 2), NA_real_)
+  ghg_c2f_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(co2e_cradle_kg / prot_kg, 3), NA_real_)
+  water_protein <- dplyr::if_else(prot_kg > 0 & !is_non_milking_dairy, round(water_total_m3 / prot_kg, 2), NA_real_)
+
+  pop_n <- final_summary$population
+  ghg_head <- dplyr::if_else(pop_n > 0, round(co2e_total_kg / pop_n, 2), NA_real_)
+  land_head <- dplyr::if_else(pop_n > 0, round(land_total_m2 / pop_n, 1), NA_real_)
+  ghg_c2f_head <- dplyr::if_else(pop_n > 0, round(co2e_cradle_kg / pop_n, 2), NA_real_)
+  water_head <- dplyr::if_else(pop_n > 0, round(water_total_m3 / pop_n, 1), NA_real_)
 
   # 4) Protein Feed Conversion and Human Food Security (Mottet et al. 2017)
   feed_cp_tot <- final_summary$feed_CP_total_kg
@@ -327,21 +367,37 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       AF_wool                = round(af_wool, 4),
       AF_egg                 = round(af_egg, 4),
 
-      # Product-specific intensities
-      GHG_intensity_milk     = ghg_milk,
-      Land_intensity_milk    = land_milk,
-      GHG_intensity_meat     = ghg_meat,
-      Land_intensity_meat    = land_meat,
-      GHG_intensity_wool     = ghg_wool,
-      Land_intensity_wool    = land_wool,
-      GHG_intensity_egg      = ghg_egg,
-      Land_intensity_egg     = land_egg,
+      # On-Farm (Scope 1) Dedicated Product Intensities
+      GHG_intensity_milk          = ghg_milk,
+      Land_intensity_milk         = land_milk,
+      GHG_cradle_to_farm_milk     = ghg_c2f_milk,
+      Water_intensity_milk        = water_milk,
+
+      GHG_intensity_meat          = ghg_meat,
+      Land_intensity_meat         = land_meat,
+      GHG_cradle_to_farm_meat     = ghg_c2f_meat,
+      Water_intensity_meat        = water_meat,
+
+      GHG_intensity_wool          = ghg_wool,
+      Land_intensity_wool         = land_wool,
+      GHG_cradle_to_farm_wool     = ghg_c2f_wool,
+      Water_intensity_wool        = water_wool,
+
+      GHG_intensity_egg           = ghg_egg,
+      Land_intensity_egg          = land_egg,
+      GHG_cradle_to_farm_egg      = ghg_c2f_egg,
+      Water_intensity_egg         = water_egg,
 
       # Universal Nutritional and Per-Head FUs
-      GHG_intensity_protein  = ghg_protein,
-      Land_intensity_protein = land_protein,
-      GHG_intensity_head     = ghg_head,
-      Land_intensity_head    = land_head,
+      GHG_intensity_protein       = ghg_protein,
+      Land_intensity_protein      = land_protein,
+      GHG_cradle_to_farm_protein  = ghg_c2f_protein,
+      Water_intensity_protein     = water_protein,
+
+      GHG_intensity_head          = ghg_head,
+      Land_intensity_head         = land_head,
+      GHG_cradle_to_farm_head     = ghg_c2f_head,
+      Water_intensity_head        = water_head,
 
       # Protein Feed Conversion and Human Food Security (Mottet et al. 2017)
       Protein_FCR_total      = protein_fcr_total,
