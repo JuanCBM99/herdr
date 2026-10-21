@@ -75,6 +75,7 @@ build_herdr_sidebar <- function() {
           "Direct N2O from Manure" = "calculate_N2O_direct_manure",
           "Indirect N2O from Volatilization" = "calculate_N2O_indirect_volatilization",
           "Indirect N2O from Leaching" = "calculate_N2O_indirect_leaching",
+          "Feed Footprint (GHG & Water)" = "calculate_feed_emissions",
           "Land Use Requirement" = "calculate_land_use"
         )
       )),

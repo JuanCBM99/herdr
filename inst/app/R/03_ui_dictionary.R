@@ -377,7 +377,7 @@ build_dictionary_panel <- function() {
               id = "dict-mapping",
               class = "mb-4",
               h5(tagList(icon("diagram-project"), " 11. Mapping (mapping.csv)"), class = "fw-bold text-info border-bottom pb-2"),
-              p(class = "text-muted small mb-3", "Cross-database links connecting internal feed ingredients with international databases (FAOSTAT and AGRIBALYSE v3.1 LCA)."),
+              p(class = "text-muted small mb-3", "Cross-database links connecting internal feed ingredients with international databases (FAOSTAT, AGRIBALYSE v3.1, and INRAE/ADEME ECOALIM V9 LCA)."),
               tags$dl(
                 class = "row small",
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient")),
@@ -385,7 +385,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("yield_name")),
                 tags$dd(class = "col-sm-9", "Corresponding FAOSTAT commodity name used for national crop yield lookups."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("agribalyse_name")),
-                tags$dd(class = "col-sm-9", "AGRIBALYSE v3.1 LCA database process name for upstream feed carbon footprint."),
+                tags$dd(class = "col-sm-9", "ECOALIM V9 / AGRIBALYSE v3.1 LCA database process name for upstream feed carbon and water footprint."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("economic_allocation")),
                 tags$dd(class = "col-sm-9", "Economic allocation fraction applied to co-products (between 0 and 1).")
               )

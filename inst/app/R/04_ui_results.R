@@ -25,35 +25,80 @@ build_results_panel <- function() {
               options = list(plugins = list('remove_button'))
             )
           ),
+          # --- Controls for Full Assessment (generate_impact_assessment) ---
           conditionalPanel(
             condition = "input.function_choice == 'generate_impact_assessment'",
             class = "col-md-3",
             selectInput(
-              "plot_functional_unit",
-              "Functional Unit / Metric:",
+              "plot_impact_category",
+              "Impact Category:",
               choices = c(
-                "Total Emissions & Land"               = "total",
-                "Per kg Edible Protein"                = "protein",
-                "Per Commercial Product"               = "product",
-                "Per Animal Head"                      = "head",
-                "Protein Feed Efficiency (Mottet FCR)" = "fcr"
+                "Carbon Footprint (GHG)"          = "ghg",
+                "Land Footprint (Land Use)"        = "land",
+                "Water Deprivation (AWARE / EF 3.1)" = "water",
+                "Multi-Impact Overview"            = "overview",
+                "Protein Feed Efficiency (Mottet)"  = "fcr"
+              ),
+              selected = "ghg"
+            )
+          ),
+          conditionalPanel(
+            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'overview' && input.plot_impact_category != 'fcr'",
+            class = "col-md-3",
+            selectInput(
+              "plot_functional_unit",
+              "Functional Unit / Scale:",
+              choices = c(
+                "Total Farm / Herd"      = "total",
+                "Per Commercial Product" = "product",
+                "Per kg Edible Protein"  = "protein",
+                "Per Animal Head"        = "head"
               ),
               selected = "total"
             )
           ),
           conditionalPanel(
-            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_functional_unit == 'product'",
-            class = "col-md-3",
+            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'overview' && input.plot_impact_category != 'fcr' && input.plot_functional_unit == 'product'",
+            class = "col-md-2",
             selectInput(
               "plot_product_subchoice",
-              "Commercial Product:",
+              "Product:",
               choices = c(
-                "Milk (kg FPCM)"         = "milk",
-                "Meat (kg Carcass)"      = "meat",
-                "Wool (kg Greasy Wool)"  = "wool",
-                "Eggs (kg Fresh Eggs)"   = "egg"
+                "Milk (FPCM)"     = "milk",
+                "Meat (Carcass)"  = "meat",
+                "Eggs (Fresh)"    = "egg",
+                "Wool (Greasy)"   = "wool"
               ),
               selected = "milk"
+            )
+          ),
+
+          # --- Controls for Feed Footprint (calculate_feed_emissions) ---
+          conditionalPanel(
+            condition = "input.function_choice == 'calculate_feed_emissions'",
+            class = "col-md-3",
+            selectInput(
+              "plot_feed_metric",
+              "Feed Impact Metric:",
+              choices = c(
+                "Feed GHG (Fossil vs LUC)" = "ghg",
+                "Feed Water Deprivation"   = "water",
+                "Multi-Impact Overview"    = "overview"
+              ),
+              selected = "ghg"
+            )
+          ),
+          conditionalPanel(
+            condition = "input.function_choice == 'calculate_feed_emissions' && input.plot_feed_metric != 'overview'",
+            class = "col-md-3",
+            selectInput(
+              "plot_feed_scale",
+              "Scale:",
+              choices = c(
+                "Total Herd Annual" = "total",
+                "Per Animal Head"   = "head"
+              ),
+              selected = "total"
             )
           ),
           div(

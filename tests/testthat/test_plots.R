@@ -186,5 +186,64 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_s3_class(p_fu_fcr, "ggplot")
   expect_match(p_fu_fcr$labels$title, "Protein Feed Efficiency")
   expect_true("Cropland Protein FCR (Human Competition)" %in% levels(p_fu_fcr$data$metric))
+
+  # 14. Assertions: Standalone Feed Environmental Footprint plot (calculate_feed_emissions)
+  feed_res_df <- data.frame(
+    animal_tag = c("dairy_cow", "beef_heifer"),
+    region = c("Europe", "Europe"),
+    subregion = c("Spain", "Spain"),
+    class_flex = c("dairy", "beef"),
+    population = c(100, 50),
+    feed_dmi_kg_year = c(700000, 150000),
+    feed_fresh_kg_year = c(1800000, 350000),
+    feed_CO2e_total_kg_year = c(450000, 90000),
+    feed_CO2e_fossil_kg_year = c(250000, 60000),
+    feed_CO2e_luc_kg_year = c(200000, 30000),
+    feed_water_m3_year = c(85000, 12000),
+    feed_CO2e_per_head_year = c(4500, 1800),
+    feed_water_per_head_year = c(850, 240)
+  )
+  p_feed <- plot_herdr_results(feed_res_df, group_cols = "animal_tag", func_name = "calculate_feed_emissions")
+  expect_s3_class(p_feed, "ggplot")
+  expect_match(p_feed$labels$title, "Feed Environmental Footprint")
+  expect_true("Feed GHG Emissions (t CO2e)" %in% levels(p_feed$data$panel))
+  expect_true("Water Deprivation (m³ depriv.)" %in% levels(p_feed$data$panel))
+  expect_true("Fossil & Inputs" %in% levels(p_feed$data$component))
+  expect_true("LUC Deforestation" %in% levels(p_feed$data$component))
+
+  p_feed_head <- plot_herdr_results(feed_res_df, group_cols = "animal_tag", func_name = "calculate_feed_emissions", functional_unit = "head")
+  expect_s3_class(p_feed_head, "ggplot")
+  expect_true("Feed GHG per Head (kg CO2e / head)" %in% levels(p_feed_head$data$panel))
+
+  # 15. Assertions: Cradle-to-Farm-Gate Scope 1 + Scope 3 LCA Breakdown
+  cradle_df <- impact_breakdown_df %>%
+    dplyr::mutate(
+      CO2eq_feed_fossil_Gg = c(0.45, 0.12),
+      CO2eq_feed_luc_Gg    = c(0.30, 0.05),
+      CO2eq_feed_Gg        = c(0.75, 0.17),
+      Water_feed_m3        = c(85000, 15000)
+    )
+  p_cradle <- plot_herdr_results(cradle_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "cradle_breakdown")
+  expect_s3_class(p_cradle, "ggplot")
+  expect_match(p_cradle$labels$title, "Cradle-to-Farm-Gate")
+  expect_true("Cradle-to-Farm GHG (Gg CO2e)" %in% levels(p_cradle$data$panel))
+  expect_true("Land Footprint (ha)" %in% levels(p_cradle$data$panel))
+  expect_true("Water Deprivation (Mm³ depriv.)" %in% levels(p_cradle$data$panel))
+  expect_true("Feed Fossil GHG" %in% levels(p_cradle$data$component))
+  expect_true("Feed LUC Deforestation" %in% levels(p_cradle$data$component))
+
+  # 16. Assertions: Dedicated Water Deprivation Footprint
+  p_water_tot <- plot_herdr_results(cradle_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "water")
+  expect_s3_class(p_water_tot, "ggplot")
+  expect_match(p_water_tot$labels$title, "Water Deprivation Footprint")
+
+  cradle_intensities_df <- cradle_df %>%
+    dplyr::mutate(
+      Water_intensity_protein = c(0.35, 0.18),
+      Water_intensity_head    = c(85.0, 3.0)
+    )
+  p_water_prot <- plot_herdr_results(cradle_intensities_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "water_protein")
+  expect_s3_class(p_water_prot, "ggplot")
+  expect_match(p_water_prot$labels$x, "Water Intensity")
 })
 

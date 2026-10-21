@@ -660,26 +660,41 @@ herdr_server <- function(input, output, session) {
   current_plot <- reactive({
     req(model_data(), input$plot_groups)
 
-    fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
-    if (fu == "product") {
-      if (!is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "" && input$plot_product_subchoice != "product") {
-        fu <- input$plot_product_subchoice
+    func_name <- input$function_choice
+    impact_cat <- "ghg"
+    fu <- "total"
+
+    if (identical(func_name, "generate_impact_assessment")) {
+      impact_cat <- if (!is.null(input$plot_impact_category)) input$plot_impact_category else "ghg"
+      if (impact_cat %in% c("fcr", "overview")) {
+        fu <- impact_cat
       } else {
-        df <- model_data()
-        if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
-          fu <- "milk"
-        } else {
-          fu <- "meat"
+        fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
+        if (fu == "product") {
+          if (!is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "" && input$plot_product_subchoice != "product") {
+            fu <- input$plot_product_subchoice
+          } else {
+            df <- model_data()
+            if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
+              fu <- "milk"
+            } else {
+              fu <- "meat"
+            }
+          }
         }
       }
+    } else if (identical(func_name, "calculate_feed_emissions")) {
+      impact_cat <- if (!is.null(input$plot_feed_metric)) input$plot_feed_metric else "ghg"
+      fu <- if (!is.null(input$plot_feed_scale)) input$plot_feed_scale else "total"
     }
 
     herdr::plot_herdr_results(
       df = model_data(),
       group_cols = input$plot_groups,
-      func_name = input$function_choice,
+      func_name = func_name,
       gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5",
-      functional_unit = fu
+      functional_unit = fu,
+      impact_category = impact_cat
     )
   })
 
