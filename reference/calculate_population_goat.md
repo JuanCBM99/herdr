@@ -10,7 +10,7 @@ kids.
 ``` r
 calculate_population_goat(
   census_goat,
-  rate_parameters,
+  rate_parameters = NULL,
   definitions = NULL,
   weights = NULL,
   data_dir = "user_data"

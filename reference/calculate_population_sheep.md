@@ -10,7 +10,7 @@ lambs.
 ``` r
 calculate_population_sheep(
   census_sheep,
-  rate_parameters,
+  rate_parameters = NULL,
   definitions = NULL,
   weights = NULL,
   data_dir = "user_data"

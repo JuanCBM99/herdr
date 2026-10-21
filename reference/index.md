@@ -28,6 +28,8 @@
   : Calculate Net Energy for Maintenance (NEm)
 - [`calculate_emissions_enteric()`](https://juancbm99.github.io/herdr/reference/calculate_emissions_enteric.md)
   : Calculate methane emissions from enteric fermentation
+- [`calculate_feed_emissions()`](https://juancbm99.github.io/herdr/reference/calculate_feed_emissions.md)
+  : Calculate Feed Environmental Footprint (GHG Emissions and Water Use)
 - [`calculate_ge()`](https://juancbm99.github.io/herdr/reference/calculate_ge.md)
   : Calculate Gross Energy (GE)
 - [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
@@ -56,6 +58,8 @@
   : Summarize CH4, N2O Emissions, and Land Use
 - [`herdr_cache_dir()`](https://juancbm99.github.io/herdr/reference/herdr_cache_dir.md)
   : Get herdr user data cache directory
+- [`herdr_get_ecoalim_path()`](https://juancbm99.github.io/herdr/reference/herdr_get_ecoalim_path.md)
+  : Locate the ECOALIM feed LCA dataset (ecoalim.parquet)
 - [`herdr_get_fao_crops_path()`](https://juancbm99.github.io/herdr/reference/herdr_get_fao_crops_path.md)
   : Locate or download the FAO crops dataset (fao_crops.parquet)
 - [`herdr_get_fao_trade_matrix_path()`](https://juancbm99.github.io/herdr/reference/herdr_get_fao_trade_matrix_path.md)

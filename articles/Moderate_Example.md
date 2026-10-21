@@ -15,7 +15,7 @@ South) to improve precision over a single national figure.
 | Category | Files |
 |:---|:---|
 | **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
-| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` |
+| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` · `ecoalim.parquet` |
 
 Full details on every file above are in the [Technical
 Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)

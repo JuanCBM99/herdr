@@ -49,6 +49,7 @@
 <li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Water_and_Feed_Footprint.html">Feed Water &amp; Carbon Footprint (AWARE)</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul>
 </li>
@@ -100,9 +101,10 @@
 </h2>
 <p><strong><code>herdr</code></strong> is an integrated computational
 framework in R for modeling <strong>greenhouse gas (GHG)
-emissions</strong>, <strong>agricultural land competition</strong>, and
-<strong>nutritional edible protein</strong> across livestock production
-systems.</p>
+emissions</strong>, <strong>feed environmental footprints &amp; water
+deprivation</strong>, <strong>agricultural land competition</strong>,
+and <strong>nutritional edible protein</strong> across livestock
+production systems.</p>
 <p>Most existing calculators evaluate emissions or feed land
 requirements in isolation. <code>herdr</code> bridges animal physiology,
 nutritional energy balances, herd demography, manure management, and
@@ -119,8 +121,12 @@ modeling engine</strong>.</p>
 │  1. IPCC TIER 2 GHGs     │  2. AGROECOLOGICAL LAND     │  3. FOOD PRODUCTIVITY &amp; FCR   │
 │  • Enteric CH4           │  • Cropland vs Grassland    │  • GLEAM Milk, Meat, Eggs     │
 │  • Manure CH4            │  • Mottet (2017) Framework  │  • IDF (2022) Physical Alloc. │
-│  • Direct &amp; Indirect N2O │  • FAOSTAT Bilateral Trade  │  • 3 Feed Conversion Ratios   │
-└──────────────────────────┴─────────────────────────────┴───────────────────────────────┘</code></pre>
+│  • Direct &amp; Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Mottet (2017) Protein FCRs │
+├──────────────────────────┴─────────────────────────────┴───────────────────────────────┤
+│  4. UPSTREAM FEED LCA &amp; WATER DEPRIVATION (EF 3.1)                                     │
+│  • ECOALIM v9 &amp; AGRIBALYSE v3.1 (Fossil vs. LUC CO2e)                                  │
+│  • AWARE Freshwater Deprivation (m3 depriv. / Mm3 depriv.)                             │
+└────────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
 <ol style="list-style-type: decimal">
 <li>
 <strong>IPCC Tier 2 Greenhouse Gas Inventories:</strong> Implements
@@ -150,6 +156,13 @@ Efficiency (Mottet et al., 2017):</strong> Applies the updated
 Net Energy physical allocation and reports protein conversion and human
 food competition metrics (<code>Protein_FCR_total</code> and
 <code>Protein_FCR_cropland</code>).</li>
+<li>
+<strong>Upstream Feed LCA &amp; Water Deprivation (EF 3.1 /
+AWARE):</strong> Integrates INRAE/ADEME <strong>ECOALIM v9</strong> to
+evaluate upstream feed carbon footprints (fossil emissions
+vs. deforestation LUC) and freshwater deprivation
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.}</annotation></semantics></math>)
+characterized via the international <strong>AWARE</strong> model.</li>
 </ol>
 <hr>
 </div>
@@ -276,40 +289,47 @@ trade tracing operate.</td>
 </tr>
 <tr class="even">
 <td align="left"></td>
+<td align="left"><a href="Water_and_Feed_Footprint.html">Feed Footprints
+&amp; Water Deprivation</a></td>
+<td align="left">Upstream feed GHG (fossil vs. LUC) and AWARE water
+scarcity metrics.</td>
+</tr>
+<tr class="odd">
+<td align="left"></td>
 <td align="left"><a href="Adding_Ingredient.html">Adding a Custom Feed
 Ingredient</a></td>
 <td align="left">How to expand nutritional and LCA reference databases
 with custom feedstuffs.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><strong>Case Studies</strong></td>
 <td align="left"><a href="Easy_Example.html">1. Dairy Cattle
 (Basic)</a></td>
 <td align="left">Single-farm assessment highlighting FPCM and IDF
 co-product allocation.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"></td>
 <td align="left"><a href="Moderate_Example.html">2. Regional Variations
 (Moderate)</a></td>
 <td align="left">Multi-farm spatial stratification across diverse
 climatic regions.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"></td>
 <td align="left"><a href="Difficult_Example.html">3. Intensive
 Multi-Cohort AAP (Advanced)</a></td>
 <td align="left">High-throughput batch rearing in swine and poultry
 systems.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><strong>Methodology &amp; Reference</strong></td>
 <td align="left"><a href="Technical_reference.html">Technical Data
 Dictionary</a></td>
 <td align="left">Comprehensive field-by-field schema of all CSV
 templates and background databases.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"></td>
 <td align="left"><a href="Theoretical_basis.html">Theoretical
 Basis</a></td>

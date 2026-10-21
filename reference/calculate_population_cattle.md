@@ -9,7 +9,7 @@ period durations.
 ``` r
 calculate_population_cattle(
   census_cattle,
-  rate_parameters,
+  rate_parameters = NULL,
   definitions = NULL,
   weights = NULL,
   data_dir = "user_data"

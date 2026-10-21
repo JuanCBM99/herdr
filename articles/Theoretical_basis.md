@@ -898,15 +898,16 @@ efficiency and human food security via two key indicators:
 [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)
 and
 [`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
-support five functional units for benchmarking:
+support standardized functional units across all three environmental
+impact dimensions:
 
-| Functional Unit (`functional_unit`) | GHG Emissions Metric | Land Footprint Metric | Allocation / Normalization |
-|:---|:---|:---|:---|
-| **`total`** (Default) | Absolute Gg $`\text{CO}_2\text{e}`$ | Absolute hectares (ha) | Whole-inventory absolute footprint |
-| **`product`** | kg $`\text{CO}_2\text{e}`$ / kg commercial product | $`\text{m}^2`$ / kg commercial product | IDF Net Energy physical allocation for dairy |
-| **`protein`** | kg $`\text{CO}_2\text{e}`$ / kg edible protein | $`\text{m}^2`$ / kg edible protein | Total human edible protein output |
-| **`head`** | kg $`\text{CO}_2\text{e}`$ / head / year | $`\text{m}^2`$ / head / year | Annual average population (AAP) |
-| **`fcr`** | Total Protein FCR (Biological) | Cropland Protein FCR (Human Competition) | Mottet et al. (2017) feed protein conversion ratio (threshold line at 1.0) |
+| Functional Unit (`functional_unit`) | GHG Emissions Metric | Land Footprint Metric | Water Deprivation Metric (AWARE / EF 3.1) | Allocation / Normalization |
+|:---|:---|:---|:---|:---|
+| **`total`** (Default) | Absolute Gg $`\text{CO}_2\text{e}`$ | Absolute hectares (ha) | Absolute $`\text{Mm}^3\text{ depriv.}`$ ($`10^6\text{ m}^3\text{ depriv.} = 1\text{ hm}^3`$) | Whole-inventory absolute footprint |
+| **`product`** | kg $`\text{CO}_2\text{e}`$ / kg commercial product | $`\text{m}^2`$ / kg commercial product | $`\text{m}^3\text{ depriv.}`$ / kg commercial product | IDF Net Energy physical allocation for dairy |
+| **`protein`** | kg $`\text{CO}_2\text{e}`$ / kg edible protein | $`\text{m}^2`$ / kg edible protein | $`\text{m}^3\text{ depriv.}`$ / kg edible protein | Total human edible protein output |
+| **`head`** | kg $`\text{CO}_2\text{e}`$ / head / year | $`\text{m}^2`$ / head / year | $`\text{m}^3\text{ depriv.}`$ / head / year | Annual average population (AAP) |
+| **`fcr`** | Total Protein FCR (Biological) | Cropland Protein FCR (Human Competition) | — | Mottet et al. (2017) feed protein conversion ratio (threshold at 1.0) |
 
 ### 4. Agroecological Land Footprint Breakdown
 
@@ -922,21 +923,97 @@ based on the feed competition framework (Mottet et al., 2017):
 - **`Land_other_m2`:** Silvopastoral zones, fallow, farm infrastructure,
   or unclassified land.
 
+### 5. Feed Upstream Life Cycle Assessment (GHG & Water Deprivation)
+
+For each feed ingredient $`i`$, upstream environmental burdens are
+quantified using the **INRAE / ADEME ECOALIM v9** (EF 3.1) database.
+
+#### 5.1 Fresh Feed Intake ($`Fresh_i`$)
+
+Life cycle emission factors are reported per kilogram of fresh weight as
+fed:
+
+**Formula:**
+``` math
+Fresh_i = \frac{AnnualConsumption_i}{\left( \frac{DM\_pct_i}{100} \right)} \quad (\text{kg fresh / head / year})
+```
+
+| Variable | Description | Source in the Package |
+|:---|:---|:---|
+| $`Fresh_i`$ | Annual fresh feed intake per animal (kg fresh/year) | Calculated |
+| $`AnnualConsumption_i`$ | Annual dry matter intake of ingredient $`i`$ | Result of Section V.2.C |
+| $`DM\_pct_i`$ | Dry matter percentage of ingredient $`i`$ (%) | `feed_characteristics.csv` |
+
+#### 5.2 Water Deprivation Footprint ($`Water_i`$)
+
+Freshwater deprivation characterized via the international **AWARE**
+model (EF 3.1):
+
+**Formula:**
+``` math
+WaterPerAnimal_i = Fresh_i \cdot EF_{water, i} \quad (\text{m}^3\text{ depriv. / head / year})
+```
+``` math
+TotalWater_i = WaterPerAnimal_i \cdot AAP \quad (\text{m}^3\text{ depriv. / year})
+```
+
+| Variable | Description | Source in the Package |
+|:---|:---|:---|
+| $`WaterPerAnimal_i`$ | Water deprivation per head ($`\text{m}^3\text{ depriv.}`$) | Calculated |
+| $`TotalWater_i`$ | Total cohort water deprivation ($`\text{m}^3\text{ depriv.}`$) | Calculated |
+| $`Fresh_i`$ | Annual fresh feed intake (kg) | Result of Eq. 5.1 |
+| $`EF_{water, i}`$ | Water deprivation characterization factor (`Water use (m3 depriv.)`) | `ecoalim.parquet` |
+| $`AAP`$ | Annual Average Population | `livestock_census.csv` |
+
+#### 5.3 Feed Greenhouse Gas Emissions ($`GHG_i`$)
+
+Cradle-to-farm-gate feed greenhouse gas emissions partitioned by origin:
+
+**Formula:**
+``` math
+GHGPerAnimal_i = Fresh_i \cdot EF_{climate, i} \quad (\text{kg CO}_2\text{e / head / year})
+```
+``` math
+TotalGHG_i = GHGPerAnimal_i \cdot AAP \quad (\text{kg CO}_2\text{e / year})
+```
+
+- **Fossil inputs:**
+  $`GHG_{\text{fossil}, i} = Fresh_i \cdot EF_{\text{fossil}, i}`$
+- **Land-use change / deforestation:**
+  $`GHG_{\text{luc}, i} = Fresh_i \cdot EF_{\text{luc}, i}`$
+
+| Variable | Description | Source in the Package |
+|:---|:---|:---|
+| $`GHGPerAnimal_i`$ | Feed GHG emissions per head ($`\text{kg CO}_2\text{e}`$) | Calculated |
+| $`TotalGHG_i`$ | Total cohort feed GHG emissions ($`\text{kg CO}_2\text{e}`$) | Calculated |
+| $`Fresh_i`$ | Annual fresh feed intake (kg) | Result of Eq. 5.1 |
+| $`EF_{climate, i}`$ | Climate change characterization factor (`Climate change - EF 3.1`) | `ecoalim.parquet` |
+| $`EF_{\text{fossil}, i}`$ | Fossil climate change factor (`Climate change - Fossil`) | `ecoalim.parquet` |
+| $`EF_{\text{luc}, i}`$ | Land-use change factor (`Climate change - Land use and LU change`) | `ecoalim.parquet` |
+| $`AAP`$ | Annual Average Population | `livestock_census.csv` |
+
 ------------------------------------------------------------------------
 
 #### 📚 References
 
-- IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National
-  Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
+- Boulay, A.-M., et al. (2018). *The WULCA-consensus characterization
+  model for water scarcity footprint: assessing impacts of water
+  consumption based on available water remaining (AWARE)*. **The
+  International Journal of Life Cycle Assessment**, 23(2), 368–378.
+- European Commission (2021). *Commission Recommendation (EU) 2021/2279
+  on the use of Environmental Footprint methods*. **Official Journal of
+  the European Union**, L 471, 1–396.
 - FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM)
   v3.0: Model description*. Food and Agriculture Organization of the
   United Nations, Rome.
-- IDF (2015). *A common carbon footprint approach for the dairy sector:
-  The green house gas emissions from dairy and beef production*.
-  International Dairy Federation Bulletin 479/2015.
 - IDF (2022). *The C-footprint of dairy: Updated IDF standard for carbon
   footprinting of the dairy sector*. International Dairy Federation
   Bulletin 520/2022.
+- INRAE (2023). *ECOALIM dataset v9: Life Cycle Assessment datasets for
+  animal feed ingredients*. Institut National de Recherche pour
+  l’Agriculture, l’Alimentation et l’Environnement (INRAE).
+- IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National
+  Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
 - Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., &
   Gerber, P. (2017). *More fuel than food: Global food security and the
   role of livestock feed*. **Global Food Security**, 14, 1–8.

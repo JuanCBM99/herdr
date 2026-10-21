@@ -187,12 +187,30 @@ Connects diet ingredients to statutory crop yield statistics and Life
 Cycle Assessment databases: \* `ingredient`: Name in
 `feed_characteristics.csv`. \* `yield_name`: Item name in FAOSTAT
 (`fao_crops.parquet`) or forage database (`forages.parquet`). \*
-`agribalyse_name`: Matching process in the Agribalyse v3.1 LCA database.
-\* `economic_allocation`: Fraction (0.0 to 1.0) of crop cultivation area
-allocated to this co-product (e.g. 0.80 for cereal grain vs. 0.20 for
-straw).
+`agribalyse_name`: Matching process in the INRAE / ADEME ECOALIM v9 and
+AGRIBALYSE v3.1 LCA databases. \* `economic_allocation`: Fraction (0.0
+to 1.0) of crop cultivation area allocated to this co-product (e.g. 0.80
+for cereal grain vs. 0.20 for straw).
 
-#### 3. `forages.parquet` — Curated National Forage Database
+#### 3. `ecoalim.parquet` — Feed Life Cycle Inventory Database
+
+Bundled reference database containing environmental characterization
+factors from **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1** under
+the European Commission’s **Environmental Footprint (EF 3.1)** standard:
+\* `Climate change - Fossil (kg CO2 eq/kg)`: Fossil greenhouse gas
+emissions per kg of feed fresh weight. \*
+`Climate change - Land use and LU change (kg CO2 eq/kg)`: Direct
+land-use change / deforestation greenhouse gas emissions per kg fresh
+weight. \* `Water use (m3 depriv.)`: Freshwater deprivation
+characterized with the international **AWARE** model
+($`m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}`$ fresh weight).
+\* Powers
+[`calculate_feed_emissions()`](https://juancbm99.github.io/herdr/reference/calculate_feed_emissions.md),
+cradle-to-farm-gate breakdowns in
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md),
+and dedicated feed environmental footprint visualizations.
+
+#### 4. `forages.parquet` — Curated National Forage Database
 
 Official national forage productivities from the Spanish Ministry of
 Agriculture (**MAPA 2024**, Anuario de Estadística Agraria) and BC3
@@ -201,7 +219,7 @@ Mediterranean, and Mountain pastures, annual silages, and hays. \*
 Serves as statutory proxy fallback when international studies lack local
 pasture productivity data.
 
-#### 4. `fao_crops.parquet` — Statutory Crop Yields (Auto-Downloaded)
+#### 5. `fao_crops.parquet` — Statutory Crop Yields (Auto-Downloaded)
 
 Auto-downloaded crop productivity database (~24 MB) queried from FAOSTAT
 Production statistics across countries and reporting years (kg fresh
@@ -209,7 +227,7 @@ weight/ha, automatically converted to dry matter via `DM_pct`).
 Downloaded automatically from GitHub Releases to the central user cache
 upon first requirement to keep the core package lightweight.
 
-#### 5. `fao_trade_matrix.parquet` — Dynamic Trade Background (Auto-Downloaded)
+#### 6. `fao_trade_matrix.parquet` — Dynamic Trade Background (Auto-Downloaded)
 
 Auto-downloaded international bilateral trade matrix (~187 MB) recording
 export and import flows. Downloaded automatically from GitHub Releases

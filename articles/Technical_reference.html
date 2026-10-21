@@ -49,6 +49,7 @@
 <li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Water_and_Feed_Footprint.html">Feed Water &amp; Carbon Footprint (AWARE)</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul>
 </li>
@@ -891,13 +892,34 @@ Cycle Assessment databases: * <code>ingredient</code>: Name in
 <code>feed_characteristics.csv</code>. * <code>yield_name</code>: Item
 name in FAOSTAT (<code>fao_crops.parquet</code>) or forage database
 (<code>forages.parquet</code>). * <code>agribalyse_name</code>: Matching
-process in the Agribalyse v3.1 LCA database. *
-<code>economic_allocation</code>: Fraction (0.0 to 1.0) of crop
-cultivation area allocated to this co-product (e.g. 0.80 for cereal
+process in the INRAE / ADEME ECOALIM v9 and AGRIBALYSE v3.1 LCA
+databases. * <code>economic_allocation</code>: Fraction (0.0 to 1.0) of
+crop cultivation area allocated to this co-product (e.g. 0.80 for cereal
 grain vs. 0.20 for straw).</p>
 </div>
 <div class="section level4">
-<h4 id="forages-parquet-curated-national-forage-database">3. <code>forages.parquet</code> — Curated National Forage
+<h4 id="ecoalim">3. <code>ecoalim.parquet</code> — Feed Life Cycle Inventory
+Database<a class="anchor" aria-label="anchor" href="#ecoalim"></a>
+</h4>
+<p>Bundled reference database containing environmental characterization
+factors from <strong>INRAE / ADEME ECOALIM v9</strong> and
+<strong>AGRIBALYSE v3.1</strong> under the European Commission’s
+<strong>Environmental Footprint (EF 3.1)</strong> standard: *
+<code>Climate change - Fossil (kg CO2 eq/kg)</code>: Fossil greenhouse
+gas emissions per kg of feed fresh weight. *
+<code>Climate change - Land use and LU change (kg CO2 eq/kg)</code>:
+Direct land-use change / deforestation greenhouse gas emissions per kg
+fresh weight. * <code>Water use (m3 depriv.)</code>: Freshwater
+deprivation characterized with the international <strong>AWARE</strong>
+model
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow><mo>=</mo><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> world-eq</mtext></mrow><mi>/</mi><mtext mathvariant="normal">kg</mtext></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}</annotation></semantics></math>
+fresh weight). * Powers <code><a href="../reference/calculate_feed_emissions.html">calculate_feed_emissions()</a></code>,
+cradle-to-farm-gate breakdowns in
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>, and dedicated feed
+environmental footprint visualizations.</p>
+</div>
+<div class="section level4">
+<h4 id="forages-parquet-curated-national-forage-database">4. <code>forages.parquet</code> — Curated National Forage
 Database<a class="anchor" aria-label="anchor" href="#forages-parquet-curated-national-forage-database"></a>
 </h4>
 <p>Official national forage productivities from the Spanish Ministry of
@@ -908,7 +930,7 @@ hays. * Serves as statutory proxy fallback when international studies
 lack local pasture productivity data.</p>
 </div>
 <div class="section level4">
-<h4 id="fao_crops">4. <code>fao_crops.parquet</code> — Statutory Crop Yields
+<h4 id="fao_crops">5. <code>fao_crops.parquet</code> — Statutory Crop Yields
 (Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_crops"></a>
 </h4>
 <p>Auto-downloaded crop productivity database (~24 MB) queried from
@@ -919,7 +941,7 @@ the central user cache upon first requirement to keep the core package
 lightweight.</p>
 </div>
 <div class="section level4">
-<h4 id="fao_trade_matrix">5. <code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
+<h4 id="fao_trade_matrix">6. <code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
 (Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_trade_matrix"></a>
 </h4>
 <p>Auto-downloaded international bilateral trade matrix (~187 MB)

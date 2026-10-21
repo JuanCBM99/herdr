@@ -23,6 +23,8 @@ nutritional modules.
   Guide](https://juancbm99.github.io/herdr/articles/Manure.md):
 - [Land Use
   Methodology](https://juancbm99.github.io/herdr/articles/land_use.md):
+- [Feed Environmental Footprint & Water Deprivation (AWARE / EF
+  3.1)](https://juancbm99.github.io/herdr/articles/Water_and_Feed_Footprint.md):
 - [Adding a New
   Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md):
 

@@ -3,8 +3,9 @@
 ## Welcome to herdr
 
 **`herdr`** is an integrated computational framework in R for modeling
-**greenhouse gas (GHG) emissions**, **agricultural land competition**,
-and **nutritional edible protein** across livestock production systems.
+**greenhouse gas (GHG) emissions**, **feed environmental footprints &
+water deprivation**, **agricultural land competition**, and
+**nutritional edible protein** across livestock production systems.
 
 Most existing calculators evaluate emissions or feed land requirements
 in isolation. `herdr` bridges animal physiology, nutritional energy
@@ -22,8 +23,12 @@ flows into a **single, internally consistent modeling engine**.
 │  1. IPCC TIER 2 GHGs     │  2. AGROECOLOGICAL LAND     │  3. FOOD PRODUCTIVITY & FCR   │
 │  • Enteric CH4           │  • Cropland vs Grassland    │  • GLEAM Milk, Meat, Eggs     │
 │  • Manure CH4            │  • Mottet (2017) Framework  │  • IDF (2022) Physical Alloc. │
-│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • 3 Feed Conversion Ratios   │
-└──────────────────────────┴─────────────────────────────┴───────────────────────────────┘
+│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Mottet (2017) Protein FCRs │
+├──────────────────────────┴─────────────────────────────┴───────────────────────────────┤
+│  4. UPSTREAM FEED LCA & WATER DEPRIVATION (EF 3.1)                                     │
+│  • ECOALIM v9 & AGRIBALYSE v3.1 (Fossil vs. LUC CO2e)                                  │
+│  • AWARE Freshwater Deprivation (m3 depriv. / Mm3 depriv.)                             │
+└────────────────────────────────────────────────────────────────────────────────────────┘
 ```
 
 1.  **IPCC Tier 2 Greenhouse Gas Inventories:** Implements the *2019
@@ -47,6 +52,11 @@ flows into a **single, internally consistent modeling engine**.
     Federation (IDF Bulletin 520/2022)** Net Energy physical allocation
     and reports protein conversion and human food competition metrics
     (`Protein_FCR_total` and `Protein_FCR_cropland`).
+5.  **Upstream Feed LCA & Water Deprivation (EF 3.1 / AWARE):**
+    Integrates INRAE/ADEME **ECOALIM v9** to evaluate upstream feed
+    carbon footprints (fossil emissions vs. deforestation LUC) and
+    freshwater deprivation ($`m^3\text{ depriv.}`$) characterized via
+    the international **AWARE** model.
 
 ------------------------------------------------------------------------
 
@@ -138,6 +148,7 @@ to support different stages of your work:
 | **How-To Guides** | [Herd Demography & Life Cycles](https://juancbm99.github.io/herdr/articles/Herd_Demography.md) | How to configure biological cycles, AAP population dynamics, and automatic herd closures. |
 |  | [Manure Management Pathways](https://juancbm99.github.io/herdr/articles/Manure.md) | How to select valid IPCC storage, treatment, and climate combinations in CSV inputs. |
 |  | [Feed Land Competition & Trade](https://juancbm99.github.io/herdr/articles/land_use.md) | How agroecological land categories and dynamic FAO trade tracing operate. |
+|  | [Feed Footprints & Water Deprivation](https://juancbm99.github.io/herdr/articles/Water_and_Feed_Footprint.md) | Upstream feed GHG (fossil vs. LUC) and AWARE water scarcity metrics. |
 |  | [Adding a Custom Feed Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md) | How to expand nutritional and LCA reference databases with custom feedstuffs. |
 | **Case Studies** | [1. Dairy Cattle (Basic)](https://juancbm99.github.io/herdr/articles/Easy_Example.md) | Single-farm assessment highlighting FPCM and IDF co-product allocation. |
 |  | [2. Regional Variations (Moderate)](https://juancbm99.github.io/herdr/articles/Moderate_Example.md) | Multi-farm spatial stratification across diverse climatic regions. |

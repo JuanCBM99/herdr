@@ -47,8 +47,8 @@ This generates three standard folders:
   scenario templates and reference libraries (`ipcc_coefficients.csv`,
   `ipcc_mm.csv`, `feed_characteristics.csv`, `mapping.csv`). Background
   databases (`forages.parquet`, `fao_crops.parquet`,
-  `fao_trade_matrix.parquet`) are resolved automatically via bundled
-  assets and central cache.
+  `fao_trade_matrix.parquet`, `ecoalim.parquet`) are resolved
+  automatically via bundled assets and central cache.
 - **`Examples/`**: Pre-configured baseline datasets across species
   (dairy cattle, beef cattle, swine, sheep) ready to use as templates.
 - **`output/`**: Destination directory where results, emission

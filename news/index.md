@@ -2,16 +2,36 @@
 
 ## herdr 1.0.4
 
-### New Features
-
+- **Upstream Feed Environmental Footprints & Water Deprivation
+  (`calculate_feed_emissions`)**:
+  - Integrated the bundled **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE
+    v3.1** life cycle inventory database (`ecoalim.parquet`) to quantify
+    cradle-to-farm-gate Scope 3 feed production burdens.
+  - Implemented the international **AWARE** (*Available WAter
+    REmaining*, Boulay et al., 2018) characterization model adopted
+    under the European Commission’s **Environmental Footprint (EF 3.1)**
+    standard for freshwater deprivation.
+  - Standardized water units across all functional scales: absolute herd
+    water footprints in $`\text{Mm}^3\text{ depriv.}`$
+    ($`10^6\text{ m}^3\text{ depriv.} = 1\text{ hm}^3\text{ depriv.}`$),
+    per animal head in $`\text{m}^3\text{ depriv.} / \text{head}`$, per
+    commercial product in
+    $`\text{m}^3\text{ depriv.} / \text{kg product}`$, and per edible
+    protein in $`\text{m}^3\text{ depriv.} / \text{kg protein}`$.
+  - Partitioned feed carbon footprints into fossil inputs
+    ($`\text{CO}_2\text{e}_{\text{fossil}}`$) and land-use change /
+    deforestation ($`\text{CO}_2\text{e}_{\text{luc}}`$).
+  - Added dedicated comprehensive methodology vignette:
+    `Feed Environmental Footprint & Water Deprivation (AWARE / EF 3.1)`
+    (`vignettes/Water_and_Feed_Footprint.Rmd`).
 - **Consolidated Impact Assessment & Functional Units
   (`generate_impact_assessment`)**:
   - Implemented 5 standardized functional units across modeling and
     graphics (`plot_herdr_results`): `total` (absolute inventory in Gg
-    CO2e and ha), `protein` (intensities per kg edible human protein),
-    `product` (intensities per kg commercial product), `head` (per
-    animal head per year), and `fcr` (Protein Feed Conversion Ratio and
-    human food competition).
+    CO2e, ha, and Mm3 depriv.), `protein` (intensities per kg edible
+    human protein), `product` (intensities per kg commercial product),
+    `head` (per animal head per year), and `fcr` (Protein Feed
+    Conversion Ratio and human food competition).
   - Adopted the updated **IDF Bulletin 520/2022** physical Net Energy
     allocation method for dairy systems (3.1 MJ/kg FPCM milk vs. 15.0
     MJ/kg live weight gain) to partition impacts and feed intake between
@@ -28,12 +48,10 @@
   - Added dynamic grouping selector supporting species (`animal_type`)
     and production subtype (`animal_subtype`) alongside cohort and
     regional keys.
-  - Added interactive Functional Unit dropdown in the Results tab to
-    toggle dynamically between absolute footprint, intensities, and
-    Mottet Protein FCR (with a red dashed reference line at 1.0).
-  - Added dynamic conditional dropdown to select dedicated commercial
-    products (milk, meat, wool, egg) when evaluating per commercial
-    product, removing redundant generic intensity columns.
+  - Symmetrical 2-level impact selection: primary choice of Impact
+    Category (Carbon GHG, Land Use, Water Deprivation, Overview, Mottet
+    FCR) followed by Functional Unit and Commercial Product subselector
+    applied uniformly across Carbon, Land, and Water.
   - Interactive preview table with sorted column previews and CSV/PNG
     download handlers.
 - **User-Defined Milk Protein Percentage (`protein_content_pct`)**:

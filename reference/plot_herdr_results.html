@@ -27,6 +27,7 @@
   <ul class="dropdown-menu" aria-labelledby="dropdown-how-to-guides"><li><a class="dropdown-item" href="../articles/Herd_Demography.html">Herd Demography &amp; Life Cycles</a></li>
     <li><a class="dropdown-item" href="../articles/Manure.html">Manure Management Pathways</a></li>
     <li><a class="dropdown-item" href="../articles/land_use.html">Feed Land Competition &amp; Trade</a></li>
+    <li><a class="dropdown-item" href="../articles/Water_and_Feed_Footprint.html">Feed Water &amp; Carbon Footprint (AWARE)</a></li>
     <li><a class="dropdown-item" href="../articles/Adding_Ingredient.html">Adding a Custom Feed Ingredient</a></li>
   </ul></li>
 <li class="nav-item dropdown">
@@ -69,7 +70,8 @@
 <span>  func_name <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  gwp_report <span class="op">=</span> <span class="st">"AR5"</span>,</span>
 <span>  ar <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  functional_unit <span class="op">=</span> <span class="st">"total"</span></span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"total"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -98,7 +100,11 @@
 
 
 <dt id="arg-functional-unit">functional_unit<a class="anchor" aria-label="anchor" href="#arg-functional-unit"></a></dt>
-<dd><p>Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e and ha), `"protein"` (kg CO2e and m2 per kg edible protein), `"product"` (kg CO2e and m2 per kg commercial product), `"fcr"` (Mottet et al. 2017 Protein Feed Conversion Ratio and human food competition), `"milk"`, `"meat"`, `"wool"`, `"egg"`, or `"head"` (kg CO2e and m2 per animal head). Default is `"total"`.</p></dd>
+<dd><p>Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e, ha, m3), `"protein"` (per kg edible protein), `"product"` (per kg commercial product), `"fcr"` (Mottet et al. 2017 Protein Feed Conversion Ratio and human food competition), `"milk"`, `"meat"`, `"wool"`, `"egg"`, or `"head"` (per animal head). Default is `"total"`.</p></dd>
+
+
+<dt id="arg-impact-category">impact_category<a class="anchor" aria-label="anchor" href="#arg-impact-category"></a></dt>
+<dd><p>Character string specifying the environmental impact category to visualize: `"ghg"` (carbon footprint), `"land"` (land use footprint), `"water"` (feed water deprivation footprint), `"overview"` (multi-criteria comparison of all footprints), or `"fcr"` (protein feed efficiency). Default is `NULL` (auto-selected).</p></dd>
 
 </dl></div>
     <div class="section level2">
