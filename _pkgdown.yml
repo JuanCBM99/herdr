@@ -29,6 +29,8 @@ navbar:
           href: articles/Manure.html
         - text: "Feed Land Competition & Trade"
           href: articles/land_use.html
+        - text: "Feed Water & Carbon Footprint (AWARE)"
+          href: articles/Water_and_Feed_Footprint.html
         - text: "Adding a Custom Feed Ingredient"
           href: articles/Adding_Ingredient.html
     - text: "Case Studies"
@@ -73,6 +75,7 @@ articles:
       - Herd_Demography
       - Manure
       - land_use
+      - Water_and_Feed_Footprint
       - Adding_Ingredient
   - title: "Case Studies"
     desc: "Step-by-step reproducible examples from farm-scale to complex multi-cohort systems."
