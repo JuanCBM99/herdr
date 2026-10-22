@@ -715,25 +715,55 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
   if (!is.null(rv$manure) && nrow(rv$manure) > 0) {
     clean_manure <- rv$manure[!is.na(rv$manure$animal_tag) & trimws(as.character(rv$manure$animal_tag)) != "", , drop = FALSE]
     if (nrow(clean_manure) > 0) {
-      m_keys <- build_keys(clean_manure)
-      m_active <- clean_manure[m_keys %in% census_keys, , drop = FALSE]
+      # Allocations sum check per cohort defined in Manure (must sum to 1.0 / 100%)
+      if ("allocation" %in% names(clean_manure)) {
+        has_alloc <- !is.na(clean_manure$allocation) & trimws(as.character(clean_manure$allocation)) != "" & clean_manure$allocation != "NA"
+        has_sys <- !is.na(clean_manure$system_base) & trimws(as.character(clean_manure$system_base)) != "" & clean_manure$system_base != "NA"
+        m_all_keys <- build_keys(clean_manure)
+        active_in_census <- m_all_keys %in% census_keys
 
-      # Allocations sum check per active cohort (sum should equal 1.0 / 100%)
-      if (nrow(m_active) > 0 && "allocation" %in% names(m_active)) {
-        m_clean_alloc <- m_active[!is.na(m_active$allocation), , drop = FALSE]
-        if (nrow(m_clean_alloc) > 0) {
-          m_cohort_tags <- build_keys(m_clean_alloc)
-          alloc_sums <- tapply(as.numeric(m_clean_alloc$allocation), m_cohort_tags, sum, na.rm = TRUE)
-          bad_allocs <- alloc_sums[!is.na(alloc_sums) & abs(alloc_sums - 1.0) > 0.05]
+        cohorts_with_activity <- unique(m_all_keys[has_alloc | has_sys | active_in_census])
+        cohorts_with_activity <- cohorts_with_activity[cohorts_with_activity != ""]
+
+        if (length(cohorts_with_activity) > 0) {
+          m_eval <- clean_manure[m_all_keys %in% cohorts_with_activity, , drop = FALSE]
+          m_eval_keys <- build_keys(m_eval)
+
+          eval_num <- suppressWarnings(as.numeric(m_eval$allocation))
+
+          # 1. Non-numeric allocations check
+          non_num <- which(!is.na(m_eval$allocation) & trimws(as.character(m_eval$allocation)) != "" & is.na(eval_num))
+          if (length(non_num) > 0) {
+            add_issue("error", "manure", "Manure", "Non-numeric Manure Allocation",
+                      paste0("Non-numeric allocation value detected in Manure row(s): ", paste(head(non_num, 5), collapse = ", "),
+                             ". Ensure decimal points '.' are used instead of commas ','."))
+          }
+
+          # 2. Negative allocation check
+          neg_rows <- which(!is.na(eval_num) & eval_num < 0)
+          if (length(neg_rows) > 0) {
+            add_issue("error", "manure", "Manure", "Negative Manure Allocation",
+                      paste0("Negative allocation values detected in Manure row(s): ", paste(head(neg_rows, 5), collapse = ", "), "."))
+          }
+
+          # 3. Allocation sum check per active/configured cohort (must sum to 1.0 / 100%)
+          alloc_sums <- tapply(eval_num, m_eval_keys, function(vals) sum(vals[!is.na(vals)], na.rm = TRUE))
+          bad_allocs <- alloc_sums[!is.na(alloc_sums) & abs(alloc_sums - 1.0) > 0.001]
           if (length(bad_allocs) > 0) {
             bad_desc <- vapply(names(bad_allocs), function(k) {
               lbl <- format_cohort_label(k)
-              if (lbl != "") paste0(lbl, " (", round(bad_allocs[[k]] * 100, 1), "%)") else ""
+              tot <- bad_allocs[[k]]
+              pct_str <- paste0(round(tot * 100, 1), "%")
+              if (tot > 1.5) {
+                paste0(lbl, " (", round(tot, 2), " = ", pct_str, "; note: enter as decimal fraction 0-1)")
+              } else {
+                paste0(lbl, " (", pct_str, ")")
+              }
             }, character(1), USE.NAMES = FALSE)
             bad_desc <- bad_desc[bad_desc != ""]
             if (length(bad_desc) > 0) {
-              add_issue("warning", "manure", "Manure", "Manure Allocations != 100%",
-                        paste0("Manure system allocations should sum to 100% (1.0). Current sums: ", paste(bad_desc, collapse = ", "), "."))
+              add_issue("error", "manure", "Manure", "Manure Allocations != 100%",
+                        paste0("Manure system allocations must sum to 100% (1.0). Current sums: ", paste(bad_desc, collapse = ", "), "."))
             }
           }
         }

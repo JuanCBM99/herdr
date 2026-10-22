@@ -161,6 +161,20 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
     session$setInputs(auto_cycle = TRUE)
     issues_demo_on <- project_validation_issues()
     expect_false(any(sapply(issues_demo_on, function(x) grepl("feedlot_calves_male", x$message))))
+
+    # 9. Modifying manure allocation to != 100% triggers a blocking error in manure
+    orig_alloc <- rv$manure$allocation[13]
+    rv$manure$allocation[13] <- "0.5" # Alters mature_dairy_cattle sum to ~1.45
+    issues_bad_alloc <- project_validation_issues()
+    expect_true(any(sapply(issues_bad_alloc, function(x) x$table_id == "manure" && x$severity == "error" && grepl("100%", x$title))))
+
+    # 10. Negative manure allocation triggers a blocking error
+    rv$manure$allocation[13] <- "-0.1"
+    issues_neg_alloc <- project_validation_issues()
+    expect_true(any(sapply(issues_neg_alloc, function(x) x$table_id == "manure" && x$severity == "error" && grepl("Negative", x$title))))
+
+    # Restore clean allocation
+    rv$manure$allocation[13] <- orig_alloc
   })
 })
 
