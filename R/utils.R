@@ -315,5 +315,51 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
          call. = FALSE)
   }
 
+  # Species-specific compatibility check if animal_type is present in both tables
+  if ("animal_type" %in% names(definitions) && "animal_type" %in% names(coefficients)) {
+    coeff_map <- list(
+      cfi = "cfi",
+      ca = "ca",
+      c = "c",
+      a = "a",
+      b = "b",
+      c_pregnancy_cattle = "c_pregnancy",
+      c_pregnancy = "c_pregnancy"
+    )
+    spec_errors <- character()
+    for (r in seq_len(nrow(definitions))) {
+      s_type <- tolower(trimws(as.character(definitions$animal_type[r])))
+      if (is.na(s_type) || s_type == "") next
+      cohort_lbl <- if ("animal_tag" %in% names(definitions)) definitions$animal_tag[r] else paste("Row", r)
+
+      for (col_name in names(coeff_map)) {
+        if (!col_name %in% names(definitions)) next
+        val <- trimws(as.character(definitions[[col_name]][r]))
+        if (is.na(val) || val == "" || val == "NA") next
+
+        c_type <- coeff_map[[col_name]]
+        allowed_spec <- coefficients$description[
+          tolower(coefficients$coefficient) == tolower(c_type) &
+          tolower(coefficients$animal_type) == s_type
+        ]
+        if (length(allowed_spec) == 0) {
+          spec_errors <- c(spec_errors, paste0("Cohort '", cohort_lbl, "' specifies '", col_name, "' = '", val,
+                                               "', but '", col_name, "' is not applicable to animal_type '", s_type,
+                                               "' in 'ipcc_coefficients.csv'."))
+        } else if (!val %in% allowed_spec && val %in% coefficients$description[tolower(coefficients$coefficient) == tolower(c_type)]) {
+          spec_errors <- c(spec_errors, paste0("Cohort '", cohort_lbl, "' has incompatible '", col_name, "' = '", val,
+                                               "' for animal_type '", s_type, "'. Valid options in 'ipcc_coefficients.csv': ",
+                                               paste(allowed_spec, collapse = ", ")))
+        }
+      }
+    }
+    if (length(spec_errors) > 0) {
+      stop("Data Error: Incompatible species coefficients in 'ruminant_definitions.csv':\n",
+           paste("- ", unique(spec_errors), collapse = "\n"),
+           "\nPlease consult 'ipcc_coefficients.csv' for valid species-specific entries.",
+           call. = FALSE)
+    }
+  }
+
   invisible(TRUE)
 }

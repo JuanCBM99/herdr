@@ -609,6 +609,118 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
                      ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
   }
 
+  # --- 3.1 Ruminant Biological Coefficients Validation (cfi, ca, c, a, b, c_pregnancy) ---
+  if (!is.null(rv$def) && nrow(rv$def) > 0 && !is.null(rv$ipcc_coef) && nrow(rv$ipcc_coef) > 0) {
+    clean_def <- rv$def[!is.na(rv$def$animal_tag) & trimws(as.character(rv$def$animal_tag)) != "", , drop = FALSE]
+    if (nrow(clean_def) > 0) {
+      coef_df <- rv$ipcc_coef
+      has_species_col <- "animal_type" %in% names(coef_df)
+
+      # Dynamic lookup function to retrieve allowed coefficient descriptions directly from ipcc_coefficients.csv
+      get_valid_from_csv <- function(c_name, s_name = NULL) {
+        sub <- coef_df[tolower(trimws(coef_df$coefficient)) == tolower(c_name), , drop = FALSE]
+        if (!is.null(s_name) && has_species_col) {
+          sub <- sub[tolower(trimws(sub$animal_type)) == tolower(s_name), , drop = FALSE]
+        }
+        res <- unique(na.omit(trimws(as.character(sub$description))))
+        res[res != "" & res != "NA"]
+      }
+
+      # Global allowed values for each coefficient from CSV
+      all_valid_cfi    <- get_valid_from_csv("cfi")
+      all_valid_ca     <- get_valid_from_csv("ca")
+      all_valid_c      <- get_valid_from_csv("c")
+      all_valid_a      <- get_valid_from_csv("a")
+      all_valid_b      <- get_valid_from_csv("b")
+      all_valid_c_preg <- get_valid_from_csv("c_pregnancy")
+
+      for (r in seq_len(nrow(clean_def))) {
+        a_tag <- clean_def$animal_tag[r]
+        a_type <- tolower(trimws(as.character(clean_def$animal_type[r])))
+        cohort_lbl <- format_cohort_label(build_keys(clean_def[r, , drop = FALSE]))
+        if (cohort_lbl == "") cohort_lbl <- a_tag
+
+        cfi_val <- if ("cfi" %in% names(clean_def)) trimws(as.character(clean_def$cfi[r])) else ""
+        ca_val  <- if ("ca" %in% names(clean_def)) trimws(as.character(clean_def$ca[r])) else ""
+        c_val   <- if ("c" %in% names(clean_def)) trimws(as.character(clean_def$c[r])) else ""
+        a_val   <- if ("a" %in% names(clean_def)) trimws(as.character(clean_def$a[r])) else ""
+        b_val   <- if ("b" %in% names(clean_def)) trimws(as.character(clean_def$b[r])) else ""
+        c_preg_col <- intersect(c("c_pregnancy_cattle", "c_pregnancy"), names(clean_def))
+        c_preg_val <- if (length(c_preg_col) > 0) trimws(as.character(clean_def[[c_preg_col[1]]][r])) else ""
+
+        if (is.na(cfi_val) || cfi_val == "NA") cfi_val <- ""
+        if (is.na(ca_val) || ca_val == "NA") ca_val <- ""
+        if (is.na(c_val) || c_val == "NA") c_val <- ""
+        if (is.na(a_val) || a_val == "NA") a_val <- ""
+        if (is.na(b_val) || b_val == "NA") b_val <- ""
+        if (is.na(c_preg_val) || c_preg_val == "NA") c_preg_val <- ""
+
+        # 1. Global tag validity against CSV library
+        if (cfi_val != "" && !cfi_val %in% all_valid_cfi) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown cfi tag '", cfi_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+        if (ca_val != "" && !ca_val %in% all_valid_ca) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown ca tag '", ca_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+        if (c_val != "" && !c_val %in% all_valid_c) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown c tag '", c_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+        if (a_val != "" && !a_val %in% all_valid_a) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown a tag '", a_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+        if (b_val != "" && !b_val %in% all_valid_b) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown b tag '", b_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+        if (c_preg_val != "" && !c_preg_val %in% all_valid_c_preg) {
+          add_issue("error", "def", "Ruminants", "Unknown Coefficient Tag",
+                    paste0("Unknown c_pregnancy tag '", c_preg_val, "' in cohort '", cohort_lbl, "'. Must match a valid entry in ipcc_coefficients.csv."))
+        }
+
+        # 2. Species-specific compatibility checks (dynamically queried from CSV)
+        if (has_species_col && a_type %in% c("cattle", "sheep", "goat")) {
+          species_title_case <- paste0(toupper(substr(a_type, 1, 1)), substr(a_type, 2, nchar(a_type)))
+
+          check_species_coeff <- function(val, c_name, global_valid, is_growth = FALSE) {
+            if (val == "") return()
+            spec_valid <- get_valid_from_csv(c_name, a_type)
+            title_text <- if (is_growth) {
+              paste0("Incompatible Growth Coefficient in ", species_title_case)
+            } else if (c_name == "ca") {
+              paste0("Incompatible Activity in ", species_title_case)
+            } else if (c_name %in% c("c_pregnancy", "c_pregnancy_cattle")) {
+              paste0("Incompatible Pregnancy Coefficient in ", species_title_case)
+            } else {
+              paste0("Incompatible Coefficient in ", species_title_case)
+            }
+
+            if (length(spec_valid) == 0) {
+              add_issue("error", "def", "Ruminants", title_text,
+                        paste0(species_title_case, " cohort '", cohort_lbl, "' specifies coefficient ", c_name, " = '", val,
+                               "', but coefficient '", c_name, "' is not applicable to ", a_type, " according to ipcc_coefficients.csv."))
+            } else if (!val %in% spec_valid && val %in% global_valid) {
+              opts_disp <- paste0("'", paste(spec_valid, collapse = "', '"), "'")
+              add_issue("error", "def", "Ruminants", title_text,
+                        paste0(species_title_case, " cohort '", cohort_lbl, "' has incompatible ", c_name, " '", val,
+                               "'. Valid ", a_type, " options in ipcc_coefficients.csv: ", opts_disp, "."))
+            }
+          }
+
+          check_species_coeff(cfi_val, "cfi", all_valid_cfi)
+          check_species_coeff(ca_val, "ca", all_valid_ca)
+          check_species_coeff(c_val, "c", all_valid_c, is_growth = TRUE)
+          check_species_coeff(a_val, "a", all_valid_a, is_growth = TRUE)
+          check_species_coeff(b_val, "b", all_valid_b, is_growth = TRUE)
+          check_species_coeff(c_preg_val, "c_pregnancy", all_valid_c_preg)
+        }
+      }
+    }
+  }
+
   # --- 4. Weights Validation (4-Key matching) ---
   # Check for cohorts in weights not in Census
   if (!is.null(rv$weights) && nrow(rv$weights) > 0) {

@@ -120,6 +120,7 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
     rv$def$animal_type[1] <- "dinosaur"
     issues_type <- project_validation_issues()
     expect_true(any(sapply(issues_type, function(x) x$table_id == "def" && grepl("dinosaur", x$message))))
+    rv$def$animal_type[1] <- "cattle"
 
     # 5. Typing an invalid variant like 'a' in manure triggers error
     rv$manure$system_variant[1] <- "a"
@@ -175,6 +176,25 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
 
     # Restore clean allocation
     rv$manure$allocation[13] <- orig_alloc
+
+    # 11. Selecting incompatible growth coefficient 'a' in cattle triggers a blocking error in def
+    rv$def$a[1] <- "a_females" # Row 1 is cattle (feedlot_calves_male)
+    issues_bad_a <- project_validation_issues()
+    expect_true(any(sapply(issues_bad_a, function(x) x$table_id == "def" && x$severity == "error" && grepl("Growth Coefficient in Cattle", x$title))))
+    rv$def$a[1] <- NA
+
+    # 12. Selecting incompatible cfi (e.g. goats) in cattle triggers a blocking error in def
+    orig_cfi <- rv$def$cfi[1]
+    rv$def$cfi[1] <- "goats"
+    issues_bad_cfi <- project_validation_issues()
+    expect_true(any(sapply(issues_bad_cfi, function(x) x$table_id == "def" && x$severity == "error" && grepl("Incompatible Coefficient in Cattle", x$title))))
+    rv$def$cfi[1] <- orig_cfi
+
+    # 13. Selecting completely unknown tag triggers Unknown Coefficient Tag error
+    rv$def$cfi[1] <- "invented_cfi"
+    issues_unknown_cfi <- project_validation_issues()
+    expect_true(any(sapply(issues_unknown_cfi, function(x) x$table_id == "def" && x$severity == "error" && grepl("Unknown Coefficient Tag", x$title))))
+    rv$def$cfi[1] <- orig_cfi
   })
 })
 

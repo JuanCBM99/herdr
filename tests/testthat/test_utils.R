@@ -234,5 +234,37 @@ test_that("herdr_validate_ruminant_coefficients validates tags against ipcc_coef
   # 4. Safe handling on NULL or empty tables
   expect_true(herdr_validate_ruminant_coefficients(NULL, NULL))
   expect_true(herdr_validate_ruminant_coefficients(data.frame(), data.frame()))
+
+  # 5. Species-specific compatibility when animal_type is present in both tables
+  coeffs_spec <- data.frame(
+    description = c("cattle_buffalo [lactating cows]", "stall", "females", "cattle and buffalo", "goats", "a_females"),
+    coefficient = c("cfi", "ca", "c", "c_pregnancy", "cfi", "a"),
+    animal_type = c("cattle", "cattle", "cattle", "cattle", "goat", "sheep")
+  )
+  cattle_def <- data.frame(
+    animal_tag = "dairy_cow",
+    animal_type = "cattle",
+    cfi = "cattle_buffalo [lactating cows]",
+    ca = "stall",
+    c = "females",
+    c_pregnancy_cattle = "cattle and buffalo"
+  )
+  expect_silent(herdr_validate_ruminant_coefficients(cattle_def, coeffs_spec))
+
+  # 6. Incompatible growth coefficient 'a' in cattle throws error
+  bad_cattle_a <- cattle_def
+  bad_cattle_a$a <- "a_females"
+  expect_error(
+    herdr_validate_ruminant_coefficients(bad_cattle_a, coeffs_spec),
+    "Incompatible species coefficients in 'ruminant_definitions.csv'"
+  )
+
+  # 7. Incompatible cfi (e.g. goats) in cattle throws error
+  bad_cattle_cfi <- cattle_def
+  bad_cattle_cfi$cfi <- "goats"
+  expect_error(
+    herdr_validate_ruminant_coefficients(bad_cattle_cfi, coeffs_spec),
+    "Incompatible species coefficients in 'ruminant_definitions.csv'"
+  )
 })
 
