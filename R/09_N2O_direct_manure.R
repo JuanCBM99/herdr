@@ -174,12 +174,12 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       N_retention_kg_day = dplyr::case_when(
 
         # Poultry lifecycle retention rate (Layers)
-        animal_type == "poultry" &  egg_mass_g_day > 0 ~
-          (0.028 * daily_gain) + ((0.0185 * egg_mass_g_day) / 1000),
+        animal_type == "poultry" & egg_mass_g_day > 0 ~
+          (0.028 * pmax(0, daily_gain)) + ((0.0185 * egg_mass_g_day) / 1000),
 
         # Poultry lifecycle retention rate (Pullets and Broilers)
         animal_type == "poultry" & productive_period_days > 0 ~
-          ((final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
+          (pmax(0, final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
 
         # Small Ruminants baseline retention rate (IPCC 2019 Table 10.20 Option 1: 10% of N intake)
         animal_type %in% c("sheep", "goat") ~ 0.10 * N_intake_kgheadday,
@@ -190,12 +190,12 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
         # IPCC 2019 SWINE Scenario 2: Standard Growing Animals (Switch activated when lifecycle phase days are 0)
         animal_type == "swine" & productive_period_days > 0 & sows_gestation_days == 0 & sows_lactation_days == 0 ~
-          ((final_weight_kg - initial_weight_kg) * ipcc_swine_n_gain_factor) / productive_period_days,
+          (pmax(0, final_weight_kg - initial_weight_kg) * ipcc_swine_n_gain_factor) / productive_period_days,
 
         # Cattle Scenario 1: Lactating AND growing concurrently
         animal_type == "cattle" & daily_gain > 0 & NEg_MJday > 0 ~
           ((daily_milk * (milk_protein / 100)) / 6.38) +
-          ((daily_gain * (268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
+          ((daily_gain * pmax(0, 268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
 
         # Cattle Scenario 2: Mature adult milking animals (No active growth)
         animal_type == "cattle" & daily_milk > 0 & (daily_gain <= 0 | NEg_MJday <= 0) ~
@@ -203,10 +203,11 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
         # Cattle Scenario 3: Young growing animals (No milking)
         animal_type == "cattle" & daily_milk == 0 & daily_gain > 0 & NEg_MJday > 0 ~
-          ((daily_gain * (268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
+          ((daily_gain * pmax(0, 268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
 
         TRUE ~ 0
       ),
+      N_retention_kg_day = pmax(0, N_retention_kg_day),
 
       # Annual Nitrogen Excretion (kg N / animal / year) [IPCC Eq 10.31a]
       N_excreted_kgheadyear = pmax(0, (N_intake_kgheadday - N_retention_kg_day) * 365),

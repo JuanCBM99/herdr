@@ -8,23 +8,7 @@ test_that("calculate_monogastric_energy produces correct output structure using 
 
   # 1. Set test directory to use existing CSV files
   withr::local_dir(test_path("test_data"))
-
-  # 2. Normalize existing files
-  files_to_fix <- c(
-    "livestock_weights.csv",
-    "monogastric_definitions.csv"
-  )
-
-  for (f in files_to_fix) {
-    path <- file.path("user_data", f)
-    if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-        mutate(across(everything(), trimws)) %>%
-        write_csv(path)
-    }
-  }
-
-  # 3. Execute calculation
+  # Execute calculation
   results <- suppressWarnings(
     calculate_monogastric_energy(saveoutput = FALSE)
   )

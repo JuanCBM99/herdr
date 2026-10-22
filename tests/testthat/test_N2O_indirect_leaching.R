@@ -8,26 +8,7 @@ test_that("calculate_N2O_indirect_leaching integrates correctly using CSV data",
   # 1. Set test directory to use your existing data
   withr::local_dir(test_path("test_data"))
 
-  # 2. Normalize input CSVs
-  # Essential for joining manure systems, leaching fractions (frac_leach) and EF5
-  files_to_fix <- c(
-    "ruminant_definitions.csv", "livestock_weights.csv",
-    "livestock_census.csv", "manure_management.csv",
-    "ipcc_mm.csv", "diet_profiles.csv",
-    "diet_ingredients.csv", "feed_characteristics.csv",
-    "ipcc_coefficients.csv"
-  )
-
-  for (f in files_to_fix) {
-    path <- file.path("user_data", f)
-    if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-        mutate(across(everything(), trimws)) %>%
-        write_csv(path)
-    }
-  }
-
-  # 3. Execute Indirect Leaching calculation
+  # Execute Indirect Leaching calculation
   # This triggers: Leaching -> Direct N2O -> Nitrogen Balance -> GE -> Population
   results <- suppressWarnings(
     calculate_N2O_indirect_leaching(automatic_cycle = FALSE, saveoutput = FALSE)

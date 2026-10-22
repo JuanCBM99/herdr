@@ -8,16 +8,6 @@ test_that("calculate_NE_work computes work energy correctly", {
   # Set test directory
   withr::local_dir(test_path("test_data"))
 
-  # Normalize CSVs: ensure work_hours and join keys are correctly typed
-  read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_weights.csv")
-
-  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/ruminant_definitions.csv")
-
-  read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/ipcc_coefficients.csv")
-
   # Execute calculation
   results <- calculate_NE_work(saveoutput = FALSE)
 
@@ -31,7 +21,10 @@ test_that("calculate_NE_work computes work energy correctly", {
 })
 
 test_that("calculate_NE_work handles missing work hours with zero", {
-  withr::local_dir(test_path("test_data"))
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
 
   # Inject NA in work_hours for testing
   defs <- read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE) %>%

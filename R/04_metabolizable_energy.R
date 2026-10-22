@@ -80,20 +80,20 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       # --- Lactation phase requirements ---
       piglet_adg_gday = dplyr::if_else(
         sows_lactation_days > 0,
-        ((piglet_weaning_weight_kg - piglet_birth_weight_kg) / sows_lactation_days) * 1000,
+        (pmax(0, piglet_weaning_weight_kg - piglet_birth_weight_kg) / sows_lactation_days) * 1000,
         0
       ),
       ME_milk_daily = dplyr::if_else(
-        sows_lactation_days > 0,
-        ((6.83 * piglet_adg_gday) - 125) * piglets_suckling,
+        sows_lactation_days > 0 & piglets_suckling > 0,
+        pmax(0, (6.83 * piglet_adg_gday) - 125) * piglets_suckling,
         0
       ),
       ME_mobilization_daily = dplyr::if_else(
-        sows_lactation_days > 0,
+        sows_lactation_days > 0 & piglets_suckling > 0,
         -28183 / sows_lactation_days,
         0
       ),
-      ME_lactation_phase_daily = ME_milk_daily + ME_mobilization_daily,
+      ME_lactation_phase_daily = pmax(0, ME_milk_daily + ME_mobilization_daily),
 
       # --- Additional requirements (Growth and eggs) ---
       ME_standard_growth_day = dplyr::case_when(
@@ -106,7 +106,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       ME_eggs_day = 2 * egg_mass_g_day,
 
       # --- Total daily energy integration ---
-      ME_total_kcal_day = ME_maint_kcal_day + ME_standard_growth_day + ME_eggs_day + ME_gestation_phase_daily + ME_lactation_phase_daily,
+      ME_total_kcal_day = pmax(0, ME_maint_kcal_day + ME_standard_growth_day + ME_eggs_day + ME_gestation_phase_daily + ME_lactation_phase_daily),
 
       # Map outputs directly to report columns
       ME_mant_kcal      = ME_maint_kcal_day,

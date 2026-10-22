@@ -134,10 +134,10 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
 
 
       NEg_MJday = dplyr::case_when(
-        tolower(animal_type) == "cattle" & (C_val * adult_weight_kg) > 0 & productive_period_days > 0 ~
+        tolower(animal_type) == "cattle" & (C_val * adult_weight_kg) > 0 & productive_period_days > 0 & (final_weight_kg > initial_weight_kg) ~
           22.02 * ((((initial_weight_kg + final_weight_kg)/2) / (C_val * adult_weight_kg))^0.75) * (((final_weight_kg - initial_weight_kg)/productive_period_days)^1.097),
 
-        tolower(animal_type) %in% c("sheep", "goat") & productive_period_days > 0 ~
+        tolower(animal_type) %in% c("sheep", "goat") & productive_period_days > 0 & (final_weight_kg > initial_weight_kg) ~
           ((final_weight_kg - initial_weight_kg)/productive_period_days) * (A_val + 0.5 * B_val * (initial_weight_kg + final_weight_kg)),
 
         TRUE ~ 0
@@ -290,7 +290,12 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", ne
 
   if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
 
-  required_cols <- c("c_pregnancy_cattle", "pr_sheep_goat", "pregnancy_rate")
+  c_preg_col <- intersect(c("c_pregnancy_cattle", "c_pregnancy"), names(categories))
+  if (length(c_preg_col) == 0) {
+    stop(paste0("Error: Missing pregnancy column ('c_pregnancy_cattle' or 'c_pregnancy') in '", file.path(data_dir, "ruminant_definitions.csv"), "'"))
+  }
+
+  required_cols <- c("pr_sheep_goat", "pregnancy_rate")
   missing_cols <- setdiff(required_cols, names(categories))
   if (length(missing_cols) > 0) {
     stop(paste0("Error: Missing column(s) in '", file.path(data_dir, "ruminant_definitions.csv"), "': ", paste(missing_cols, collapse = ", ")))
@@ -300,16 +305,19 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", ne
     dplyr::filter(tolower(coefficient) == "c_pregnancy") %>%
     dplyr::select(c_pregnancy_tag = description, c_value = value)
 
+  cat_sub <- categories %>%
+    dplyr::select(
+      animal_tag, region, subregion, class_flex, animal_type, animal_subtype,
+      c_pregnancy_tag = dplyr::all_of(c_preg_col[1]), pr_sheep_goat, pregnancy_rate
+    )
+
   # --- 2. Calculation Pipeline ---
   results <- nem_df %>%
     dplyr::left_join(
-      categories %>% dplyr::select(
-        animal_tag, region, subregion, class_flex, animal_type, animal_subtype,
-        c_pregnancy_cattle, pr_sheep_goat, pregnancy_rate
-      ),
+      cat_sub,
       by = c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype")
     ) %>%
-    dplyr::left_join(coeff_lookup, by = c("c_pregnancy_cattle" = "c_pregnancy_tag")) %>%
+    dplyr::left_join(coeff_lookup, by = "c_pregnancy_tag") %>%
     dplyr::mutate(
       pregnancy_rate = tidyr::replace_na(suppressWarnings(as.numeric(pregnancy_rate)), 0),
       pr_sheep_goat = tidyr::replace_na(suppressWarnings(as.numeric(pr_sheep_goat)), 0),

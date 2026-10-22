@@ -299,13 +299,15 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
     }
   }
 
+  c_preg_col <- intersect(c("c_pregnancy_cattle", "c_pregnancy"), names(definitions))
+
   errors <- c(
     check_tag("cfi", "cfi", "Maintenance coefficient"),
     check_tag("ca", "ca", "Activity coefficient"),
     check_tag("c", "c", "Growth coefficient c"),
     check_tag("a", "a", "Growth coefficient a"),
     check_tag("b", "b", "Growth coefficient b"),
-    check_tag("c_pregnancy_cattle", "c_pregnancy", "Pregnancy coefficient")
+    if (length(c_preg_col) > 0) check_tag(c_preg_col[1], "c_pregnancy", "Pregnancy coefficient") else character()
   )
 
   if (length(errors) > 0) {

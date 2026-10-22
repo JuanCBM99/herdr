@@ -8,26 +8,7 @@ library(ggplot2)
 test_that("plot_herdr_results generates dynamic plots from calculated pipeline outputs", {
   # 1. Set test directory
   withr::local_dir(test_path("test_data"))
-
-  # 2. Normalize and prepare input CSVs
-  files_to_fix <- c(
-    "ruminant_definitions.csv", "livestock_weights.csv",
-    "livestock_census.csv", "manure_management.csv",
-    "ipcc_mm.csv", "diet_profiles.csv",
-    "diet_ingredients.csv", "feed_characteristics.csv",
-    "ipcc_coefficients.csv"
-  )
-
-  for (f in files_to_fix) {
-    path <- file.path("user_data", f)
-    if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE, lazy = FALSE) %>%
-        mutate(across(everything(), trimws)) %>%
-        write_csv(path)
-    }
-  }
-
-  # 3. Execute pipeline functions to get real data structures
+  # Execute pipeline functions to get real data structures
   ge_results <- suppressWarnings(calculate_ge(saveoutput = FALSE))
   dmi_results <- suppressWarnings(calculate_DMI(saveoutput = FALSE))
 

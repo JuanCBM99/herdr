@@ -57,7 +57,8 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
         # Ruminants (Default): IPCC Tier 2 Formula
         # Converts remaining energy (fecal + urinary loss) into mass using the 18.45 MJ/kg DM conversion factor
         TRUE ~ ((GE_MJday * (1 - DE_pct/100)) + (urinary_energy * GE_MJday)) * ((1 - ASH_pct/100) / 18.45)
-      )
+      ),
+      VS_kgday = pmax(0, VS_kgday)
     ) %>%
 
     # --- 4. Select, Format and Round Outputs ---

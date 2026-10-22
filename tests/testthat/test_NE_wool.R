@@ -8,13 +8,6 @@ test_that("calculate_NE_wool computes wool energy correctly", {
   # Set test directory
   withr::local_dir(test_path("test_data"))
 
-  # Normalize CSVs: force character types for join keys and handle NA in yield
-  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/ruminant_definitions.csv")
-
-  read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_weights.csv")
-
   # Execute calculation
   results <- calculate_NE_wool(saveoutput = FALSE)
 

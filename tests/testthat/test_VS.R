@@ -8,23 +8,7 @@ test_that("calculate_vs computes volatile solids using CSV data", {
   # 1. Set test directory
   withr::local_dir(test_path("test_data"))
 
-  # 2. Normalize input CSVs to ensure consistent types for joins
-  files_to_fix <- c(
-    "livestock_weights.csv", "ruminant_definitions.csv",
-    "ipcc_coefficients.csv", "diet_profiles.csv",
-    "diet_ingredients.csv", "feed_characteristics.csv"
-  )
-
-  for (f in files_to_fix) {
-    path <- file.path("user_data", f)
-    if (file.exists(path)) {
-      read_csv(path, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-        mutate(across(everything(), trimws)) %>%
-        write_csv(path)
-    }
-  }
-
-  # 3. Execute Volatile Solids calculation
+  # Execute Volatile Solids calculation
   results <- suppressWarnings(
     calculate_vs(urinary_energy = 0.04, saveoutput = FALSE)
   )

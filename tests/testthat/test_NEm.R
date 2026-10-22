@@ -8,15 +8,7 @@ test_that("calculate_NEm computes metabolic energy correctly with test data", {
   # Set test directory
   withr::local_dir(test_path("test_data"))
 
-  # Fix column types to avoid logical vs character errors
-  read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/livestock_weights.csv")
-  read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/ruminant_definitions.csv")
-  read_csv("user_data/ipcc_coefficients.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-    write_csv("user_data/ipcc_coefficients.csv")
-
-  # Block: Run calculation
+  # Run calculation
   # This function uses weights and IPCC coefficients to calculate MJ/day
   results <- calculate_NEm(saveoutput = FALSE)
 
