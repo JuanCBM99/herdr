@@ -36,3 +36,4 @@ fao_trade_matrix\.parquet$
 ^CITATION\.cff$
 ^doc$
 ^Meta$
+^AGENTS\.md$
