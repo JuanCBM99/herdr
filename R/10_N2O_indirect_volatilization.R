@@ -10,7 +10,7 @@
 calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                                  direct_N2O_df = NULL, pop_df = NULL) {
 
-  message("\U0001f7e2 Calculating indirect N2O emissions (volatilization)...")
+  message("Calculating indirect N2O emissions (volatilization)...")
 
   # --- 1. Data Loading ---
   user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
@@ -19,39 +19,11 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
   if (is.null(direct_N2O_df)) direct_N2O_df <- suppressMessages(calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   if (is.null(pop_df))        pop_df        <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
 
-  # --- 2. Validations (Asserts) ---
-
-  # 2.1 Combinations Integrity Check (Validates against ipcc_mm.csv)
-  # Filter out rows where key fields are missing to avoid false positives with NAs
-  check_data <- user_manure %>%
-    dplyr::filter(!is.na(system_base))
-
-  if (nrow(check_data) > 0) {
-    user_keys <- check_data %>%
-      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
-      dplyr::pull(key) %>%
-      unique()
-
-    master_keys <- ipcc_master %>%
-      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
-      dplyr::pull(key)
-
-    invalid_combos <- user_keys[!user_keys %in% master_keys]
-
-    assertthat::assert_that(
-      length(invalid_combos) == 0,
-      msg = paste0(
-        "\u274C Error: Invalid system/climate combinations detected in 'manure_management.csv':\n",
-        paste("- ", invalid_combos, collapse = "\n"),
-        "\n\nPlease consult the 'Manure System Guide' and ensure names match the internal library exactly."
-      )
-    )
-  }
-
-  # 2.2 Allocation Assertion
-  herdr_validate_manure_allocation(user_manure)
-
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+
+  # --- 2. Validations ---
+  herdr_validate_manure_systems(user_manure, ipcc_master, animal_metadata = direct_N2O_df)
+  herdr_validate_manure_allocation(user_manure)
 
   # --- 2. Master Dataset Construction & Joins ---
 
@@ -109,7 +81,7 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/N2O_indirect_volatilization.csv")
-    message("\U1F4BE Saved output to output/N2O_indirect_volatilization.csv")
+    message("[herdr] Saved output to output/N2O_indirect_volatilization.csv")
   }
 
   return(results)

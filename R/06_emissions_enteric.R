@@ -14,7 +14,7 @@
 calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                         diet_vars = NULL, ge_df = NULL, pop_df = NULL) {
 
-  message("\U0001f7e2 Calculating enteric fermentation emissions...")
+  message("Calculating enteric fermentation emissions...")
 
   # --- 1. Data Loading and Propagation ---
   if (is.null(diet_vars)) diet_vars <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
@@ -34,7 +34,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   }
 
   if (nrow(diet_vars) == 0) {
-    message("\u26a0 No diet data found. Returning empty structure.")
+    message("[herdr] No diet data found. Returning empty structure.")
     return(dplyr::tibble())
   }
 
@@ -135,7 +135,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   if (isTRUE(saveoutput) && nrow(results) > 0) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/enteric_emissions.csv")
-    message("\U0001f4be Saved output to output/enteric_emissions.csv")
+    message("[herdr] Saved output to output/enteric_emissions.csv")
   }
 
   return(results)

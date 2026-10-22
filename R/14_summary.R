@@ -51,7 +51,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   ch4_factor <- as.numeric(gwp_vals[["CH4"]])
   n2o_factor <- as.numeric(gwp_vals[["N2O"]])
 
-  message("\U0001f7e2 Starting impact assessment summary (GWP standard: ", gwp_choice, ")...")
+  message("[herdr] Starting impact assessment summary (GWP standard: ", gwp_choice, ")...")
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
   # 1. Base components computed ONCE in memory
@@ -412,7 +412,7 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
   if (saveoutput) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(final_summary, "output/impact_assessment_summary.csv")
-    message("\U1F4BE Report saved to output/impact_assessment_summary.csv")
+    message("[herdr] Report saved to output/impact_assessment_summary.csv")
   }
 
   return(final_summary)

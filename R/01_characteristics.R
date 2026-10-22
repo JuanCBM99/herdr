@@ -7,7 +7,7 @@
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data") {
-  message("\U0001f7e2 Calculating Weighted Nutritional Variables...")
+  message("Calculating Weighted Nutritional Variables...")
 
   # --- 1. Load Data Assets ---
   diets <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
@@ -93,7 +93,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     warn_forage_low <- mature_check %>% dplyr::filter(forage_pct < 30)
     if (nrow(warn_forage_low) > 0) {
       warning(paste0(
-        "\u26A0 Warning (Forage): < 30% in: ", paste(unique(warn_forage_low$animal_tag), collapse = ", "),
+        "Warning (Forage): < 30% in: ", paste(unique(warn_forage_low$animal_tag), collapse = ", "),
         ". Risk of acidosis due to lack of structural fiber (Ref: NRC 2001)."
       ))
     }
@@ -101,7 +101,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     warn_forage_high <- mature_check %>% dplyr::filter(forage_pct > 80)
     if (nrow(warn_forage_high) > 0) {
       warning(paste0(
-        "\u26A0 Warning (Forage): > 80% in: ", paste(unique(warn_forage_high$animal_tag), collapse = ", "),
+        "Warning (Forage): > 80% in: ", paste(unique(warn_forage_high$animal_tag), collapse = ", "),
         ". Likely to limit intake due to physical rumen fill (Ref: NRC 2001 / 1996)."
       ))
     }
@@ -109,7 +109,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     warn_cp_low <- mature_check %>% dplyr::filter(CP_pct < 7)
     if (nrow(warn_cp_low) > 0) {
       warning(paste0(
-        "\u26A0 Warning (Protein): < 7% in: ", paste(unique(warn_cp_low$animal_tag), collapse = ", "),
+        "Warning (Protein): < 7% in: ", paste(unique(warn_cp_low$animal_tag), collapse = ", "),
         ". Insufficient to maintain basal rumen fermentation (Ref: CSIRO 2007)."
       ))
     }
@@ -117,7 +117,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     warn_cp_high <- mature_check %>% dplyr::filter(CP_pct > 20)
     if (nrow(warn_cp_high) > 0) {
       warning(paste0(
-        "\u26A0 Warning (Protein): > 20% in: ", paste(unique(warn_cp_high$animal_tag), collapse = ", "),
+        "Warning (Protein): > 20% in: ", paste(unique(warn_cp_high$animal_tag), collapse = ", "),
         ". Excess causes high energy expenditure and reproductive/embryonic toxicity (Ref: NRC 2001)."
       ))
     }
@@ -125,7 +125,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     warn_ash <- mature_check %>% dplyr::filter(ASH_pct > 10)
     if (nrow(warn_ash) > 0) {
       warning(paste0(
-        "\u26A0 Warning (Ash): > 10% in: ", paste(unique(warn_ash$animal_tag), collapse = ", "),
+        "Warning (Ash): > 10% in: ", paste(unique(warn_ash$animal_tag), collapse = ", "),
         ". Drastically increases water requirements due to osmotic stress (Ref: CSIRO 2007)."
       ))
     }
@@ -142,7 +142,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/weighted_nutritional_variables.csv")
-    message("\U0001f4be Saved nutritional variables to output/weighted_nutritional_variables.csv")
+    message("[herdr] Saved nutritional variables to output/weighted_nutritional_variables.csv")
   }
 
   return(results)

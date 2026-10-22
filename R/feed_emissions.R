@@ -18,7 +18,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
                                      DMI_df = NULL,
                                      population_df = NULL) {
 
-  message("\U0001f33e Calculating feed environmental footprint (GHG & water)...")
+  message("[herdr] Calculating feed environmental footprint (GHG & water)...")
 
   # --- 1. Load Reference Datasets ---
   ecoalim_path <- herdr_get_ecoalim_path(data_dir)
@@ -66,7 +66,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
   }
   if (nrow(DMI_df) == 0) {
-    message("\u26a0 No DMI data found. Returning empty structure.")
+    message("[herdr] No DMI data found. Returning empty structure.")
     return(dplyr::tibble())
   }
   DMI_df <- DMI_df %>%
@@ -114,7 +114,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
 
   if (nrow(missing_factors) > 0) {
     warning(
-      "\u26A0 [herdr] Feed emissions disclaimer: No ECOALIM emission factor found for: ",
+      "[herdr] Feed emissions disclaimer: No ECOALIM emission factor found for: ",
       paste(missing_factors$ingredient, collapse = ", "),
       ". Set their footprints to 0. Please map them in 'mapping.csv' if available.",
       call. = FALSE
@@ -204,7 +204,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
 
     readr::write_csv(ingredient_report, "output/feed_emissions_by_ingredient.csv")
     readr::write_csv(summary_by_animal, "output/feed_emissions_summary.csv")
-    message("\U0001f4be Feed emission reports saved to 'output/feed_emissions_summary.csv' and 'output/feed_emissions_by_ingredient.csv'")
+    message("[herdr] Feed emission reports saved to 'output/feed_emissions_summary.csv' and 'output/feed_emissions_by_ingredient.csv'")
   }
 
   summary_by_animal

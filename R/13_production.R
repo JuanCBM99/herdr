@@ -14,7 +14,7 @@
 calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                  pop_df = NULL) {
 
-  message("\U0001f9c3 Calculating total livestock production (physical products & protein)...")
+  message("[herdr] Calculating total livestock production (physical products & protein)...")
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 
@@ -212,7 +212,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/production.csv")
-    message("\U0001f4be Production report saved to output/production.csv")
+    message("[herdr] Production report saved to output/production.csv")
   }
 
   return(results)

@@ -23,7 +23,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
                                DMI_df = NULL,
                                population_df = NULL) {
 
-  message("\U0001f7e2 Calculating land use...")
+  message("[herdr] Calculating land use...")
 
   year_col <- paste0("Y", year)
 
@@ -57,12 +57,12 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   feed_chars_raw <- readr::read_csv(file.path(data_dir, "feed_characteristics.csv"), show_col_types = FALSE)
 
   if (!"land_type" %in% colnames(feed_chars_raw)) {
-    warning("\u26A0 Column 'land_type' not found in feed_characteristics.csv. Setting as NA.")
+    warning("[herdr] Column 'land_type' not found in feed_characteristics.csv. Setting as NA.")
     feed_chars_raw$land_type <- NA_character_
   }
 
   if (!"DM_pct" %in% colnames(feed_chars_raw)) {
-    warning("\u26A0 Column 'DM_pct' not found in feed_characteristics.csv. Assuming 100%.")
+    warning("[herdr] Column 'DM_pct' not found in feed_characteristics.csv. Assuming 100%.")
     feed_chars_raw$DM_pct <- 100
   }
 
@@ -151,7 +151,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       stop("Could not locate or download fao_trade_matrix.parquet. Please check your internet connection.")
     }
 
-    message(paste0("\u23f3 Missing countries of origin found. Tracing real origin (beyond re-export hubs) for ", farm_country, " (", year, ")..."))
+    message(paste0("[herdr] Missing countries of origin found. Tracing real origin (beyond re-export hubs) for ", farm_country, " (", year, ")..."))
 
     fao_items <- unique(stats::na.omit(name_mapping$yield_name))
 
@@ -325,7 +325,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   if (nrow(forages_with_proxy) > 0) {
     items_txt <- paste0(forages_with_proxy$ingredient, " (", forages_with_proxy$country_of_origin, ")", collapse = ", ")
     warning(paste0(
-      "\u26A0 [herdr] Forage yields disclaimer: Currently herdr only includes established national forage yield data for Spain (MAPA). ",
+      "[herdr] Forage yields disclaimer: Currently herdr only includes established national forage yield data for Spain (MAPA). ",
       "Using Spanish yield as proxy for: ", items_txt, ". ",
       "To provide local yield data, specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
     ), call. = FALSE)
@@ -379,7 +379,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
         ". Land use set to 0 m2. Please specify 'custom_yield_kg_ha' in 'diet_ingredients.csv'."
       ))
     }
-    warning(paste0("\u26A0 [herdr] Land use disclaimer: ", paste(warn_msgs, collapse = " | ")), call. = FALSE)
+    warning(paste0("[herdr] Land use disclaimer: ", paste(warn_msgs, collapse = " | ")), call. = FALSE)
   }
 
   results <- results %>%
@@ -420,7 +420,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/land_use.csv")
-    message("\U0001f4be Land use report saved to output/land_use.csv")
+    message("[herdr] Land use report saved to output/land_use.csv")
   }
 
   return(results)

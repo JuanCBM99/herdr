@@ -28,7 +28,7 @@
 #' @export
 calculate_population_poultry <- function(census_poultry, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
-  message("\U0001F426 Calculating populations for POULTRY...")
+  message("Calculating populations for POULTRY...")
 
   # Handle flexible parameter positioning
   if (!is.null(rate_parameters)) {

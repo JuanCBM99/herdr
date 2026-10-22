@@ -23,7 +23,7 @@
 #' @export
 calculate_population_swine <- function(census_swine, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
-  message("\U0001F416 Calculating populations for SWINE...")
+  message("Calculating populations for SWINE...")
 
   # Handle flexible parameter positioning
   if (!is.null(rate_parameters)) {
@@ -168,7 +168,7 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
 
   # Demographic integrity warning (replacements exceeding available piglets)
   if (any(calculated_pops$pop_replacement_sows > calculated_pops$annual_piglets + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Swine): Replacement demand exceeds annual piglets produced. Check litter size (piglets_born/piglets_suckling) vs replacement_rate.")
+    warning("Demographic Warning (Swine): Replacement demand exceeds annual piglets produced. Check litter size (piglets_born/piglets_suckling) vs replacement_rate.")
   }
 
   # =========================================================================

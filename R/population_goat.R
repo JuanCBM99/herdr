@@ -26,7 +26,7 @@
 #' @export
 calculate_population_goat <- function(census_goat, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
-  message("\U0001F9EE Calculating populations for GOAT...")
+  message("Calculating populations for GOAT...")
 
   # Handle flexible parameter positioning
   if (!is.null(rate_parameters)) {
@@ -168,10 +168,10 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
 
   # Demographic integrity warnings (replacements exceeding available births)
   if (any(calculated_pops$pop_kid_goat_female_dairy_repl + calculated_pops$pop_kid_goat_male_dairy_repl > calculated_pops$total_dairy_births + 1e-6, na.rm = TRUE) && dairy_kidding > 0) {
-    warning("\u26A0 Demographic Warning (Dairy Goat): Replacement demand exceeds kids born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
+    warning("Demographic Warning (Dairy Goat): Replacement demand exceeds kids born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
   }
   if (any(calculated_pops$pop_kid_goat_female_meat_repl + calculated_pops$pop_kid_goat_male_meat_repl > calculated_pops$total_meat_births + 1e-6, na.rm = TRUE) && meat_kidding > 0) {
-    warning("\u26A0 Demographic Warning (Meat Goat): Replacement demand exceeds kids born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
+    warning("Demographic Warning (Meat Goat): Replacement demand exceeds kids born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
   }
 
   # =========================================================================

@@ -16,7 +16,7 @@
 calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
                           ge_req = NULL, diet_char = NULL, mono = NULL, weights = NULL) {
 
-  message("\U0001f37d Calculating Dry Matter Intake (DMI)...")
+  message("Calculating Dry Matter Intake (DMI)...")
 
   # --- 1. Load Dependencies and Inputs ---
   if (is.null(ge_req))    ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
@@ -75,7 +75,7 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
 
   if (nrow(warn_high) > 0) {
     warning(paste0(
-      "\u26A0 Intake Warning: DMI (% BW) exceeds maximum physiological limits for: ",
+      "Intake Warning: DMI (% BW) exceeds maximum physiological limits for: ",
       paste(unique(warn_high$animal_tag), collapse = ", "),
       ". This is physically unlikely. Check GE requirements or diet ed (Ref: NRC 1996 / DSN 2004)."
     ))
@@ -93,7 +93,7 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(final_DMI, "output/DMI_report.csv")
-    message("\U0001f4be Saved DMI report to output/DMI_report.csv")
+    message("[herdr] Saved DMI report to output/DMI_report.csv")
   }
 
   return(final_DMI)

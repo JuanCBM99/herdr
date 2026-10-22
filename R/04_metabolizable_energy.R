@@ -8,7 +8,7 @@
 #' @export
 calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_data") {
 
-  message("\U0001f4be Calculating Monogastric Metabolizable Energy (kcal/day)...")
+  message("Calculating Monogastric Metabolizable Energy (kcal/day)...")
 
   # 1. Read input data files
   mono_csv <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
@@ -128,7 +128,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/monogastric_metabolizable_energy.csv")
-    message("\U0001f4be Saved phase-isolated monogastric energy to output/monogastric_metabolizable_energy.csv")
+    message("[herdr] Saved phase-isolated monogastric energy to output/monogastric_metabolizable_energy.csv")
   }
 
   return(results)

@@ -6,12 +6,14 @@
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data") {
-  message("\U0001f7e2 Calculating Net Energy for Maintenance (NEm)...")
+  message("Calculating Net Energy for Maintenance (NEm)...")
 
   # --- 1. Data Loading from user_data ---
   weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
   categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+
+  herdr_validate_ruminant_coefficients(categories, coefficients)
 
   # --- 2. Calculation Pipeline ---
   results <- weights %>%
@@ -46,7 +48,7 @@ calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param nem_df Optional precalculated NEm dataframe to avoid recomputation.
 #' @export
 calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
-  message("\U0001f7e2 Calculating Net Energy for Activity (NEa)...")
+  message("Calculating Net Energy for Activity (NEa)...")
 
   # --- 1. Data Loading ---
   weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
@@ -96,7 +98,7 @@ calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NU
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
-  message("\U0001f7e2 Calculating Net Energy for Growth (NEg)...")
+  message("Calculating Net Energy for Growth (NEg)...")
 
   # --- 1. Data Loading (Robust reading) ---
   weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"),
@@ -110,6 +112,8 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"),
                                   col_types = readr::cols(description = "c"),
                                   show_col_types = FALSE)
+
+  herdr_validate_ruminant_coefficients(categories, coefficients)
 
   coeff_lookup <- coefficients %>% dplyr::select(description, value) %>% dplyr::distinct()
 
@@ -147,7 +151,7 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NEg_result.csv")
-    message("\U0001f4be Results saved to output/NEg_result.csv")
+    message("[herdr] Results saved to output/NEg_result.csv")
   }
 
   return(results)
@@ -158,7 +162,7 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data") {
-  message("\U0001f7e2 Calculating Net Energy for Lactation (NEl)...")
+  message("Calculating Net Energy for Lactation (NEl)...")
 
   # --- 1. Data Loading from user_data ---
   categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
@@ -199,7 +203,7 @@ calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @export
 calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
 
-  message("\U0001f7e2 Calculating Net Energy for Work (NE_work)...")
+  message("Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading from user_data ---
   categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
@@ -233,7 +237,7 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/NE_work_result.csv")
-    message("\U1F4BE Saved output to output/NE_work_result.csv")
+    message("[herdr] Saved output to output/NE_work_result.csv")
   }
 
   return(results)
@@ -244,7 +248,7 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data") {
-  message("\U0001f7e2 Calculating Net Energy for Wool (NE_wool)...")
+  message("Calculating Net Energy for Wool (NE_wool)...")
 
   # --- 1. Data Loading from user_data ---
   categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
@@ -276,11 +280,14 @@ calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param nem_df Optional precalculated NEm dataframe to avoid recomputation.
 #' @export
 calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
-  message("\U0001f7e2 Calculating Net Energy for Pregnancy (NE_pregnancy)...")
+  message("Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
   # --- 1. Data Loading ---
   categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+
+  herdr_validate_ruminant_coefficients(categories, coefficients)
+
   if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
 
   required_cols <- c("c_pregnancy_cattle", "pr_sheep_goat", "pregnancy_rate")

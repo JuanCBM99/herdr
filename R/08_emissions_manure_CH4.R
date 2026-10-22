@@ -11,44 +11,12 @@
 calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                  vs_df = NULL, pop_df = NULL) {
 
-  message("\U0001f7e2 Calculating CH4 emissions from manure management...")
+  message("Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Loading ---
   user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
-
-  # --- 2. Validations (Asserts) ---
-
-  # 2.1 Combinations Integrity Check (Validates against ipcc_mm.csv)
-  # Filter out rows where key fields are missing to avoid false positives with NAs
-  check_data <- user_manure %>%
-    dplyr::filter(!is.na(system_base))
-
-  if (nrow(check_data) > 0) {
-    user_keys <- check_data %>%
-      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
-      dplyr::pull(key) %>%
-      unique()
-
-    master_keys <- ipcc_master %>%
-      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
-      dplyr::pull(key)
-
-    invalid_combos <- user_keys[!user_keys %in% master_keys]
-
-    assertthat::assert_that(
-      length(invalid_combos) == 0,
-      msg = paste0(
-        "\u274C Error: Invalid system/climate combinations detected in 'manure_management.csv':\n",
-        paste("- ", invalid_combos, collapse = "\n"),
-        "\n\nPlease consult the 'Manure System Guide' and ensure names match the internal library exactly."
-      )
-    )
-  }
-
-  # 2.2 Allocation Assertion
-  herdr_validate_manure_allocation(user_manure)
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
@@ -58,6 +26,10 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (is.null(pop_df)) {
     pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   }
+
+  # --- 2. Validations ---
+  herdr_validate_manure_systems(user_manure, ipcc_master, coefficients = coefficients, animal_metadata = vs_df)
+  herdr_validate_manure_allocation(user_manure)
 
   # --- 3. Processing and Joins ---
   results <- vs_df %>%
@@ -118,7 +90,7 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/CH4_manure.csv")
-    message("\U0001f4be Saved methane results to output/CH4_manure.csv")
+    message("[herdr] Saved methane results to output/CH4_manure.csv")
   }
 
   return(results)

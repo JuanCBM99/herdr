@@ -14,7 +14,7 @@
 calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data",
                          ge_data = NULL, dmi_data = NULL, diet_char = NULL) {
 
-  message("\U0001f7e2 Calculating Volatile Solids (VS)...")
+  message("Calculating Volatile Solids (VS)...")
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
@@ -71,7 +71,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/VS.csv")
-    message("\U0001f4be Saved output to output/VS.csv")
+    message("[herdr] Saved output to output/VS.csv")
   }
 
   return(results)

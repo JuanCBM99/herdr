@@ -5,11 +5,13 @@ library(dplyr)
 library(withr)
 
 test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen excretion", {
-  # 1. Set test directory
-  withr::local_dir(test_path("test_data"))
+  # 1. Set test directory in an isolated temporary location
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
 
   # 2. Normalize and prepare input CSVs
-  # N2O calculation requires almost all master files to be consistent
   files_to_fix <- c(
     "ruminant_definitions.csv", "livestock_weights.csv",
     "livestock_census.csv", "manure_management.csv",
@@ -64,3 +66,27 @@ test_that("calculate_N2O_direct_manure computes direct emissions from nitrogen e
     }
   }
 })
+
+test_that("calculate_N2O_direct_manure detects nitrogen retention exceeding intake", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  # Artificially set an extreme milk yield with low protein intake
+  rum_path <- "user_data/ruminant_definitions.csv"
+  rum <- read_csv(rum_path, show_col_types = FALSE)
+  rum$milk_yield_kg_year <- 250000
+  write_csv(rum, rum_path)
+
+  diet_path <- "user_data/feed_characteristics.csv"
+  feed <- read_csv(diet_path, show_col_types = FALSE)
+  feed$CP_pct <- 0.1
+  write_csv(feed, diet_path)
+
+  expect_error(
+    suppressWarnings(calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = FALSE)),
+    "Biological Imbalance Error: Daily nitrogen retention exceeds daily nitrogen intake"
+  )
+})
+

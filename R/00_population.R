@@ -29,7 +29,7 @@
 #' @export
 calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
-  message("\U0001F7E2 Calculating Total Population...")
+  message("Calculating Total Population...")
 
   # =========================================================================
   # Step 1: Load Input Tables Safely
@@ -117,9 +117,9 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     missing_tags <- setdiff(required_bases, present_tags)
 
     if (length(missing_tags) > 0) {
-      message("\u26A0  Watch out! You have removed or set to zero these mature animals: ",
+      message("[herdr] Notice: Mature breeding animals with zero count or omitted: ",
               paste(missing_tags, collapse = ", "),
-              ". Their respective kids/offspring will NOT appear in the results.")
+              ". Corresponding offspring cohorts will not be modeled.")
     }
 
     results_list <- list()
@@ -127,35 +127,35 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     # 3a. Cattle demographic modeling
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
-      message("\U0001F403 Calculating populations for CATTLE...")
+      message("Calculating populations for CATTLE...")
       results_list$cattle <- calculate_population_cattle(df_cattle, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3b. Sheep demographic modeling
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
-      message("\U0001F411 Calculating populations for SHEEP...")
+      message("Calculating populations for SHEEP...")
       results_list$sheep <- calculate_population_sheep(df_sheep, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3c. Goat demographic modeling
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
-      message("\U0001F410 Calculating populations for GOAT...")
+      message("Calculating populations for GOAT...")
       results_list$goat <- calculate_population_goat(df_goat, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3d. Swine demographic modeling
     df_swine <- census_base %>% dplyr::filter(tolower(animal_type) == "swine")
     if (nrow(df_swine) > 0) {
-      message("\U0001F416 Calculating populations for SWINE...")
+      message("Calculating populations for SWINE...")
       results_list$swine <- calculate_population_swine(df_swine, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
     # 3e. Poultry demographic modeling
     df_poultry <- census_base %>% dplyr::filter(tolower(animal_type) == "poultry")
     if (nrow(df_poultry) > 0) {
-      message("\U0001F426 Calculating populations for POULTRY...")
+      message("Calculating populations for POULTRY...")
       results_list$poultry <- calculate_population_poultry(df_poultry, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
@@ -239,7 +239,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (saveoutput) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(final_result, "output/population_result.csv")
-    message("\U0001F4BE Results saved to output/population_result.csv")
+    message("[herdr] Results saved to output/population_result.csv")
   }
 
   return(final_result)

@@ -23,7 +23,7 @@
 #' @export
 calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
-  message("\U0001F9EE Calculating populations for CATTLE...")
+  message("Calculating populations for CATTLE...")
 
   # Handle flexible parameter positioning
   if (!is.null(rate_parameters)) {
@@ -165,13 +165,13 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
 
   # Demographic integrity warnings (replacements exceeding available births)
   if (any(calculated_pops$pop_dairy_calves_female_repl > calculated_pops$dairy_births_half + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Dairy Cattle): Female replacement demand exceeds female calves born. Check pregnancy_rate vs replacement_rate.")
+    warning("Demographic Warning (Dairy Cattle): Female replacement demand exceeds female calves born. Check pregnancy_rate vs replacement_rate.")
   }
   if (any(calculated_pops$pop_beef_calves_female_repl > calculated_pops$beef_births_half + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Beef Cattle): Female replacement demand exceeds female calves born. Check pregnancy_rate vs replacement_rate.")
+    warning("Demographic Warning (Beef Cattle): Female replacement demand exceeds female calves born. Check pregnancy_rate vs replacement_rate.")
   }
   if (any(calculated_pops$pop_beef_calves_male_repl > calculated_pops$beef_births_half + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Beef Bulls): Male replacement demand exceeds male calves born. Check pregnancy_rate vs replacement_rate.")
+    warning("Demographic Warning (Beef Bulls): Male replacement demand exceeds male calves born. Check pregnancy_rate vs replacement_rate.")
   }
 
   # =========================================================================

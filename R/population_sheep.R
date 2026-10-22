@@ -26,7 +26,7 @@
 #' @export
 calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
-  message("\U0001F9EE Calculating populations for SHEEP...")
+  message("Calculating populations for SHEEP...")
 
   # Handle flexible parameter positioning
   if (!is.null(rate_parameters)) {
@@ -168,10 +168,10 @@ calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, def
 
   # Demographic integrity warnings (replacements exceeding available births)
   if (any(calculated_pops$pop_lamb_female_dairy_repl + calculated_pops$pop_lamb_male_dairy_repl > calculated_pops$total_dairy_births + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Dairy Sheep): Replacement demand exceeds lambs born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
+    warning("Demographic Warning (Dairy Sheep): Replacement demand exceeds lambs born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
   }
   if (any(calculated_pops$pop_lamb_female_meat_repl + calculated_pops$pop_lamb_male_meat_repl > calculated_pops$total_meat_births + 1e-6, na.rm = TRUE)) {
-    warning("\u26A0 Demographic Warning (Meat Sheep): Replacement demand exceeds lambs born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
+    warning("Demographic Warning (Meat Sheep): Replacement demand exceeds lambs born. Check pr_sheep_goat (prolificacy) vs replacement_rate.")
   }
 
   # =========================================================================

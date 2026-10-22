@@ -8,39 +8,37 @@ herdr_init <- function() {
 
   folders <- c("user_data", "Examples")
 
-  message("\u2699\ufe0f Initializing herdr project structure...")
+  message("[herdr] Initializing project structure...")
 
   for (f in folders) {
     if (!dir.exists(f)) {
       dir.create(f, showWarnings = FALSE)
-      message("\u2705 Created folder: ", f)
+      message("[herdr] Created folder: ", f)
     }
   }
-
 
   path_default_example <- system.file("Examples/Level1_Spain_Dairy_Cattle_2015", package = "herdr")
   if (path_default_example != "") {
     files_ud <- list.files(path_default_example, full.names = TRUE)
 
     file.copy(files_ud, "user_data", overwrite = FALSE)
-    message("\U0001f4d1 Copied default template (Level1_Spain_Dairy_Cattle_2015) to 'user_data/'.")
+    message("[herdr] Copied default template (Level1_Spain_Dairy_Cattle_2015) to 'user_data/'.")
   } else {
-    message("\u26a0\ufe0f Note: Default example 'Level1_Spain_Dairy_Cattle_2015' not found in the package.")
+    message("[herdr] Note: Default example 'Level1_Spain_Dairy_Cattle_2015' not found in package.")
   }
-
 
   path_examples <- system.file("Examples", package = "herdr")
   if (path_examples != "") {
     items_to_copy <- list.files(path_examples, full.names = TRUE)
 
     file.copy(items_to_copy, "Examples", recursive = TRUE, overwrite = FALSE)
-    message("\U0001f4ca Copied reference examples (including subfolders) to 'Examples/'.")
+    message("[herdr] Copied reference examples (including subfolders) to 'Examples/'.")
   } else {
-    message("\u2139\ufe0f Note: No 'Examples' folder found in the package.")
+    message("[herdr] Note: No 'Examples' folder found in package.")
   }
 
-  message("\n\u2728 Project initialized successfully!")
-  message("\U0001f4a1 Check your working directory: ", getwd())
+  message("[herdr] Project initialized successfully.")
+  message("[herdr] Working directory: ", getwd())
 }
 
 #' Validate Manure System Allocation Fractions
@@ -166,6 +164,155 @@ herdr_validate_diet_shares <- function(diets, ingredients, diet_join_keys = "die
   if (length(missing_ingredients) > 0) {
     stop("Ingredient Error: Active diet categories missing ingredients in 'diet_ingredients.csv': ",
          paste(missing_ingredients, collapse = ", "), call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate Manure Management Systems and Reference Factors
+#'
+#' Verifies that:
+#' \enumerate{
+#'   \item Every system combination declared in \code{user_manure}
+#'         (\code{system_base}, \code{management_months}, \code{system_climate},
+#'         \code{system_subclimate}, \code{climate_zone}, \code{system_variant},
+#'         \code{climate_moisture}) exists in \code{ipcc_mm.csv}.
+#'   \item If present in \code{user_manure}, methane producing capacity (\code{b_0}) tags
+#'         exist in \code{ipcc_coefficients.csv}.
+#'   \item If \code{animal_metadata} is provided, verifies that the system has valid
+#'         emission factors for that specific \code{animal_type} and \code{animal_subtype}.
+#' }
+#' Throws a fatal error with diagnostic details if any combination or tag is invalid.
+#'
+#' @param user_manure Data frame containing user manure management allocations.
+#' @param ipcc_master Data frame containing master IPCC manure systems (from \code{ipcc_mm.csv}).
+#' @param coefficients Optional data frame of IPCC coefficients (from \code{ipcc_coefficients.csv}).
+#' @param animal_metadata Optional data frame containing animal identifiers and types.
+#' @return Invisibly returns TRUE if all validations pass.
+#' @noRd
+herdr_validate_manure_systems <- function(user_manure, ipcc_master, coefficients = NULL, animal_metadata = NULL) {
+  if (is.null(user_manure) || nrow(user_manure) == 0 || is.null(ipcc_master) || nrow(ipcc_master) == 0) {
+    return(invisible(TRUE))
+  }
+
+  check_data <- user_manure %>% dplyr::filter(!is.na(system_base))
+  if (nrow(check_data) == 0) {
+    return(invisible(TRUE))
+  }
+
+  sys_keys <- c("system_base", "management_months", "system_climate", "system_subclimate",
+                "system_variant", "climate_zone", "climate_moisture")
+
+  if (all(sys_keys %in% names(check_data)) && all(sys_keys %in% names(ipcc_master))) {
+    user_keys <- check_data %>%
+      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
+      dplyr::pull(key) %>%
+      unique()
+
+    master_keys <- ipcc_master %>%
+      dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate, system_variant, climate_zone, climate_moisture, sep = " | ")) %>%
+      dplyr::pull(key)
+
+    invalid_combos <- user_keys[!user_keys %in% master_keys]
+    if (length(invalid_combos) > 0) {
+      stop("Data Error: Invalid system/climate combinations detected in 'manure_management.csv':\n",
+           paste("- ", invalid_combos, collapse = "\n"),
+           "\nPlease consult the 'Manure System Guide' and ensure names match 'ipcc_mm.csv' exactly.",
+           call. = FALSE)
+    }
+  }
+
+  # Validate b_0 tags against ipcc_coefficients if present
+  if ("b_0" %in% names(check_data) && !is.null(coefficients) && "description" %in% names(coefficients)) {
+    b0_coeffs <- coefficients$description[tolower(coefficients$coefficient) == "b_0"]
+    declared_b0 <- stats::na.omit(unique(check_data$b_0))
+    declared_b0 <- declared_b0[declared_b0 != ""]
+    invalid_b0 <- declared_b0[!declared_b0 %in% b0_coeffs]
+    if (length(invalid_b0) > 0) {
+      stop("Data Error: Unknown methane producing capacity (b_0) tags in 'manure_management.csv': ",
+           paste(invalid_b0, collapse = ", "),
+           ". Please verify valid b_0 descriptions in 'ipcc_coefficients.csv'.",
+           call. = FALSE)
+    }
+  }
+
+  # Validate species-specific support in ipcc_mm if animal metadata is provided
+  if (!is.null(animal_metadata) && all(c("animal_type", "animal_subtype") %in% names(animal_metadata))) {
+    join_cols <- intersect(c("region", "subregion", "animal_tag", "class_flex"), names(check_data))
+    matched_manure <- check_data %>%
+      dplyr::left_join(
+        animal_metadata %>% dplyr::select(dplyr::all_of(c(join_cols, "animal_type", "animal_subtype"))) %>% dplyr::distinct(),
+        by = join_cols
+      ) %>%
+      dplyr::filter(!is.na(animal_type), !is.na(animal_subtype))
+
+    if (nrow(matched_manure) > 0) {
+      user_spec_keys <- matched_manure %>%
+        dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate,
+                                  system_variant, climate_zone, climate_moisture, animal_type, animal_subtype, sep = " | ")) %>%
+        dplyr::pull(key) %>%
+        unique()
+
+      master_spec_keys <- ipcc_master %>%
+        dplyr::mutate(key = paste(system_base, management_months, system_climate, system_subclimate,
+                                  system_variant, climate_zone, climate_moisture, animal_type, animal_subtype, sep = " | ")) %>%
+        dplyr::pull(key)
+
+      invalid_spec_combos <- user_spec_keys[!user_spec_keys %in% master_spec_keys]
+      if (length(invalid_spec_combos) > 0) {
+        stop("Data Error: Manure management system is not supported for animal category in 'ipcc_mm.csv':\n",
+             paste("- ", invalid_spec_combos, collapse = "\n"),
+             call. = FALSE)
+      }
+    }
+  }
+
+  invisible(TRUE)
+}
+
+#' Validate Ruminant Biological Coefficients
+#'
+#' Validates that biological coefficient tags declared in \code{ruminant_definitions.csv}
+#' (\code{cfi}, \code{ca}, \code{c}, \code{a}, \code{b}, \code{c_pregnancy_cattle})
+#' match valid entries in \code{ipcc_coefficients.csv}.
+#'
+#' @param definitions Data frame of ruminant definitions.
+#' @param coefficients Data frame of IPCC coefficients.
+#' @return Invisibly returns TRUE if all validations pass.
+#' @noRd
+herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
+  if (is.null(definitions) || nrow(definitions) == 0 || is.null(coefficients) || nrow(coefficients) == 0) {
+    return(invisible(TRUE))
+  }
+
+  check_tag <- function(col_name, coeff_type, label) {
+    if (!col_name %in% names(definitions)) return(character())
+    vals <- stats::na.omit(definitions[[col_name]])
+    vals <- vals[vals != "" & vals != "NA"]
+    if (length(vals) == 0) return(character())
+    valid_tags <- coefficients$description[tolower(coefficients$coefficient) == tolower(coeff_type)]
+    bad <- vals[!vals %in% valid_tags]
+    if (length(bad) > 0) {
+      paste0(label, " (col '", col_name, "'): ", paste(unique(bad), collapse = ", "))
+    } else {
+      character()
+    }
+  }
+
+  errors <- c(
+    check_tag("cfi", "cfi", "Maintenance coefficient"),
+    check_tag("ca", "ca", "Activity coefficient"),
+    check_tag("c", "c", "Growth coefficient c"),
+    check_tag("a", "a", "Growth coefficient a"),
+    check_tag("b", "b", "Growth coefficient b"),
+    check_tag("c_pregnancy_cattle", "c_pregnancy", "Pregnancy coefficient")
+  )
+
+  if (length(errors) > 0) {
+    stop("Data Error: Unknown coefficient tags in 'ruminant_definitions.csv':\n",
+         paste("- ", errors, collapse = "\n"),
+         "\nPlease verify valid coefficient descriptions in 'ipcc_coefficients.csv'.",
+         call. = FALSE)
   }
 
   invisible(TRUE)

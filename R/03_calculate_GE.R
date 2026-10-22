@@ -18,7 +18,7 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
                          NEl_df = NULL, NE_work_df = NULL,
                          NE_pregnancy_df = NULL, NE_wool_df = NULL) {
 
-  message("\U0001f7e2 Calculating Gross Energy (GE)...")
+  message("Calculating Gross Energy (GE)...")
 
   join_keys_univ <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
 
@@ -89,7 +89,7 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
     readr::write_csv(results, "output/ge_result.csv")
-    message("\U0001f4be Saved output to output/ge_result.csv")
+    message("[herdr] Saved output to output/ge_result.csv")
   }
 
   return(results)
