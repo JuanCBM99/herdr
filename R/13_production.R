@@ -39,14 +39,11 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
 
   # Consolidate Definitions
   if (nrow(ruminants) > 0) {
-    ruminants$production_role <- dplyr::coalesce(
-      if ("production_role" %in% names(ruminants)) ruminants$production_role else NA_character_,
-      dplyr::case_when(
-        grepl("mature", ruminants$animal_tag, ignore.case = TRUE) ~ "mature",
-        grepl("replacement", ruminants$animal_tag, ignore.case = TRUE) ~ "replacement",
-        TRUE ~ "slaughter"
-      )
-    )
+    if (!"production_role" %in% names(ruminants)) {
+      stop(paste0("Data Error: Missing required column 'production_role' in '", ruminants_file,
+                  "'. Valid options: 'mature', 'replacement', 'slaughter'."), call. = FALSE)
+    }
+    ruminants$production_role <- tolower(trimws(as.character(ruminants$production_role)))
 
     if (!"protein_content_pct" %in% names(ruminants)) {
       ruminants$protein_content_pct <- 0
@@ -69,14 +66,11 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   }
 
   if (nrow(monogastrics) > 0) {
-    monogastrics$production_role <- dplyr::coalesce(
-      if ("production_role" %in% names(monogastrics)) monogastrics$production_role else NA_character_,
-      dplyr::case_when(
-        grepl("mature|layer|sow", monogastrics$animal_tag, ignore.case = TRUE) ~ "mature",
-        grepl("replacement", monogastrics$animal_tag, ignore.case = TRUE) ~ "replacement",
-        TRUE ~ "slaughter"
-      )
-    )
+    if (!"production_role" %in% names(monogastrics)) {
+      stop(paste0("Data Error: Missing required column 'production_role' in '", monogastrics_file,
+                  "'. Valid options: 'mature', 'replacement', 'slaughter'."), call. = FALSE)
+    }
+    monogastrics$production_role <- tolower(trimws(as.character(monogastrics$production_role)))
 
     # Calculate daily egg mass internally for egg yield: (eggs_per_year / 365) * egg_weight_g
     egg_wt <- if ("egg_weight_g" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$egg_weight_g)) else 60

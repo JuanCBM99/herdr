@@ -82,12 +82,15 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     dplyr::left_join(diet_profiles, by = diet_join_keys) %>%
     dplyr::filter(!is.na(region))
 
+  if (!"production_role" %in% names(full_data)) {
+    full_data$production_role <- NA_character_
+  }
+
   # --- 5. Biological & Nutritional Threshold Checks (Mature Ruminants Only) ---
   mature_check <- full_data %>%
     dplyr::filter(
       tolower(animal_type) %in% c("cattle", "sheep", "goat", "buffalo"),
-      grepl("mature", animal_tag, ignore.case = TRUE) |
-        (if ("production_role" %in% names(full_data)) tolower(trimws(as.character(production_role))) == "mature" else FALSE)
+      tolower(trimws(as.character(production_role))) == "mature"
     )
 
   if (nrow(mature_check) > 0) {
