@@ -27,3 +27,20 @@ test_that("reference data paths resolve bundled datasets correctly", {
   expect_equal(nrow(df_eco), 224)
   expect_equal(ncol(df_eco), 38)
 })
+
+test_that("herdr_cache_dir returns a valid directory path", {
+  cache <- herdr_cache_dir()
+  expect_type(cache, "character")
+  expect_true(dir.exists(cache))
+})
+
+test_that("reference data paths prioritize local data_dir when present", {
+  withr::with_tempdir({
+    dir.create("custom_data")
+    mock_file <- file.path("custom_data", "forages.parquet")
+    file.copy(herdr_get_forages_path(), mock_file)
+
+    resolved <- herdr_get_forages_path(data_dir = "custom_data")
+    expect_equal(normalizePath(resolved), normalizePath(mock_file))
+  })
+})

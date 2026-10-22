@@ -55,16 +55,31 @@ herdr_get_fao_crops_path <- function(data_dir = "user_data", download_if_missing
   # nocov start
   if (download_if_missing) {
     url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_crops.parquet"
-    message("\u23f3 FAO crops dataset not found locally. Downloading to central cache (24 MB)...")
+    message("FAO crops dataset not found locally. Downloading to central cache (24 MB)...")
     old_timeout <- getOption("timeout")
     on.exit(options(timeout = old_timeout), add = TRUE)
     options(timeout = max(300, old_timeout))
+
+    tmp_file <- tempfile(pattern = "fao_crops_", fileext = ".parquet")
+    on.exit({
+      if (file.exists(tmp_file)) unlink(tmp_file)
+    }, add = TRUE)
+
     tryCatch({
-      utils::download.file(url_release, destfile = cache_file, mode = "wb")
-      message("\u2705 Download completed successfully.")
+      utils::download.file(url_release, destfile = tmp_file, mode = "wb")
+      if (!file.exists(tmp_file) || file.info(tmp_file)$size == 0) {
+        stop("Downloaded file is empty or missing.")
+      }
+      arrow::read_parquet(tmp_file, as_data_frame = FALSE)
+      dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+      if (!file.copy(tmp_file, cache_file, overwrite = TRUE)) {
+        stop("Failed to copy dataset to cache directory.")
+      }
+      unlink(tmp_file)
+      message("Download completed successfully.")
       return(cache_file)
     }, error = function(e) {
-      warning("\u26A0 Could not download fao_crops.parquet: ", e$message)
+      warning("Could not download fao_crops.parquet: ", e$message)
     })
   }
   # nocov end
@@ -99,14 +114,29 @@ herdr_get_fao_trade_matrix_path <- function(data_dir = "user_data", download_if_
   # nocov start
   if (download_if_missing) {
     url_release <- "https://github.com/JuanCBM99/herdr/releases/latest/download/fao_trade_matrix.parquet"
-    message("\u23f3 FAO trade matrix not found locally.")
-    message("Downloading background database (187 MB) to central cache... This will only happen once.")
+    message("FAO trade matrix not found locally.")
+    message("Downloading background database (187 MB) to central cache...")
     old_timeout <- getOption("timeout")
     on.exit(options(timeout = old_timeout), add = TRUE)
     options(timeout = max(600, old_timeout))
+
+    tmp_file <- tempfile(pattern = "fao_trade_matrix_", fileext = ".parquet")
+    on.exit({
+      if (file.exists(tmp_file)) unlink(tmp_file)
+    }, add = TRUE)
+
     tryCatch({
-      utils::download.file(url_release, destfile = cache_file, mode = "wb")
-      message("\u2705 Download completed successfully.")
+      utils::download.file(url_release, destfile = tmp_file, mode = "wb")
+      if (!file.exists(tmp_file) || file.info(tmp_file)$size == 0) {
+        stop("Downloaded file is empty or missing.")
+      }
+      arrow::read_parquet(tmp_file, as_data_frame = FALSE)
+      dir.create(cache_dir, recursive = TRUE, showWarnings = FALSE)
+      if (!file.copy(tmp_file, cache_file, overwrite = TRUE)) {
+        stop("Failed to copy dataset to cache directory.")
+      }
+      unlink(tmp_file)
+      message("Download completed successfully.")
       return(cache_file)
     }, error = function(e) {
       stop("Error downloading the trade matrix. Please check your internet connection: ", e$message)

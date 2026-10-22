@@ -41,6 +41,7 @@ Imports:
     assertthat,
     magrittr,
     utils,
+    tools,
     shiny,
     bslib,
     rhandsontable,

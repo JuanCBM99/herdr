@@ -320,7 +320,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       water_scale <- ifelse(valid, 1 / prot, 0)
       emiss_unit  <- "kg CO2e / kg protein"
       land_unit   <- "m2 / kg protein"
-      water_unit  <- "m³ depriv. / kg protein"
+      water_unit  <- "m\u00b3 depriv. / kg protein"
       scale_desc  <- "per kg of edible animal protein"
     } else if (fu == "head" && "population" %in% names(df_agg)) {
       pop <- df_agg$population
@@ -330,7 +330,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       water_scale <- ifelse(valid, 1 / pop, 0)
       emiss_unit  <- "kg CO2e / head"
       land_unit   <- "m2 / head"
-      water_unit  <- "m³ depriv. / head"
+      water_unit  <- "m\u00b3 depriv. / head"
       scale_desc  <- "per animal head per year"
     } else if (fu %in% c("product", "milk", "meat", "wool", "egg") && any(c("milk_FPCM_kg", "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg") %in% names(df_agg))) {
       milk_kg <- if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg else 0
@@ -394,7 +394,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       water_scale <- ifelse(valid, af / prod_yield, 0)
       emiss_unit  <- paste0("kg CO2e / kg ", prod_label)
       land_unit   <- paste0("m2 / kg ", prod_label)
-      water_unit  <- paste0("m³ depriv. / kg ", prod_label)
+      water_unit  <- paste0("m\u00b3 depriv. / kg ", prod_label)
       scale_desc  <- paste0("per kg of ", prod_label, " (biophysical allocation)")
     } else {
       # Default: fu == "total"
@@ -403,7 +403,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       water_scale <- rep(1 / 1e6, nrow(df_agg))   # m3 to Mm3 (10^6 m3 depriv.)
       emiss_unit  <- "Gg CO2e"
       land_unit   <- "ha"
-      water_unit  <- "Mm³ depriv."
+      water_unit  <- "Mm\u00b3 depriv."
       scale_desc  <- "total herd annual footprint"
     }
 
@@ -616,17 +616,17 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       if (fu_raw %in% c("cradle_breakdown", "cradle")) {
         emiss_panel <- "Cradle-to-Farm GHG (Gg CO2e)"
         land_panel  <- "Land Footprint (ha)"
-        water_panel <- "Water Deprivation (Mm³ depriv.)"
+        water_panel <- "Water Deprivation (Mm\u00b3 depriv.)"
         overview_title <- "Cradle-to-Farm-Gate Scope 1 + Scope 3 LCA Breakdown"
       } else if (fu == "head") {
         emiss_panel <- "GHG per Head (kg CO2e / head)"
         land_panel  <- "Land per Head (m2 / head)"
-        water_panel <- "Water per Head (m³ depriv. / head)"
+        water_panel <- "Water per Head (m\u00b3 depriv. / head)"
         overview_title <- "Environmental Impact Assessment"
       } else if (fu == "protein") {
         emiss_panel <- "GHG Intensity (kg CO2e / kg protein)"
         land_panel  <- "Land Footprint (m2 / kg protein)"
-        water_panel <- "Water Intensity (m³ depriv. / kg protein)"
+        water_panel <- "Water Intensity (m\u00b3 depriv. / kg protein)"
         overview_title <- "Environmental Impact Assessment"
       } else if (fu %in% c("product", "milk", "meat", "wool", "egg")) {
         emiss_panel <- paste0("GHG Intensity (", emiss_unit, ")")
@@ -636,7 +636,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       } else {
         emiss_panel <- "GHG Emissions (Gg CO2e)"
         land_panel  <- "Land Footprint (ha)"
-        water_panel <- "Water Deprivation (Mm³ depriv.)"
+        water_panel <- "Water Deprivation (Mm\u00b3 depriv.)"
         overview_title <- "Environmental Impact Assessment"
       }
 
@@ -768,14 +768,14 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       df_agg$luc_val    <- df_agg$feed_CO2e_luc_kg_year / pop_safe
       df_agg$water_val  <- df_agg$feed_water_m3_year / pop_safe
       emiss_unit <- "kg CO2e / head"
-      water_unit <- "m³ depriv. / head"
+      water_unit <- "m\u00b3 depriv. / head"
       sub_title  <- "Annual feed environmental footprint per animal head (ECOALIM V9 / EF 3.1 AWARE)"
     } else {
       df_agg$fossil_val <- df_agg$feed_CO2e_fossil_kg_year / 1000
       df_agg$luc_val    <- df_agg$feed_CO2e_luc_kg_year / 1000
       df_agg$water_val  <- df_agg$feed_water_m3_year
       emiss_unit <- "t CO2e"
-      water_unit <- "m³ depriv."
+      water_unit <- "m\u00b3 depriv."
       sub_title  <- "Total annual feed greenhouse gas emissions and water deprivation (ECOALIM V9 / EF 3.1 AWARE)"
     }
 
@@ -836,7 +836,7 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
     emiss_panel <- if (is_per_head) "Feed GHG per Head (kg CO2e / head)" else "Feed GHG Emissions (t CO2e)"
-    water_panel <- if (is_per_head) "Water per Head (m³ depriv. / head)" else "Water Deprivation (m³ depriv.)"
+    water_panel <- if (is_per_head) "Water per Head (m\u00b3 depriv. / head)" else "Water Deprivation (m\u00b3 depriv.)"
 
     ghg_df <- df_agg %>%
       dplyr::select(dplyr::all_of(c("plot_label", "fossil_val", "luc_val"))) %>%
