@@ -50,19 +50,7 @@ calculate_N2O_indirect_leaching <- function(automatic_cycle = FALSE, saveoutput 
   }
 
   # 2.2 Allocation Assertion
-  # Verify that the sum of allocations for each unique animal group does not exceed 100%
-  allocation_sums <- user_manure %>%
-    dplyr::filter(!is.na(allocation)) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
-    dplyr::summarise(total_alloc = sum(allocation, na.rm = TRUE), .groups = "drop")
-
-  if (nrow(allocation_sums) > 0) {
-    assertthat::assert_that(
-      all(allocation_sums$total_alloc <= 1.001),
-      msg = paste("Data Error: Manure allocation exceeds 1.0 (100%) for animals in:",
-                  paste(unique(allocation_sums$animal_tag[allocation_sums$total_alloc > 1.001]), collapse = ", "))
-    )
-  }
+  herdr_validate_manure_allocation(user_manure)
 
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")

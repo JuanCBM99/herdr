@@ -95,6 +95,9 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     diet_join_keys <- intersect(c("region", "subregion", "class_flex", "diet_tag"), names(diet_profiles))
   }
 
+  # --- 3.1 Validate Diet Categories and Ingredient Shares ---
+  herdr_validate_diet_shares(diet_profiles, diet_ingredients_raw, diet_join_keys = diet_join_keys)
+
   # --- 4. Merge Diets, Characteristics and ECOALIM Factors ---
   joined <- DMI_df %>%
     dplyr::inner_join(diet_profiles, by = diet_join_keys) %>%

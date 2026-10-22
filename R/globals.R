@@ -75,7 +75,7 @@ if(getRversion() >= "2.15.1") {
 
     # --- Manure and Methane (CH4) ---
     "system_base", "management_months", "system_climate", "system_subclimate",
-    "system_variant", "climate_zone", "climate_moisture", "allocation",
+    "system_variant", "climate_zone", "climate_moisture", "allocation", "total_alloc",
     "VS_kgday", "MCF_pct", "B0", "EF_kgheadyear", "EF_kgyear", "Ym_pct",
     "total_CH4_enteric_Ggyear", "total_CH4_mm_kgyear", "b_0",
 

@@ -32,28 +32,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   }
 
   # --- 2. Consistency Validations (Shares must sum to 100%) ---
-  diet_sum_check <- diets %>%
-    dplyr::mutate(total_diet = forage_share + concentrate_share + milk_share + milk_replacer_share) %>%
-    dplyr::filter(abs(total_diet - 100) > 0.1)
-
-  assertthat::assert_that(nrow(diet_sum_check) == 0,
-    msg = paste(
-      "Diet Profile Error: Shares do not sum to 100% in 'diet_profiles.csv' for:",
-      paste(diet_sum_check$diet_tag, collapse = ", ")
-    )
-  )
-
-  ing_sum_check <- ingredients %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(c(diet_join_keys, "ingredient_type")))) %>%
-    dplyr::summarise(total_ing = sum(ingredient_share, na.rm = TRUE), .groups = "drop") %>%
-    dplyr::filter(total_ing > 0 & abs(total_ing - 100) > 0.1)
-
-  assertthat::assert_that(nrow(ing_sum_check) == 0,
-    msg = paste(
-      "Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for:",
-      paste(unique(ing_sum_check$diet_tag), collapse = ", ")
-    )
-  )
+  herdr_validate_diet_shares(diets, ingredients, diet_join_keys = diet_join_keys)
 
   # --- 3. Compute Weighted Nutritional Profiles ---
   diet_profiles <- diets %>%

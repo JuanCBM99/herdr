@@ -298,15 +298,8 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   population_df <- population_df %>%
     dplyr::distinct(animal_tag, region, subregion, class_flex, population)
 
-  # --- 4. Validate ingredient shares ---
-  invalid_share <- diet_ingredients %>%
-    dplyr::group_by(dplyr::across(dplyr::all_of(c(diet_join_keys, "ingredient_type")))) %>%
-    dplyr::summarise(total = sum(as.numeric(ingredient_share), na.rm = TRUE), .groups = "drop") %>%
-    dplyr::filter(abs(total - 100) > 0.1)
-
-  if (nrow(invalid_share) > 0) {
-    warning("\u26A0 Ingredient shares do not sum to 100% in: ", paste(unique(invalid_share$diet_tag), collapse = ", "))
-  }
+  # --- 4. Validate diet and ingredient shares ---
+  herdr_validate_diet_shares(diet_profiles, diet_ingredients, diet_join_keys = diet_join_keys)
 
   # --- 5. Merge data and calculate impact ---
   results <- DMI_df %>%

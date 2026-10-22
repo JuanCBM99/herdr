@@ -5,8 +5,11 @@ library(dplyr)
 library(withr)
 
 test_that("calculate_weighted_variable handles integrity errors and biological warnings", {
-  # Set test directory
-  withr::local_dir(test_path("test_data"))
+  # Set test directory in an isolated temporary location
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
 
   # Fix column types to avoid logical vs character errors
   read_csv("user_data/diet_profiles.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
