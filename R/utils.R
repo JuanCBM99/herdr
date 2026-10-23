@@ -365,3 +365,166 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
 
   invisible(TRUE)
 }
+
+#' Resolve Demographic Parameters by Stratum
+#'
+#' Hierarchically matches and resolves zootechnical parameters (replacement rates,
+#' fertility rates, prolificacy) per stratum (region, subregion, class_flex).
+#'
+#' @param base_df Data.frame containing base mature cohorts (with region, subregion, class_flex).
+#' @param tag Character. Animal tag to resolve parameters for.
+#' @param param_col Character. Column name in definitions table (e.g. "replacement_rate").
+#' @param param_name Character. Parameter name in rate_parameters table. Defaults to param_col.
+#' @param definitions Optional definitions data.frame (e.g. ruminant_definitions or monogastric_definitions).
+#' @param rate_parameters Optional rate_parameters data.frame.
+#' @param default_val Numeric. Fallback default value if not found. Default is 0.
+#'
+#' @return A numeric vector of length nrow(base_df).
+#' @noRd
+herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name = param_col,
+                                           definitions = NULL, rate_parameters = NULL, default_val = 0) {
+  if (is.null(base_df) || nrow(base_df) == 0) return(numeric(0))
+  n <- nrow(base_df)
+  out <- numeric(n)
+  if (length(default_val) == 1) default_val <- rep(default_val, n)
+
+  has_defs <- !is.null(definitions) && nrow(definitions) > 0 && param_col %in% names(definitions)
+  sub_defs <- if (has_defs) definitions[definitions$animal_tag == tag, , drop = FALSE] else NULL
+  if (!is.null(sub_defs) && nrow(sub_defs) == 0) sub_defs <- NULL
+
+  has_rates <- !is.null(rate_parameters) && nrow(rate_parameters) > 0 &&
+               "parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters)
+  sub_rates <- if (has_rates) {
+    rate_parameters[tolower(rate_parameters$parameter) == tolower(param_name) & rate_parameters$animal_tag == tag, , drop = FALSE]
+  } else {
+    NULL
+  }
+  if (!is.null(sub_rates) && nrow(sub_rates) == 0) sub_rates <- NULL
+
+  for (i in seq_len(n)) {
+    r <- if ("region" %in% names(base_df)) base_df$region[i] else NA_character_
+    s <- if ("subregion" %in% names(base_df)) base_df$subregion[i] else NA_character_
+    c_flx <- if ("class_flex" %in% names(base_df)) base_df$class_flex[i] else NA_character_
+
+    val_found <- NA_real_
+
+    # 1. Try matching in definitions
+    if (!is.null(sub_defs)) {
+      m <- sub_defs
+      # Level 1: full stratum match (region + subregion + class_flex)
+      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
+        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
+        if (nrow(m_r) > 0) m <- m_r
+      }
+      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
+        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
+        if (nrow(m_s) > 0) m <- m_s
+      }
+      if ("class_flex" %in% names(m) && !is.na(c_flx) && nzchar(c_flx)) {
+        m_c <- m[!is.na(m$class_flex) & m$class_flex == c_flx, , drop = FALSE]
+        if (nrow(m_c) > 0) m <- m_c
+      }
+
+      # Extract candidate
+      for (row_idx in seq_len(nrow(m))) {
+        cand <- suppressWarnings(as.numeric(m[[param_col]][row_idx]))
+        if (!is.na(cand) && cand >= 0) {
+          val_found <- cand
+          break
+        }
+      }
+    }
+
+    # 2. Try matching in rate_parameters if not found in definitions
+    if (is.na(val_found) && !is.null(sub_rates)) {
+      m <- sub_rates
+      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
+        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
+        if (nrow(m_r) > 0) m <- m_r
+      }
+      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
+        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
+        if (nrow(m_s) > 0) m <- m_s
+      }
+      for (row_idx in seq_len(nrow(m))) {
+        cand <- suppressWarnings(as.numeric(m$value[row_idx]))
+        if (!is.na(cand) && cand >= 0) {
+          val_found <- cand
+          break
+        }
+      }
+    }
+
+    out[i] <- if (!is.na(val_found)) val_found else default_val[i]
+  }
+
+  return(out)
+}
+
+#' Resolve Productive Period Days by Stratum
+#'
+#' Resolves productive_period_days from livestock_weights.csv hierarchically
+#' per stratum (region, subregion, class_flex).
+#'
+#' @param base_df Data.frame containing base mature cohorts (with region, subregion, class_flex).
+#' @param tag Character. Animal tag to resolve period days for.
+#' @param weights Optional weights data.frame (e.g. livestock_weights).
+#' @param default_days Numeric or numeric vector of default period days. Default is 365.
+#'
+#' @return A numeric vector of length nrow(base_df).
+#' @noRd
+herdr_resolve_period_days <- function(base_df, tag, weights = NULL, default_days = 365) {
+  if (is.null(base_df) || nrow(base_df) == 0) return(numeric(0))
+  n <- nrow(base_df)
+  out <- numeric(n)
+  if (length(default_days) == 1) default_days <- rep(default_days, n)
+
+  has_weights <- !is.null(weights) && nrow(weights) > 0 && "productive_period_days" %in% names(weights)
+
+  generic_tag <- sub("_(male|female)$", "", tag)
+  sub_w <- if (has_weights) {
+    w_sub <- weights[weights$animal_tag == tag, , drop = FALSE]
+    if (nrow(w_sub) == 0 && generic_tag != tag) {
+      w_sub <- weights[weights$animal_tag == generic_tag, , drop = FALSE]
+    }
+    if (nrow(w_sub) > 0) w_sub else NULL
+  } else {
+    NULL
+  }
+
+  for (i in seq_len(n)) {
+    r <- if ("region" %in% names(base_df)) base_df$region[i] else NA_character_
+    s <- if ("subregion" %in% names(base_df)) base_df$subregion[i] else NA_character_
+    c_flx <- if ("class_flex" %in% names(base_df)) base_df$class_flex[i] else NA_character_
+
+    val_found <- NA_real_
+
+    if (!is.null(sub_w)) {
+      m <- sub_w
+      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
+        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
+        if (nrow(m_r) > 0) m <- m_r
+      }
+      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
+        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
+        if (nrow(m_s) > 0) m <- m_s
+      }
+      if ("class_flex" %in% names(m) && !is.na(c_flx) && nzchar(c_flx)) {
+        m_c <- m[!is.na(m$class_flex) & m$class_flex == c_flx, , drop = FALSE]
+        if (nrow(m_c) > 0) m <- m_c
+      }
+
+      for (row_idx in seq_len(nrow(m))) {
+        cand <- suppressWarnings(as.numeric(m$productive_period_days[row_idx]))
+        if (!is.na(cand) && cand > 0) {
+          val_found <- cand
+          break
+        }
+      }
+    }
+
+    out[i] <- if (!is.na(val_found)) val_found else default_days[i]
+  }
+
+  return(out)
+}
