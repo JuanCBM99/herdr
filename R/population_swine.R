@@ -59,80 +59,7 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   }
 
   # =========================================================================
-  # Step 2: Retrieve Biological & Zootechnical Parameters
-  # =========================================================================
-  # 2a. Parameter retrieval helper closures
-  get_def_val <- function(col, tag, default_val = 0) {
-    if (is.null(definitions) || !col %in% names(definitions)) return(default_val)
-    val <- definitions %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(!!rlang::sym(col))
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
-    val <- rate_parameters %>%
-      dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
-      dplyr::pull(value)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  weights_df <- if (!is.null(weights)) {
-    weights
-  } else {
-    weights_path <- file.path(data_dir, "livestock_weights.csv")
-    if (file.exists(weights_path)) {
-      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
-    } else {
-      NULL
-    }
-  }
-
-  get_period_days <- function(tag, default_days = 365) {
-    if (is.null(weights_df)) return(default_days)
-    val <- weights_df %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(productive_period_days)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
-    }
-    return(default_days)
-  }
-
-  # 2b. Durations of reproductive cycle and fattening period
-  sow_cycle_days <- get_period_days("breeder_sows", default_days = 148.9)
-  fattening_days <- get_period_days("fattening_pigs", default_days = 110)
-
-  # 2c. Sow replacement rate (priority: definitions -> rate_parameters -> default 25%)
-  sow_replacement_rate <- get_def_val("replacement_rate", "breeder_sows",
-                                      default_val = get_rate("replacement_rate", "breeder_sows", default_val = 0.25))
-
-  # 2d. Farrowing index (litters per sow per year: reproductive cycle turnover 365 / productive_period_days)
-  farrowing_rate <- if (sow_cycle_days > 0) (365 / sow_cycle_days) else 2.45
-
-  # 2e. Litter size (weaned piglets per litter: definitions piglets_suckling -> piglets_born * 0.85 -> default 12.0)
-  suckling_def <- get_def_val("piglets_suckling", "breeder_sows", default_val = 0)
-  born_def     <- get_def_val("piglets_born", "breeder_sows", default_val = 0)
-  litter_size  <- if (suckling_def > 0) {
-    suckling_def
-  } else if (born_def > 0) {
-    born_def * 0.85
-  } else {
-    12.0
-  }
-
-  # =========================================================================
-  # Step 3: Pivot Mature Base Populations (Wide Format)
+  # Step 2: Pivot Mature Base Populations (Wide Format)
   # =========================================================================
   base_pops_wide <- census_swine %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
@@ -147,6 +74,38 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   if (all(c(base_pops_wide$breeder_sows, base_pops_wide$boars) == 0)) {
     return(census_swine %>% dplyr::filter(animal_tag %in% valid_swine_tags))
   }
+
+  # =========================================================================
+  # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
+  # =========================================================================
+  weights_df <- if (!is.null(weights)) {
+    weights
+  } else {
+    weights_path <- file.path(data_dir, "livestock_weights.csv")
+    if (file.exists(weights_path)) {
+      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+    } else {
+      NULL
+    }
+  }
+
+  # 3a. Durations of reproductive cycle and fattening period
+  sow_cycle_days <- herdr_resolve_period_days(base_pops_wide, "breeder_sows",   weights = weights_df, default_days = 148.9)
+  fattening_days <- herdr_resolve_period_days(base_pops_wide, "fattening_pigs", weights = weights_df, default_days = 110)
+
+  # 3b. Sow replacement rate (priority: definitions -> rate_parameters -> default 25%)
+  sow_replacement_rate <- herdr_resolve_demographic_param(base_pops_wide, "breeder_sows", "replacement_rate",
+                                                          definitions = definitions, rate_parameters = rate_parameters, default_val = 0.25)
+
+  # 3c. Farrowing index (litters per sow per year: reproductive cycle turnover 365 / productive_period_days)
+  farrowing_rate <- ifelse(sow_cycle_days > 0, 365 / sow_cycle_days, 2.45)
+
+  # 3d. Litter size (weaned piglets per litter: definitions piglets_suckling -> piglets_born * 0.85 -> default 12.0)
+  suckling_def <- herdr_resolve_demographic_param(base_pops_wide, "breeder_sows", "piglets_suckling",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 0)
+  born_def     <- herdr_resolve_demographic_param(base_pops_wide, "breeder_sows", "piglets_born",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 0)
+  litter_size  <- ifelse(suckling_def > 0, suckling_def, ifelse(born_def > 0, born_def * 0.85, 12.0))
 
   # =========================================================================
   # Step 4: Demographic Modeling Equations
@@ -206,16 +165,16 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   if (tot_sows > 0) {
     message(sprintf("   \u2022 Breeder sows: %s head (cycle %.1f days = %.2f litters/yr, %.1f piglets/litter)",
                     format(round(tot_sows), big.mark = ","),
-                    sow_cycle_days,
-                    farrowing_rate,
-                    litter_size))
+                    sow_cycle_days[1],
+                    farrowing_rate[1],
+                    litter_size[1]))
     message(sprintf("   \u2022 Replacement sows: %s head (repl rate %.1f%%)",
                     format(round(tot_repl_sows), big.mark = ","),
-                    sow_replacement_rate * 100))
+                    sow_replacement_rate[1] * 100))
     if (tot_fattening > 0) {
       message(sprintf("   \u2022 Fattening pigs: %s standing barn places (%.0f days fattening -> %s slaughter pigs/yr)",
                       format(round(tot_fattening), big.mark = ","),
-                      fattening_days,
+                      fattening_days[1],
                       format(round(total_slaughter), big.mark = ",")))
     }
   }

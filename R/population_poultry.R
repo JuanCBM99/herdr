@@ -75,83 +75,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   }
 
   # =========================================================================
-  # Step 2: Retrieve Biological & Zootechnical Parameters
-  # =========================================================================
-  # 2a. Parameter retrieval helper closures
-  get_def_val <- function(col, tag, default_val = 0) {
-    if (is.null(definitions) || !col %in% names(definitions)) return(default_val)
-    val <- definitions %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(!!rlang::sym(col))
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
-    val <- rate_parameters %>%
-      dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
-      dplyr::pull(value)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  weights_df <- if (!is.null(weights)) {
-    weights
-  } else {
-    weights_path <- file.path(data_dir, "livestock_weights.csv")
-    if (file.exists(weights_path)) {
-      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
-    } else {
-      NULL
-    }
-  }
-
-  get_period_days <- function(tag, default_days = 365) {
-    if (is.null(weights_df)) return(default_days)
-    val <- weights_df %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(productive_period_days)
-    if (length(val) > 0 && !is.na(val[1]) && as.numeric(val[1]) > 0) as.numeric(val[1]) else default_days
-  }
-
-  # 2b. Durations of productive laying cycles and rearing periods
-  pullet_meat_days  <- get_period_days("replacement_meat_pullets", default_days = 140)
-  pullet_layer_days <- get_period_days("replacement_layer_pullets", default_days = 119)
-  hen_meat_days     <- get_period_days("breeder_meat_hens", default_days = 301)
-  laying_days       <- get_period_days("laying_hens", default_days = 511)
-  broiler_days      <- get_period_days("broilers", default_days = 42)
-
-  # 2c. Breeder meat hen oviposition and fertility parameters
-  eggs_yr_breeder   <- get_def_val("eggs_per_year", "breeder_meat_hens", default_val = 211.7)
-  egg_wt_breeder    <- get_def_val("egg_weight_g", "breeder_meat_hens", default_val = 64.0)
-  fertility_def     <- get_def_val("fertility_rate", "breeder_meat_hens", default_val = 0)
-  fertility_breeder <- if (fertility_def > 0) {
-    fertility_def
-  } else {
-    get_rate("fertility_rate", "breeder_meat_hens", default_val = 0.83)
-  }
-  if (fertility_breeder > 1) fertility_breeder <- fertility_breeder / 100
-
-  # 2d. Replacement rate dynamics: user-specified value takes precedence,
-  # otherwise estimated from all-in all-out cycle turnover (365 / productive_period_days)
-  get_repl_rate <- function(tag, cycle_days) {
-    user_val <- get_def_val("replacement_rate", tag, default_val = get_rate("replacement_rate", tag, default_val = NA_real_))
-    if (!is.na(user_val) && user_val >= 0) return(user_val)
-    if (cycle_days > 0) (365 / cycle_days) else 1.0
-  }
-
-  breeder_meat_repl_rate <- get_repl_rate("breeder_meat_hens", hen_meat_days)
-  laying_repl_rate       <- get_repl_rate("laying_hens", laying_days)
-
-  # =========================================================================
-  # Step 3: Pivot Mature Base Populations (Wide Format)
+  # Step 2: Pivot Mature Base Populations (Wide Format)
   # =========================================================================
   adult_census <- census_poultry %>%
     dplyr::filter(animal_tag %in% base_tags)
@@ -176,11 +100,53 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     if (!tag %in% names(base_wide)) base_wide[[tag]] <- 0
   }
 
-  eggs_per_day <- if (!is.na(eggs_yr_breeder) && eggs_yr_breeder > 0) {
-    eggs_yr_breeder / 365
-  } else {
-    211.7 / 365
+  if (nrow(base_wide) == 0 ||
+      all(c(base_wide$breeder_meat_hens, base_wide$laying_hens) == 0)) {
+    return(census_poultry %>% dplyr::filter(animal_tag %in% valid_poultry_tags))
   }
+
+  # =========================================================================
+  # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
+  # =========================================================================
+  weights_df <- if (!is.null(weights)) {
+    weights
+  } else {
+    weights_path <- file.path(data_dir, "livestock_weights.csv")
+    if (file.exists(weights_path)) {
+      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+    } else {
+      NULL
+    }
+  }
+
+  # 3a. Durations of productive laying cycles and rearing periods
+  pullet_meat_days  <- herdr_resolve_period_days(base_wide, "replacement_meat_pullets",  weights = weights_df, default_days = 140)
+  pullet_layer_days <- herdr_resolve_period_days(base_wide, "replacement_layer_pullets", weights = weights_df, default_days = 119)
+  hen_meat_days     <- herdr_resolve_period_days(base_wide, "breeder_meat_hens",         weights = weights_df, default_days = 301)
+  laying_days       <- herdr_resolve_period_days(base_wide, "laying_hens",               weights = weights_df, default_days = 511)
+  broiler_days      <- herdr_resolve_period_days(base_wide, "broilers",                  weights = weights_df, default_days = 42)
+
+  # 3b. Breeder meat hen oviposition and fertility parameters
+  eggs_yr_breeder   <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "eggs_per_year",
+                                                       definitions = definitions, rate_parameters = rate_parameters, default_val = 211.7)
+  egg_wt_breeder    <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "egg_weight_g",
+                                                       definitions = definitions, rate_parameters = rate_parameters, default_val = 64.0)
+  fertility_def     <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "fertility_rate",
+                                                       definitions = definitions, rate_parameters = rate_parameters, default_val = 0.83)
+  fertility_breeder <- ifelse(fertility_def > 1, fertility_def / 100, fertility_def)
+  eggs_per_day      <- ifelse(eggs_yr_breeder > 0, eggs_yr_breeder / 365, 211.7 / 365)
+
+  # 3c. Replacement rate dynamics: user-specified value takes precedence,
+  # otherwise estimated from all-in all-out cycle turnover (365 / productive_period_days)
+  breeder_meat_repl_rate_def <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "replacement_rate",
+                                                                definitions = definitions, rate_parameters = rate_parameters, default_val = -1)
+  breeder_meat_repl_rate     <- ifelse(breeder_meat_repl_rate_def >= 0, breeder_meat_repl_rate_def,
+                                       ifelse(hen_meat_days > 0, 365 / hen_meat_days, 1.0))
+
+  laying_repl_rate_def       <- herdr_resolve_demographic_param(base_wide, "laying_hens", "replacement_rate",
+                                                                definitions = definitions, rate_parameters = rate_parameters, default_val = -1)
+  laying_repl_rate           <- ifelse(laying_repl_rate_def >= 0, laying_repl_rate_def,
+                                       ifelse(laying_days > 0, 365 / laying_days, 1.0))
 
   # =========================================================================
   # Step 4: Demographic Modeling Equations
@@ -249,38 +215,38 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   tot_broilers      <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "broilers"], na.rm = TRUE)
 
   if (tot_broilers > 0) {
-    annual_broiler_harvest <- tot_broilers * (365 / broiler_days)
+    annual_broiler_harvest <- tot_broilers * (365 / broiler_days[1])
     if (user_has_broilers) {
       message(sprintf("   \u2022 Broilers: %s standing barn places (%.0f days feed -> %s finished/yr)",
                       format(round(tot_broilers), big.mark = ","),
-                      broiler_days,
+                      broiler_days[1],
                       format(round(annual_broiler_harvest), big.mark = ",")))
     } else if (auto_model_broilers && any(calculated$pop_broilers > 0)) {
       message(sprintf("   \u2022 Broilers: %s standing barn places (%.0f days feed -> %s finished/yr) (auto-modeled from breeder hens: %.2f eggs/day, %.1f%% hatch)",
                       format(round(tot_broilers), big.mark = ","),
-                      broiler_days,
+                      broiler_days[1],
                       format(round(annual_broiler_harvest), big.mark = ","),
-                      eggs_per_day,
-                      fertility_breeder * 100))
+                      eggs_per_day[1],
+                      fertility_breeder[1] * 100))
     }
   }
 
   if (tot_layers > 0) {
     message(sprintf("   \u2022 Layer hens: %s head (cycle %.0f days, repl %.1f%%) -> %s standing replacement pullets (%.0f days rearing)",
                     format(round(tot_layers), big.mark = ","),
-                    laying_days,
-                    laying_repl_rate * 100,
+                    laying_days[1],
+                    laying_repl_rate[1] * 100,
                     format(round(tot_layer_pullets, 1), big.mark = ","),
-                    pullet_layer_days))
+                    pullet_layer_days[1]))
   }
 
   if (tot_breeders > 0) {
     message(sprintf("   \u2022 Breeder hens: %s head (cycle %.0f days, repl %.1f%%) -> %s standing replacement pullets (%.0f days rearing)",
                     format(round(tot_breeders), big.mark = ","),
-                    hen_meat_days,
-                    breeder_meat_repl_rate * 100,
+                    hen_meat_days[1],
+                    breeder_meat_repl_rate[1] * 100,
                     format(round(tot_meat_pullets, 1), big.mark = ","),
-                    pullet_meat_days))
+                    pullet_meat_days[1]))
   }
 
   return(final_poultry_pop)

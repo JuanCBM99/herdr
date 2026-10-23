@@ -45,34 +45,6 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
     return(census_cattle)
   }
 
-  # =========================================================================
-  # Step 2: Retrieve Biological & Zootechnical Parameters
-  # =========================================================================
-  # 2a. Parameter retrieval helper closures
-  get_def_val <- function(col, tag, default_val = 0) {
-    if (is.null(definitions) || !col %in% names(definitions)) return(default_val)
-    val <- definitions %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(!!rlang::sym(col))
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
-    val <- rate_parameters %>%
-      dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
-      dplyr::pull(value)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
   weights_df <- if (!is.null(weights)) {
     weights
   } else {
@@ -84,49 +56,8 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
     }
   }
 
-  get_period_days <- function(tag, default_days = 365) {
-    if (is.null(weights_df)) return(default_days)
-    val <- weights_df %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(productive_period_days)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
-    }
-    # Check generic tag without sex suffix (e.g., feedlot_calves from feedlot_calves_male)
-    generic_tag <- sub("_(male|female)$", "", tag)
-    if (generic_tag != tag) {
-      val_gen <- weights_df %>%
-        dplyr::filter(animal_tag == generic_tag) %>%
-        dplyr::pull(productive_period_days)
-      if (length(val_gen) > 0 && !is.na(val_gen[1])) {
-        num_gen <- suppressWarnings(as.numeric(val_gen[1]))
-        if (!is.na(num_gen) && num_gen > 0) return(num_gen)
-      }
-    }
-    return(default_days)
-  }
-
-  # 2b. Pregnancy rates (priority: definitions pregnancy_rate -> rate_parameters pregnancy_rate -> default)
-  dairy_calving_def <- get_def_val("pregnancy_rate", "mature_dairy_cattle", default_val = 0)
-  dairy_calving     <- if (dairy_calving_def > 0) dairy_calving_def else get_rate("pregnancy_rate", "mature_dairy_cattle", default_val = 0.86)
-
-  beef_calving_def  <- get_def_val("pregnancy_rate", "mature_beef_cattle", default_val = 0)
-  beef_calving      <- if (beef_calving_def > 0) beef_calving_def else get_rate("pregnancy_rate", "mature_beef_cattle", default_val = 0.79)
-
-  # 2c. Replacement rates (priority: definitions -> rate_parameters -> defaults)
-  beef_male_repl    <- get_def_val("replacement_rate", "mature_beef_bull", default_val = get_rate("replacement_rate", "mature_beef_bull", default_val = 0.125))
-  beef_female_repl  <- get_def_val("replacement_rate", "mature_beef_cattle", default_val = get_rate("replacement_rate", "mature_beef_cattle", default_val = 0.15))
-  dairy_female_repl <- get_def_val("replacement_rate", "mature_dairy_cattle", default_val = get_rate("replacement_rate", "mature_dairy_cattle", default_val = 0.27))
-
-  # 2d. Feeding durations for IPCC Average Annual Population (AAP) scaling
-  feedlot_days_male   <- get_period_days("feedlot_calves_male", default_days = 365)
-  feedlot_days_female <- get_period_days("feedlot_calves_female", default_days = feedlot_days_male)
-  beef_days_male      <- get_period_days("beef_calves_male", default_days = 365)
-  beef_days_female    <- get_period_days("beef_calves_female", default_days = beef_days_male)
-
   # =========================================================================
-  # Step 3: Pivot Mature Base Populations (Wide Format)
+  # Step 2: Pivot Mature Base Populations (Wide Format)
   # =========================================================================
   base_pops_wide <- census_cattle %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
@@ -141,6 +72,29 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
   if (all(c(base_pops_wide$mature_beef_bull, base_pops_wide$mature_dairy_cattle, base_pops_wide$mature_beef_cattle) == 0)) {
     return(census_cattle)
   }
+
+  # =========================================================================
+  # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
+  # =========================================================================
+  # 3a. Pregnancy rates (priority: definitions pregnancy_rate -> rate_parameters pregnancy_rate -> default)
+  dairy_calving <- herdr_resolve_demographic_param(base_pops_wide, "mature_dairy_cattle", "pregnancy_rate",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 0.86)
+  beef_calving  <- herdr_resolve_demographic_param(base_pops_wide, "mature_beef_cattle",  "pregnancy_rate",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 0.79)
+
+  # 3b. Replacement rates (priority: definitions -> rate_parameters -> defaults)
+  beef_male_repl    <- herdr_resolve_demographic_param(base_pops_wide, "mature_beef_bull",    "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.125)
+  beef_female_repl  <- herdr_resolve_demographic_param(base_pops_wide, "mature_beef_cattle",  "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.15)
+  dairy_female_repl <- herdr_resolve_demographic_param(base_pops_wide, "mature_dairy_cattle", "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.27)
+
+  # 3c. Feeding durations for IPCC Average Annual Population (AAP) scaling
+  feedlot_days_male   <- herdr_resolve_period_days(base_pops_wide, "feedlot_calves_male", weights = weights_df, default_days = 365)
+  feedlot_days_female <- herdr_resolve_period_days(base_pops_wide, "feedlot_calves_female", weights = weights_df, default_days = feedlot_days_male)
+  beef_days_male      <- herdr_resolve_period_days(base_pops_wide, "beef_calves_male", weights = weights_df, default_days = 365)
+  beef_days_female    <- herdr_resolve_period_days(base_pops_wide, "beef_calves_female", weights = weights_df, default_days = beef_days_male)
 
   # =========================================================================
   # Step 4: Demographic Modeling Equations
@@ -216,29 +170,39 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
   tot_feedlot_calves <- sum(final_cattle_pop$population[grepl("feedlot_calves", final_cattle_pop$animal_tag)], na.rm = TRUE)
 
   if (tot_dairy > 0) {
-    feedlot_note <- if (feedlot_days_male < 365 || feedlot_days_female < 365) {
-      sprintf(" -> %s standing feedlot calves (AAP, %.0f days)", format(round(tot_feedlot_calves, 1), big.mark = ","), feedlot_days_male)
+    avg_feedlot_days <- mean(feedlot_days_male[base_pops_wide$mature_dairy_cattle > 0], na.rm = TRUE)
+    feedlot_note <- if (any(feedlot_days_male < 365) || any(feedlot_days_female < 365)) {
+      sprintf(" -> %s standing feedlot calves (AAP, %.0f days)", format(round(tot_feedlot_calves, 1), big.mark = ","), avg_feedlot_days)
     } else {
       sprintf(" -> %s feedlot calves to fattening", format(round(tot_feedlot_calves), big.mark = ","))
     }
-    message(sprintf("   \u2022 Dairy cattle: %s cows (pregnancy rate %.1f%%, repl %.1f%%)%s",
+    calv_vals <- unique(round(dairy_calving[base_pops_wide$mature_dairy_cattle > 0] * 100, 1))
+    repl_vals <- unique(round(dairy_female_repl[base_pops_wide$mature_dairy_cattle > 0] * 100, 1))
+    calv_str <- if (length(calv_vals) == 1) sprintf("%.1f%%", calv_vals) else sprintf("%.1f%%-%.1f%%", min(calv_vals), max(calv_vals))
+    repl_str <- if (length(repl_vals) == 1) sprintf("%.1f%%", repl_vals) else sprintf("%.1f%%-%.1f%%", min(repl_vals), max(repl_vals))
+    message(sprintf("   \u2022 Dairy cattle: %s cows (pregnancy rate %s, repl %s)%s",
                     format(round(tot_dairy), big.mark = ","),
-                    dairy_calving * 100,
-                    dairy_female_repl * 100,
+                    calv_str,
+                    repl_str,
                     feedlot_note))
   }
 
   if (tot_beef_cows > 0) {
     tot_beef_slaughter <- sum(final_cattle_pop$population[final_cattle_pop$animal_tag %in% c("beef_calves_male", "beef_calves_female")], na.rm = TRUE)
-    beef_note <- if (beef_days_male < 365 || beef_days_female < 365) {
-      sprintf(" -> %s standing beef calves (AAP, %.0f days)", format(round(tot_beef_slaughter, 1), big.mark = ","), beef_days_male)
+    avg_beef_days <- mean(beef_days_male[base_pops_wide$mature_beef_cattle > 0], na.rm = TRUE)
+    beef_note <- if (any(beef_days_male < 365) || any(beef_days_female < 365)) {
+      sprintf(" -> %s standing beef calves (AAP, %.0f days)", format(round(tot_beef_slaughter, 1), big.mark = ","), avg_beef_days)
     } else {
       sprintf(" -> %s beef calves to slaughter", format(round(tot_beef_slaughter), big.mark = ","))
     }
-    message(sprintf("   \u2022 Beef cattle: %s cows (pregnancy rate %.1f%%, repl %.1f%%)%s",
+    beef_calv_vals <- unique(round(beef_calving[base_pops_wide$mature_beef_cattle > 0] * 100, 1))
+    beef_repl_vals <- unique(round(beef_female_repl[base_pops_wide$mature_beef_cattle > 0] * 100, 1))
+    beef_calv_str <- if (length(beef_calv_vals) == 1) sprintf("%.1f%%", beef_calv_vals) else sprintf("%.1f%%-%.1f%%", min(beef_calv_vals), max(beef_calv_vals))
+    beef_repl_str <- if (length(beef_repl_vals) == 1) sprintf("%.1f%%", beef_repl_vals) else sprintf("%.1f%%-%.1f%%", min(beef_repl_vals), max(beef_repl_vals))
+    message(sprintf("   \u2022 Beef cattle: %s cows (pregnancy rate %s, repl %s)%s",
                     format(round(tot_beef_cows), big.mark = ","),
-                    beef_calving * 100,
-                    beef_female_repl * 100,
+                    beef_calv_str,
+                    beef_repl_str,
                     beef_note))
   }
 

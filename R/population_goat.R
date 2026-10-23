@@ -50,81 +50,7 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
   }
 
   # =========================================================================
-  # Step 2: Retrieve Biological & Zootechnical Parameters
-  # =========================================================================
-  # 2a. Parameter retrieval helper closures
-  get_def_val <- function(col, tag, default_val = 0) {
-    if (is.null(definitions) || !col %in% names(definitions)) return(default_val)
-    val <- definitions %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(!!rlang::sym(col))
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  get_rate <- function(param, tag, default_val = 0) {
-    if (is.null(rate_parameters) || nrow(rate_parameters) == 0 || !"parameter" %in% names(rate_parameters) || !"value" %in% names(rate_parameters)) return(default_val)
-    val <- rate_parameters %>%
-      dplyr::filter(tolower(parameter) == tolower(param), animal_tag == tag) %>%
-      dplyr::pull(value)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val >= 0) return(num_val)
-    }
-    return(default_val)
-  }
-
-  weights_df <- if (!is.null(weights)) {
-    weights
-  } else {
-    weights_path <- file.path(data_dir, "livestock_weights.csv")
-    if (file.exists(weights_path)) {
-      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
-    } else {
-      NULL
-    }
-  }
-
-  get_period_days <- function(tag, default_days = 365) {
-    if (is.null(weights_df)) return(default_days)
-    val <- weights_df %>%
-      dplyr::filter(animal_tag == tag) %>%
-      dplyr::pull(productive_period_days)
-    if (length(val) > 0 && !is.na(val[1])) {
-      num_val <- suppressWarnings(as.numeric(val[1]))
-      if (!is.na(num_val) && num_val > 0) return(num_val)
-    }
-    return(default_days)
-  }
-
-  # 2b. Durations of reproductive cycle (kidding interval) and slaughter kid feeding period
-  dairy_doe_cycle_days <- get_period_days("mature_goat_female_dairy", default_days = 365)
-  meat_doe_cycle_days  <- get_period_days("mature_goat_female_meat", default_days = 365)
-
-  dairy_kidding_freq <- if (dairy_doe_cycle_days > 0) (365 / dairy_doe_cycle_days) else 1.0
-  meat_kidding_freq  <- if (meat_doe_cycle_days > 0) (365 / meat_doe_cycle_days) else 1.0
-
-  dairy_kid_days <- get_period_days("kid_goat_dairy_slaughter", default_days = 365)
-  meat_kid_days  <- get_period_days("kid_goat_meat_slaughter", default_days = 365)
-
-  # 2c. Prolificacy per parturition (priority: definitions pr_sheep_goat -> rate_parameters pr_sheep_goat -> default)
-  dairy_kidding_def <- get_def_val("pr_sheep_goat", "mature_goat_female_dairy", default_val = 0)
-  dairy_kidding     <- if (dairy_kidding_def > 0) dairy_kidding_def else get_rate("pr_sheep_goat", "mature_goat_female_dairy", default_val = 1.27)
-
-  meat_kidding_def  <- get_def_val("pr_sheep_goat", "mature_goat_female_meat", default_val = 0)
-  meat_kidding      <- if (meat_kidding_def > 0) meat_kidding_def else get_rate("pr_sheep_goat", "mature_goat_female_meat", default_val = 1.0)
-
-  # 2d. Replacement rates (priority: definitions -> rate_parameters -> defaults)
-  dairy_male_repl   <- get_def_val("replacement_rate", "mature_goat_male_dairy", default_val = get_rate("replacement_rate", "mature_goat_male_dairy", default_val = 0.23))
-  dairy_female_repl <- get_def_val("replacement_rate", "mature_goat_female_dairy", default_val = get_rate("replacement_rate", "mature_goat_female_dairy", default_val = 0.30))
-  meat_male_repl    <- get_def_val("replacement_rate", "mature_goat_male_meat", default_val = get_rate("replacement_rate", "mature_goat_male_meat", default_val = 0.25))
-  meat_female_repl  <- get_def_val("replacement_rate", "mature_goat_female_meat", default_val = get_rate("replacement_rate", "mature_goat_female_meat", default_val = 0.30))
-
-  # =========================================================================
-  # Step 3: Pivot Mature Base Populations (Wide Format)
+  # Step 2: Pivot Mature Base Populations (Wide Format)
   # =========================================================================
   base_pops_wide <- census_goat %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
@@ -141,6 +67,46 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
             base_pops_wide$mature_goat_female_dairy, base_pops_wide$mature_goat_female_meat) == 0)) {
     return(census_goat)
   }
+
+  # =========================================================================
+  # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
+  # =========================================================================
+  weights_df <- if (!is.null(weights)) {
+    weights
+  } else {
+    weights_path <- file.path(data_dir, "livestock_weights.csv")
+    if (file.exists(weights_path)) {
+      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+    } else {
+      NULL
+    }
+  }
+
+  # 3a. Durations of reproductive cycle and slaughter kid feeding period
+  dairy_doe_cycle_days <- herdr_resolve_period_days(base_pops_wide, "mature_goat_female_dairy", weights = weights_df, default_days = 365)
+  meat_doe_cycle_days  <- herdr_resolve_period_days(base_pops_wide, "mature_goat_female_meat",  weights = weights_df, default_days = 365)
+
+  dairy_kidding_freq <- ifelse(dairy_doe_cycle_days > 0, 365 / dairy_doe_cycle_days, 1.0)
+  meat_kidding_freq  <- ifelse(meat_doe_cycle_days > 0, 365 / meat_doe_cycle_days, 1.0)
+
+  dairy_kid_days <- herdr_resolve_period_days(base_pops_wide, "kid_goat_dairy_slaughter", weights = weights_df, default_days = 365)
+  meat_kid_days  <- herdr_resolve_period_days(base_pops_wide, "kid_goat_meat_slaughter",  weights = weights_df, default_days = 365)
+
+  # 3b. Prolificacy per parturition (priority: definitions pr_sheep_goat -> rate_parameters pr_sheep_goat -> default)
+  dairy_kidding <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_female_dairy", "pr_sheep_goat",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 1.27)
+  meat_kidding  <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_female_meat",  "pr_sheep_goat",
+                                                  definitions = definitions, rate_parameters = rate_parameters, default_val = 1.0)
+
+  # 3c. Replacement rates (priority: definitions -> rate_parameters -> defaults)
+  dairy_male_repl   <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_male_dairy",   "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.23)
+  dairy_female_repl <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_female_dairy", "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.30)
+  meat_male_repl    <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_male_meat",    "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.25)
+  meat_female_repl  <- herdr_resolve_demographic_param(base_pops_wide, "mature_goat_female_meat",  "replacement_rate",
+                                                      definitions = definitions, rate_parameters = rate_parameters, default_val = 0.30)
 
   # =========================================================================
   # Step 4: Demographic Modeling Equations
