@@ -129,3 +129,30 @@ test_that("feedlot and slaughter calves are scaled to AAP according to productiv
   expect_equal(repl_females, 100)
 })
 
+test_that("demographic parameters vary dynamically across strata and years without val[1] lock", {
+  mock_census <- tibble::tribble(
+    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
+    "mature_dairy_cattle", "spain_1990", "north", "lactation", 1000,
+    "mature_dairy_cattle", "spain_2015", "north", "lactation", 1000
+  )
+
+  mock_defs <- tibble::tribble(
+    ~animal_tag, ~region, ~subregion, ~class_flex, ~pregnancy_rate, ~replacement_rate,
+    "mature_dairy_cattle", "spain_1990", "north", "lactation", 1.0, 0.19,
+    "mature_dairy_cattle", "spain_2015", "north", "lactation", 1.0, 0.27
+  )
+
+  res <- calculate_population_cattle(mock_census, mock_defs)
+
+  repl_1990 <- res %>%
+    filter(animal_tag == "dairy_calves_female_replacement", region == "spain_1990") %>%
+    pull(population)
+  expect_equal(repl_1990, 190)
+
+  repl_2015 <- res %>%
+    filter(animal_tag == "dairy_calves_female_replacement", region == "spain_2015") %>%
+    pull(population)
+  expect_equal(repl_2015, 270)
+})
+
+
