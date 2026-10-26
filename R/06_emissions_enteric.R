@@ -62,11 +62,13 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
       Ym_pct = dplyr::case_when(
         animal_type == "sheep" ~ 6.7,
         animal_type == "goat" ~ 5.5,
+        # [IPCC 2019 Refinement, Vol 4, Ch 10, Table 10.12] Lactating Dairy Cows Ym (%)
         animal_type == "cattle" & animal_subtype == "dairy" & milk_yield_kg_year > 0 ~ dplyr::case_when(
           DE_pct >= 70 & NDF_pct < 35 ~ 5.7,
           DE_pct >= 70 & NDF_pct >= 35 ~ 6.0,
           DE_pct >= 63 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
           DE_pct <= 62 & NDF_pct > 38 ~ 6.5,
+          # Conservative IPCC baseline fallback for rations outside Table 10.12 experimental ranges
           TRUE ~ 6.5
         ),
         animal_type == "cattle" ~ dplyr::case_when(

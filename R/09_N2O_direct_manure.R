@@ -118,7 +118,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         c(
           GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct, protein_content_pct,
           initial_weight_kg, final_weight_kg, productive_period_days, sows_gestation_days, sows_lactation_days,
-          piglets_born, egg_mass_g_day, piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg, NEg_MJday, allocation, EF3
+          piglets_born, piglets_suckling, egg_mass_g_day, piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg, NEg_MJday, allocation, EF3
         ),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
@@ -159,8 +159,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
       # [IPCC 2019] Eq 10.33b: Exported nitrogen content inside weaned piglets annual pool (kg N/animal/year)
       ipcc_swine_N_weaned_piglets = dplyr::if_else(
-        animal_type == "swine" & piglets_born > 0,
-        (0.025 * piglets_born * ipcc_swine_fr * ((piglet_weaning_weight_kg - piglet_birth_weight_kg)) / 0.98),
+        animal_type == "swine" & piglets_suckling > 0,
+        (0.025 * piglets_suckling * ipcc_swine_fr * ((piglet_weaning_weight_kg - piglet_birth_weight_kg)) / 0.98),
         0
       ),
 
