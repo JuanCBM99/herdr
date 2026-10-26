@@ -85,6 +85,14 @@
 </ul><div class="section level3">
 <h3 id="bug-fixes-and-improvements-1-0-4">Bug Fixes and Improvements<a class="anchor" aria-label="anchor" href="#bug-fixes-and-improvements-1-0-4"></a></h3>
 <ul><li>
+<strong>Swine enteric CH4 (<code>calculate_emissions_enteric</code>)</strong>: Replaced the liveweight-scaled factor (<code>1.5 * (W/72)^0.75</code>, not an IPCC method) with the fixed IPCC 2019 Refinement Tier 1 factor of 1.5 kg CH4/head/year for high productivity systems (Vol 4, Ch 10, Table 10.10 and Eq. 10.19). Swine enteric emissions no longer depend on <code>livestock_weights.csv</code>. Results change for swine with liveweight below 72 kg (e.g. ~1.40 to 1.5 kg CH4/head/year for fattening pigs).</li>
+<li>
+<strong>No intermediate rounding</strong>: Removed <code><a href="https://rdrr.io/r/base/Round.html" class="external-link">round()</a></code> from the calculation functions (energy, DMI, VS, enteric, manure CH4/N2O, land use, production). Small herds were truncated to 0 when expressed in Gg. Outputs are now returned at full precision.</li>
+<li>
+<strong>Missing manure management systems now stop the calculation</strong>: <code>calculate_N2O_direct_manure</code>, <code>calculate_CH4_manure</code>, <code>calculate_N2O_indirect_volatilization</code> and <code>calculate_N2O_indirect_leaching</code> raise an error if a cohort with animals has no row in <code>manure_management.csv</code> (previously its manure emissions were silently reported as 0).</li>
+<li>
+<strong>DMI check</strong>: <code>calculate_DMI</code> warns when a category ends with <code>DMI = 0</code> because diet or energy data are missing.</li>
+<li>
 <strong>Consolidation of <code>replacement_rate</code></strong>: Streamlined user input definitions by integrating <code>replacement_rate</code> directly as a parameter column in <code>ruminant_definitions.csv</code> and <code>monogastric_definitions.csv</code>, completely deprecating the separate <code>reproduction_parameters.csv</code> file across all demographic modeling functions, vignettes, example files, and the Shiny application data dictionary.</li>
 <li>
 <strong>Dairy Feedlot Meat Accounting</strong>: Refined <code>is_non_milking_dairy</code> detection in <code>R/14_summary.R</code> and <code>R/plots.R</code> to check <code>(animal_subtype == "dairy") &amp; (milk_kg == 0) &amp; (meat_kg == 0)</code>. Cohorts born from dairy herds that yield meat (e.g. <code>feedlot_calves_male</code>, <code>feedlot_calves_female</code>) are no longer excluded as non-milking phases, ensuring their meat yields, greenhouse gas and land use intensities, and Mottet FCR are fully accounted for and displayed in summary outputs and plots.</li>

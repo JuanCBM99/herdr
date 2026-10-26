@@ -63,6 +63,26 @@
 
 ### Bug Fixes and Improvements
 
+- **Swine enteric CH4 (`calculate_emissions_enteric`)**: Replaced the
+  liveweight-scaled factor (`1.5 * (W/72)^0.75`, not an IPCC method)
+  with the fixed IPCC 2019 Refinement Tier 1 factor of 1.5 kg
+  CH4/head/year for high productivity systems (Vol 4, Ch 10, Table 10.10
+  and Eq. 10.19). Swine enteric emissions no longer depend on
+  `livestock_weights.csv`. Results change for swine with liveweight
+  below 72 kg (e.g. ~1.40 to 1.5 kg CH4/head/year for fattening pigs).
+- **No intermediate rounding**: Removed
+  [`round()`](https://rdrr.io/r/base/Round.html) from the calculation
+  functions (energy, DMI, VS, enteric, manure CH4/N2O, land use,
+  production). Small herds were truncated to 0 when expressed in Gg.
+  Outputs are now returned at full precision.
+- **Missing manure management systems now stop the calculation**:
+  `calculate_N2O_direct_manure`, `calculate_CH4_manure`,
+  `calculate_N2O_indirect_volatilization` and
+  `calculate_N2O_indirect_leaching` raise an error if a cohort with
+  animals has no row in `manure_management.csv` (previously its manure
+  emissions were silently reported as 0).
+- **DMI check**: `calculate_DMI` warns when a category ends with
+  `DMI = 0` because diet or energy data are missing.
 - **Consolidation of `replacement_rate`**: Streamlined user input
   definitions by integrating `replacement_rate` directly as a parameter
   column in `ruminant_definitions.csv` and

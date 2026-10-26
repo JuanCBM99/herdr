@@ -2,8 +2,9 @@
 
 Computes enteric methane emissions based on Gross Energy (GE),
 Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic for
-ruminants, and IPCC Tier 1 with metabolic weight scaling for swine
-(Table 10.10 & Section 10.2.4).
+ruminants, and the IPCC Tier 1 fixed emission factor for swine (1.5 kg
+CH4/head/year, high productivity systems; IPCC 2019 Refinement, Vol 4,
+Ch 10, Table 10.10 and Eq. 10.19).
 
 ## Usage
 
