@@ -93,6 +93,8 @@
 <li>
 <strong>DMI check</strong>: <code>calculate_DMI</code> warns when a category ends with <code>DMI = 0</code> because diet or energy data are missing.</li>
 <li>
+<strong>Swine N2O retention in weaned piglets (<code>calculate_N2O_direct_manure</code>)</strong>: In IPCC 2019 Refinement Eq. 10.33b, nitrogen retained and exported in weaned piglets now uses <code>piglets_suckling</code> (weaned litter size) rather than total piglets born alive (<code>piglets_born</code>), aligning with survival to weaning age.</li>
+<li>
 <strong>Consolidation of <code>replacement_rate</code></strong>: Streamlined user input definitions by integrating <code>replacement_rate</code> directly as a parameter column in <code>ruminant_definitions.csv</code> and <code>monogastric_definitions.csv</code>, completely deprecating the separate <code>reproduction_parameters.csv</code> file across all demographic modeling functions, vignettes, example files, and the Shiny application data dictionary.</li>
 <li>
 <strong>Dairy Feedlot Meat Accounting</strong>: Refined <code>is_non_milking_dairy</code> detection in <code>R/14_summary.R</code> and <code>R/plots.R</code> to check <code>(animal_subtype == "dairy") &amp; (milk_kg == 0) &amp; (meat_kg == 0)</code>. Cohorts born from dairy herds that yield meat (e.g. <code>feedlot_calves_male</code>, <code>feedlot_calves_female</code>) are no longer excluded as non-milking phases, ensuring their meat yields, greenhouse gas and land use intensities, and Mottet FCR are fully accounted for and displayed in summary outputs and plots.</li>

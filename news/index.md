@@ -83,6 +83,11 @@
   emissions were silently reported as 0).
 - **DMI check**: `calculate_DMI` warns when a category ends with
   `DMI = 0` because diet or energy data are missing.
+- **Swine N2O retention in weaned piglets
+  (`calculate_N2O_direct_manure`)**: In IPCC 2019 Refinement Eq. 10.33b,
+  nitrogen retained and exported in weaned piglets now uses
+  `piglets_suckling` (weaned litter size) rather than total piglets born
+  alive (`piglets_born`), aligning with survival to weaning age.
 - **Consolidation of `replacement_rate`**: Streamlined user input
   definitions by integrating `replacement_rate` directly as a parameter
   column in `ruminant_definitions.csv` and
