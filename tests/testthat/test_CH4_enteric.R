@@ -47,9 +47,11 @@ test_that("calculate_emissions_enteric calculates enteric methane for swine and 
     expect_true(all(swine_res$EF_kgheadyear > 0))
     expect_true(all(swine_res$total_CH4_enteric_Ggyear > 0))
 
-    # Fattening pigs (average liveweight (20 + 111.82)/2 = ~65.9 kg) EF should be ~1.40 kg CH4/year per IPCC Eq. 10.10
+    # IPCC 2019 Table 10.10 + Eq. 10.19: Tier 1 swine factor is fixed at 1.5 kg CH4/head/year
+    # (high productivity systems), independent of liveweight
+    expect_true(all(swine_res$EF_kgheadyear == 1.5))
     fattening <- swine_res %>% dplyr::filter(animal_tag == "fattening_pigs")
-    expect_equal(fattening$EF_kgheadyear, 1.40, tolerance = 0.05)
+    expect_equal(fattening$EF_kgheadyear, 1.5)
   })
 })
 

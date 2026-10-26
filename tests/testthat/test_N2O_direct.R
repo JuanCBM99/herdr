@@ -90,3 +90,35 @@ test_that("calculate_N2O_direct_manure detects nitrogen retention exceeding inta
   )
 })
 
+test_that("herdr_validate_manure_coverage stops when a populated cohort has no manure system", {
+  pop <- data.frame(
+    region = "R1", subregion = "S1", class_flex = "1",
+    animal_tag = c("dairy_cows", "beef_cows", "empty_cohort"),
+    population = c(100, 50, 0),
+    stringsAsFactors = FALSE
+  )
+  manure <- data.frame(
+    region = "R1", subregion = "S1", class_flex = 1,
+    animal_tag = "dairy_cows", system_base = "Lagoon",
+    stringsAsFactors = FALSE
+  )
+
+  # beef_cows has animals but no manure system -> error naming only that cohort
+  expect_error(
+    herdr:::herdr_validate_manure_coverage(pop, manure),
+    "beef_cows"
+  )
+  expect_error(
+    herdr:::herdr_validate_manure_coverage(pop, manure),
+    "no manure management system"
+  )
+
+  # Cohort with zero animals does not need a system (empty_cohort is not reported)
+  err <- tryCatch(herdr:::herdr_validate_manure_coverage(pop, manure), error = function(e) conditionMessage(e))
+  expect_false(grepl("empty_cohort", err))
+
+  # Fully covered herd passes silently (class_flex numeric vs character is handled)
+  manure_full <- rbind(manure, transform(manure, animal_tag = "beef_cows"))
+  expect_true(herdr:::herdr_validate_manure_coverage(pop, manure_full))
+})
+

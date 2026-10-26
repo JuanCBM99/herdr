@@ -137,7 +137,6 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
 
   # --- 6. Formatting and File Export ---
   results <- full_data %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4))) %>%
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype, diet_tag,
       DE_pct, CP_pct, CP_cropland_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg

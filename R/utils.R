@@ -83,6 +83,31 @@ herdr_validate_manure_allocation <- function(user_manure, tolerance = 1e-3) {
   invisible(allocation_sums)
 }
 
+#' Validate That Every Populated Cohort Has a Manure Management System
+#'
+#' Stops if a cohort with animals has no row in \code{manure_management.csv};
+#' otherwise its manure emissions would silently be reported as 0.
+#'
+#' @param pop_df Data frame with cohort keys and a \code{population} column (head).
+#' @param user_manure Data frame from \code{manure_management.csv}.
+#' @return Invisibly returns TRUE if all populated cohorts are covered.
+#' @noRd
+herdr_validate_manure_coverage <- function(pop_df, user_manure) {
+  keys <- c("region", "subregion", "animal_tag", "class_flex")
+  key_of <- function(df) do.call(paste, c(lapply(df[keys], as.character), sep = " | "))
+
+  populated <- pop_df[!is.na(pop_df$population) & pop_df$population > 0, , drop = FALSE]
+  covered <- user_manure[!is.na(user_manure$system_base), , drop = FALSE]
+
+  missing_tags <- unique(populated$animal_tag[!key_of(populated) %in% key_of(covered)])
+  if (length(missing_tags) > 0) {
+    stop("Data Error: Cohorts with animals have no manure management system in 'manure_management.csv': ",
+         paste(missing_tags, collapse = ", "), ".", call. = FALSE)
+  }
+
+  invisible(TRUE)
+}
+
 #' Validate Diet Profiles and Ingredient Shares
 #'
 #' Verifies that:

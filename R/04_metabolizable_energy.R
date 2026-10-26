@@ -7,7 +7,6 @@
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @export
 calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_data") {
-
   message("Calculating Monogastric Metabolizable Energy (kcal/day)...")
 
   # 1. Read input data files
@@ -53,8 +52,8 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       W_mean = (initial_weight_kg + final_weight_kg) / 2,
       W_metabolic = dplyr::case_when(
         animal_type == "poultry" ~ W_mean^0.75,
-        animal_type == "swine"   ~ W_mean^alpha,
-        TRUE                     ~ W_mean^0.75
+        animal_type == "swine" ~ W_mean^alpha,
+        TRUE ~ W_mean^0.75
       ),
       ME_maint_kcal_day = cfi_maintenance * W_metabolic,
 
@@ -109,20 +108,18 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       ME_total_kcal_day = pmax(0, ME_maint_kcal_day + ME_standard_growth_day + ME_eggs_day + ME_gestation_phase_daily + ME_lactation_phase_daily),
 
       # Map outputs directly to report columns
-      ME_mant_kcal      = ME_maint_kcal_day,
-      ME_crec_kcal      = dplyr::if_else(sows_gestation_days > 0, ME_growth_gestation_daily, ME_standard_growth_day),
-      ME_eggs_kcal      = ME_eggs_day,
+      ME_mant_kcal = ME_maint_kcal_day,
+      ME_crec_kcal = dplyr::if_else(sows_gestation_days > 0, ME_growth_gestation_daily, ME_standard_growth_day),
+      ME_eggs_kcal = ME_eggs_day,
       ME_gestation_kcal = ME_gestation_phase_daily,
       ME_lactation_kcal = ME_lactation_phase_daily
     ) %>%
-
     # Select final tidy report schema
     dplyr::select(
       dplyr::all_of(join_keys), diet_tag, initial_weight_kg, final_weight_kg, productive_period_days,
       adg_gday, alpha, cfi_maintenance, ME_mant_kcal, ME_crec_kcal, ME_eggs_kcal,
       ME_gestation_kcal, ME_lactation_kcal, ME_total_kcal_day
-    ) %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 4)))
+    )
 
   # 4. Save results to disk
   if (isTRUE(saveoutput)) {

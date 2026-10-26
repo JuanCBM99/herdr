@@ -15,14 +15,13 @@
 #' @export
 calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
                           ge_req = NULL, diet_char = NULL, mono = NULL, weights = NULL) {
-
   message("Calculating Dry Matter Intake (DMI)...")
 
   # --- 1. Load Dependencies and Inputs ---
-  if (is.null(ge_req))    ge_req    <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(ge_req)) ge_req <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
   if (is.null(diet_char)) diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  if (is.null(weights))   weights   <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  if (is.null(mono))      mono      <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(mono)) mono <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
 
@@ -39,7 +38,7 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
     ) %>%
     dplyr::left_join(
       mono %>%
-      dplyr::mutate(dplyr::across(dplyr::all_of(join_keys), ~ as.character(.))) %>%
+        dplyr::mutate(dplyr::across(dplyr::all_of(join_keys), ~ as.character(.))) %>%
         dplyr::select(dplyr::all_of(join_keys), ME_total_kcal_day),
       by = join_keys
     ) %>%
@@ -69,8 +68,8 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
   warn_high <- results %>%
     dplyr::filter(
       (animal_type == "cattle" & DMI_bw_pct > 4.4) |
-        (animal_type == "sheep"  & DMI_bw_pct > 5.5) |
-        (animal_type == "goat"   & DMI_bw_pct > 6.7)
+        (animal_type == "sheep" & DMI_bw_pct > 5.5) |
+        (animal_type == "goat" & DMI_bw_pct > 6.7)
     )
 
   if (nrow(warn_high) > 0) {
@@ -83,7 +82,6 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
 
   # --- 6. Formatting and Export Execution ---
   final_DMI <- results %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3))) %>%
     dplyr::select(
       dplyr::all_of(join_keys), diet_tag, animal_type, animal_subtype,
       GE_MJday, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_ME_kcal_kg, ME_total_kcal_day,

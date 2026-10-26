@@ -13,7 +13,6 @@
 #' @export
 calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                  pop_df = NULL) {
-
   message("[herdr] Calculating total livestock production (physical products & protein)...")
 
   join_keys <- c("region", "subregion", "animal_tag", "class_flex")
@@ -29,7 +28,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::distinct()
 
   weights_file <- file.path(data_dir, "livestock_weights.csv")
-  weights  <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
+  weights <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
 
   ruminants_file <- file.path(data_dir, "ruminant_definitions.csv")
   ruminants <- if (file.exists(ruminants_file)) readr::read_csv(ruminants_file, show_col_types = FALSE) else tibble::tibble()
@@ -40,8 +39,10 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   # Consolidate Definitions
   if (nrow(ruminants) > 0) {
     if (!"production_role" %in% names(ruminants)) {
-      stop(paste0("Data Error: Missing required column 'production_role' in '", ruminants_file,
-                  "'. Valid options: 'mature', 'replacement', 'slaughter'."), call. = FALSE)
+      stop(paste0(
+        "Data Error: Missing required column 'production_role' in '", ruminants_file,
+        "'. Valid options: 'mature', 'replacement', 'slaughter'."
+      ), call. = FALSE)
     }
     ruminants$production_role <- tolower(trimws(as.character(ruminants$production_role)))
 
@@ -67,8 +68,10 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
 
   if (nrow(monogastrics) > 0) {
     if (!"production_role" %in% names(monogastrics)) {
-      stop(paste0("Data Error: Missing required column 'production_role' in '", monogastrics_file,
-                  "'. Valid options: 'mature', 'replacement', 'slaughter'."), call. = FALSE)
+      stop(paste0(
+        "Data Error: Missing required column 'production_role' in '", monogastrics_file,
+        "'. Valid options: 'mature', 'replacement', 'slaughter'."
+      ), call. = FALSE)
     }
     monogastrics$production_role <- tolower(trimws(as.character(monogastrics$production_role)))
 
@@ -130,9 +133,11 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::mutate(
       has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),
       dplyr::across(
-        c(population, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year,
+        c(
+          population, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year,
           egg_mass_g_day, replacement_rate, productive_period_days, adult_weight_kg,
-          final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def),
+          final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def
+        ),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
 
@@ -159,7 +164,6 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         # 4. Commercial slaughter/fattening cohort (broilers, fattening pigs, calves, lambs)
         production_role == "slaughter" ~
           population * (365 / dplyr::if_else(productive_period_days > 0, productive_period_days, 365)),
-
         TRUE ~ 0
       ),
 
@@ -168,8 +172,8 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       # Real milk protein percentage: User input preferred; fallback to IPCC fat regression, then GLEAM default
       milk_prot_pct = dplyr::case_when(
         protein_content_pct > 0 ~ protein_content_pct / 100,
-        fat_content_pct > 0     ~ (1.9 + 0.4 * fat_content_pct) / 100,
-        TRUE                    ~ MILK_prot_def
+        fat_content_pct > 0 ~ (1.9 + 0.4 * fat_content_pct) / 100,
+        TRUE ~ MILK_prot_def
       ),
       milk_protein_kg = milk_fresh_kg * milk_prot_pct,
       # FPCM (Fat and Protein Corrected Milk - IDF)
@@ -201,8 +205,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
       # Edible protein (GLEAM)
       milk_protein_kg, meat_protein_kg, egg_protein_kg, total_protein_kg
-    ) %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 2)))
+    )
 
   # --- 4. Save output file ---
   if (isTRUE(saveoutput)) {

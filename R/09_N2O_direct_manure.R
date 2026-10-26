@@ -13,15 +13,14 @@
 #' @export
 calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                         ge_df = NULL, cp_df = NULL, pop_df = NULL, neg_df = NULL, dmi_df = NULL) {
-
   message("Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  cat_csv      <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  weights_csv  <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  user_manure  <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master  <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  mono_csv     <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
+  cat_csv <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  weights_csv <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  ipcc_master <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  mono_csv <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
   # Calculate daily egg mass internally for IPCC N retention: (eggs_per_year / 365) * egg_weight_g
   egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
@@ -30,8 +29,8 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   eggs_yr <- dplyr::coalesce(eggs_yr, 0)
   mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
 
-  if (is.null(cp_df))  cp_df  <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  if (is.null(ge_df))  ge_df  <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir, de_df = cp_df))
+  if (is.null(cp_df)) cp_df <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
+  if (is.null(ge_df)) ge_df <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir, de_df = cp_df))
   if (is.null(pop_df)) pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   if (is.null(neg_df)) neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
   if (is.null(dmi_df)) dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir, ge_req = ge_df, diet_char = cp_df))
@@ -41,12 +40,12 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   # --- 2. Validations ---
   herdr_validate_manure_systems(user_manure, ipcc_master, animal_metadata = ge_df)
   herdr_validate_manure_allocation(user_manure)
+  herdr_validate_manure_coverage(pop_df, user_manure)
 
   # --- 3. Master Dataset Construction & Joins ---
 
   results <- ge_df %>%
     dplyr::select(dplyr::all_of(join_keys), GE_MJday) %>%
-
     dplyr::left_join(
       cp_df %>% dplyr::select(dplyr::all_of(join_keys), CP_pct),
       by = join_keys
@@ -59,87 +58,89 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       dmi_df %>% dplyr::select(dplyr::all_of(join_keys), DMI_kgday),
       by = join_keys
     ) %>%
-
     dplyr::left_join(
       (if ("protein_content_pct" %in% names(cat_csv)) {
         cat_csv %>% dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct, protein_content_pct)
       } else {
-        cat_csv %>% dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct) %>% dplyr::mutate(protein_content_pct = 0)
+        cat_csv %>%
+          dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct) %>%
+          dplyr::mutate(protein_content_pct = 0)
       }),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
-
     # Read structural fields matching your exact livestock_weights.csv
     dplyr::left_join(
       weights_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg,
-                      productive_period_days, sows_gestation_days, sows_lactation_days,
-                      piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg),
+        dplyr::select(
+          region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg,
+          productive_period_days, sows_gestation_days, sows_lactation_days,
+          piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg
+        ),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
-
     # Read biological fields matching your exact monogastric_definitions.csv
     dplyr::left_join(
       mono_csv %>%
         dplyr::select(region, subregion, animal_tag, class_flex, egg_mass_g_day, piglets_born, piglets_suckling),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
-
     dplyr::left_join(
       neg_df %>%
         dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJday),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
-
     dplyr::left_join(
       user_manure %>%
-        dplyr::select(region, subregion, animal_tag, class_flex,
-                      system_base, management_months, system_climate,
-                      system_subclimate, climate_zone, system_variant,
-                      climate_moisture, allocation),
+        dplyr::select(
+          region, subregion, animal_tag, class_flex,
+          system_base, management_months, system_climate,
+          system_subclimate, climate_zone, system_variant,
+          climate_moisture, allocation
+        ),
       by = c("region", "subregion", "animal_tag", "class_flex")
     ) %>%
-
     dplyr::left_join(
       ipcc_master %>%
-        dplyr::select(system_base, management_months, system_climate,
-                      system_subclimate, climate_zone, system_variant,
-                      climate_moisture, animal_type, animal_subtype, EF3),
-      by = c("system_base", "management_months", "system_climate",
-             "system_subclimate", "climate_zone", "system_variant",
-             "climate_moisture", "animal_type", "animal_subtype")
+        dplyr::select(
+          system_base, management_months, system_climate,
+          system_subclimate, climate_zone, system_variant,
+          climate_moisture, animal_type, animal_subtype, EF3
+        ),
+      by = c(
+        "system_base", "management_months", "system_climate",
+        "system_subclimate", "climate_zone", "system_variant",
+        "climate_moisture", "animal_type", "animal_subtype"
+      )
     ) %>%
-
     # --- 4. Calculations ---
     dplyr::mutate(
       dplyr::across(
-        c(GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct, protein_content_pct,
+        c(
+          GE_MJday, CP_pct, population, DMI_kgday, milk_yield_kg_year, fat_content_pct, protein_content_pct,
           initial_weight_kg, final_weight_kg, productive_period_days, sows_gestation_days, sows_lactation_days,
-          piglets_born, egg_mass_g_day, piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg, NEg_MJday, allocation, EF3),
+          piglets_born, egg_mass_g_day, piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg, NEg_MJday, allocation, EF3
+        ),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
-
       daily_milk = milk_yield_kg_year / 365,
-
       daily_gain = dplyr::if_else(
         productive_period_days > 0,
         (final_weight_kg - initial_weight_kg) / productive_period_days,
         0
       ),
-
       milk_protein = dplyr::case_when(
         protein_content_pct > 0 ~ protein_content_pct,
-        fat_content_pct > 0     ~ 1.9 + 0.4 * fat_content_pct,
-        TRUE                    ~ 3.3
+        fat_content_pct > 0 ~ 1.9 + 0.4 * fat_content_pct,
+        TRUE ~ 3.3
       ),
 
       # [IPCC 2019] Dynamic Ngain growth factor selector based on final body weight (Table 10.20B)
       ipcc_swine_n_gain_factor = dplyr::case_when(
-        animal_type == "swine" & final_weight_kg <= 7  ~ 0.031,
+        animal_type == "swine" & final_weight_kg <= 7 ~ 0.031,
         animal_type == "swine" & final_weight_kg <= 20 ~ 0.028,
         animal_type == "swine" & final_weight_kg <= 40 ~ 0.025,
         animal_type == "swine" & final_weight_kg <= 80 ~ 0.024,
-        animal_type == "swine" & final_weight_kg > 80  ~ 0.021,
+        animal_type == "swine" & final_weight_kg > 80 ~ 0.021,
         TRUE ~ 0
       ),
 
@@ -172,7 +173,6 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
       # --- Unified Daily Nitrogen Retention Switch (kg N / animal / day) ---
       N_retention_kg_day = dplyr::case_when(
-
         # Poultry lifecycle retention rate (Layers)
         animal_type == "poultry" & egg_mass_g_day > 0 ~
           (0.028 * pmax(0, daily_gain)) + ((0.0185 * egg_mass_g_day) / 1000),
@@ -204,7 +204,6 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
         # Cattle Scenario 3: Young growing animals (No milking)
         animal_type == "cattle" & daily_milk == 0 & daily_gain > 0 & NEg_MJday > 0 ~
           ((daily_gain * pmax(0, 268 - (7.03 * NEg_MJday / daily_gain)) / 1000) / 6.25),
-
         TRUE ~ 0
       ),
       N_retention_kg_day = pmax(0, N_retention_kg_day),
@@ -229,8 +228,9 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       collapse = ", "
     )
     stop("Biological Imbalance Error: Daily nitrogen retention exceeds daily nitrogen intake for: ",
-         details, ". An animal cannot retain more nitrogen than it ingests. Check crude protein (CP%) or production rates.",
-         call. = FALSE)
+      details, ". An animal cannot retain more nitrogen than it ingests. Check crude protein (CP%) or production rates.",
+      call. = FALSE
+    )
   }
 
   # --- 5. Final Formatting ---
@@ -240,9 +240,6 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       system_base, system_variant, climate_moisture, climate_zone, system_climate,
       system_subclimate, allocation, ipcc_swine_N_weaned_piglets, ipcc_swine_Skg, ipcc_swine_N_gain_sow, ipcc_swine_fr,
       N_intake_kgheadday, N_retention_kg_day, N_excreted_kgheadyear, EF3, population, direct_N2O_kgyear
-    ) %>%
-    dplyr::mutate(
-      dplyr::across(where(is.numeric), ~ round(.x, 4))
     )
 
   # --- 6. Save Output ---

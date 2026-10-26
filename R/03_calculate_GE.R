@@ -17,7 +17,6 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
                          NEm_df = NULL, NEa_df = NULL, NEg_df = NULL,
                          NEl_df = NULL, NE_work_df = NULL,
                          NE_pregnancy_df = NULL, NE_wool_df = NULL) {
-
   message("Calculating Gross Energy (GE)...")
 
   join_keys_univ <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
@@ -41,50 +40,42 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
     }
   }
 
-  NEm_df          <- get_ne(NEm_df, calculate_NEm, "NEm_MJday")
-  NEa_df          <- get_ne(NEa_df, calculate_NEa, "NEa_MJday", nem_df = NEm_df)
-  NEg_df          <- get_ne(NEg_df, calculate_NEg, "NEg_MJday")
-  NEl_df          <- get_ne(NEl_df, calculate_NEl, "NEl_MJday")
-  NE_work_df      <- get_ne(NE_work_df, calculate_NE_work, "NEwork_MJday", nem_df = NEm_df)
+  NEm_df <- get_ne(NEm_df, calculate_NEm, "NEm_MJday")
+  NEa_df <- get_ne(NEa_df, calculate_NEa, "NEa_MJday", nem_df = NEm_df)
+  NEg_df <- get_ne(NEg_df, calculate_NEg, "NEg_MJday")
+  NEl_df <- get_ne(NEl_df, calculate_NEl, "NEl_MJday")
+  NE_work_df <- get_ne(NE_work_df, calculate_NE_work, "NEwork_MJday", nem_df = NEm_df)
   NE_pregnancy_df <- get_ne(NE_pregnancy_df, calculate_NE_pregnancy, "NEpregnancy_MJday", nem_df = NEm_df)
-  NE_wool_df      <- get_ne(NE_wool_df, calculate_NE_wool, "NEwool_MJday")
+  NE_wool_df <- get_ne(NE_wool_df, calculate_NE_wool, "NEwool_MJday")
 
   # --- 3. Aggregation and GE Calculation (IPCC) ---
   results <- de_df %>%
-    dplyr::left_join(NEm_df,          by = join_keys_univ) %>%
-    dplyr::left_join(NEa_df,          by = join_keys_univ) %>%
-    dplyr::left_join(NEg_df,          by = join_keys_univ) %>%
-    dplyr::left_join(NEl_df,          by = join_keys_univ) %>%
-    dplyr::left_join(NE_work_df,      by = join_keys_univ) %>%
+    dplyr::left_join(NEm_df, by = join_keys_univ) %>%
+    dplyr::left_join(NEa_df, by = join_keys_univ) %>%
+    dplyr::left_join(NEg_df, by = join_keys_univ) %>%
+    dplyr::left_join(NEl_df, by = join_keys_univ) %>%
+    dplyr::left_join(NE_work_df, by = join_keys_univ) %>%
     dplyr::left_join(NE_pregnancy_df, by = join_keys_univ) %>%
-    dplyr::left_join(NE_wool_df,      by = join_keys_univ) %>%
-
+    dplyr::left_join(NE_wool_df, by = join_keys_univ) %>%
     # 4. Calculations and Cleanup
     dplyr::mutate(
       across(
         c(DE_pct, NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEwork_MJday, NEpregnancy_MJday, NEwool_MJday),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
-
       de_safe = dplyr::if_else(DE_pct == 0, 60, DE_pct),
       de_percent = de_safe / 100,
-
       REM = 1.123 - (4.092e-3 * de_safe) + (1.126e-5 * de_safe^2) - (25.4 / de_safe),
       REG = 1.164 - (5.16e-3 * de_safe) + (1.308e-5 * de_safe^2) - (37.4 / de_safe),
-
       REM = dplyr::if_else(REM <= 0, 1, REM),
       REG = dplyr::if_else(REG <= 0, 1, REG),
-
       GE_MJday = ((NEm_MJday + NEa_MJday + NEl_MJday + NEwork_MJday + NEpregnancy_MJday) / REM + (NEg_MJday + NEwool_MJday) / REG) / de_percent
     ) %>%
-
     # 5. Final Selection
     dplyr::select(
       region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
       NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEwork_MJday, NEpregnancy_MJday, NEwool_MJday, GE_MJday, DE_pct, REM, REG
-    ) %>%
-    dplyr::mutate(across(where(is.numeric), ~ round(.x, 3)))
-
+    )
   # --- 6. Save Output ---
   if (isTRUE(saveoutput)) {
     if (!dir.exists("output")) dir.create("output")
