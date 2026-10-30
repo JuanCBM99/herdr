@@ -66,6 +66,7 @@ herdr_server <- function(input, output, session) {
   dirty <- reactiveValues()
   table_render_triggers <- reactiveValues()
   model_data <- reactiveVal(NULL)
+  model_intensities <- reactiveVal(NULL)
 
   load_all_data <- function(reset = FALSE) {
     for (id in names(tables_info)) {
@@ -80,6 +81,7 @@ herdr_server <- function(input, output, session) {
       table_render_triggers[[id]] <- if (is.null(table_render_triggers[[id]])) 1 else table_render_triggers[[id]] + 1
     }
     model_data(NULL)
+    model_intensities(NULL)
   }
 
   isolate(load_all_data(reset = FALSE))
@@ -102,7 +104,7 @@ herdr_server <- function(input, output, session) {
       title = tagList(icon("triangle-exclamation", class = "text-danger me-2"), "Clear All Project Data?"),
       div(
         class = "p-2",
-        p("Are you sure you want to reset all data? This will restore all 12 input tables to blank templates and erase any unsaved inputs."),
+        p("Are you sure you want to reset all data? This will restore all 11 input tables to blank templates and erase any unsaved inputs."),
         p(class = "text-muted small mb-0", "If you want to save your current work, click 'Download Input Data (ZIP)' in the sidebar first.")
       ),
       footer = tagList(
@@ -147,10 +149,6 @@ herdr_server <- function(input, output, session) {
       showNotification(paste(count, "files updated!"), type = "message")
       nav_select("main_tabs", "census")
     }
-  })
-
-  observe({
-    if (isTRUE(input$auto_cycle)) nav_show("main_tabs", "repro") else nav_hide("main_tabs", "repro")
   })
 
   # --- 4. Pre-Flight Inspection & Data Health UI ---
@@ -587,7 +585,13 @@ herdr_server <- function(input, output, session) {
 
       incProgress(0.4, detail = "Done")
       if (!is.null(res)) showNotification(paste(input$function_choice, "executed!"), type = "message")
-      model_data(res)
+      if (is.list(res) && !is.data.frame(res) && !is.null(res$totals)) {
+        model_data(res$totals)
+        model_intensities(res$intensities)
+      } else {
+        model_data(res)
+        model_intensities(NULL)
+      }
     })
   }
 
@@ -622,10 +626,21 @@ herdr_server <- function(input, output, session) {
     }
   })
 
+  # Sync table selector automatically when chart functional unit / impact category changes
+  observeEvent(list(input$plot_impact_category, input$plot_functional_unit), {
+    if (!identical(input$function_choice, "generate_impact_assessment")) return()
+    ic <- if (!is.null(input$plot_impact_category)) input$plot_impact_category else "ghg"
+    fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
+    target_tbl <- if (ic == "fcr" || fu %in% c("product", "protein")) "intensities" else "totals"
+    if (!identical(input$results_table_choice, target_tbl)) {
+      updateRadioButtons(session, "results_table_choice", selected = target_tbl)
+    }
+  }, ignoreInit = TRUE)
+
   # Dynamically adapt commercial product choices based on active model outputs
-  observeEvent(list(model_data(), input$function_choice), {
+  observeEvent(list(model_data(), model_intensities(), input$function_choice), {
     req(model_data())
-    df <- model_data()
+    df <- if (!is.null(model_intensities())) model_intensities() else model_data()
     if (!is.data.frame(df) || nrow(df) == 0 || input$function_choice != "generate_impact_assessment") return()
 
     prod_choices <- c()
@@ -634,16 +649,10 @@ herdr_server <- function(input, output, session) {
     }
     if (("meat_carcass_weight_kg" %in% names(df) && any(df$meat_carcass_weight_kg > 0, na.rm = TRUE)) ||
         ("meat_live_weight_kg" %in% names(df) && any(df$meat_live_weight_kg > 0, na.rm = TRUE))) {
-      has_meat <- if ("AF_meat" %in% names(df)) any(df$AF_meat > 0, na.rm = TRUE) else TRUE
-      if (has_meat) {
-        prod_choices <- c(prod_choices, "Meat (kg Carcass)" = "meat")
-      }
+      prod_choices <- c(prod_choices, "Meat (kg Carcass)" = "meat")
     }
     if ("wool_kg" %in% names(df) && any(df$wool_kg > 0, na.rm = TRUE)) {
-      has_wool <- if ("AF_wool" %in% names(df)) any(df$AF_wool > 0, na.rm = TRUE) else TRUE
-      if (has_wool) {
-        prod_choices <- c(prod_choices, "Wool (kg Wool)" = "wool")
-      }
+      prod_choices <- c(prod_choices, "Wool (kg Wool)" = "wool")
     }
     if ("egg_fresh_kg" %in% names(df) && any(df$egg_fresh_kg > 0, na.rm = TRUE)) {
       prod_choices <- c(prod_choices, "Eggs (kg Fresh Eggs)" = "egg")
@@ -666,16 +675,16 @@ herdr_server <- function(input, output, session) {
 
     if (identical(func_name, "generate_impact_assessment")) {
       impact_cat <- if (!is.null(input$plot_impact_category)) input$plot_impact_category else "ghg"
-      if (impact_cat %in% c("fcr", "overview")) {
-        fu <- impact_cat
+      if (impact_cat == "fcr") {
+        fu <- "fcr"
       } else {
         fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
         if (fu == "product") {
           if (!is.null(input$plot_product_subchoice) && input$plot_product_subchoice != "" && input$plot_product_subchoice != "product") {
             fu <- input$plot_product_subchoice
           } else {
-            df <- model_data()
-            if ("milk_FPCM_kg" %in% names(df) && any(df$milk_FPCM_kg > 0, na.rm = TRUE)) {
+            df_prod <- if (!is.null(model_intensities())) model_intensities() else model_data()
+            if ("milk_FPCM_kg" %in% names(df_prod) && any(df_prod$milk_FPCM_kg > 0, na.rm = TRUE)) {
               fu <- "milk"
             } else {
               fu <- "meat"
@@ -688,8 +697,14 @@ herdr_server <- function(input, output, session) {
       fu <- if (!is.null(input$plot_feed_scale)) input$plot_feed_scale else "total"
     }
 
+    plot_df_input <- if (identical(func_name, "generate_impact_assessment") && !is.null(model_intensities())) {
+      list(totals = model_data(), intensities = model_intensities())
+    } else {
+      model_data()
+    }
+
     herdr::plot_herdr_results(
-      df = model_data(),
+      df = plot_df_input,
       group_cols = input$plot_groups,
       func_name = func_name,
       gwp_report = if (!is.null(input$gwp_report)) input$gwp_report else "AR5",
@@ -713,10 +728,21 @@ herdr_server <- function(input, output, session) {
     }
   )
 
-  output$table_results <- renderTable({ req(model_data()); model_data() }, digits = 6)
+  active_table_data <- reactive({
+    req(model_data())
+    if (identical(input$function_choice, "generate_impact_assessment") &&
+        identical(input$results_table_choice, "intensities") &&
+        !is.null(model_intensities())) {
+      model_intensities()
+    } else {
+      model_data()
+    }
+  })
+
+  output$table_results <- renderTable({ req(active_table_data()); active_table_data() }, digits = 6)
 
   output$table_results_hot <- renderRHandsontable({
-    df <- model_data()
+    df <- active_table_data()
     req(df)
     if (nrow(df) == 0) return(NULL)
 
@@ -732,15 +758,28 @@ herdr_server <- function(input, output, session) {
       readOnly = TRUE,
       width = "100%",
       height = 360,
-      stretchH = "all"
+      stretchH = "all",
+      digits = 4
     )
     tbl <- hot_cols(tbl, columnSorting = TRUE)
+    for (nc in names(df_display)[num_cols]) {
+      if (grepl("intensity|cradle_to_farm", nc, ignore.case = TRUE)) {
+        tbl <- hot_col(tbl, nc, format = "0.000")
+      }
+    }
     tbl
   })
 
   output$download <- downloadHandler(
-    filename = function() paste0("herdr_results_", Sys.Date(), ".csv"),
-    content = function(file) write_csv(model_data(), file)
+    filename = function() {
+      if (identical(input$function_choice, "generate_impact_assessment") &&
+          identical(input$results_table_choice, "intensities")) {
+        paste0("herdr_product_intensities_", Sys.Date(), ".csv")
+      } else {
+        paste0("herdr_results_", Sys.Date(), ".csv")
+      }
+    },
+    content = function(file) write_csv(active_table_data(), file)
   )
 
   output$download_inputs <- downloadHandler(

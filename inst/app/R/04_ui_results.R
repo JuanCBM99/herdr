@@ -19,8 +19,8 @@ build_results_panel <- function() {
             selectizeInput(
               "plot_groups",
               "Group Chart By:",
-              choices = c("animal_tag", "animal_type", "animal_subtype", "region", "subregion", "class_flex"),
-              selected = c("animal_tag", "region", "subregion", "class_flex"),
+              choices = c("farm_id", "animal_tag", "animal_type", "animal_subtype", "region", "subregion"),
+              selected = c("farm_id", "animal_tag", "region", "subregion"),
               multiple = TRUE,
               options = list(plugins = list('remove_button'))
             )
@@ -43,7 +43,7 @@ build_results_panel <- function() {
             )
           ),
           conditionalPanel(
-            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'overview' && input.plot_impact_category != 'fcr'",
+            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'fcr'",
             class = "col-md-3",
             selectInput(
               "plot_functional_unit",
@@ -58,7 +58,7 @@ build_results_panel <- function() {
             )
           ),
           conditionalPanel(
-            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'overview' && input.plot_impact_category != 'fcr' && input.plot_functional_unit == 'product'",
+            condition = "input.function_choice == 'generate_impact_assessment' && input.plot_impact_category != 'fcr' && input.plot_functional_unit == 'product'",
             class = "col-md-2",
             selectInput(
               "plot_product_subchoice",
@@ -115,8 +115,27 @@ build_results_panel <- function() {
           )
         ),
         div(
-          class = "d-flex justify-content-between align-items-center mb-2 mt-4",
-          h5("Detailed Model Outputs", class = "m-0 text-muted", style = "font-family: 'Fraunces', serif; font-weight: 700;"),
+          class = "d-flex justify-content-between align-items-center flex-wrap gap-2 mb-2 mt-4",
+          div(
+            class = "d-flex align-items-center gap-3 flex-wrap",
+            h5("Detailed Model Outputs", class = "m-0 text-muted", style = "font-family: 'Fraunces', serif; font-weight: 700;"),
+            conditionalPanel(
+              condition = "input.function_choice == 'generate_impact_assessment'",
+              div(
+                class = "ms-2",
+                radioButtons(
+                  "results_table_choice",
+                  label = NULL,
+                  choices = c(
+                    "Table 1: Total Inventory" = "totals",
+                    "Table 2: Product & Protein Intensities" = "intensities"
+                  ),
+                  selected = "totals",
+                  inline = TRUE
+                )
+              )
+            )
+          ),
           tags$span(class = "text-muted small", icon("table"), " Interactive preview — click column headers to sort, select cells to copy (Ctrl+C)")
         ),
         div(

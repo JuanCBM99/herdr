@@ -8,8 +8,11 @@ enforce_column_order <- function(df, id) {
   if (is.null(df) || nrow(df) == 0 || ncol(df) == 0) return(df)
 
   desired_lead <- switch(id,
-    "def" = c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype", "production_role"),
-    "mono" = c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype", "production_role"),
+    "census" = c("farm_id", "animal_tag", "region", "subregion", "population"),
+    "def" = c("farm_id", "animal_tag", "region", "subregion", "animal_type", "animal_subtype", "production_role"),
+    "mono" = c("farm_id", "animal_tag", "region", "subregion", "animal_type", "animal_subtype", "production_role"),
+    "weights" = c("farm_id", "animal_tag", "region", "subregion"),
+    "manure" = c("farm_id", "animal_tag", "region", "subregion"),
     "diet_ingr" = c("diet_tag", "ingredient_type", "ingredient", "ingredient_share", "country_of_origin", "custom_yield_kg_ha"),
     NULL
   )
@@ -73,11 +76,11 @@ build_keys <- function(df) {
   }
 
   tag <- clean_col("animal_tag")
+  farm <- clean_col("farm_id")
   reg <- clean_col("region")
   subreg <- clean_col("subregion")
-  cflex <- clean_col("class_flex")
 
-  keys <- paste(tag, reg, subreg, cflex, sep = " | ")
+  keys <- paste(tag, farm, reg, subreg, sep = " | ")
   keys[tag == ""] <- ""
   keys
 }
@@ -184,8 +187,7 @@ get_dropdown_options <- function(id, col_name, rv) {
       if (!is.null(rv$def) && "animal_tag" %in% names(rv$def)) rv$def$animal_tag,
       if (!is.null(rv$mono) && "animal_tag" %in% names(rv$mono)) rv$mono$animal_tag,
       if (!is.null(rv$weights) && "animal_tag" %in% names(rv$weights)) rv$weights$animal_tag,
-      if (!is.null(rv$manure) && "animal_tag" %in% names(rv$manure)) rv$manure$animal_tag,
-      if (!is.null(rv$repro) && "animal_tag" %in% names(rv$repro)) rv$repro$animal_tag
+      if (!is.null(rv$manure) && "animal_tag" %in% names(rv$manure)) rv$manure$animal_tag
     )
   } else if (col_name == "ingredient") {
     options <- c(
@@ -211,16 +213,44 @@ apply_dynamic_dropdowns <- function(tbl, id, rv) {
 
     if (length(options) > 0) {
       col_type <- if (!is.null(rule$type)) rule$type else "dropdown"
-      tbl <- rhandsontable::hot_col(
-        tbl,
-        col = target_col,
-        type = col_type,
-        source = options,
-        strict = FALSE,
-        allowInvalid = TRUE,
-        validator = htmlwidgets::JS("function(value, callback) { callback(true); }"),
-        filter = FALSE
-      )
+      is_strict <- isTRUE(rule$strict)
+
+      src_arg <- options
+      if (id == "mono" && target_col == "animal_subtype" && "animal_type" %in% names(rv[[id]])) {
+        type_col_idx <- match("animal_type", names(rv[[id]])) - 1
+        src_arg <- htmlwidgets::JS(sprintf("function(query, process) {
+          var hot = this.instance; var row = this.row;
+          if (row === null || row === undefined) {
+            var sel = hot.getSelected();
+            if (sel && sel.length > 0) row = sel[0][0];
+          }
+          var aType = (row !== null && row !== undefined) ? String(hot.getDataAtCell(row, %d) || '').trim().toLowerCase() : '';
+          if (aType === 'swine') { process(['meat']); } else { process(['meat', 'layer']); }
+        }", type_col_idx))
+      }
+
+      if (is_strict) {
+        tbl <- rhandsontable::hot_col(
+          tbl,
+          col = target_col,
+          type = col_type,
+          source = src_arg,
+          strict = TRUE,
+          allowInvalid = FALSE,
+          filter = FALSE
+        )
+      } else {
+        tbl <- rhandsontable::hot_col(
+          tbl,
+          col = target_col,
+          type = col_type,
+          source = src_arg,
+          strict = FALSE,
+          allowInvalid = TRUE,
+          validator = htmlwidgets::JS("function(value, callback) { callback(true); }"),
+          filter = FALSE
+        )
+      }
     }
   }
   tbl
@@ -493,7 +523,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
     }
   }
 
-  # Active cohorts in Census (population > 0) identified by 4-key: animal_tag, region, subregion, class_flex
+  # Active cohorts in Census (population > 0) identified by 3-key: animal_tag, region, subregion
   active_census <- if ("population" %in% names(valid_census)) {
     valid_census[!is.na(valid_census$population) & as.numeric(valid_census$population) > 0, , drop = FALSE]
   } else {
@@ -508,7 +538,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
 
   census_keys <- build_keys(active_census)
 
-  # Helper to extract the animal_tag from a 4-key
+  # Helper to extract the animal_tag from a key
   extract_key_tag <- function(keys) {
     vapply(strsplit(keys, " \\| "), function(p) if (length(p) > 0) p[1] else "", character(1), USE.NAMES = FALSE)
   }
@@ -558,7 +588,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       if (length(fmt_orphans) > 0) {
         add_issue("error", table_id, tab_label, "Cohort Not in Census",
                   paste0("Cohort(s) in ", tab_label, " do not exist in Census: ", paste(fmt_orphans, collapse = ", "),
-                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in animal_tag, region, subregion, or class_flex."))
+                         ". Census is the source of truth for livestock. Register this cohort in Census or check for typos in farm_id, animal_tag, region, or subregion."))
       }
     }
 
@@ -606,7 +636,54 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
     fmt_bio <- vapply(missing_bio_keys, format_cohort_label, character(1), USE.NAMES = FALSE)
     add_issue("error", "def", "Ruminants", "Missing Biological Definition",
               paste0("Active cohort(s) from Census missing in Ruminants or Monogastrics: ", paste(fmt_bio, collapse = ", "),
-                     ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
+                     ". Ensure farm_id, animal_tag, region, and subregion match exactly."))
+  }
+
+  # --- 3.0 Strict Validation of animal_subtype and production_role in Ruminants & Monogastrics ---
+  if (!is.null(rv$def) && nrow(rv$def) > 0) {
+    clean_def_meta <- rv$def[!is.na(rv$def$animal_tag) & trimws(as.character(rv$def$animal_tag)) != "" &
+                             !is.na(rv$def$animal_type) & trimws(as.character(rv$def$animal_type)) != "", , drop = FALSE]
+    if (nrow(clean_def_meta) > 0) {
+      for (r in seq_len(nrow(clean_def_meta))) {
+        cohort_lbl <- format_cohort_label(build_keys(clean_def_meta[r, , drop = FALSE]))
+        if (cohort_lbl == "") cohort_lbl <- clean_def_meta$animal_tag[r]
+        sub_val <- if ("animal_subtype" %in% names(clean_def_meta)) tolower(trimws(as.character(clean_def_meta$animal_subtype[r]))) else ""
+        if (is.na(sub_val) || !sub_val %in% c("dairy", "meat")) {
+          add_issue("error", "def", "Ruminants", "Invalid Animal Subtype",
+                    paste0("Cohort '", cohort_lbl, "' in Ruminants has invalid animal_subtype '", sub_val, "'. Must be strictly 'dairy' or 'meat'."))
+        }
+        role_val <- if ("production_role" %in% names(clean_def_meta)) tolower(trimws(as.character(clean_def_meta$production_role[r]))) else ""
+        if (is.na(role_val) || !role_val %in% c("mature", "replacement", "slaughter")) {
+          add_issue("error", "def", "Ruminants", "Invalid Production Role",
+                    paste0("Cohort '", cohort_lbl, "' in Ruminants has invalid production_role '", role_val, "'. Must be strictly 'mature', 'replacement', or 'slaughter'."))
+        }
+      }
+    }
+  }
+
+  if (!is.null(rv$mono) && nrow(rv$mono) > 0) {
+    clean_mono_meta <- rv$mono[!is.na(rv$mono$animal_tag) & trimws(as.character(rv$mono$animal_tag)) != "" &
+                               !is.na(rv$mono$animal_type) & trimws(as.character(rv$mono$animal_type)) != "", , drop = FALSE]
+    if (nrow(clean_mono_meta) > 0) {
+      for (r in seq_len(nrow(clean_mono_meta))) {
+        cohort_lbl <- format_cohort_label(build_keys(clean_mono_meta[r, , drop = FALSE]))
+        if (cohort_lbl == "") cohort_lbl <- clean_mono_meta$animal_tag[r]
+        type_val <- tolower(trimws(as.character(clean_mono_meta$animal_type[r])))
+        sub_val <- if ("animal_subtype" %in% names(clean_mono_meta)) tolower(trimws(as.character(clean_mono_meta$animal_subtype[r]))) else ""
+        if (type_val == "swine" && (is.na(sub_val) || sub_val != "meat")) {
+          add_issue("error", "mono", "Monogastrics", "Invalid Animal Subtype",
+                    paste0("Swine cohort '", cohort_lbl, "' in Monogastrics has invalid animal_subtype '", sub_val, "'. For swine, animal_subtype must be strictly 'meat'."))
+        } else if (type_val == "poultry" && (is.na(sub_val) || !sub_val %in% c("meat", "layer"))) {
+          add_issue("error", "mono", "Monogastrics", "Invalid Animal Subtype",
+                    paste0("Poultry cohort '", cohort_lbl, "' in Monogastrics has invalid animal_subtype '", sub_val, "'. For poultry, animal_subtype must be strictly 'meat' or 'layer'."))
+        }
+        role_val <- if ("production_role" %in% names(clean_mono_meta)) tolower(trimws(as.character(clean_mono_meta$production_role[r]))) else ""
+        if (is.na(role_val) || !role_val %in% c("mature", "replacement", "slaughter")) {
+          add_issue("error", "mono", "Monogastrics", "Invalid Production Role",
+                    paste0("Cohort '", cohort_lbl, "' in Monogastrics has invalid production_role '", role_val, "'. Must be strictly 'mature', 'replacement', or 'slaughter'."))
+        }
+      }
+    }
   }
 
   # --- 3.1 Ruminant Biological Coefficients Validation (cfi, ca, c, a, b, c_pregnancy) ---
@@ -736,7 +813,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
     fmt_weights <- vapply(missing_weights_keys, format_cohort_label, character(1), USE.NAMES = FALSE)
     add_issue("error", "weights", "Weights", "Missing Animal Weights",
               paste0("Active cohort(s) from Census missing in Weights: ", paste(fmt_weights, collapse = ", "),
-                     ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
+                     ". Ensure farm_id, animal_tag, region, and subregion match exactly."))
   }
 
   if (isTRUE(automatic_cycle)) {
@@ -804,7 +881,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
     if (length(fmt_manure) > 0) {
       add_issue("error", "manure", "Manure", "Missing Manure System",
                 paste0("Active cohort(s) from Census missing in Manure: ", paste(fmt_manure, collapse = ", "),
-                       ". Ensure animal_tag, region, subregion, and class_flex match exactly."))
+                       ". Ensure farm_id, animal_tag, region, and subregion match exactly."))
     }
   }
 
@@ -884,7 +961,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
 
     # Manure System Options, Whitespace & Variant Validity across ALL rows in rv$manure
     # 1. Whitespace check on system and cohort columns across all rows
-    sys_cols <- intersect(names(rv$manure), c(MANURE_CASCADE_COLUMNS, "animal_tag", "region", "subregion", "class_flex"))
+    sys_cols <- intersect(names(rv$manure), c(MANURE_CASCADE_COLUMNS, "farm_id", "animal_tag", "region", "subregion"))
     for (sc in sys_cols) {
       vals <- as.character(rv$manure[[sc]])
       bad_ws <- which(!is.na(vals) & vals != "" & (vals != trimws(vals) | trimws(vals) == ""))

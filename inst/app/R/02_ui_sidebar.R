@@ -30,7 +30,7 @@ build_herdr_sidebar <- function() {
       ),
       hr(),
       selectInput("farm_country", "Farm Country / Area:", choices = c("Loading..." = "")),
-      numericInput("year", "FAO Reference Year:", value = 2022, step = 1),
+      numericInput("year", "FAO Reference Year:", value = 2024, step = 1),
       selectInput(
         "gwp_report", "IPCC GWP Standard:",
         choices = c(

@@ -25,9 +25,9 @@ dynamic_dropdowns <- list(
   def = list(
     animal_tag      = list(source_table = "census", extract_column = "animal_tag", type = "dropdown", strict = FALSE),
     diet_tag        = list(source_table = "diet_prof", extract_column = "diet_tag", type = "dropdown", strict = FALSE),
-    animal_type     = list(choices = c("cattle", "sheep", "goat"), type = "dropdown", strict = FALSE),
-    animal_subtype  = list(choices = c("dairy", "beef", "meat"), type = "dropdown", strict = FALSE),
-    production_role = list(choices = c("mature", "replacement", "slaughter"), type = "dropdown", strict = FALSE),
+    animal_type     = list(choices = c("cattle", "sheep", "goat"), type = "dropdown", strict = TRUE),
+    animal_subtype  = list(choices = c("dairy", "meat"), type = "dropdown", strict = TRUE),
+    production_role = list(choices = c("mature", "replacement", "slaughter"), type = "dropdown", strict = TRUE),
     cfi             = list(source_table = "ipcc_coef", filter_column = "coefficient", filter_value = "cfi",         extract_column = "description", type = "dropdown", strict = FALSE),
     ca              = list(source_table = "ipcc_coef", filter_column = "coefficient", filter_value = "ca",          extract_column = "description", type = "dropdown", strict = FALSE),
     c               = list(source_table = "ipcc_coef", filter_column = "coefficient", filter_value = "c",           extract_column = "description", type = "dropdown", strict = FALSE),
@@ -39,9 +39,9 @@ dynamic_dropdowns <- list(
   mono = list(
     animal_tag      = list(source_table = "census", extract_column = "animal_tag", type = "dropdown", strict = FALSE),
     diet_tag        = list(source_table = "diet_prof", extract_column = "diet_tag", type = "dropdown", strict = FALSE),
-    animal_type     = list(choices = c("swine", "poultry"), type = "dropdown", strict = FALSE),
-    animal_subtype  = list(choices = c("breeder", "fattening", "replacement", "layer", "meat"), type = "dropdown", strict = FALSE),
-    production_role = list(choices = c("mature", "replacement", "slaughter"), type = "dropdown", strict = FALSE)
+    animal_type     = list(choices = c("swine", "poultry"), type = "dropdown", strict = TRUE),
+    animal_subtype  = list(choices = c("meat", "layer"), type = "dropdown", strict = TRUE),
+    production_role = list(choices = c("mature", "replacement", "slaughter"), type = "dropdown", strict = TRUE)
   ),
   weights = list(
     animal_tag      = list(source_table = "census", extract_column = "animal_tag", type = "dropdown", strict = FALSE)
@@ -77,10 +77,10 @@ MANURE_CASCADE_COLUMNS <- c(
 
 # --- Field Help Tooltips ---
 modal_tooltips <- list(
+  farm_id                  = "Mandatory: Unique identifier for the farm or production holding (e.g., 'farm_1', 'farm_north'). Enables multi-farm benchmarking.",
   animal_tag               = "Mandatory: A unique name for this specific group of animals (e.g., 'mature_dairy_cattle').",
   region                   = "Optional: A general location or grouping level (e.g., 'Europe', 'Spain', or 'Farm A').",
   subregion                = "Optional: A subdivision of your Region (e.g., if Region is 'Spain', Subregion could be 'Euskadi').",
-  class_flex               = "Optional: A flexible tag to group animals by trait, breed, or phase (e.g., 'lactating', 'dry', 'angus').",
   population               = "Average Annual Population (AAP) per IPCC Tier 2 guidelines: the average standing headcount present on the farm over the year (i.e. occupied barn or pasture capacity). For short-cycle animals (e.g. broilers, fattening pigs), annual slaughter throughput is automatically derived from productive_period_days (365 / days on feed).",
   forage_share             = "Percentage of the diet made up of roughage/forage (e.g., pasture, hay, silage).",
   concentrate_share        = "Percentage of the diet made up of concentrates (e.g., grains, pellets, soy).",
@@ -109,7 +109,7 @@ modal_tooltips <- list(
   wool_yield_kg_year       = "Total wool produced by one animal in a year (in kg).",
   work_hours               = "Number of hours per day the animal is used for physical draft/work.",
   animal_type              = "Broad species category (e.g., 'cattle', 'sheep', 'swine').",
-  animal_subtype           = "Specific production type (e.g., 'dairy', 'beef').",
+  animal_subtype           = "Specific production type ('dairy' or 'meat' for ruminants; 'meat' for swine; 'meat' or 'layer' for poultry).",
   production_role          = "Role in production cycle: 'mature' (breeding/milking/laying adults), 'replacement' (growing breeding stock), or 'slaughter' (growing animals for meat).",
   cfi_maintenance          = "Maintenance coefficient in kcal/kg_day",
   frac_fat_pct             = "Fat fraction in the animal's daily weight gain.",
