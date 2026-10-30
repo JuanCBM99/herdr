@@ -1,7 +1,7 @@
 #' Calculate Volatile Solids (VS) for Animals
 #'
 #' Computes volatile solids (VS) based on Gross Energy (GE), Digestible Energy (DE),
-#' and Ash content using IPCC Tier 2 methodology for ruminants, and DMI/Energy ratios for poultry.
+#' and Ash content using IPCC Tier 2 methodology for ruminants, and DMI/Energy ratios for monogastrics (swine and poultry).
 #'
 #' @param urinary_energy Numeric. Fraction of energy lost in urine. Default 0.04.
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
@@ -15,7 +15,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
                          ge_data = NULL, dmi_data = NULL, diet_char = NULL) {
   message("Calculating Volatile Solids (VS)...")
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # --- 1. Load Dependencies and Model Components ---
   if (is.null(diet_char)) diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))

@@ -18,7 +18,7 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
   if (is.null(direct_N2O_df)) direct_N2O_df <- suppressMessages(calculate_N2O_direct_manure(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   if (is.null(pop_df)) pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # --- 2. Validations ---
   herdr_validate_manure_systems(user_manure, ipcc_master, animal_metadata = direct_N2O_df)
@@ -38,12 +38,12 @@ calculate_N2O_indirect_volatilization <- function(automatic_cycle = FALSE, saveo
     dplyr::left_join(
       user_manure %>%
         dplyr::select(
-          region, subregion, animal_tag, class_flex,
+          farm_id, region, subregion, animal_tag,
           system_base, management_months, system_climate,
           system_subclimate, climate_zone, system_variant,
           climate_moisture, allocation
         ),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     dplyr::left_join(
       ipcc_master %>%

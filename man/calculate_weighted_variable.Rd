@@ -11,7 +11,10 @@ calculate_weighted_variable(saveoutput = TRUE, data_dir = "user_data")
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
+\value{
+Tibble with weighted nutritional variables for all animal cohorts.
+}
 \description{
-Computes weighted averages of nutritional variables (DE, CP, NDF, ASH, ED, Fat, NFC)
-by mapping ingredients to diets and diets to animals, combining ruminant and poultry definitions.
+Computes weighted averages of nutritional variables (DE, CP, Cropland CP, NDF, ASH, GE, and monogastric DE/ME)
+by mapping ingredients to diets and diets to animals, combining ruminant and monogastric (swine and poultry) definitions.
 }

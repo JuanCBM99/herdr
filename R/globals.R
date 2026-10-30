@@ -9,7 +9,7 @@ NULL
 if(getRversion() >= "2.15.1") {
   utils::globalVariables(c(
     # --- Identifiers and Metadata ---
-    ".", ".env", "region", "subregion", "animal_tag", "class_flex",
+    ".", ".data", ".env", "farm_id", "region", "subregion", "animal_tag",
     "animal_type", "animal_subtype", "diet_tag", "key", "parameter",
     "description", "coefficient", "value",
 
@@ -63,7 +63,7 @@ if(getRversion() >= "2.15.1") {
     "pop_lamb_female_meat_repl", "pop_lamb_male_meat_repl",
     "breeder_sows", "boars", "pop_replacement_sows", "pop_fattening_pigs",
     "fattening_pigs", "replacement_sows", "annual_piglets", "annual_slaughter",
-    "breeder_meat_hens", "laying_hens",
+    "breeder_meat_hens", "laying_hens", "free_range_laying_hens",
     "annual_meat_pullets", "annual_layer_pullets",
     "annual_dairy_slaughter", "annual_meat_slaughter",
     "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers",
@@ -106,14 +106,14 @@ if(getRversion() >= "2.15.1") {
 
     # --- Impacts and Summary (CO2eq) ---
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
-    "N2O_lea_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
+    "N2O_lea_Gg", "N2O_indirect_Gg", "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O",
     "CO2eq_N2O_direct", "CO2eq_N2O_indirect", "CO2eq_Total_Gg", "Land_m2",
     "Land_cropland_m2", "Land_grassland_convertible_m2", "Land_grassland_unconvertible_m2",
-    "Land_other_m2",
+    "Land_other_m2", "total_population", ".pop_row_id", ".orig_row_id",
 
     # --- Plotting and Graphics ---
     "plot_label", "Gg_CO2e", "Emission_Source", "Percentage", "Nutrient",
-    "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg",
+    "Land_Val", "tail", "download.file", "Protein_Source", "Protein_kg", "Total_Protein",
     "component", "panel", "component_raw", "co2e_ch4_ent", "co2e_ch4_man",
     "co2e_n2o_dir", "co2e_n2o_ind", "land_ha", "land_val", "functional_unit",
     "total_val", "label_text", "land_crop", "land_g_conv", "land_g_unco",
@@ -123,6 +123,7 @@ if(getRversion() >= "2.15.1") {
     # --- Functional Units and Intensities ---
     "GHG_intensity_protein", "Land_intensity_protein",
     "GHG_intensity_head", "Land_intensity_head",
+    "CO2eq_Total_head", "CO2eq_cradle_to_farm_head", "Land_head", "Water_head",
     "feed_intake_kg",
     "feed_CP_total_kg", "feed_CP_cropland_kg", "CP_cropland_pct",
 
@@ -147,15 +148,22 @@ if(getRversion() >= "2.15.1") {
     "GHG_cradle_to_farm_egg", "Water_intensity_egg",
     "GHG_cradle_to_farm_protein", "Water_intensity_protein",
     "GHG_cradle_to_farm_head", "Water_intensity_head",
+    "GHG_intensity_product", "GHG_cradle_to_farm_product",
+    "Land_intensity_product", "Water_intensity_product", "product_weight_kg",
+    ".is_dairy", ".is_layer", ".is_meat", ".breed", ".repl", ".mat", ".slau", ".has_brd", ".mat_pop", ".slau_pop", ".r_sh", ".b_sh", ".pool_mode",
+    ".p_ent", ".p_man", ".p_ndir", ".p_nind", ".p_fos", ".p_luc",
+    ".p_crop", ".p_gcon", ".p_gunc", ".p_loth", ".s1_sum", ".fd_sum", ".ld_sum",
+    "share_ent", "share_man", "share_n2o_dir", "share_n2o_ind",
+    "share_fossil", "share_luc", "share_crop", "share_g_conv", "share_g_unco", "share_other",
 
     # --- ECOALIM Feed Calculation Columns ---
     "Feedstuff", "Simapro LCI name", "Types of feedstuffs for livestock",
     "Climate change - EF 3.1 (kg CO2 eq)", "Climate change - Fossil (kg CO2 eq/kg)",
     "Climate change - Land use and LU change (kg CO2 eq/kg)", "Water use (m3 depriv.)",
     "annual_dmi_kg_head", "annual_dmi_kg_herd", "annual_fresh_kg_head", "annual_fresh_kg_herd",
-    "ecoalim_feedstuff", "ef_climate_fossil", "ef_climate_luc", "ef_climate_total", "ef_water",
-    "feed_CO2e_fossil_herd_kg", "feed_CO2e_fossil_kg_year", "feed_CO2e_herd_kg",
-    "feed_CO2e_luc_herd_kg", "feed_CO2e_luc_kg_year", "feed_CO2e_total_kg_year",
-    "feed_fresh_kg_year", "feed_water_herd_m3", "feed_water_m3_year"
+    "ecoalim_category", "ecoalim_feedstuff", "ef_climate_fossil", "ef_climate_luc", "ef_climate_total", "ef_water",
+    "feed_CO2e_fossil_herd_kg", "feed_CO2e_fossil_kg_year", "feed_CO2e_head_kg", "feed_CO2e_herd_kg",
+    "feed_CO2e_luc_herd_kg", "feed_CO2e_luc_kg_year", "feed_CO2e_per_head_year", "feed_CO2e_total_kg_year",
+    "feed_dmi_kg_year", "feed_fresh_kg_year", "feed_water_herd_m3", "feed_water_m3_year", "feed_water_per_head_year"
   ))
 }

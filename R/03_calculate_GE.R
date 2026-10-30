@@ -19,7 +19,7 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
                          NE_pregnancy_df = NULL, NE_wool_df = NULL) {
   message("Calculating Gross Energy (GE)...")
 
-  join_keys_univ <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys_univ <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # --- 1. Database Preparation ---
   if (is.null(de_df)) {
@@ -73,7 +73,7 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
     ) %>%
     # 5. Final Selection
     dplyr::select(
-      region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
+      farm_id, region, subregion, animal_tag, animal_type, animal_subtype,
       NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEwork_MJday, NEpregnancy_MJday, NEwool_MJday, GE_MJday, DE_pct, REM, REG
     )
   # --- 6. Save Output ---

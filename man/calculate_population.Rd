@@ -21,7 +21,7 @@ for each species. Default is \code{FALSE}.}
 }
 \value{
 A tibble containing the complete animal population structure with columns:
-  \code{region}, \code{subregion}, \code{animal_tag}, \code{class_flex},
+  \code{farm_id}, \code{region}, \code{subregion}, \code{animal_tag},
   \code{animal_type}, \code{animal_subtype}, and \code{population}.
 }
 \description{
@@ -42,5 +42,10 @@ When \code{automatic_cycle = TRUE}, the model requires standard mature categorie
 \code{mature_goat_female_dairy}, \code{breeder_sows}, \code{breeder_meat_hens}, \code{laying_hens}).
 All generated offspring automatically inherit the \code{region} and \code{subregion} of their
 parent cohorts, ensuring seamless downstream integration with diets, weights, and manure management.
+
+\itemize{
+  \item \code{farm_id}: Farm or production system identifier.
+  \item \code{region} and \code{subregion}: Strictly geographical location identifiers (e.g., country/province/municipality) that define the spatial unit of the farm. Different housing or management variants within the same geographical farm must be distinguished via \code{animal_tag} (e.g., \code{laying_hens} vs. \code{free_range_laying_hens}), not via \code{subregion}.
+}
 }
 

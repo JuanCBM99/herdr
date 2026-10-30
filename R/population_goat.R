@@ -54,7 +54,7 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
   # =========================================================================
   base_pops_wide <- census_goat %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0)
 
@@ -145,7 +145,7 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
   # =========================================================================
   all_pops_long <- calculated_pops %>%
     dplyr::select(
-      region, subregion, class_flex,
+      farm_id, region, subregion,
       mature_goat_male_dairy, mature_goat_male_meat,
       mature_goat_female_dairy, mature_goat_female_meat,
       kid_goat_female_dairy_replacement = pop_kid_goat_female_dairy_repl,
@@ -156,17 +156,13 @@ calculate_population_goat <- function(census_goat, rate_parameters = NULL, defin
       kid_goat_meat_slaughter           = pop_kid_goat_meat_slaughter
     ) %>%
     tidyr::pivot_longer(
-      cols = -c(region, subregion, class_flex),
+      cols = -c(farm_id, region, subregion),
       names_to = "animal_tag",
       values_to = "population"
-    ) %>%
-    # Offspring do not inherit productivity phases (class_flex) from parents
-    dplyr::mutate(
-      class_flex = dplyr::if_else(animal_tag %in% base_tags, class_flex, NA_character_)
     )
 
   final_goat_pop <- all_pops_long %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(round(population, 5) > 0)
 

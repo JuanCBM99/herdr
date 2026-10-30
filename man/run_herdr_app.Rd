@@ -2,9 +2,12 @@
 % Please edit documentation in R/run_app.R
 \name{run_herdr_app}
 \alias{run_herdr_app}
+\alias{run_app}
 \title{Launch the herdr Interactive Application}
 \usage{
 run_herdr_app()
+
+run_app()
 }
 \description{
 Opens the local herdr graphical user interface (GUI) in your default web browser.

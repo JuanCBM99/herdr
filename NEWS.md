@@ -1,5 +1,8 @@
 # herdr 1.0.4
 
+- **Multi-Farm Benchmarking Architecture (`farm_id`)**:
+  - Replaced legacy `class_flex` with `farm_id` as a first-class identifier across all user inputs, calculation pipelines, tests, and Shiny GUI data tables.
+  - Enables multi-farm benchmarking, spatial comparisons, and multi-holding life cycle inventories while strictly separating geographical location (`region`, `subregion`) from holding identity (`farm_id`) and biological management (`animal_tag`).
 - **Upstream Feed Environmental Footprints & Water Deprivation (`calculate_feed_emissions`)**:
   - Integrated the bundled **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1** life cycle inventory database (`ecoalim.parquet`) to quantify cradle-to-farm-gate Scope 3 feed production burdens.
   - Implemented the international **AWARE** (*Available WAter REmaining*, Boulay et al., 2018) characterization model adopted under the European Commission's **Environmental Footprint (EF 3.1)** standard for freshwater deprivation.

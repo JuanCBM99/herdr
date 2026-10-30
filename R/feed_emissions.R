@@ -70,7 +70,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     return(dplyr::tibble())
   }
   DMI_df <- DMI_df %>%
-    dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
+    dplyr::distinct(region, diet_tag, subregion, animal_tag, .keep_all = TRUE)
 
   if (is.null(population_df)) {
     population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
@@ -79,20 +79,20 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
   diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
   diet_ingredients_raw <- readr::read_csv(file.path(data_dir, "diet_ingredients.csv"), show_col_types = FALSE)
 
-  legacy_diet_mode <- any(c("region", "subregion", "class_flex") %in% names(diet_profiles)) &&
+  legacy_diet_mode <- any(c("region", "subregion") %in% names(diet_profiles)) &&
                       any(duplicated(diet_profiles$diet_tag))
 
   if (!legacy_diet_mode) {
     diet_profiles <- diet_profiles %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
       dplyr::distinct(diet_tag, .keep_all = TRUE)
     diet_ingredients_raw <- diet_ingredients_raw %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex")))
+      dplyr::select(-dplyr::any_of(c("region", "subregion")))
     diet_join_keys <- "diet_tag"
   } else {
     diet_profiles <- diet_profiles %>%
-      dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
-    diet_join_keys <- intersect(c("region", "subregion", "class_flex", "diet_tag"), names(diet_profiles))
+      dplyr::distinct(diet_tag, region, subregion, .keep_all = TRUE)
+    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diet_profiles))
   }
 
   # --- 3.1 Validate Diet Categories and Ingredient Shares ---
@@ -168,7 +168,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
 
   # --- 6. Aggregate Summary by Animal Tag ---
   summary_by_animal <- calc %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag, animal_type, animal_subtype, population) %>%
     dplyr::summarise(
       feed_dmi_kg_year = sum(annual_dmi_kg_herd, na.rm = TRUE),
       feed_fresh_kg_year = sum(annual_fresh_kg_herd, na.rm = TRUE),
@@ -190,7 +190,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     # Detailed ingredient breakdown
     ingredient_report <- calc %>%
       dplyr::select(
-        region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population,
+        farm_id, region, subregion, animal_tag, animal_type, animal_subtype, population,
         ingredient_type, ingredient, agribalyse_name, ecoalim_feedstuff,
         ingredient_share_pct = ingredient_share, DM_pct,
         annual_dmi_kg_head, annual_fresh_kg_head,

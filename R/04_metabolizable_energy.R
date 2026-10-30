@@ -14,7 +14,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
   weights_csv <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
 
   # Platform standard joining keys
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # Calculate daily egg mass internally for bioenergetics: (eggs_per_year / 365) * egg_weight_g
   egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
@@ -25,7 +25,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
 
   # 2. Join definition and weight files
   master <- mono_csv %>%
-    dplyr::left_join(weights_csv, by = c("region", "subregion", "animal_tag", "class_flex")) %>%
+    dplyr::left_join(weights_csv, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
     dplyr::filter(animal_type %in% c("poultry", "swine"))
 
   # 3. Process daily energy equations

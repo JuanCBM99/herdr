@@ -15,7 +15,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
                                  pop_df = NULL) {
   message("[herdr] Calculating total livestock production (physical products & protein)...")
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag")
 
   # --- 1. Load Data Assets ---
 
@@ -45,6 +45,27 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       ), call. = FALSE)
     }
     ruminants$production_role <- tolower(trimws(as.character(ruminants$production_role)))
+    ruminants$animal_subtype <- tolower(trimws(as.character(ruminants$animal_subtype)))
+
+    active_rum <- ruminants[!is.na(ruminants$animal_type) & trimws(as.character(ruminants$animal_type)) != "", , drop = FALSE]
+    if (nrow(active_rum) > 0) {
+      bad_role <- active_rum$animal_tag[is.na(active_rum$production_role) | !active_rum$production_role %in% c("mature", "replacement", "slaughter")]
+      if (length(bad_role) > 0) {
+        stop(paste0(
+          "Data Error: Invalid 'production_role' in '", ruminants_file, "' for cohort(s): ",
+          paste(unique(bad_role), collapse = ", "),
+          ". Must be strictly 'mature', 'replacement', or 'slaughter'."
+        ), call. = FALSE)
+      }
+      bad_sub <- active_rum$animal_tag[is.na(active_rum$animal_subtype) | !active_rum$animal_subtype %in% c("dairy", "meat")]
+      if (length(bad_sub) > 0) {
+        stop(paste0(
+          "Data Error: Invalid 'animal_subtype' in '", ruminants_file, "' for cohort(s): ",
+          paste(unique(bad_sub), collapse = ", "),
+          ". Must be strictly 'dairy' or 'meat'."
+        ), call. = FALSE)
+      }
+    }
 
     if (!"protein_content_pct" %in% names(ruminants)) {
       ruminants$protein_content_pct <- 0
@@ -74,6 +95,36 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       ), call. = FALSE)
     }
     monogastrics$production_role <- tolower(trimws(as.character(monogastrics$production_role)))
+    monogastrics$animal_subtype <- tolower(trimws(as.character(monogastrics$animal_subtype)))
+
+    active_mono <- monogastrics[!is.na(monogastrics$animal_type) & trimws(as.character(monogastrics$animal_type)) != "", , drop = FALSE]
+    if (nrow(active_mono) > 0) {
+      bad_role_m <- active_mono$animal_tag[is.na(active_mono$production_role) | !active_mono$production_role %in% c("mature", "replacement", "slaughter")]
+      if (length(bad_role_m) > 0) {
+        stop(paste0(
+          "Data Error: Invalid 'production_role' in '", monogastrics_file, "' for cohort(s): ",
+          paste(unique(bad_role_m), collapse = ", "),
+          ". Must be strictly 'mature', 'replacement', or 'slaughter'."
+        ), call. = FALSE)
+      }
+      a_type_m <- tolower(trimws(as.character(active_mono$animal_type)))
+      bad_swine <- active_mono$animal_tag[a_type_m == "swine" & (is.na(active_mono$animal_subtype) | active_mono$animal_subtype != "meat")]
+      if (length(bad_swine) > 0) {
+        stop(paste0(
+          "Data Error: Invalid 'animal_subtype' in '", monogastrics_file, "' for swine cohort(s): ",
+          paste(unique(bad_swine), collapse = ", "),
+          ". For swine, 'animal_subtype' must be strictly 'meat'."
+        ), call. = FALSE)
+      }
+      bad_poultry <- active_mono$animal_tag[a_type_m == "poultry" & (is.na(active_mono$animal_subtype) | !active_mono$animal_subtype %in% c("meat", "layer"))]
+      if (length(bad_poultry) > 0) {
+        stop(paste0(
+          "Data Error: Invalid 'animal_subtype' in '", monogastrics_file, "' for poultry cohort(s): ",
+          paste(unique(bad_poultry), collapse = ", "),
+          ". For poultry, 'animal_subtype' must be strictly 'meat' or 'layer'."
+        ), call. = FALSE)
+      }
+    }
 
     # Calculate daily egg mass internally for egg yield: (eggs_per_year / 365) * egg_weight_g
     egg_wt <- if ("egg_weight_g" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$egg_weight_g)) else 60
@@ -105,7 +156,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   animal_defs <- dplyr::bind_rows(ruminants_clean, monogastrics_clean)
   if (nrow(animal_defs) > 0) {
     animal_defs <- animal_defs %>%
-      dplyr::distinct(region, subregion, animal_tag, class_flex, .keep_all = TRUE)
+      dplyr::distinct(farm_id, region, subregion, animal_tag, .keep_all = TRUE)
   }
 
   # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) ---

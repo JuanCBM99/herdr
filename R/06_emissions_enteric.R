@@ -32,7 +32,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
     return(dplyr::tibble())
   }
 
-  join_keys <- c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # --- 2. Processing Pipeline: Merge Energy and Population ---
   results <- diet_vars %>%

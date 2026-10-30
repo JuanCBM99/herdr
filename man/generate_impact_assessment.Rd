@@ -2,15 +2,15 @@
 % Please edit documentation in R/14_summary.R
 \name{generate_impact_assessment}
 \alias{generate_impact_assessment}
-\title{Summarize CH4, N2O Emissions, and Land Use}
+\title{Summarize CH4, N2O Emissions, Land Use, and Farm Product Intensities}
 \usage{
 generate_impact_assessment(
   automatic_cycle = FALSE,
+  farm_id = NULL,
   region = NULL,
   subregion = NULL,
   animal = NULL,
   type = NULL,
-  class_flex = NULL,
   saveoutput = TRUE,
   group_by_identification = TRUE,
   farm_country = "Spain",
@@ -21,25 +21,25 @@ generate_impact_assessment(
 )
 }
 \arguments{
-\item{automatic_cycle}{Logical. TRUE for built-in model, FALSE for manual livestock_census.csv.}
+\item{automatic_cycle}{Logical. TRUE for built-in demographic models, FALSE for manual livestock_census.csv.}
 
-\item{region}{Character/Numeric vector to filter.}
+\item{farm_id}{Character vector to filter by farm_id. Default is NULL.}
 
-\item{subregion}{Character vector to filter.}
+\item{region}{Character/Numeric vector to filter by geographical region (e.g., country or province). Together with \code{subregion}, defines the spatial location of the farm; management or housing variants within the same farm must be distinguished via \code{animal_tag}, not \code{subregion}. Default is NULL.}
 
-\item{animal}{Livestock type (animal_type).}
+\item{subregion}{Character vector to filter by geographical subregion (e.g., municipality or district). Default is NULL.}
 
-\item{type}{Livestock subtype (animal_subtype).}
+\item{animal}{Livestock type (animal_type). Default is NULL.}
 
-\item{class_flex}{Management class (e.g., 'grazing', 'stall').}
+\item{type}{Livestock subtype (animal_subtype). Default is NULL.}
 
-\item{saveoutput}{If TRUE saves to output folder.}
+\item{saveoutput}{If TRUE saves to output folder: 'output/total_emissions_and_land_use.csv' and 'output/product_intensities.csv'.}
 
-\item{group_by_identification}{If TRUE returns by animal_tag.}
+\item{group_by_identification}{If TRUE returns the inventory totals by individual animal_tag cohort. If FALSE aggregates totals by farm_id, region, subregion, animal_type, animal_subtype.}
 
 \item{farm_country}{Character. The country of the farm/study (e.g., "Spain"). Default is "Spain".}
 
-\item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2022.}
+\item{year}{Numeric. The reference year for FAO trade data calculation if origins are missing. Default is 2024.}
 
 \item{gwp_report}{Character string or named numeric vector. IPCC Assessment Report version for Global Warming Potential (GWP100) factors. Options are `"AR5"` (default, CH4=28, N2O=265), `"AR6"` (CH4=27, N2O=273), `"AR4"` (CH4=25, N2O=298), or `"SAR"` (CH4=21, N2O=310). Alternatively, a custom named vector like `c(CH4 = 27, N2O = 273)` can be provided.}
 
@@ -47,6 +47,13 @@ generate_impact_assessment(
 
 \item{data_dir}{Path to the directory containing input CSV/data files. Defaults to `"user_data"`.}
 }
+\value{
+A named list containing two dataframes:
+  \item{totals}{Absolute environmental inventory of emissions, feed, and land use.}
+  \item{intensities}{Farm-level product, nutritional, and per-head environmental intensities.}
+}
 \description{
-Summarize CH4, N2O Emissions, and Land Use
+Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
+and GLEAM production outputs. Generates two distinct reports: an absolute environmental inventory (totals)
+and farm-level product, nutritional, and per-head environmental intensities.
 }

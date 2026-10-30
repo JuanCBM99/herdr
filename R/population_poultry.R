@@ -56,18 +56,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     valid_poultry_tags <- unique(census_poultry$animal_tag)
   }
 
-  # Backward compatibility: migrate legacy 'free_range_laying_hens' to 'laying_hens'
-  if ("free_range_laying_hens" %in% census_poultry$animal_tag) {
-    census_poultry <- census_poultry %>%
-      dplyr::mutate(
-        class_flex = dplyr::if_else(animal_tag == "free_range_laying_hens" & (is.na(class_flex) | class_flex == ""),
-                                    "free_range", class_flex),
-        animal_tag = dplyr::if_else(animal_tag == "free_range_laying_hens",
-                                    "laying_hens", animal_tag)
-      )
-  }
-
-  base_tags <- c("breeder_meat_hens", "laying_hens")
+  base_tags <- c("breeder_meat_hens", "laying_hens", "free_range_laying_hens")
   present_bases <- intersect(base_tags, census_poultry$animal_tag[census_poultry$population > 0])
 
   if (length(present_bases) == 0) {
@@ -89,7 +78,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   broilers_in_definitions <- "broilers" %in% valid_poultry_tags
   auto_model_broilers     <- !user_has_broilers && broilers_in_definitions
 
-  grouped_keys <- c("region", "subregion", "class_flex")
+  grouped_keys <- c("farm_id", "region", "subregion")
 
   base_wide <- adult_census %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(grouped_keys)), animal_tag) %>%
@@ -101,7 +90,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   }
 
   if (nrow(base_wide) == 0 ||
-      all(c(base_wide$breeder_meat_hens, base_wide$laying_hens) == 0)) {
+      all(c(base_wide$breeder_meat_hens, base_wide$laying_hens, base_wide$free_range_laying_hens) == 0)) {
     return(census_poultry %>% dplyr::filter(animal_tag %in% valid_poultry_tags))
   }
 
@@ -120,17 +109,16 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   }
 
   # 3a. Durations of productive laying cycles and rearing periods
-  pullet_meat_days  <- herdr_resolve_period_days(base_wide, "replacement_meat_pullets",  weights = weights_df, default_days = 140)
-  pullet_layer_days <- herdr_resolve_period_days(base_wide, "replacement_layer_pullets", weights = weights_df, default_days = 119)
-  hen_meat_days     <- herdr_resolve_period_days(base_wide, "breeder_meat_hens",         weights = weights_df, default_days = 301)
-  laying_days       <- herdr_resolve_period_days(base_wide, "laying_hens",               weights = weights_df, default_days = 511)
-  broiler_days      <- herdr_resolve_period_days(base_wide, "broilers",                  weights = weights_df, default_days = 42)
+  pullet_meat_days       <- herdr_resolve_period_days(base_wide, "replacement_meat_pullets",  weights = weights_df, default_days = 140)
+  pullet_layer_days      <- herdr_resolve_period_days(base_wide, "replacement_layer_pullets", weights = weights_df, default_days = 119)
+  hen_meat_days          <- herdr_resolve_period_days(base_wide, "breeder_meat_hens",         weights = weights_df, default_days = 301)
+  laying_days            <- herdr_resolve_period_days(base_wide, "laying_hens",               weights = weights_df, default_days = 511)
+  free_range_laying_days <- herdr_resolve_period_days(base_wide, "free_range_laying_hens",    weights = weights_df, default_days = 441)
+  broiler_days           <- herdr_resolve_period_days(base_wide, "broilers",                  weights = weights_df, default_days = 42)
 
   # 3b. Breeder meat hen oviposition and fertility parameters
   eggs_yr_breeder   <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "eggs_per_year",
                                                        definitions = definitions, rate_parameters = rate_parameters, default_val = 211.7)
-  egg_wt_breeder    <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "egg_weight_g",
-                                                       definitions = definitions, rate_parameters = rate_parameters, default_val = 64.0)
   fertility_def     <- herdr_resolve_demographic_param(base_wide, "breeder_meat_hens", "fertility_rate",
                                                        definitions = definitions, rate_parameters = rate_parameters, default_val = 0.83)
   fertility_breeder <- ifelse(fertility_def > 1, fertility_def / 100, fertility_def)
@@ -148,6 +136,11 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   laying_repl_rate           <- ifelse(laying_repl_rate_def >= 0, laying_repl_rate_def,
                                        ifelse(laying_days > 0, 365 / laying_days, 1.0))
 
+  free_range_repl_rate_def   <- herdr_resolve_demographic_param(base_wide, "free_range_laying_hens", "replacement_rate",
+                                                                definitions = definitions, rate_parameters = rate_parameters, default_val = -1)
+  free_range_repl_rate       <- ifelse(free_range_repl_rate_def >= 0, free_range_repl_rate_def,
+                                       ifelse(free_range_laying_days > 0, 365 / free_range_laying_days, 1.0))
+
   # =========================================================================
   # Step 4: Demographic Modeling Equations
   # =========================================================================
@@ -155,7 +148,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     dplyr::mutate(
       # 4a. Annual replacement pullets required for laying and breeding flocks
       annual_meat_pullets  = breeder_meat_hens * breeder_meat_repl_rate,
-      annual_layer_pullets = laying_hens * laying_repl_rate,
+      annual_layer_pullets = (laying_hens * laying_repl_rate) + (free_range_laying_hens * free_range_repl_rate),
 
       # 4b. Standing population of replacement pullets (IPCC Eq. 10.1 AAP)
       pop_replacement_meat_pullets  = annual_meat_pullets * (pullet_meat_days / 365),
@@ -193,22 +186,18 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
       cols = -dplyr::all_of(grouped_keys),
       names_to = "animal_tag",
       values_to = "population"
-    ) %>%
-    # Offspring do not inherit productivity phases (class_flex) from parents
-    dplyr::mutate(
-      class_flex = dplyr::if_else(animal_tag %in% base_tags, class_flex, NA_character_)
     )
 
   # Combine auto-modeled cohorts with preserved user cohorts (e.g. manual commercial broilers)
   combined_pops <- dplyr::bind_rows(generated_long, non_base_census)
 
   final_poultry_pop <- combined_pops %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(animal_tag %in% valid_poultry_tags, round(population, 5) > 0)
 
   # Informative console summary messages
-  tot_layers        <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "laying_hens"], na.rm = TRUE)
+  tot_layers        <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag %in% c("laying_hens", "free_range_laying_hens")], na.rm = TRUE)
   tot_breeders      <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "breeder_meat_hens"], na.rm = TRUE)
   tot_layer_pullets <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "replacement_layer_pullets"], na.rm = TRUE)
   tot_meat_pullets  <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "replacement_meat_pullets"], na.rm = TRUE)

@@ -17,6 +17,11 @@
 #' All generated offspring automatically inherit the \code{region} and \code{subregion} of their
 #' parent cohorts, ensuring seamless downstream integration with diets, weights, and manure management.
 #'
+#' \itemize{
+#'   \item \code{farm_id}: Farm or production system identifier.
+#'   \item \code{region} and \code{subregion}: Strictly geographical location identifiers (e.g., country/province/municipality) that define the spatial unit of the farm. Different housing or management variants within the same geographical farm must be distinguished via \code{animal_tag} (e.g., \code{laying_hens} vs. \code{free_range_laying_hens}), not via \code{subregion}.
+#' }
+#'
 #' @param automatic_cycle Logical. If \code{TRUE}, runs the built-in biological demographic model
 #'   for each species. Default is \code{FALSE}.
 #' @param saveoutput Logical. If \code{TRUE}, exports the final population dataset to
@@ -24,7 +29,7 @@
 #'
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @return A tibble containing the complete animal population structure with columns:
-#'   \code{region}, \code{subregion}, \code{animal_tag}, \code{class_flex},
+#'   \code{farm_id}, \code{region}, \code{subregion}, \code{animal_tag},
 #'   \code{animal_type}, \code{animal_subtype}, and \code{population}.
 #' @export
 calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
@@ -36,7 +41,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   # =========================================================================
   census_raw <- readr::read_csv(
     file.path(data_dir, "livestock_census.csv"),
-    col_types = readr::cols(subregion = "c", class_flex = "c"),
+    col_types = readr::cols(farm_id = "c", subregion = "c"),
     show_col_types = FALSE
   )
 
@@ -44,11 +49,11 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   definitions_ruminant <- if (file.exists(rum_file)) {
     readr::read_csv(
       rum_file,
-      col_types = readr::cols(subregion = "c", class_flex = "c"),
+      col_types = readr::cols(farm_id = "c", subregion = "c"),
       show_col_types = FALSE
     )
   } else {
-    tibble::tibble(animal_tag = character(), region = character(), subregion = character(), class_flex = character(), animal_type = character(), animal_subtype = character())
+    tibble::tibble(farm_id = character(), animal_tag = character(), region = character(), subregion = character(), animal_type = character(), animal_subtype = character())
   }
 
   if ("replacement_rate" %in% names(definitions_ruminant)) {
@@ -59,11 +64,11 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   definitions_monogastric <- if (file.exists(mono_file)) {
     readr::read_csv(
       mono_file,
-      col_types = readr::cols(subregion = "c", class_flex = "c"),
+      col_types = readr::cols(farm_id = "c", subregion = "c"),
       show_col_types = FALSE
     )
   } else {
-    tibble::tibble(animal_tag = character(), region = character(), subregion = character(), class_flex = character(), animal_type = character(), animal_subtype = character())
+    tibble::tibble(farm_id = character(), animal_tag = character(), region = character(), subregion = character(), animal_type = character(), animal_subtype = character())
   }
   if ("replacement_rate" %in% names(definitions_monogastric)) {
     definitions_monogastric$replacement_rate <- suppressWarnings(as.numeric(definitions_monogastric$replacement_rate))
@@ -83,7 +88,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     stop("Critical Error: Negative population values found in 'livestock_census.csv'.")
   }
 
-  def_cols <- c("animal_tag", "region", "subregion", "class_flex", "animal_type", "animal_subtype")
+  def_cols <- c("farm_id", "animal_tag", "region", "subregion", "animal_type", "animal_subtype")
   unified_definitions <- dplyr::bind_rows(
     definitions_ruminant %>% dplyr::select(dplyr::any_of(def_cols)),
     definitions_monogastric %>% dplyr::select(dplyr::any_of(def_cols))
@@ -91,8 +96,8 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
 
   census_base <- census_raw %>%
     dplyr::left_join(
-      unified_definitions %>% dplyr::select(dplyr::any_of(c("animal_tag", "region", "subregion", "class_flex", "animal_type"))),
-      by = c("animal_tag", "region", "subregion", "class_flex")
+      unified_definitions %>% dplyr::select(dplyr::any_of(c("farm_id", "animal_tag", "region", "subregion", "animal_type"))),
+      by = c("farm_id", "animal_tag", "region", "subregion")
     )
 
   # =========================================================================
@@ -172,18 +177,18 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     ~animal_tag, ~animal_type, ~animal_subtype,
     # Cattle
     "mature_dairy_cattle", "cattle", "dairy",
-    "mature_beef_cattle", "cattle", "beef",
-    "mature_beef_bull", "cattle", "beef",
+    "mature_beef_cattle", "cattle", "meat",
+    "mature_beef_bull", "cattle", "meat",
     "dairy_calves_female_replacement", "cattle", "dairy",
     "dairy_yearlings_female_replacement", "cattle", "dairy",
     "feedlot_calves_male", "cattle", "dairy",
     "feedlot_calves_female", "cattle", "dairy",
-    "beef_calves_male", "cattle", "beef",
-    "beef_calves_female", "cattle", "beef",
-    "beef_calves_male_replacement", "cattle", "beef",
-    "beef_calves_female_replacement", "cattle", "beef",
-    "beef_yearlings_male_replacement", "cattle", "beef",
-    "beef_yearlings_female_replacement", "cattle", "beef",
+    "beef_calves_male", "cattle", "meat",
+    "beef_calves_female", "cattle", "meat",
+    "beef_calves_male_replacement", "cattle", "meat",
+    "beef_calves_female_replacement", "cattle", "meat",
+    "beef_yearlings_male_replacement", "cattle", "meat",
+    "beef_yearlings_female_replacement", "cattle", "meat",
     # Sheep
     "mature_sheep_female_dairy", "sheep", "dairy",
     "mature_sheep_female_meat", "sheep", "meat",
@@ -207,15 +212,16 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     "kid_goat_dairy_slaughter", "goat", "dairy",
     "kid_goat_meat_slaughter", "goat", "meat",
     # Swine
-    "breeder_sows", "swine", "breeder",
-    "boars", "swine", "breeder",
-    "replacement_sows", "swine", "replacement",
-    "fattening_pigs", "swine", "fattening",
+    "breeder_sows", "swine", "meat",
+    "boars", "swine", "meat",
+    "replacement_sows", "swine", "meat",
+    "fattening_pigs", "swine", "meat",
     # Poultry
     "breeder_meat_hens", "poultry", "meat",
     "replacement_meat_pullets", "poultry", "meat",
     "broilers", "poultry", "meat",
     "laying_hens", "poultry", "layer",
+    "free_range_laying_hens", "poultry", "layer",
     "replacement_layer_pullets", "poultry", "layer"
   )
 
@@ -230,7 +236,7 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   final_result <- final_pop_raw %>%
     dplyr::select(-dplyr::any_of(c("animal_type", "animal_subtype"))) %>%
     dplyr::left_join(all_metadata, by = "animal_tag") %>%
-    dplyr::select(region, subregion, animal_tag, class_flex, animal_type, animal_subtype, population) %>%
+    dplyr::select(farm_id, region, subregion, animal_tag, animal_type, animal_subtype, population) %>%
     dplyr::filter(population > 0)
 
   # =========================================================================

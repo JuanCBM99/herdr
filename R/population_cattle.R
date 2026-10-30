@@ -61,7 +61,7 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
   # =========================================================================
   base_pops_wide <- census_cattle %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0)
 
@@ -133,7 +133,7 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
   # =========================================================================
   all_pops_long <- calculated_pops %>%
     dplyr::select(
-      region, subregion, class_flex,
+      farm_id, region, subregion,
       mature_beef_bull, mature_dairy_cattle, mature_beef_cattle,
       feedlot_calves_male             = pop_feedlot_calves_male,
       feedlot_calves_female           = pop_feedlot_calves_female,
@@ -150,17 +150,13 @@ calculate_population_cattle <- function(census_cattle, rate_parameters = NULL, d
       dairy_yearlings_female_replacement = dairy_calves_female_replacement
     ) %>%
     tidyr::pivot_longer(
-      cols = -c(region, subregion, class_flex),
+      cols = -c(farm_id, region, subregion),
       names_to = "animal_tag",
       values_to = "population"
-    ) %>%
-    # 5b. Offspring do not inherit productivity phases (class_flex) from parents
-    dplyr::mutate(
-      class_flex = dplyr::if_else(animal_tag %in% base_tags, class_flex, NA_character_)
     )
 
   final_cattle_pop <- all_pops_long %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(round(population, 5) > 0)
 

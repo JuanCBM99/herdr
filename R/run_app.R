@@ -22,4 +22,8 @@ run_herdr_app <- function() {
 
   shiny::runApp(app_obj, display.mode = "normal")
 }
+
+#' @rdname run_herdr_app
+#' @export
+run_app <- run_herdr_app
 # nocov end

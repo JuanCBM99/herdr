@@ -63,7 +63,7 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   # =========================================================================
   base_pops_wide <- census_swine %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0)
 
@@ -135,24 +135,20 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   # =========================================================================
   all_pops_long <- calculated_pops %>%
     dplyr::select(
-      region, subregion, class_flex,
+      farm_id, region, subregion,
       breeder_sows,
       boars,
       replacement_sows = pop_replacement_sows,
       fattening_pigs   = pop_fattening_pigs
     ) %>%
     tidyr::pivot_longer(
-      cols = -c(region, subregion, class_flex),
+      cols = -c(farm_id, region, subregion),
       names_to = "animal_tag",
       values_to = "population"
-    ) %>%
-    # Offspring do not inherit productivity phases (class_flex) from parents
-    dplyr::mutate(
-      class_flex = dplyr::if_else(animal_tag %in% base_tags, class_flex, NA_character_)
     )
 
   final_swine_pop <- all_pops_long %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(animal_tag %in% valid_swine_tags, round(population, 5) > 0)
 

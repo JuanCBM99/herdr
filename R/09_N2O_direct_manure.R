@@ -35,7 +35,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   if (is.null(neg_df)) neg_df <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
   if (is.null(dmi_df)) dmi_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir, ge_req = ge_df, diet_char = cp_df))
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # --- 2. Validations ---
   herdr_validate_manure_systems(user_manure, ipcc_master, animal_metadata = ge_df)
@@ -60,44 +60,44 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     ) %>%
     dplyr::left_join(
       (if ("protein_content_pct" %in% names(cat_csv)) {
-        cat_csv %>% dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct, protein_content_pct)
+        cat_csv %>% dplyr::select(farm_id, region, subregion, animal_tag, milk_yield_kg_year, fat_content_pct, protein_content_pct)
       } else {
         cat_csv %>%
-          dplyr::select(region, subregion, animal_tag, class_flex, milk_yield_kg_year, fat_content_pct) %>%
+          dplyr::select(farm_id, region, subregion, animal_tag, milk_yield_kg_year, fat_content_pct) %>%
           dplyr::mutate(protein_content_pct = 0)
       }),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     # Read structural fields matching your exact livestock_weights.csv
     dplyr::left_join(
       weights_csv %>%
         dplyr::select(
-          region, subregion, animal_tag, class_flex, initial_weight_kg, final_weight_kg,
+          farm_id, region, subregion, animal_tag, initial_weight_kg, final_weight_kg,
           productive_period_days, sows_gestation_days, sows_lactation_days,
           piglet_birth_weight_kg, piglet_weaning_weight_kg, sow_reserve_gain_kg
         ),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     # Read biological fields matching your exact monogastric_definitions.csv
     dplyr::left_join(
       mono_csv %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, egg_mass_g_day, piglets_born, piglets_suckling),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+        dplyr::select(farm_id, region, subregion, animal_tag, egg_mass_g_day, piglets_born, piglets_suckling),
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     dplyr::left_join(
       neg_df %>%
-        dplyr::select(region, subregion, animal_tag, class_flex, NEg_MJday),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+        dplyr::select(farm_id, region, subregion, animal_tag, NEg_MJday),
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     dplyr::left_join(
       user_manure %>%
         dplyr::select(
-          region, subregion, animal_tag, class_flex,
+          farm_id, region, subregion, animal_tag,
           system_base, management_months, system_climate,
           system_subclimate, climate_zone, system_variant,
           climate_moisture, allocation
         ),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     dplyr::left_join(
       ipcc_master %>%

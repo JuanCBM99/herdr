@@ -23,7 +23,7 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
   if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
   if (is.null(mono)) mono <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag")
 
   # --- 2. Merge Data Assets and Harmonize Missing Values ---
   results <- ge_req %>%
@@ -63,6 +63,19 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
       W_mean = (initial_weight_kg + final_weight_kg) / 2,
       DMI_bw_pct = dplyr::if_else(W_mean > 0, (DMI_kgday / W_mean) * 100, 0)
     )
+  # --- 3b. Missing-input check: DMI = 0 means diet or energy data were missing ---
+  zero_dmi <- results %>%
+    dplyr::filter(DMI_kgday == 0)
+
+  if (nrow(zero_dmi) > 0) {
+    warning(
+      "DMI could not be calculated (DMI = 0) for: ",
+      paste(unique(zero_dmi$animal_tag), collapse = ", "),
+      ". Check diet assignment and feed energy values (GE_feed_kcal_kg / ME_kcal_kg).",
+      call. = FALSE
+    )
+  }
+
 
   # --- 4. Upper Bound Biological Threshold Checks ---
   warn_high <- results %>%

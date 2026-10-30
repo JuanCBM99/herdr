@@ -13,7 +13,79 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom dplyr group_by summarise across all_of cur_column arrange mutate filter select bind_rows
 #' @importFrom scales comma
-plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subregion", "class_flex"), func_name = NULL, gwp_report = "AR5", ar = NULL, functional_unit = "total", impact_category = NULL) {
+plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "region", "subregion"), func_name = NULL, gwp_report = "AR5", ar = NULL, functional_unit = "total", impact_category = NULL) {
+  fu_check <- if (!is.null(functional_unit)) tolower(functional_unit[1]) else "total"
+  ic_check <- if (!is.null(impact_category)) tolower(impact_category[1]) else ""
+
+  if (is.list(df) && !is.data.frame(df)) {
+    if (!is.null(df$totals) && !is.null(df$intensities)) {
+      use_intensities <- (ic_check %in% c("fcr", "protein_fcr")) ||
+        (fu_check %in% c("protein", "product", "milk", "meat", "wool", "egg", "fcr", "protein_fcr", "water_protein", "water_product"))
+
+      if (use_intensities) {
+        tot_df <- df$totals
+        int_df <- df$intensities
+        join_cols <- intersect(c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype", "production_role"), intersect(names(tot_df), names(int_df)))
+
+        if (length(join_cols) > 0 && all(c("CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O_direct", "CO2eq_N2O_indirect") %in% names(tot_df))) {
+          ent_keys <- intersect(c("farm_id", "region", "subregion", "animal_type", "animal_subtype"), names(tot_df))
+          tot_shares <- tot_df %>%
+            dplyr::group_by(dplyr::across(dplyr::all_of(ent_keys))) %>%
+            dplyr::mutate(
+              .is_dairy = tolower(trimws(as.character(animal_subtype))) == "dairy",
+              .is_layer = tolower(trimws(as.character(animal_subtype))) == "layer",
+              .is_meat  = !.is_dairy & !.is_layer,
+              .breed    = production_role %in% c("mature", "replacement"),
+              .repl     = production_role == "replacement",
+              .mat      = production_role == "mature",
+              .slau     = production_role == "slaughter",
+              .has_brd  = any(.breed & population > 0, na.rm = TRUE),
+              .mat_pop  = sum(population[.mat], na.rm = TRUE),
+              .slau_pop = sum(population[.slau], na.rm = TRUE),
+              .r_sh     = dplyr::if_else(.mat & .mat_pop > 0, population / .mat_pop, 0),
+              .b_sh     = dplyr::if_else(.slau & .slau_pop > 0, population / .slau_pop, 1),
+              .pool_mode = dplyr::case_when(
+                production_role == "mature" & (.is_dairy | .is_layer) ~ "mat_repl",
+                .is_meat & .has_brd & production_role == "slaughter" ~ "slau_breed",
+                .is_meat & .has_brd & production_role == "mature" ~ "sys",
+                TRUE ~ "row"
+              ),
+              .p_ent  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_enteric + .r_sh * sum(CO2eq_enteric[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_enteric + .b_sh * sum(CO2eq_enteric[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_enteric, na.rm = TRUE), TRUE ~ CO2eq_enteric),
+              .p_man  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_manure + .r_sh * sum(CO2eq_manure[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_manure + .b_sh * sum(CO2eq_manure[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_manure, na.rm = TRUE), TRUE ~ CO2eq_manure),
+              .p_ndir = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_N2O_direct + .r_sh * sum(CO2eq_N2O_direct[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_N2O_direct + .b_sh * sum(CO2eq_N2O_direct[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_N2O_direct, na.rm = TRUE), TRUE ~ CO2eq_N2O_direct),
+              .p_nind = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_N2O_indirect + .r_sh * sum(CO2eq_N2O_indirect[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_N2O_indirect + .b_sh * sum(CO2eq_N2O_indirect[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_N2O_indirect, na.rm = TRUE), TRUE ~ CO2eq_N2O_indirect),
+              .p_fos  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_feed_fossil_Gg + .r_sh * sum(CO2eq_feed_fossil_Gg[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_feed_fossil_Gg + .b_sh * sum(CO2eq_feed_fossil_Gg[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_feed_fossil_Gg, na.rm = TRUE), TRUE ~ CO2eq_feed_fossil_Gg),
+              .p_luc  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_feed_luc_Gg + .r_sh * sum(CO2eq_feed_luc_Gg[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_feed_luc_Gg + .b_sh * sum(CO2eq_feed_luc_Gg[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_feed_luc_Gg, na.rm = TRUE), TRUE ~ CO2eq_feed_luc_Gg),
+              .p_crop = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_cropland_m2 + .r_sh * sum(Land_cropland_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_cropland_m2 + .b_sh * sum(Land_cropland_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_cropland_m2, na.rm = TRUE), TRUE ~ Land_cropland_m2),
+              .p_gcon = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_grassland_convertible_m2 + .r_sh * sum(Land_grassland_convertible_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_grassland_convertible_m2 + .b_sh * sum(Land_grassland_convertible_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_grassland_convertible_m2, na.rm = TRUE), TRUE ~ Land_grassland_convertible_m2),
+              .p_gunc = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_grassland_unconvertible_m2 + .r_sh * sum(Land_grassland_unconvertible_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_grassland_unconvertible_m2 + .b_sh * sum(Land_grassland_unconvertible_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_grassland_unconvertible_m2, na.rm = TRUE), TRUE ~ Land_grassland_unconvertible_m2),
+              .p_loth = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_other_m2 + .r_sh * sum(Land_other_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_other_m2 + .b_sh * sum(Land_other_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_other_m2, na.rm = TRUE), TRUE ~ Land_other_m2),
+              .s1_sum = .p_ent + .p_man + .p_ndir + .p_nind,
+              .fd_sum = .p_fos + .p_luc,
+              .ld_sum = .p_crop + .p_gcon + .p_gunc + .p_loth,
+              share_ent     = dplyr::if_else(.s1_sum > 0, .p_ent / .s1_sum, 0),
+              share_man     = dplyr::if_else(.s1_sum > 0, .p_man / .s1_sum, 0),
+              share_n2o_dir = dplyr::if_else(.s1_sum > 0, .p_ndir / .s1_sum, 0),
+              share_n2o_ind = dplyr::if_else(.s1_sum > 0, .p_nind / .s1_sum, 0),
+              share_fossil  = dplyr::if_else(.fd_sum > 0, .p_fos / .fd_sum, 1),
+              share_luc     = dplyr::if_else(.fd_sum > 0, .p_luc / .fd_sum, 0),
+              share_crop    = dplyr::if_else(.ld_sum > 0, .p_crop / .ld_sum, 1),
+              share_g_conv  = dplyr::if_else(.ld_sum > 0, .p_gcon / .ld_sum, 0),
+              share_g_unco  = dplyr::if_else(.ld_sum > 0, .p_gunc / .ld_sum, 0),
+              share_other   = dplyr::if_else(.ld_sum > 0, .p_loth / .ld_sum, 0)
+            ) %>%
+            dplyr::ungroup() %>%
+            dplyr::select(dplyr::all_of(join_cols), share_ent, share_man, share_n2o_dir, share_n2o_ind, share_fossil, share_luc, share_crop, share_g_conv, share_g_unco, share_other)
+
+          int_df <- dplyr::left_join(int_df, tot_shares, by = join_cols)
+        }
+        df <- int_df
+      } else {
+        df <- df$totals
+      }
+    }
+  }
+
   if (!is.data.frame(df) || nrow(df) == 0) {
     return(NULL)
   }
@@ -23,18 +95,127 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     return(NULL)
   }
 
+  # Pre-populate generic '_product' intensity columns if Table 2 intensities are present
+  has_table2_cols <- any(c("GHG_intensity_milk", "GHG_intensity_meat", "GHG_intensity_egg", "GHG_intensity_wool", "GHG_intensity_protein") %in% names(df))
+  if (has_table2_cols) {
+    m_kg <- if ("milk_FPCM_kg" %in% names(df)) tidyr::replace_na(df$milk_FPCM_kg, 0) else rep(0, nrow(df))
+    c_kg <- if ("meat_carcass_weight_kg" %in% names(df)) tidyr::replace_na(df$meat_carcass_weight_kg, 0) else rep(0, nrow(df))
+    e_kg <- if ("egg_fresh_kg" %in% names(df)) tidyr::replace_na(df$egg_fresh_kg, 0) else rep(0, nrow(df))
+    w_kg <- if ("wool_kg" %in% names(df)) tidyr::replace_na(df$wool_kg, 0) else rep(0, nrow(df))
+
+    df <- df %>%
+      dplyr::mutate(
+        GHG_intensity_product = dplyr::coalesce(GHG_intensity_milk, GHG_intensity_meat, GHG_intensity_egg, GHG_intensity_wool),
+        GHG_cradle_to_farm_product = dplyr::coalesce(GHG_cradle_to_farm_milk, GHG_cradle_to_farm_meat, GHG_cradle_to_farm_egg, GHG_cradle_to_farm_wool),
+        Land_intensity_product = if ("Land_intensity_milk" %in% names(df)) dplyr::coalesce(Land_intensity_milk, Land_intensity_meat, Land_intensity_egg, Land_intensity_wool) else NA_real_,
+        Water_intensity_product = if ("Water_intensity_milk" %in% names(df)) dplyr::coalesce(Water_intensity_milk, Water_intensity_meat, Water_intensity_egg, Water_intensity_wool) else NA_real_
+      )
+    df$product_weight_kg <- dplyr::case_when(
+      !is.na(df$GHG_intensity_milk) & m_kg > 0 ~ m_kg,
+      !is.na(df$GHG_intensity_meat) & c_kg > 0 ~ c_kg,
+      !is.na(df$GHG_intensity_egg)  & e_kg > 0 ~ e_kg,
+      !is.na(df$GHG_intensity_wool) & w_kg > 0 ~ w_kg,
+      TRUE ~ m_kg + c_kg + e_kg + w_kg
+    )
+
+    # Filter out non-producing (NA) rows for the selected functional unit before grouping
+    target_fu <- dplyr::case_when(
+      ic_check %in% c("fcr", "protein_fcr") | fu_check %in% c("fcr", "protein_fcr") ~ "fcr",
+      fu_check %in% c("protein", "water_protein") ~ "protein",
+      fu_check == "milk" ~ "milk",
+      fu_check == "meat" ~ "meat",
+      fu_check == "egg" ~ "egg",
+      fu_check == "wool" ~ "wool",
+      fu_check %in% c("product", "water_product") ~ "product",
+      TRUE ~ ""
+    )
+    if (target_fu == "fcr" && "Protein_FCR_total" %in% names(df)) {
+      keep_rows <- !is.na(df$Protein_FCR_total) & df$Protein_FCR_total > 0
+      if (any(keep_rows)) df <- df[keep_rows, , drop = FALSE]
+    } else if (target_fu %in% c("milk", "meat", "egg", "wool", "product", "protein")) {
+      g_col <- paste0("GHG_intensity_", target_fu)
+      c_col <- paste0("GHG_cradle_to_farm_", target_fu)
+      l_col <- paste0("Land_intensity_", target_fu)
+      w_col <- paste0("Water_intensity_", target_fu)
+      keep_rows <- rep(FALSE, nrow(df))
+      for (col_chk in c(g_col, c_col, l_col, w_col)) {
+        if (col_chk %in% names(df)) keep_rows <- keep_rows | (!is.na(df[[col_chk]]) & df[[col_chk]] > 0)
+      }
+      if (any(keep_rows)) df <- df[keep_rows, , drop = FALSE]
+    }
+  }
+
   num_cols <- names(df)[vapply(df, is.numeric, logical(1))]
   exclude_cols <- c("year", "fixed_coef", "weight_kg", "management_months")
   target_cols <- setdiff(num_cols, exclude_cols)
 
-  # 1. Smart aggregation: mean for rates/percentages, sum for totals
+  wmean_safe <- function(x, w) {
+    ok <- !is.na(x) & !is.na(w) & w > 0
+    if (any(ok)) {
+      return(sum(x[ok] * w[ok]) / sum(w[ok]))
+    }
+    val <- mean(x, na.rm = TRUE)
+    if (is.nan(val)) NA_real_ else val
+  }
+
+  # 1. Build a single readable label per row from the grouping columns and preserve user's input order
+  build_row_labels <- function(data_frame) {
+    apply(data_frame[, valid_groups, drop = FALSE], 1, function(x) {
+      valid_vals <- x[!is.na(x) & trimws(x) != ""]
+      if (length(valid_vals) == 0) {
+        return("Unknown")
+      }
+      paste(valid_vals, collapse = " - ")
+    })
+  }
+  orig_label_order <- unique(build_row_labels(df))
+
+  # 2. Smart aggregation: production-weighted mean for intensities/FCR/shares, sum for totals
   if (length(target_cols) > 0) {
     df_agg <- df %>%
       dplyr::group_by(dplyr::across(dplyr::all_of(valid_groups))) %>%
       dplyr::summarise(
         dplyr::across(dplyr::all_of(target_cols), function(x) {
           col_name <- dplyr::cur_column()
-          if (grepl("pct|ef|factor|intensity|fcr|rate|dmi", col_name, ignore.case = TRUE)) mean(x, na.rm = TRUE) else sum(x, na.rm = TRUE)
+          cur_grp  <- dplyr::pick(dplyr::everything())
+
+          if (grepl("_milk$", col_name, ignore.case = TRUE) && "milk_FPCM_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$milk_FPCM_kg)
+          } else if (grepl("_meat$", col_name, ignore.case = TRUE) && "meat_carcass_weight_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$meat_carcass_weight_kg)
+          } else if (grepl("_egg$", col_name, ignore.case = TRUE) && "egg_fresh_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$egg_fresh_kg)
+          } else if (grepl("_wool$", col_name, ignore.case = TRUE) && "wool_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$wool_kg)
+          } else if (grepl("_protein$|fcr", col_name, ignore.case = TRUE) && "total_protein_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$total_protein_kg)
+          } else if (grepl("_product$", col_name, ignore.case = TRUE) && "product_weight_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$product_weight_kg)
+          } else if (grepl("^share_", col_name, ignore.case = TRUE)) {
+            w_sh <- if (exists("target_fu") && target_fu == "milk" && "milk_FPCM_kg" %in% names(cur_grp)) {
+              cur_grp$milk_FPCM_kg
+            } else if (exists("target_fu") && target_fu == "meat" && "meat_carcass_weight_kg" %in% names(cur_grp)) {
+              cur_grp$meat_carcass_weight_kg
+            } else if (exists("target_fu") && target_fu == "egg" && "egg_fresh_kg" %in% names(cur_grp)) {
+              cur_grp$egg_fresh_kg
+            } else if (exists("target_fu") && target_fu == "wool" && "wool_kg" %in% names(cur_grp)) {
+              cur_grp$wool_kg
+            } else if (exists("target_fu") && target_fu == "protein" && "total_protein_kg" %in% names(cur_grp)) {
+              cur_grp$total_protein_kg
+            } else if ("product_weight_kg" %in% names(cur_grp)) {
+              cur_grp$product_weight_kg
+            } else if ("population" %in% names(cur_grp)) {
+              cur_grp$population
+            } else {
+              rep(1, length(x))
+            }
+            wmean_safe(x, w_sh)
+          } else if (grepl("pct|ef|factor|intensity|cradle_to_farm|rate|dmi|_head", col_name, ignore.case = TRUE)) {
+            w_pop <- if ("population" %in% names(cur_grp)) cur_grp$population else rep(1, length(x))
+            wmean_safe(x, w_pop)
+          } else {
+            sum(x, na.rm = TRUE)
+          }
         }),
         .groups = "drop"
       )
@@ -42,14 +223,9 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     df_agg <- df
   }
 
-  # 2. Build a single readable label per row from the grouping columns
-  df_agg$plot_label <- apply(df_agg[, valid_groups, drop = FALSE], 1, function(x) {
-    valid_vals <- x[!is.na(x) & trimws(x) != ""]
-    if (length(valid_vals) == 0) {
-      return("Unknown")
-    }
-    paste(valid_vals, collapse = " - ")
-  })
+  df_agg$plot_label <- build_row_labels(df_agg)
+  df_agg <- df_agg[order(match(df_agg$plot_label, orig_label_order)), , drop = FALSE]
+  df_agg$plot_label <- factor(df_agg$plot_label, levels = rev(unique(df_agg$plot_label)))
 
   # =================================================================
   # VISUAL THEME
@@ -97,7 +273,8 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # A0) ENVIRONMENTAL IMPACT ASSESSMENT (Stacked Emissions + Land Footprint)
   is_impact_assessment <- identical(func_name, "generate_impact_assessment") ||
     all(c("CH4_enteric_Gg", "CH4_manure_Gg") %in% names(df_agg)) ||
-    all(c("CO2eq_enteric", "CO2eq_manure") %in% names(df_agg))
+    all(c("CO2eq_enteric", "CO2eq_manure") %in% names(df_agg)) ||
+    has_table2_cols
 
   if (is_impact_assessment) {
     # 1. Resolve impact_category & functional_unit
@@ -251,9 +428,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
         df_agg$fcr_cropland <- 0
       }
 
-      df_agg <- df_agg[order(df_agg$fcr_total), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
-
       plot_long <- df_agg %>%
         dplyr::select(dplyr::all_of(c("plot_label", "fcr_total", "fcr_cropland"))) %>%
         tidyr::pivot_longer(
@@ -308,8 +482,73 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     }
 
     # 6. Scaling factors for functional units
-    if (fu == "protein" && "total_protein_kg" %in% names(df_agg)) {
-      prot <- df_agg$total_protein_kg
+    if (fu %in% c("protein", "product", "milk", "meat", "wool", "egg") && has_table2_cols) {
+      sfx <- fu
+      prod_label <- dplyr::case_when(
+        fu == "milk"    ~ "FPCM milk",
+        fu == "meat"    ~ "carcass meat",
+        fu == "wool"    ~ "wool",
+        fu == "egg"     ~ "fresh eggs",
+        fu == "protein" ~ "protein",
+        TRUE            ~ "product"
+      )
+
+      g_s1_col  <- paste0("GHG_intensity_", sfx)
+      g_c2f_col <- paste0("GHG_cradle_to_farm_", sfx)
+      l_col     <- paste0("Land_intensity_", sfx)
+      w_col     <- paste0("Water_intensity_", sfx)
+
+      s1_int    <- if (g_s1_col %in% names(df_agg)) tidyr::replace_na(df_agg[[g_s1_col]], 0) else rep(0, nrow(df_agg))
+      c2f_int   <- if (g_c2f_col %in% names(df_agg)) dplyr::coalesce(df_agg[[g_c2f_col]], s1_int) else s1_int
+      feed_int  <- pmax(0, c2f_int - s1_int)
+      land_int  <- if (l_col %in% names(df_agg)) tidyr::replace_na(df_agg[[l_col]], 0) else rep(0, nrow(df_agg))
+      water_int <- if (w_col %in% names(df_agg)) tidyr::replace_na(df_agg[[w_col]], 0) else rep(0, nrow(df_agg))
+
+      if (all(c("share_ent", "share_man", "share_n2o_dir", "share_n2o_ind") %in% names(df_agg))) {
+        co2e_ch4_ent     <- s1_int * tidyr::replace_na(df_agg$share_ent, 0)
+        co2e_ch4_man     <- s1_int * tidyr::replace_na(df_agg$share_man, 0)
+        co2e_n2o_dir     <- s1_int * tidyr::replace_na(df_agg$share_n2o_dir, 0)
+        co2e_n2o_ind     <- s1_int * tidyr::replace_na(df_agg$share_n2o_ind, 0)
+        co2e_feed_fossil <- feed_int * tidyr::replace_na(df_agg$share_fossil, 1)
+        co2e_feed_luc    <- feed_int * tidyr::replace_na(df_agg$share_luc, 0)
+      } else {
+        co2e_ch4_ent     <- s1_int
+        co2e_ch4_man     <- rep(0, nrow(df_agg))
+        co2e_n2o_dir     <- rep(0, nrow(df_agg))
+        co2e_n2o_ind     <- rep(0, nrow(df_agg))
+        co2e_feed_fossil <- feed_int
+        co2e_feed_luc    <- rep(0, nrow(df_agg))
+      }
+
+      if (all(c("share_crop", "share_g_conv", "share_g_unco", "share_other") %in% names(df_agg))) {
+        land_crop          <- land_int * tidyr::replace_na(df_agg$share_crop, 1)
+        land_g_conv        <- land_int * tidyr::replace_na(df_agg$share_g_conv, 0)
+        land_g_unco        <- land_int * tidyr::replace_na(df_agg$share_g_unco, 0)
+        land_other         <- land_int * tidyr::replace_na(df_agg$share_other, 0)
+        land_total_m2      <- land_int
+        has_land_breakdown <- TRUE
+      } else {
+        land_crop          <- land_int
+        land_g_conv        <- rep(0, nrow(df_agg))
+        land_g_unco        <- rep(0, nrow(df_agg))
+        land_other         <- rep(0, nrow(df_agg))
+        land_total_m2      <- land_int
+        has_land_breakdown <- FALSE
+      }
+
+      water_total_m3 <- water_int
+      has_land       <- any(land_int > 0, na.rm = TRUE)
+      has_water      <- any(water_int > 0, na.rm = TRUE)
+
+      emiss_scale <- rep(1, nrow(df_agg))
+      land_scale  <- rep(1, nrow(df_agg))
+      water_scale <- rep(1, nrow(df_agg))
+      emiss_unit  <- paste0("kg CO2e / kg ", prod_label)
+      land_unit   <- paste0("m2 / kg ", prod_label)
+      water_unit  <- paste0("m\u00b3 depriv. / kg ", prod_label)
+      scale_desc  <- if (fu == "protein") "per kg of edible animal protein" else paste0("per kg of ", prod_label, " (biophysical allocation)")
+    } else if (fu == "protein" && ("total_protein_kg" %in% names(df_agg) || "Water_intensity_protein" %in% names(df_agg))) {
+      prot <- if ("total_protein_kg" %in% names(df_agg)) df_agg$total_protein_kg else rep(0, nrow(df_agg))
       is_dairy <- if ("animal_subtype" %in% names(df_agg)) df_agg$animal_subtype %in% "dairy" else if ("animal_tag" %in% names(df_agg)) df_agg$animal_tag %in% dairy_tags else FALSE
       is_dairy_dry <- is_dairy &
         (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE) &
@@ -317,7 +556,13 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       valid <- prot > 0 & !is_dairy_dry
       emiss_scale <- ifelse(valid, 1e6 / prot, 0)
       land_scale  <- ifelse(valid, 1 / prot, 0)
-      water_scale <- ifelse(valid, 1 / prot, 0)
+      if ("Water_intensity_protein" %in% names(df_agg) && !any(valid)) {
+        water_total_m3 <- tidyr::replace_na(df_agg$Water_intensity_protein, 0)
+        water_scale <- rep(1, nrow(df_agg))
+        has_water <- any(water_total_m3 > 0, na.rm = TRUE)
+      } else {
+        water_scale <- ifelse(valid, 1 / prot, 0)
+      }
       emiss_unit  <- "kg CO2e / kg protein"
       land_unit   <- "m2 / kg protein"
       water_unit  <- "m\u00b3 depriv. / kg protein"
@@ -420,9 +665,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       df_agg$total_val        <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir +
                                  df_agg$co2e_n2o_ind + df_agg$co2e_feed_fossil + df_agg$co2e_feed_luc
 
-      df_agg <- df_agg[order(df_agg$total_val), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
-
       emiss_cols   <- c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind", "co2e_feed_fossil", "co2e_feed_luc")
       emiss_labels <- c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Feed Fossil GHG", "Feed LUC Deforestation")
 
@@ -489,9 +731,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       df_agg$land_g_unco <- land_g_unco * land_scale
       df_agg$land_other  <- land_other * land_scale
       df_agg$total_val   <- df_agg$land_crop + df_agg$land_g_conv + df_agg$land_g_unco + df_agg$land_other
-
-      df_agg <- df_agg[order(df_agg$total_val), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
       if (has_land_breakdown) {
         has_other <- any(df_agg$land_other > 0, na.rm = TRUE)
@@ -561,8 +800,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     # --- Mode C: Water Footprint (Water Deprivation) ---
     if (impact_cat == "water") {
       df_agg$water_val <- water_total_m3 * water_scale
-      df_agg <- df_agg[order(df_agg$water_val), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
       totals_df <- df_agg %>%
         dplyr::filter(water_val > 0) %>%
@@ -606,9 +843,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
       df_agg$co2e_feed_luc    <- co2e_feed_luc * emiss_scale
       df_agg$total_co2e       <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir +
                                  df_agg$co2e_n2o_ind + df_agg$co2e_feed_fossil + df_agg$co2e_feed_luc
-
-      df_agg <- df_agg[order(df_agg$total_co2e), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
       emiss_cols   <- c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind", "co2e_feed_fossil", "co2e_feed_luc")
       emiss_labels <- c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Feed Fossil GHG", "Feed LUC Deforestation")
@@ -782,9 +1016,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     df_agg$total_ghg <- df_agg$fossil_val + df_agg$luc_val
 
     if (feed_impact == "water") {
-      df_agg <- df_agg[order(df_agg$water_val), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
-
       totals_df <- df_agg %>%
         dplyr::filter(water_val > 0) %>%
         dplyr::mutate(label_text = ifelse(water_val >= 1000, scales::comma(water_val, accuracy = 1), formatC(water_val, digits = 1, format = "f")))
@@ -804,9 +1035,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     }
 
     if (feed_impact == "ghg") {
-      df_agg <- df_agg[order(df_agg$total_ghg), ]
-      df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
-
       ghg_long <- df_agg %>%
         dplyr::select(dplyr::all_of(c("plot_label", "fossil_val", "luc_val"))) %>%
         tidyr::pivot_longer(cols = c("fossil_val", "luc_val"), names_to = "component_raw", values_to = "value") %>%
@@ -832,9 +1060,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
     }
 
     # Default: overview (2 panels)
-    df_agg <- df_agg[order(df_agg$total_ghg), ]
-    df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
-
     emiss_panel <- if (is_per_head) "Feed GHG per Head (kg CO2e / head)" else "Feed GHG Emissions (t CO2e)"
     water_panel <- if (is_per_head) "Water per Head (m\u00b3 depriv. / head)" else "Water Deprivation (m\u00b3 depriv.)"
 
@@ -889,8 +1114,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # A) EMISSIONS BREAKDOWN (stacked bars)
   if (all(c("ch4_enteric", "ch4_manure", "n2o_manure") %in% names(df_agg))) {
     df_agg$Total_Gg <- df_agg$ch4_enteric + df_agg$ch4_manure + df_agg$n2o_manure
-    df_agg <- df_agg[order(df_agg$Total_Gg), ]
-    df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
     df_long <- tidyr::pivot_longer(
       df_agg,
@@ -918,8 +1141,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # B) DIET / NUTRIENT PROFILES (grouped bars)
   if (all(c("DE_pct", "CP_pct") %in% names(df_agg))) {
     cols_to_pivot <- intersect(c("DE_pct", "CP_pct", "NDF_pct", "ASH_pct"), names(df_agg))
-    df_agg <- df_agg[order(df_agg$DE_pct), ]
-    df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
     df_long <- tidyr::pivot_longer(df_agg, cols = dplyr::all_of(cols_to_pivot), names_to = "Nutrient", values_to = "Percentage")
 
@@ -952,18 +1173,12 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
           .groups = "drop"
         )
 
-      df_land_agg$plot_label <- apply(df_land_agg[, valid_groups, drop = FALSE], 1, function(x) {
-        valid_vals <- x[!is.na(x) & trimws(x) != ""]
-        if (length(valid_vals) == 0) {
-          return("Unknown")
-        }
-        paste(valid_vals, collapse = " - ")
-      })
-
+      df_land_agg$plot_label <- build_row_labels(df_land_agg)
 
       totals <- stats::aggregate(Land_Val ~ plot_label, data = df_land_agg, FUN = sum)
-      totals <- totals[order(totals$Land_Val), ]
-      df_land_agg$plot_label <- factor(df_land_agg$plot_label, levels = unique(totals$plot_label))
+      totals <- totals[order(match(totals$plot_label, orig_label_order)), , drop = FALSE]
+      df_land_agg$plot_label <- factor(df_land_agg$plot_label, levels = rev(unique(totals$plot_label)))
+      totals$plot_label <- factor(totals$plot_label, levels = levels(df_land_agg$plot_label))
 
       totals$label_text <- dplyr::case_when(
         totals$Land_Val >= 1000 ~ scales::comma(totals$Land_Val, accuracy = 1),
@@ -1018,8 +1233,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
   # D) EDIBLE PROTEIN PRODUCTION (stacked bars by commodity)
   if (all(c("milk_protein_kg", "meat_protein_kg", "egg_protein_kg") %in% names(df_agg))) {
     df_agg$Total_Protein <- df_agg$milk_protein_kg + df_agg$meat_protein_kg + df_agg$egg_protein_kg
-    df_agg <- df_agg[order(df_agg$Total_Protein), ]
-    df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
     df_long <- tidyr::pivot_longer(
       df_agg,
@@ -1101,9 +1314,6 @@ plot_herdr_results <- function(df, group_cols = c("animal_tag", "region", "subre
 
   clean_title <- gsub("_", " ", main_var)
   palette <- if (grepl("NE|GE|ME", main_var, ignore.case = TRUE)) "inferno" else "mako"
-
-  df_agg <- df_agg[order(df_agg[[main_var]]), ]
-  df_agg$plot_label <- factor(df_agg$plot_label, levels = unique(df_agg$plot_label))
 
   p <- ggplot(df_agg, aes(x = .data[[main_var]], y = plot_label, fill = .data[[main_var]])) +
     geom_col(show.legend = FALSE, width = 0.6) +

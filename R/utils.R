@@ -58,7 +58,7 @@ herdr_validate_manure_allocation <- function(user_manure, tolerance = 1e-3) {
 
   allocation_sums <- user_manure %>%
     dplyr::filter(!is.na(allocation)) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(total_alloc = sum(as.numeric(allocation), na.rm = TRUE), .groups = "drop")
 
   if (nrow(allocation_sums) == 0) {
@@ -93,8 +93,8 @@ herdr_validate_manure_allocation <- function(user_manure, tolerance = 1e-3) {
 #' @return Invisibly returns TRUE if all populated cohorts are covered.
 #' @noRd
 herdr_validate_manure_coverage <- function(pop_df, user_manure) {
-  keys <- c("region", "subregion", "animal_tag", "class_flex")
-  key_of <- function(df) do.call(paste, c(lapply(df[keys], as.character), sep = " | "))
+  keys <- c("farm_id", "region", "subregion", "animal_tag")
+  key_of <- function(df) do.call(paste, c(lapply(df[intersect(keys, names(df))], as.character), sep = " | "))
 
   populated <- pop_df[!is.na(pop_df$population) & pop_df$population > 0, , drop = FALSE]
   covered <- user_manure[!is.na(user_manure$system_base), , drop = FALSE]
@@ -263,7 +263,7 @@ herdr_validate_manure_systems <- function(user_manure, ipcc_master, coefficients
 
   # Validate species-specific support in ipcc_mm if animal metadata is provided
   if (!is.null(animal_metadata) && all(c("animal_type", "animal_subtype") %in% names(animal_metadata))) {
-    join_cols <- intersect(c("region", "subregion", "animal_tag", "class_flex"), names(check_data))
+    join_cols <- intersect(c("farm_id", "region", "subregion", "animal_tag"), names(check_data))
     matched_manure <- check_data %>%
       dplyr::left_join(
         animal_metadata %>% dplyr::select(dplyr::all_of(c(join_cols, "animal_type", "animal_subtype"))) %>% dplyr::distinct(),
@@ -394,9 +394,9 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
 #' Resolve Demographic Parameters by Stratum
 #'
 #' Hierarchically matches and resolves zootechnical parameters (replacement rates,
-#' fertility rates, prolificacy) per stratum (region, subregion, class_flex).
+#' fertility rates, prolificacy) per stratum (region, subregion).
 #'
-#' @param base_df Data.frame containing base mature cohorts (with region, subregion, class_flex).
+#' @param base_df Data.frame containing base mature cohorts (with region, subregion).
 #' @param tag Character. Animal tag to resolve parameters for.
 #' @param param_col Character. Column name in definitions table (e.g. "replacement_rate").
 #' @param param_name Character. Parameter name in rate_parameters table. Defaults to param_col.
@@ -427,16 +427,20 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
   if (!is.null(sub_rates) && nrow(sub_rates) == 0) sub_rates <- NULL
 
   for (i in seq_len(n)) {
+    f <- if ("farm_id" %in% names(base_df)) base_df$farm_id[i] else NA_character_
     r <- if ("region" %in% names(base_df)) base_df$region[i] else NA_character_
     s <- if ("subregion" %in% names(base_df)) base_df$subregion[i] else NA_character_
-    c_flx <- if ("class_flex" %in% names(base_df)) base_df$class_flex[i] else NA_character_
 
     val_found <- NA_real_
 
     # 1. Try matching in definitions
     if (!is.null(sub_defs)) {
       m <- sub_defs
-      # Level 1: full stratum match (region + subregion + class_flex)
+      # Level 1: full stratum match (farm_id + region + subregion)
+      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
+        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
+        if (nrow(m_f) > 0) m <- m_f
+      }
       if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
         m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
         if (nrow(m_r) > 0) m <- m_r
@@ -444,10 +448,6 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
       if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
         m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
         if (nrow(m_s) > 0) m <- m_s
-      }
-      if ("class_flex" %in% names(m) && !is.na(c_flx) && nzchar(c_flx)) {
-        m_c <- m[!is.na(m$class_flex) & m$class_flex == c_flx, , drop = FALSE]
-        if (nrow(m_c) > 0) m <- m_c
       }
 
       # Extract candidate
@@ -463,6 +463,10 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
     # 2. Try matching in rate_parameters if not found in definitions
     if (is.na(val_found) && !is.null(sub_rates)) {
       m <- sub_rates
+      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
+        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
+        if (nrow(m_f) > 0) m <- m_f
+      }
       if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
         m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
         if (nrow(m_r) > 0) m <- m_r
@@ -489,9 +493,9 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
 #' Resolve Productive Period Days by Stratum
 #'
 #' Resolves productive_period_days from livestock_weights.csv hierarchically
-#' per stratum (region, subregion, class_flex).
+#' per stratum (region, subregion).
 #'
-#' @param base_df Data.frame containing base mature cohorts (with region, subregion, class_flex).
+#' @param base_df Data.frame containing base mature cohorts (with region, subregion).
 #' @param tag Character. Animal tag to resolve period days for.
 #' @param weights Optional weights data.frame (e.g. livestock_weights).
 #' @param default_days Numeric or numeric vector of default period days. Default is 365.
@@ -518,14 +522,18 @@ herdr_resolve_period_days <- function(base_df, tag, weights = NULL, default_days
   }
 
   for (i in seq_len(n)) {
+    f <- if ("farm_id" %in% names(base_df)) base_df$farm_id[i] else NA_character_
     r <- if ("region" %in% names(base_df)) base_df$region[i] else NA_character_
     s <- if ("subregion" %in% names(base_df)) base_df$subregion[i] else NA_character_
-    c_flx <- if ("class_flex" %in% names(base_df)) base_df$class_flex[i] else NA_character_
 
     val_found <- NA_real_
 
     if (!is.null(sub_w)) {
       m <- sub_w
+      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
+        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
+        if (nrow(m_f) > 0) m <- m_f
+      }
       if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
         m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
         if (nrow(m_r) > 0) m <- m_r
@@ -533,10 +541,6 @@ herdr_resolve_period_days <- function(base_df, tag, weights = NULL, default_days
       if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
         m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
         if (nrow(m_s) > 0) m <- m_s
-      }
-      if ("class_flex" %in% names(m) && !is.na(c_flx) && nzchar(c_flx)) {
-        m_c <- m[!is.na(m$class_flex) & m$class_flex == c_flx, , drop = FALSE]
-        if (nrow(m_c) > 0) m <- m_c
       }
 
       for (row_idx in seq_len(nrow(m))) {

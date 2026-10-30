@@ -54,7 +54,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, def
   # =========================================================================
   base_pops_wide <- census_sheep %>%
     dplyr::filter(animal_tag %in% base_tags) %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0)
 
@@ -145,7 +145,7 @@ calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, def
   # =========================================================================
   all_pops_long <- calculated_pops %>%
     dplyr::select(
-      region, subregion, class_flex,
+      farm_id, region, subregion,
       mature_sheep_male_dairy, mature_sheep_male_meat,
       mature_sheep_female_dairy, mature_sheep_female_meat,
       lamb_female_dairy_replacement = pop_lamb_female_dairy_repl,
@@ -156,17 +156,13 @@ calculate_population_sheep <- function(census_sheep, rate_parameters = NULL, def
       lamb_meat_slaughter           = pop_lamb_meat_slaughter
     ) %>%
     tidyr::pivot_longer(
-      cols = -c(region, subregion, class_flex),
+      cols = -c(farm_id, region, subregion),
       names_to = "animal_tag",
       values_to = "population"
-    ) %>%
-    # Offspring do not inherit productivity phases (class_flex) from parents
-    dplyr::mutate(
-      class_flex = dplyr::if_else(animal_tag %in% base_tags, class_flex, NA_character_)
     )
 
   final_sheep_pop <- all_pops_long %>%
-    dplyr::group_by(region, subregion, animal_tag, class_flex) %>%
+    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
     dplyr::filter(round(population, 5) > 0)
 

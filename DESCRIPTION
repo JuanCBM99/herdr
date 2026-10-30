@@ -49,8 +49,7 @@ Imports:
     arrow,
     ggplot2,
     scales,
-    zip,
-    rlang
+    zip
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

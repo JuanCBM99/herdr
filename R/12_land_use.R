@@ -110,7 +110,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     DMI_df <- suppressMessages(calculate_DMI(saveoutput = FALSE, data_dir = data_dir))
   }
   DMI_df <- DMI_df %>%
-    dplyr::distinct(region, diet_tag, subregion, animal_tag, class_flex, .keep_all = TRUE)
+    dplyr::distinct(farm_id, region, diet_tag, subregion, animal_tag, .keep_all = TRUE)
 
   diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
   diet_ingredients_raw <- readr::read_csv(
@@ -122,20 +122,20 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     show_col_types = FALSE
   )
 
-  legacy_diet_mode <- any(c("region", "subregion", "class_flex") %in% names(diet_profiles)) &&
+  legacy_diet_mode <- any(c("region", "subregion") %in% names(diet_profiles)) &&
                       any(duplicated(diet_profiles$diet_tag))
 
   if (!legacy_diet_mode) {
     diet_profiles <- diet_profiles %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
       dplyr::distinct(diet_tag, .keep_all = TRUE)
     diet_ingredients_raw <- diet_ingredients_raw %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex")))
+      dplyr::select(-dplyr::any_of(c("region", "subregion")))
     diet_join_keys <- "diet_tag"
   } else {
     diet_profiles <- diet_profiles %>%
-      dplyr::distinct(diet_tag, region, subregion, class_flex, .keep_all = TRUE)
-    diet_join_keys <- intersect(c("region", "subregion", "class_flex", "diet_tag"), names(diet_profiles))
+      dplyr::distinct(diet_tag, region, subregion, .keep_all = TRUE)
+    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diet_profiles))
   }
 
   diet_ingredients_raw <- diet_ingredients_raw %>%
@@ -296,7 +296,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   }
   population_df <- population_df %>%
-    dplyr::distinct(animal_tag, region, subregion, class_flex, population)
+    dplyr::distinct(farm_id, animal_tag, region, subregion, population)
 
   # --- 4. Validate diet and ingredient shares ---
   herdr_validate_diet_shares(diet_profiles, diet_ingredients, diet_join_keys = diet_join_keys)
@@ -399,10 +399,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       annual_cons_kg = (DMI_kgday * 365) * share_factor * (as.numeric(ingredient_share) / 100),
       land_use_m2 = (ha_kg_allocated * annual_cons_kg) * 10000
     ) %>%
-    dplyr::left_join(population_df, by = c("region", "subregion", "animal_tag", "class_flex")) %>%
+    dplyr::left_join(population_df, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
     tidyr::drop_na(animal_tag) %>%
     dplyr::group_by(
-      region, subregion, animal_tag, class_flex,
+      farm_id, region, subregion, animal_tag,
       ingredient, land_type, country_of_origin,
       animal_type, animal_subtype
     ) %>%
@@ -413,8 +413,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       land_use_per_animal_m2 = sum(land_use_m2, na.rm = TRUE),
       total_land_use_m2 = sum(land_use_m2 * population, na.rm = TRUE),
       .groups = "drop"
-    ) %>%
-    dplyr::mutate(dplyr::across(where(is.numeric), ~ round(.x, 3)))
+    )
 
   # --- 6. Save output ---
   if (isTRUE(saveoutput)) {

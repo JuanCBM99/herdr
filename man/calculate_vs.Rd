@@ -31,5 +31,5 @@ Tibble with VS for all animal categories.
 }
 \description{
 Computes volatile solids (VS) based on Gross Energy (GE), Digestible Energy (DE),
-and Ash content using IPCC Tier 2 methodology for ruminants, and DMI/Energy ratios for poultry.
+and Ash content using IPCC Tier 2 methodology for ruminants, and DMI/Energy ratios for monogastrics (swine and poultry).
 }

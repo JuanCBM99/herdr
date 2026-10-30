@@ -17,7 +17,7 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   ipcc_master <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
-  join_keys <- c("region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype")
+  join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   if (is.null(vs_df)) {
     vs_df <- suppressMessages(calculate_vs(saveoutput = FALSE, data_dir = data_dir))
@@ -42,12 +42,12 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::left_join(
       user_manure %>%
         dplyr::select(
-          region, subregion, animal_tag, class_flex,
+          farm_id, region, subregion, animal_tag,
           system_base, management_months, system_climate,
           system_subclimate, climate_zone, system_variant,
           climate_moisture, b_0, allocation
         ),
-      by = c("region", "subregion", "animal_tag", "class_flex")
+      by = c("farm_id", "region", "subregion", "animal_tag")
     ) %>%
     dplyr::left_join(
       coefficients %>%
@@ -79,7 +79,7 @@ calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     ) %>%
     # --- 5. Selection and Rounding ---
     dplyr::select(
-      region, subregion, animal_tag, class_flex, animal_type, animal_subtype,
+      farm_id, region, subregion, animal_tag, animal_type, animal_subtype,
       system_base, system_variant, VS_kgday,
       B0_m3kg = B0, MCF_pct, allocation,
       EF_kgyear, population, total_CH4_mm_kgyear
