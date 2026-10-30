@@ -16,14 +16,14 @@ In `herdr`, manure methane ($CH_4$) and direct/indirect nitrous oxide ($N_2O$) e
 
 To ensure IPCC Tier 2 compliance, the values entered must match official IPCC system definitions and climate combinations recorded in `ipcc_mm.csv`. If an invalid combination is entered, the model cannot assign emission factors.
 
-This guide provides the complete decision matrix of valid paths for your `manure_management.csv`. For the mathematical emission equations, see the [Theoretical Basis](Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide).
+This guide provides the complete decision matrix of valid paths for your `manure_management.csv`. For the mathematical emission equations, see the [Theoretical Basis](Theoretical_basis.html#iii-methane-module).
 
 ---
 
 # 1. The Two Fundamental Rules
 
 ### Rule 1: Allocation Must Equal Exactly 1.0 per Cohort
-For each unique animal cohort (defined by `animal_tag`, `region`, `subregion`, and `class_flex`), the sum of the `allocation` column across all assigned manure systems must equal **1.0** (100%):
+For each unique animal cohort (defined by `animal_tag`, `region`, and `subregion`), the sum of the `allocation` column across all assigned manure systems must equal **1.0** (100%):
 
 $$\sum \text{allocation} = 1.0$$
 
@@ -111,4 +111,4 @@ For standard solid, composting, digestion, and grazing systems, sub-climates, st
 
 * [Technical Data Dictionary](Technical_reference.html) — data schema for `manure_management.csv` and `ipcc_mm.csv`.
 * [General Workflow](Workflow.html) — how manure calculations integrate into the modeling pipeline.
-* [Theoretical Basis](Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide) — full mathematical equations for $VS$, $B_0$, $MCF$, $EF_3$, $EF_4$, and $EF_5$.
+* [Theoretical Basis](Theoretical_basis.html#iii-methane-module) — full mathematical equations for $VS$, $B_0$, $MCF$, $EF_3$, $EF_4$, and $EF_5$.

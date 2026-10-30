@@ -254,7 +254,7 @@ $$EF = \frac{GE \cdot \left( \frac{Y_m}{100} \right) \cdot 365}{55.65}$$
 |:---|:---|:---|
 | $EF$  | Methane emission factor (kg $CH_4$/head/year) | Calculated |
 | $GE$  | Daily gross energy intake (MJ/day) | Result of Section I |
-| $Y_m$ | Methane conversion factor (%) | `feed_characteristics.csv` |
+| $Y_m$ | Methane conversion factor (%) | Calculated from diet NDF & DE |
 
 ### Total Enteric Emissions ($E_T$) (Eq. 10.19)
 $$E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)$$
@@ -266,11 +266,11 @@ $$E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)$$
 
 ### Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)
 
-For swine, enteric methane emissions are estimated using the IPCC Tier 1 methodology with metabolic liveweight scaling relative to the standard reference market pig (72 kg):
+For swine, enteric methane emissions are estimated using the IPCC Tier 1 methodology for high-productivity systems (IPCC 2019 Refinement, Vol. 4, Ch. 10, Table 10.10 and Eq. 10.19):
 
-$$EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}$$
+$$EF_{\text{swine}} = 1.5 \; \text{kg } CH_4 / \text{head} / \text{year}$$
 
-Where $EF$ is in kg $CH_4$/head/year, $1.5$ is the baseline IPCC emission factor for market swine, and $LiveWeight$ (kg) is derived from `livestock_weights.csv`.
+For poultry, enteric fermentation emissions are negligible ($EF_{\text{poultry}} = 0$).
 
 ---
 
@@ -344,7 +344,7 @@ Nitrogen retention represents the fraction of nitrogen retained in animal produc
 
 #### Cattle
 
-Milk protein concentration is estimated as:
+Milk protein concentration is taken from `protein_content_pct` in `ruminant_definitions.csv`, or estimated via IPCC regression if omitted:
 
 $$Milk_{protein} = 1.9 + 0.4 \times Fat_{content}$$
 
@@ -352,22 +352,9 @@ For lactating and growing animals:
 
 $$N_{retention} = \frac{Milk \times (Milk_{protein}/100)}{6.38} + \frac{WG \left(268-\frac{7.03 \times NE_g}{WG}\right)/1000}{6.25}$$
 
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $N_{retention}$ | Daily nitrogen retained (kg N/head/day) | Calculated |
-| $Milk$ | Daily milk yield (kg/day) | `ruminant_definitions.csv` |
-| $Milk_{protein}$ | Estimated milk protein concentration (%) | Calculated |
-| $Fat_{content}$ | Milk fat content (%) | `ruminant_definitions.csv` |
-| $WG$ | Daily body weight gain (kg/day) | Calculated |
-| $NE_g$ | Net energy for growth (MJ/day) | Calculated |
-
-*For mature lactating animals, only the milk term is considered. For growing animals, only the growth term is considered.*
-
 #### Sheep and Goats
 
-Following the IPCC Tier 2 methodology, nitrogen retention is assumed to be a constant value:
-
-$$N_{retention} = 0.1$$
+Following the IPCC Tier 2 methodology, nitrogen retention is assumed to be a constant fraction of nitrogen intake ($0.10$).
 
 #### Poultry
 
@@ -375,33 +362,15 @@ For growing birds:
 
 $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}$$
 
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
-| $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
-
 For laying hens:
 
 $$N_{retention} = 0.028 \times WG + \frac{0.0185 \times Egg_{mass}}{1000}$$
-
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $WG$ | Daily body weight gain (kg/day) | Calculated |
-| $Egg_{mass}$ | Daily egg mass production (g/day) | `monogastric_definitions.csv` |
 
 #### Swine
 
 For growing pigs:
 
 $$N_{retention} = \frac{(BW_{final} - BW_{initial}) \times N_{gain}}{Days}$$
-
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $BW_{final}$ | Final body weight (kg) | `livestock_weights.csv` |
-| $BW_{initial}$ | Initial body weight (kg) | `livestock_weights.csv` |
-| $Days$ | Life-stage feeding duration / cycle (`productive_period_days`) | `livestock_weights.csv` |
-| $N_{gain}$ | Nitrogen retention coefficient according to final body weight | IPCC (2019) |
 
 For breeding sows:
 
@@ -415,16 +384,6 @@ and
 
 $$N_{weaned} = \frac{0.025 \times Piglets \times FR \times (W_{weaning} - W_{birth})}{0.98}$$
 
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $N_{gain,sow}$ | Annual nitrogen retained in sow body tissues (kg N/year) | Calculated |
-| $N_{weaned}$ | Annual nitrogen retained in weaned piglets (kg N/year) | Calculated |
-| $FR$ | Annual farrowing rate ($365 / \text{productive\_period\_days}$, where `productive_period_days` is the farrowing interval) | Calculated |
-| $S_{kg}$ | Sow body weight change between consecutive parturitions (kg/year) | Calculated |
-| $Piglets$ | Number of piglets born per litter | `monogastric_definitions.csv` |
-| $W_{weaning}$ | Piglet weaning weight (kg) | `livestock_weights.csv` |
-| $W_{birth}$ | Piglet birth weight (kg) | `livestock_weights.csv` |
-
 ---
 
 ### 1.3 Nitrogen Excretion ($N_{excreted}$)
@@ -437,12 +396,6 @@ For **sheep and goats**, the IPCC assumes a fixed nitrogen retention fraction of
 
 $$N_{excreted} = N_{intake} \times (1 - 0.1) \times 365$$
 
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $N_{excreted}$ | Annual nitrogen excreted (kg N/head/year) | Calculated |
-| $N_{intake}$ | Daily nitrogen intake (kg N/head/day) | Calculated |
-| $N_{retention}$ | Daily nitrogen retained (kg N/head/day) | Calculated |
-
 ---
 
 ### 1.4 Direct $N_2O$ Emissions
@@ -450,13 +403,6 @@ $$N_{excreted} = N_{intake} \times (1 - 0.1) \times 365$$
 Direct nitrous oxide emissions from manure management are calculated following IPCC (2019, Eq. 10.25):
 
 $$N_2O_{direct} = Population \times N_{excreted} \times Allocation \times EF_3 \times \frac{44}{28}$$
-
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $Population$ | Number of animals | `livestock_census.csv` |
-| $N_{excreted}$ | Annual nitrogen excreted (kg N/head/year) | Calculated |
-| $Allocation$ | Fraction of manure assigned to a management system | `manure_management.csv` |
-| $EF_3$ | Direct emission factor for the manure management system | `ipcc_mm.csv` |
 
 ---
 
@@ -470,20 +416,10 @@ $$N_{vol-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{GasMS} \righ
 **Leaching and Runoff ($N_{leaching-MMS}$) (Eq. 10.27)**
 $$N_{leach-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{LeachMS} \right]$$
 
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $Frac_{GasMS}$ | Fraction of N lost as volatilized gas ($NH_3 + NO_x$) | `ipcc_mm.csv` |
-| $Frac_{LeachMS}$ | Fraction of N lost via leaching into water | `ipcc_mm.csv` |
-
 ### 2.2 Indirect $N_2O$ Calculation (Eq. 10.28/10.29)
 
 * **From Volatilization:** $$N_2O_{G(mm)} = (N_{vol-MMS} \cdot EF_4) \cdot \frac{44}{28}$$
 * **From Leaching:** $$N_2O_{L(mm)} = (N_{leach-MMS} \cdot EF_5) \cdot \frac{44}{28}$$
-
-| Variable | Description | Source in Package |
-|:---|:---|:---|
-| $EF_4$ | Indirect $N_2O$ factor for volatilization | `ipcc_mm.csv` |
-| $EF_5$ | Indirect $N_2O$ factor for leaching | `ipcc_mm.csv` |
 
 ---
 
@@ -522,27 +458,20 @@ The cohort footprint in square meters ($1\text{ ha} = 10{,}000\text{ m}^2$) is:
 $$LandUsePerAnimal_i \; (\text{m}^2/\text{head}) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000$$
 $$TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times AAP$$
 
-## 3. Dynamic International Trade Traceback
-When `country_of_origin` is unspecified (`NA`), `herdr` resolves production nations dynamically:
-1. **Self-Sufficiency Ratio (SSR):** Assesses domestic production against apparent consumption:
-   $$ApparentConsumption = \max(1, Production + Imports - Exports)$$
-   $$SSR = \frac{Production}{ApparentConsumption}$$
-2. **Recursive Traceback:** If $SSR < 0.70$ (70%), the crop is inferred as imported and traced recursively through bilateral trade flows (`fao_trade_matrix.parquet`) to identify primary producing origins beyond transit hubs (e.g. Rotterdam).
-
 ---
 
 # VI. Animal Productivity & Edible Protein Engine (FAO/GLEAM)
 
-In addition to greenhouse gas emissions and land use, `herdr` computes physical livestock productivity and nutritional protein output using the **FAO Global Livestock Environmental Assessment Model (GLEAM v3.0)** framework and International Dairy Federation (IDF) standards.
+`herdr` computes physical livestock productivity and nutritional protein output using the **FAO Global Livestock Environmental Assessment Model (GLEAM v3.0)** framework and International Dairy Federation (IDF) standards.
 
 ## 1. Annual Slaughter Output ($N_{\text{exit}}$)
 
-Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) is calculated from the Annual Average Population ($AAP$) based on functional cohort roles:
+Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) is calculated from the Annual Average Population ($AAP$) based on strict functional cohort roles (`production_role`):
 
-* **Replacement stock (`replacement`):** $N_{\text{exit}} = 0$ (animals enter the adult herd to maintain stability).
-* **Mature breeding females (`mature`):** 
+* **Replacement stock (`replacement`):** $N_{\text{exit}} = 0$ (animals enter the adult breeding herd to maintain stability).
+* **Mature breeding stock (`mature`):** 
   $$N_{\text{exit}} = AAP \times \text{replacement\_rate}$$
-  *(For layer hens where replacement rate is omitted, $N_{\text{exit}} = AAP \times \frac{365}{\text{productive\_period\_days}}$).*
+  *(For layer hens where `replacement_rate` is omitted, $N_{\text{exit}} = AAP \times \frac{365}{\text{productive\_period\_days}}$).*
 * **Commercial slaughter cohorts (`slaughter`):**
   $$N_{\text{exit}} = AAP \times \left( \frac{365}{\text{productive\_period\_days}} \right)$$
 
@@ -551,26 +480,15 @@ Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) 
 Total fresh milk is computed as:
 $$\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}$$
 
-Milk crude protein content ($\text{Protein}_{\text{milk}}$) is entered directly by the user in `ruminant_definitions.csv` (`protein_content_pct`). When omitted or left at zero, it is estimated using the standard IPCC Tier 2 regression:
-$$\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)$$
-
 To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2015)** standard:
 $$\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \cdot \text{Fat} (\%) + 0.0776 \cdot \text{Protein} (\%) + 0.2534 \right]$$
 
 ## 3. Meat Production & Carcass Metrics
 
-Meat output transforms live animals leaving the farm into edible protein:
-
-1. **Live weight at slaughter:**
-   $$\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}$$
-2. **Carcass weight:**
-   $$\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)$$
-   where $DP\%$ is the species dressing percentage (FAO GLEAM Table 9.1).
-3. **Boneless meat:**
-   $$\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM$$
-   where $BFM$ is the boneless fraction of carcass meat.
-4. **Meat edible protein:**
-   $$\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}$$
+1. **Live weight at slaughter:** $\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}$
+2. **Carcass weight:** $\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)$
+3. **Boneless meat:** $\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM$
+4. **Meat edible protein:** $\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}$
 
 | Species | Dressing Percentage ($DP\%$) | Boneless Fraction ($BFM$) | Protein in Meat ($\text{MEAT\_prot}$) | Default Milk Protein ($\text{MILK\_prot}$) |
 |:---|:---:|:---:|:---:|:---:|
@@ -580,137 +498,55 @@ Meat output transforms live animals leaving the farm into edible protein:
 | **Swine** | 73.0% | 0.65 | 0.2020 | — |
 | **Poultry** | 70.0% | 0.75 | 0.1900 | — |
 
-## 4. Egg Production (Poultry)
+## 4. Egg Production & Total Edible Protein
 
-Annual fresh egg yield and protein content:
-$$\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP$$
-$$\text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240$$
-
-## 5. Total Edible Human Protein
-
+$$\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP, \qquad \text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240$$
 $$\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}$$
 
 ---
 
-# VII. Demographic & Herd Dynamics (AAP Rule)
+# VII. Enterprise Attribution, Biophysical Allocation & Feed Efficiency (`generate_impact_assessment`)
 
-For fast-growing and batch-reared cohorts, the census standing population in `livestock_census.csv` must always represent the **Annual Average Population ($AAP$)**:
-$$AAP = \frac{\sum_{i=1}^{M} N_i \times D_i}{365}$$
+The consolidated assessment engine (`generate_impact_assessment()`) produces two tables:
 
-Where $N_i$ is the number of animals in batch $i$ and $D_i$ is their duration on farm in days. Conversely, the annual total number of finished animals produced by a fixed barn capacity ($C$) operated continuously is:
-$$\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_period\_days} + \text{empty\_period\_days}} \right)$$
+* **Table 1 (`totals`):** Direct cohort-level emissions, feed intake, land use, water deprivation, and per-head footprints.
+* **Table 2 (`intensities`):** Enterprise-integrated commercial and nutritional intensities grouped by `(farm_id, region, subregion, animal_type, animal_subtype)`.
+
+## 1. Enterprise Footprint Attribution Across `mature`, `replacement`, and `slaughter`
+
+Within each enterprise `(farm_id, region, subregion, animal_type, animal_subtype)`, non-commercial rearing and breeding overheads are integrated into the commercial outputs according to three system archetypes:
+
+### A. Dairy Systems (`animal_subtype == "dairy"`)
+* **Breeding & Milking Pool (`mature` + `replacement`):** Replacement heifers, ewe lambs, and doeling kids (`replacement`) produce zero commercial output on their own; they exist to sustain the milking herd. Their footprint is pooled with `mature` dairy cohorts and allocated between **milk** (`milk_FPCM_kg`) and **culled adult meat** (`meat_carcass_weight_kg`) via **IDF (2022) Net Energy physical allocation**:
+  $$\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} & (\text{Cattle}) \\ 4.6 \times \text{Milk}_{\text{fresh}} & (\text{Sheep}) \\ 3.0 \times \text{Milk}_{\text{fresh}} & (\text{Goat}) \end{cases}, \qquad \text{E}_{\text{cull}} = 15.0 \times \text{Meat}_{\text{LW, cull}}$$
+  $$\text{AF}_{\text{milk}} = \frac{\text{E}_{\text{milk}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}, \qquad \text{AF}_{\text{cull}} = \frac{\text{E}_{\text{cull}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}$$
+* **Multiple Milking Cohorts:** If a farm declares more than one `mature` milking cohort within the same enterprise (e.g., stabled vs. grazing dairy cows), each milking cohort retains its own direct footprint plus a population-proportional share ($AAP_i / \sum AAP_{\text{milking}}$) of non-milking `replacement`/`mature` cohorts.
+* **Dairy Surplus Fattening Stock (`slaughter`):** Surplus dairy calves, lambs, or kids finished for meat (`production_role == "slaughter"`, `animal_subtype == "dairy"`) are evaluated on their own direct fattening footprint ($\text{AF}_{\text{meat}} = 1.0$).
+
+### B. Egg Layer Systems (`animal_type == "poultry"`, `animal_subtype == "layer"`)
+* Each `mature` laying cohort (`laying_hens`, `free_range_laying_hens`) retains its own direct footprint plus a population-proportional share ($AAP_i / \sum AAP_{\text{mature}}$) of `replacement` layer pullets (`replacement_layer_pullets`), divided by its fresh egg output (`egg_fresh_kg`).
+
+### C. Meat Systems (`animal_subtype == "meat"`)
+* **Integrated Breeding + Finishing Enterprise:** When a meat enterprise includes a breeding herd (`mature` and/or `replacement` cohorts alongside `slaughter` cohorts—e.g., `breeder_sows` + `boars` + `replacement_sows` + `fattening_pigs`, or `mature_beef_cattle` + replacements + `beef_calves`), the breeding herd overhead (`mature + replacement`) is distributed across `slaughter` cohorts in proportion to their carcass weight output ($CW_i / \sum CW_{\text{slaughter}}$). Both `slaughter` and `mature` rows display the integrated meat intensity (including culled breeder meat in the denominator).
+* **Pure Finishing / Feedlot Operation:** When no breeding herd is present on the farm (only `slaughter` cohorts), each `slaughter` cohort is evaluated on its own direct fattening footprint.
+* **Meat & Wool Co-Allocation in Sheep:** For meat sheep producing greasy wool ($\text{Wool}_{\text{kg}} > 0$ and $\text{Meat}_{\text{LW}} > 0$), physical net energy allocation splits the footprint between wool ($24.0\text{ MJ/kg wool}$) and meat ($11.0\text{ MJ/kg live weight}$):
+  $$\text{AF}_{\text{wool}} = \frac{24.0 \times \text{Wool}_{\text{kg}}}{24.0 \times \text{Wool}_{\text{kg}} + 11.0 \times \text{Meat}_{\text{LW}}}, \qquad \text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{wool}}$$
+
+### D. Replacement Cohorts (`production_role == "replacement"`)
+* In Table 1 (`totals`), `replacement` cohorts show their full direct emissions, land use, water deprivation, and per-head footprints.
+* In Table 2 (`intensities`), `replacement` cohorts show `NA` for commercial product intensities because their footprint is already absorbed into the `mature` or `slaughter` cohorts of their enterprise, preventing double counting.
 
 ---
 
-# VIII. Consolidated Assessment, Biophysical Allocation & Feed Efficiency
-
-The consolidated assessment engine in `herdr` (`generate_impact_assessment()`) integrates all upstream Tier 2 GHG emissions, agroecological land footprints, and physical production outputs into multi-metric indicators.
-
-## 1. Biophysical Allocation for Dairy Systems (IDF Bulletin 520/2022)
-
-Dairy farming produces both milk and meat (from culled cows and surplus calves). To allocate emissions, land occupation, and feed intake between milk and meat co-products based on underlying physical relationships (ISO 14044 Step 2), `herdr` implements the updated **International Dairy Federation (IDF) physical Net Energy allocation** method (Bulletin 520/2022):
-
-$$\text{NEL}_{\text{total}} = 3.1 \times \text{Milk}_{\text{FPCM}} \quad (\text{MJ})$$
-$$\text{NEG}_{\text{total}} = 15.0 \times \text{Meat}_{\text{LW}} \quad (\text{MJ})$$
-
-Where $\text{Milk}_{\text{FPCM}}$ is Fat and Protein Corrected Milk (kg), $\text{Meat}_{\text{LW}}$ is annual live weight sold (kg), $3.1 \text{ MJ/kg}$ is the net energy content of standard milk, and $15.0 \text{ MJ/kg}$ is the net energy content of live weight gain.
-
-The allocation factors are:
-$$\text{AF}_{\text{milk}} = \frac{\text{NEL}_{\text{total}}}{\text{NEL}_{\text{total}} + \text{NEG}_{\text{total}}} = \frac{3.1 \times \text{Milk}_{\text{FPCM}}}{3.1 \times \text{Milk}_{\text{FPCM}} + 15.0 \times \text{Meat}_{\text{LW}}}$$
-$$\text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}$$
-
-For specialized meat cohorts (including feedlot calves or lambs originating from dairy breeding herds where $\text{Meat}_{\text{LW}} > 0$), $\text{AF}_{\text{meat}} = 1.0$; for laying hens, $\text{AF}_{\text{egg}} = 1.0$. Conversely, non-milking and non-meat maintenance phases (such as `dry_phase` cows where both milk and meat outputs are zero) have $\text{AF}_{\text{milk}} = 0$ and $\text{AF}_{\text{meat}} = 0$, leaving product intensities as `NA` (displayed as empty bars in charts) to avoid erroneously attributing dry-period emissions entirely to cull meat.
-
 ## 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
 
-Following the protein-to-protein framework of Mottet et al. (2017, *Global Food Security*, 14, 1-8), `herdr` evaluates feed conversion efficiency and human food security via two key indicators:
+Following Mottet et al. (2017, *Global Food Security*, 14, 1–8), `herdr` evaluates protein conversion efficiency via two indicators on producing cohorts (`mature` and `slaughter`):
 
 1. **Total Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{total}}$):**
-   Evaluates system-wide biological nitrogen conversion efficiency by dividing total feed crude protein (CP) consumed by all edible animal protein produced:
    $$\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})$$
-
 2. **Cropland Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{cropland}}$):**
-   Measures direct competition with human food by considering only crude protein derived from arable cropland crops:
    $$\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})$$
-   * $\text{Feed}_{\text{CP, cropland}}$ is calculated strictly from feed ingredients tagged as `land_type == "cropland"` in `feed_characteristics.csv` (e.g., cereals, oilseeds, pulses, and arable forage crops).
-   * Feed sources tagged as `grassland_convertible` or `grassland_unconvertible` (permanent pastures, rangelands, native grasslands) and `none` (animal meals, urea/NPN, synthetic amino acids, minerals, and industrial coproducts requiring no dedicated arable land) are excluded from $\text{Feed}_{\text{CP, cropland}}$, reflecting zero direct competition for arable food crops.
-   * When $\text{Protein\_FCR}_{\text{cropland}} < 1.0$, the livestock system is a **net producer** of protein for human consumption.
-   * When $\text{Protein\_FCR}_{\text{cropland}} > 1.0$, the livestock system consumes more human-edible/cropland protein than it generates.
-
-## 3. Standardized Functional Units
-
-`generate_impact_assessment()` and `plot_herdr_results()` support standardized functional units across all three environmental impact dimensions:
-
-| Functional Unit (`functional_unit`) | GHG Emissions Metric | Land Footprint Metric | Water Deprivation Metric (AWARE / EF 3.1) | Allocation / Normalization |
-|:---|:---|:---|:---|:---|
-| **`total`** (Default) | Absolute Gg $\text{CO}_2\text{e}$ | Absolute hectares (ha) | Absolute $\text{Mm}^3\text{ depriv.}$ ($10^6\text{ m}^3\text{ depriv.} = 1\text{ hm}^3$) | Whole-inventory absolute footprint |
-| **`product`** | kg $\text{CO}_2\text{e}$ / kg commercial product | $\text{m}^2$ / kg commercial product | $\text{m}^3\text{ depriv.}$ / kg commercial product | IDF Net Energy physical allocation for dairy |
-| **`protein`** | kg $\text{CO}_2\text{e}$ / kg edible protein | $\text{m}^2$ / kg edible protein | $\text{m}^3\text{ depriv.}$ / kg edible protein | Total human edible protein output |
-| **`head`** | kg $\text{CO}_2\text{e}$ / head / year | $\text{m}^2$ / head / year | $\text{m}^3\text{ depriv.}$ / head / year | Annual average population (AAP) |
-| **`fcr`** | Total Protein FCR (Biological) | Cropland Protein FCR (Human Competition) | — | Mottet et al. (2017) feed protein conversion ratio (threshold at 1.0) |
-
-## 4. Agroecological Land Footprint Breakdown
-
-Land use requirement is partitioned into four agroecological categories based on the feed competition framework (Mottet et al., 2017):
-
-* **`Land_cropland_m2`:** Cultivated arable land suitable for direct human food production.
-* **`Land_grassland_convertible_m2`:** Pastures on fertile soils convertible to arable cropping.
-* **`Land_grassland_unconvertible_m2`:** Permanent native rangelands and marginal/upland terrain.
-* **`Land_other_m2`:** Silvopastoral zones, fallow, farm infrastructure, or unclassified land.
-
-## 5. Feed Upstream Life Cycle Assessment (GHG & Water Deprivation)
-
-For each feed ingredient $i$, upstream environmental burdens are quantified using the **INRAE / ADEME ECOALIM v9** (EF 3.1) database.
-
-### 5.1 Fresh Feed Intake ($Fresh_i$)
-
-Life cycle emission factors are reported per kilogram of fresh weight as fed:
-
-**Formula:**
-$$Fresh_i = \frac{AnnualConsumption_i}{\left( \frac{DM\_pct_i}{100} \right)} \quad (\text{kg fresh / head / year})$$
-
-| Variable | Description | Source in the Package |
-|:---|:---|:---|
-| $Fresh_i$ | Annual fresh feed intake per animal (kg fresh/year) | Calculated |
-| $AnnualConsumption_i$ | Annual dry matter intake of ingredient $i$ | Result of Section V.2.C |
-| $DM\_pct_i$ | Dry matter percentage of ingredient $i$ (%) | `feed_characteristics.csv` |
-
-### 5.2 Water Deprivation Footprint ($Water_i$)
-
-Freshwater deprivation characterized via the international **AWARE** model (EF 3.1):
-
-**Formula:**
-$$WaterPerAnimal_i = Fresh_i \cdot EF_{water, i} \quad (\text{m}^3\text{ depriv. / head / year})$$
-$$TotalWater_i = WaterPerAnimal_i \cdot AAP \quad (\text{m}^3\text{ depriv. / year})$$
-
-| Variable | Description | Source in the Package |
-|:---|:---|:---|
-| $WaterPerAnimal_i$ | Water deprivation per head ($\text{m}^3\text{ depriv.}$) | Calculated |
-| $TotalWater_i$ | Total cohort water deprivation ($\text{m}^3\text{ depriv.}$) | Calculated |
-| $Fresh_i$ | Annual fresh feed intake (kg) | Result of Eq. 5.1 |
-| $EF_{water, i}$ | Water deprivation characterization factor (`Water use (m3 depriv.)`) | `ecoalim.parquet` |
-| $AAP$ | Annual Average Population | `livestock_census.csv` |
-
-### 5.3 Feed Greenhouse Gas Emissions ($GHG_i$)
-
-Cradle-to-farm-gate feed greenhouse gas emissions partitioned by origin:
-
-**Formula:**
-$$GHGPerAnimal_i = Fresh_i \cdot EF_{climate, i} \quad (\text{kg CO}_2\text{e / head / year})$$
-$$TotalGHG_i = GHGPerAnimal_i \cdot AAP \quad (\text{kg CO}_2\text{e / year})$$
-
-* **Fossil inputs:** $GHG_{\text{fossil}, i} = Fresh_i \cdot EF_{\text{fossil}, i}$
-* **Land-use change / deforestation:** $GHG_{\text{luc}, i} = Fresh_i \cdot EF_{\text{luc}, i}$
-
-| Variable | Description | Source in the Package |
-|:---|:---|:---|
-| $GHGPerAnimal_i$ | Feed GHG emissions per head ($\text{kg CO}_2\text{e}$) | Calculated |
-| $TotalGHG_i$ | Total cohort feed GHG emissions ($\text{kg CO}_2\text{e}$) | Calculated |
-| $Fresh_i$ | Annual fresh feed intake (kg) | Result of Eq. 5.1 |
-| $EF_{climate, i}$ | Climate change characterization factor (`Climate change - EF 3.1`) | `ecoalim.parquet` |
-| $EF_{\text{fossil}, i}$ | Fossil climate change factor (`Climate change - Fossil`) | `ecoalim.parquet` |
-| $EF_{\text{luc}, i}$ | Land-use change factor (`Climate change - Land use and LU change`) | `ecoalim.parquet` |
-| $AAP$ | Annual Average Population | `livestock_census.csv` |
+   * When $\text{Protein\_FCR}_{\text{cropland}} < 1.0$, the cohort/system is a **net producer** of human-edible protein relative to arable cropland protein consumed.
 
 ---
 

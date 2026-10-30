@@ -61,11 +61,11 @@ A few notes on where these numbers come from and how herdr uses them:
 - **`DM_pct` (Dry Matter %)**: Beyond nutritional calculations, `calculate_land_use()` directly uses `DM_pct` to convert raw FAOSTAT yields to dry matter yield ($dm\_yield = raw\_yield \times \frac{DM\_pct}{100}$). If `DM_pct` is missing, herdr issues a warning and assumes 100%.
 - `ASH_pct`, `CP_pct`, `EE_pct`, and `NDF_pct` should come from a lab analysis or a recognized feed table (FEDNA is herdr's default source for most of its bundled ingredients; Feedipedia is a good alternative for by-products like this one).
 - **`source_DE`**: this column documents the origin of the Digestible Energy (`DE_pct`) value.
-- **Forages (`DE_pct`)**: If a measured value is not available, Energy Digestibility ($Ed$) is derived from Organic Matter digestibility ($OMd$) and proximate analysis ($CP$, $EE$, $NDF$, $Ash$). See the exact regression formulas in the [Technical Reference: Feed Characteristics](Technical_reference.html#feed_characteristics.csv--nutritional-values).
-- **Gross Energy (`GE_feed_kcal_kg`)**: If unmeasured by bomb calorimetry, calculate using the NRC (1989) Ewan equation documented in the [Technical Reference](Technical_reference.html#feed_characteristics.csv--nutritional-values).
+- **Forages (`DE_pct`)**: If a measured value is not available, Energy Digestibility ($Ed$) is derived from Organic Matter digestibility ($OMd$) and proximate analysis ($CP$, $EE$, $NDF$, $Ash$). See the exact regression formulas in the [Technical Reference: Feed Characteristics](Technical_reference.html#feed_characteristics).
+- **Gross Energy (`GE_feed_kcal_kg`)**: If unmeasured by bomb calorimetry, calculate using the NRC (1989) Ewan equation documented in the [Technical Reference](Technical_reference.html#feed_characteristics).
 - Leave the swine/poultry energy columns as `NA` if the ingredient is only fed to ruminants (as here) — herdr only needs them for monogastric diets.
 
-See the [Technical Reference](Technical_reference.html#feed_characteristics.csv--nutritional-values) vignette for the full column definitions.
+See the [Technical Reference](Technical_reference.html#feed_characteristics) vignette for the full column definitions.
 
 ---
 
@@ -117,9 +117,9 @@ With both reference files updated, the ingredient behaves exactly like any bundl
 Keep these practical rules in mind when entering ingredients:
 
 - **`ingredient_type`**: Must match one of four exact categories: `"forage"`, `"concentrate"`, `"milk"`, or `"milk_replacer"`. This connects the ingredient to the corresponding category share in `diet_profiles.csv`. If misspelled or unrecognized, herdr sets the intake share factor to 0, resulting in zero consumption and zero land use.
-- **`ingredient_share` Validation**: Within any given diet (`diet_tag`) and `ingredient_type`, the sum of `ingredient_share` values must total 100% ($\pm 0.1\%$). Herdr validates this before computing and throws a warning if shares do not total 100%:
+- **`ingredient_share` Validation**: Within any given diet (`diet_tag`) and `ingredient_type`, the sum of `ingredient_share` values must total 100% ($\pm 0.1\%$). Herdr validates this strictly before computing and stops with an informative error if shares do not total 100%:
   ```
-  ⚠️ Ingredient shares do not sum to 100% in: diet_dairy_mature
+  Error: Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for: diet_dairy_mature (concentrate = 95%)
   ```
 - **Country of Origin & Yield Resolution**:
   - **Explicit country** (e.g. `"spain"`): herdr resolves yields for that specific country from `fao_crops.parquet` / `forages.parquet`.
@@ -135,7 +135,7 @@ Keep these practical rules in mind when entering ingredients:
 | "Unrecognized ingredient" error | Ingredient name in `diet_ingredients.csv` doesn't exactly match `feed_characteristics.csv` (spacing, casing, typo) | Copy the name directly from `feed_characteristics.csv`, don't retype it. |
 | Warning: `Column 'land_type' not found` | `feed_characteristics.csv` is missing the `land_type` column | Add `land_type` and specify `cropland`, `grassland_convertible`, `grassland_unconvertible`, or `none`. |
 | Land-use result of zero for this ingredient | `land_type` was set to `none`/`no_land`, `yield_name` doesn't match any `Item` in FAO data, `economic_allocation` is 0, or `ingredient_type` was misspelled | Check `land_type`; re-check the exact `Item` name with `arrow::read_parquet()`; verify `economic_allocation`; ensure `ingredient_type` is one of `forage`, `concentrate`, `milk`, `milk_replacer`. |
-| Warning: `Ingredient shares do not sum to 100%` | Values in `ingredient_share` within that diet cohort and `ingredient_type` do not total 100 | Check `diet_ingredients.csv` and adjust shares so they sum to 100% for each category. |
+| Error: `Ingredient Error: Shares do not sum to 100%` | Values in `ingredient_share` within that diet cohort and `ingredient_type` do not total 100 | Check `diet_ingredients.csv` and adjust shares so they sum to 100% for each category. |
 | Warning: `Missing yield for: ...` | Country specified in `country_of_origin` has no recorded yield in FAO data for that year | Check the spelling of `Area` in `fao_crops.parquet`, leave `country_of_origin` blank to use trade tracing, or provide `custom_yield_kg_ha`. |
 | 187 MB download begins unexpectedly | `country_of_origin` was left `NA`, triggering trade matrix download | Let the download finish once, or explicitly provide a country in `country_of_origin` / fill in `custom_yield_kg_ha`. |
 | GHG values look off for the ingredient | `GE_feed_kcal_kg` wasn't calculated, or nutritional values were entered as % as-fed instead of % DM | Recalculate GE with the Ewan equation; double-check units against the [Technical Reference](Technical_reference.html). |

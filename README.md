@@ -20,11 +20,13 @@ The package currently supports:
 
 It provides estimates of:
 
-- Enteric methane (CH₄)
-- Methane from manure management (CH₄)
-- Direct and indirect nitrous oxide emissions (N₂O)
-- Feed-related land use (m²)
-- Meat, milk, and egg production
+- Enteric methane ($\text{CH}_4$)
+- Methane from manure management ($\text{CH}_4$)
+- Direct and indirect nitrous oxide emissions ($\text{N}_2\text{O}$)
+- Upstream feed carbon footprint — fossil vs. land-use change / deforestation ($\text{CO}_2\text{e}$, ECOALIM v9 / EF 3.1)
+- Feed freshwater deprivation ($\text{m}^3\text{ depriv.}$, AWARE model)
+- Feed-related land use & agroecological competition ($\text{m}^2$, Mottet et al. 2017)
+- Milk (FPCM), carcass meat, fresh eggs, greasy wool, edible human protein, and Protein FCRs
 
 ------------------------------------------------------------------------
 
@@ -101,10 +103,15 @@ herdr_init()
 ``` r
 results <- generate_impact_assessment(
   farm_country = "Spain",
-  year = "2024"
+  year = 2024,
+  gwp_report = "AR5"
 )
 
-results
+# Table 1: Absolute cohort inventory & per-head footprints
+results$totals
+
+# Table 2: Enterprise-integrated product & protein intensities
+results$intensities
 ```
 
 > **Important:** The first time an assessment requires feed origin allocation, **herdr** automatically downloads the required FAO background dataset (\~187 MB). This download occurs only once and is reused in future analyses.
@@ -125,15 +132,16 @@ Output files are automatically saved in the `output/` directory.
   - Dry Matter Intake (DMI)
   - Volatile Solids (VS)
   - Nitrogen intake, retention and excretion
-- 🌿 Enteric methane (CH₄) emissions.
-- ♻️ Manure methane (CH₄) emissions.
-- 🌱 Direct and indirect nitrous oxide (N₂O) emissions.
-- 🌾 Feed-related land use using:
-  - FAOSTAT crop yields
-  - Forage yield databases
-  - Dynamic FAO trade allocation matrix
+- 🌿 Enteric methane ($\text{CH}_4$) emissions.
+- ♻️ Manure methane ($\text{CH}_4$) emissions.
+- 🌱 Direct and indirect nitrous oxide ($\text{N}_2\text{O}$) emissions.
+- 🏭 Upstream feed LCA (fossil vs. LUC deforestation $\text{CO}_2\text{e}$) and **AWARE** water deprivation ($\text{m}^3\text{ depriv.}$) via **ECOALIM v9 / AGRIBALYSE v3.1 (EF 3.1)**.
+- 🌾 Feed-related land use & human food competition (Mottet et al., 2017) using:
+  - FAOSTAT crop yields (`cropland`, `grassland_convertible`, `grassland_unconvertible`)
+  - Curated national forage yield databases (`forages.parquet`)
+  - Dynamic FAO bilateral trade allocation matrix
   - 70% domestic self-sufficiency allocation rule
-- 🥩 Meat, milk, and egg production outputs.
+- 🥩 Milk (FPCM), meat (carcass & boneless), egg, wool, and edible human protein outputs, with **IDF (2022)** biophysical co-product allocation and **Mottet (2017)** Protein FCRs.
 - 🧩 Modular workflow allowing both individual calculations and complete assessments.
 - 📄 Transparent CSV-based input files that can easily be modified by users.
 

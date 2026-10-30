@@ -12,7 +12,7 @@ vignette: >
 
 # Moderate Assessment: North/South Regional Split
 
-This guide walks through a **Moderate Assessment** for **mature dairy cattle in Spain (2015)**, using the multi-regional structure (North and South) to improve precision over a single national figure.
+This guide walks through a **Moderate Assessment** for **mature dairy cattle in Spain (2015)**, using a multi-farm / multi-regional structure (`North` vs. `South`) to capture differences in diet composition, milk yield, and manure climate zones.
 
 > 📂 **All files referenced below live in `user_data/` and correspond to the pre-configured `inst/Examples/Level2_Spain_Dairy_Cattle_2015/` baseline.**
 
@@ -23,24 +23,24 @@ This guide walks through a **Moderate Assessment** for **mature dairy cattle in 
 | **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
 | **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` · `ecoalim.parquet` |
 
-Full details on every file above are in the [Technical Reference](Technical_reference.html) vignette. This guide builds on the [Basic Assessment](Easy_Example.html) — start there first if this is your first time using herdr.
+Full details on every file above are in the [Technical Reference](Technical_reference.html) vignette. This guide builds on the [Basic Assessment](Easy_Example.html) — start there first if this is your first time using `herdr`.
 
 ---
 
-## Step 1 — The Census
+## Step 1 — The Census (`livestock_census.csv`)
 
-Open `livestock_census.csv`. Here we split the Spanish dairy population into two climatic regions using `subregion`.
+Open `livestock_census.csv`. Here we split the Spanish dairy population into two climatic subregions (`north` and `south`) and two farm identifiers (`farm_north` and `farm_south`). The row order you declare here is preserved from top to bottom in all output tables and charts.
 
-| animal_tag | region | subregion | class_flex | population |
+| farm_id | animal_tag | region | subregion | population |
 |:---|:---|:---|:---|---:|
-| `mature_dairy_cattle` | `spain` | `north` |  | 536,987 |
-| `mature_dairy_cattle` | `spain` | `south` |  | 311,699 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | 536,987 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | 311,699 |
 
 ---
 
-## Step 2 — Designing the Diet
+## Step 2 — Designing Regional Diets
 
-Forage availability differs between North and South, so separate diets are defined for each region.
+Forage availability differs between Atlantic/Northern Spain and Mediterranean/Southern Spain, so separate diets are defined for each region.
 
 ### A. Define the profile — `diet_profiles.csv`
 
@@ -53,73 +53,80 @@ The forage proportion is higher in the North (55%) than in the South (50%).
 
 ### B. Ingredient breakdown — `diet_ingredients.csv`
 
-Within each `ingredient_type`, `ingredient_share` must sum to 100%. Here's the concentrate portion for Spain South:
+Within each `ingredient_type`, `ingredient_share` must sum to 100%. Here is an excerpt of the concentrate portion for Spain South:
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature_south` | concentrate | `corn` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature_south` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature_south` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| `diet_dairy_mature_south` | `concentrate` | `corn` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
+| `diet_dairy_mature_south` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
-> 🌍 **Missing origins:** `country_of_origin` for the soybean and rapeseed meals is left as `NA`. herdr resolves both automatically using the FAO dynamic background allocation engine and a 70% self-sufficiency rule — see [Land Use Methodology](land_use.html) for how.
+> 🌍 **Missing origins:** `country_of_origin` for soybean and rapeseed meals is left as `NA`. `herdr` resolves both automatically using the FAO dynamic bilateral trade engine and a 70% domestic self-sufficiency threshold — see [Land Use Methodology](land_use.html).
 >
-> 🎯 **Overriding the yield:** the rapeseed meal row sets `custom_yield_kg_ha` to `3200`, so herdr uses that figure directly for its land-use footprint instead of looking up a FAO/trade-based yield — regardless of what `country_of_origin` says.
+> 🎯 **Overriding the yield:** setting `custom_yield_kg_ha = 3200` instructs `herdr` to use that farm-specific dry matter yield directly instead of querying FAOSTAT.
 
 ---
 
-## Step 3 — Animal Categories and Coefficients
+## Step 3 — Animal Categories and Coefficients (`ruminant_definitions.csv`)
 
-Open `ruminant_definitions.csv`. This file links your animal tags to the IPCC physiological equations — each of `cfi`, `ca`, `c`, and `c_pregnancy_cattle` is a separate lookup into `ipcc_coefficients.csv`.
+Open `ruminant_definitions.csv`. Each cohort specifies its canonical taxonomy (`animal_type = "cattle"`, `animal_subtype = "dairy"`, `production_role = "mature"`), its diet, milk yield, and IPCC coefficients.
 
-| animal_tag | region | subregion | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
-|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `north` | `diet_dairy_mature_north` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295.0 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `diet_dairy_mature_south` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044.0 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
+| farm_id | animal_tag | region | subregion | animal_type | animal_subtype | production_role | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | pregnancy_rate | replacement_rate |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|---:|---:|
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_north` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295.0 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_south` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044.0 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
 
 ---
 
-## Step 4 — Body Weights
+## Step 4 — Body Weights (`livestock_weights.csv`)
 
-Open `livestock_weights.csv`. Make sure the identifying keys match the census exactly — these weights validate the dry matter intake (DMI) limits.
+Open `livestock_weights.csv`. Make sure the four primary demographic keys (`farm_id`, `animal_tag`, `region`, `subregion`) match the census exactly.
 
-| animal_tag | region | subregion | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg |
-|:---|:---|:---|---:|---:|---:|---:|
-| `mature_dairy_cattle` | `spain` | `north` | 675 | 365 | 675 | 675 |
-| `mature_dairy_cattle` | `spain` | `south` | 675 | 365 | 675 | 675 |
-
-> ℹ️ **About `productive_period_days`:**  
-> * For **adult breeding females (except laying hens)**, this represents the **inter-parturition interval** in days (here, `365` days corresponds to an annual calving interval).  
-> * For **laying hens**, it represents the **commercial laying cycle duration** until depopulation.  
-> * For **all other cohorts (growing, fattening, replacement)**, it represents their **life cycle / life-stage duration** (days on feed).
+| farm_id | animal_tag | region | subregion | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg |
+|:---|:---|:---|:---|---:|---:|---:|---:|
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | 675 | 365 | 675 | 675 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | 675 | 365 | 675 | 675 |
 
 ---
 
 ## Step 5 — Manure Management (`manure_management.csv`)
 
-You can define multiple manure systems for the same cohort by splitting the `allocation` across rows — the sum per `animal_tag`/`region`/`subregion` combination must equal 1.0.
+You can define multiple manure systems for the same cohort by splitting the `allocation` across rows — the sum per `(farm_id, animal_tag, region, subregion)` cohort must equal exactly **1.0**. Notice how `system_climate` (`cool` in the North vs. `warm` in the South) and `climate_moisture` (`wet` vs. `dry`) reflect regional agroclimatic conditions:
 
-| animal_tag | region | subregion | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
-|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `mature_dairy_cattle` | `spain` | `north` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.0537 |
-| `mature_dairy_cattle` | `spain` | `north` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.3432 |
-| `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
-| `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
+| farm_id | animal_tag | region | subregion | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.0537 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.3432 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
 
-> ⚠️ **Illustrative snippet:** the rows above don't sum to 1.0 per cohort — some rows were omitted here for brevity. In a real project, always check that `allocation` sums to exactly 1.0 for every `animal_tag`/`region`/`subregion` combination before running the model.
+> ⚠️ **Illustrative snippet:** Some rows were omitted above for brevity. In `inst/Examples/Level2_Spain_Dairy_Cattle_2015/manure_management.csv`, all allocations for `farm_north` and `farm_south` sum to exactly **1.0**.
 
 ---
 
-## Step 6 — Running the Analysis
-
-Once your CSVs are updated in `user_data/`, run the assessment. herdr automatically performs biological validations (e.g. checking that DMI doesn't exceed ~5.5% of body weight) and assigns trade impacts for any missing origins.
+## Step 6 — Running the Analysis & Comparing Regions
 
 ```r
 library(herdr)
 
 results <- generate_impact_assessment(
   automatic_cycle = FALSE,
-  farm_country = "Spain",
-  year = 2015
+  farm_country    = "Spain",
+  year            = 2015,
+  gwp_report      = "AR5"
+)
+
+# Inspect regional totals and product intensities
+results$totals
+results$intensities
+
+# Compare North vs. South milk carbon intensity (kg CO2e / kg FPCM milk)
+plot_herdr_results(
+  df              = results,
+  group_cols      = c("farm_id", "subregion"),
+  func_name       = "generate_impact_assessment",
+  impact_category = "ghg",
+  functional_unit = "milk"
 )
 ```
 
@@ -128,5 +135,5 @@ results <- generate_impact_assessment(
 ## Next steps
 
 - [Basic Assessment](Easy_Example.html) — the single-region version this example builds on.
-- [Advanced Assessment](Difficult_Example.html) — adds physiological life stages (`class_flex`) on top of this North/South split.
+- [Advanced Multi-Cohort Example](Difficult_Example.html) — multi-cohort swine & poultry assessment demonstrating `mature`, `replacement`, and `slaughter` lifecycle integration.
 - [Technical Reference](Technical_reference.html) — every file and column explained in detail.
