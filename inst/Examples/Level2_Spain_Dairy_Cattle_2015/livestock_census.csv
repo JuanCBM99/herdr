@@ -1,3 +1,3 @@
-﻿animal_tag,region,subregion,class_flex,population
-mature_dairy_cattle,spain,north,,536987
-mature_dairy_cattle,spain,south,,311699
+"farm_id","animal_tag","region","subregion","population"
+"farm_north","mature_dairy_cattle","spain","north",536987
+"farm_south","mature_dairy_cattle","spain","south",311699

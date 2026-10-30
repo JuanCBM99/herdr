@@ -1,2 +1,2 @@
-﻿animal_tag,region,subregion,class_flex,population
-mature_dairy_cattle,spain,,,848686
+"farm_id","animal_tag","region","subregion","population"
+"farm_1","mature_dairy_cattle","spain",,848686

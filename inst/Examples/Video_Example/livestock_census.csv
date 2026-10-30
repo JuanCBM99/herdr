@@ -1,2 +1,2 @@
-﻿animal_tag,region,subregion,class_flex,population
-random_goat,france,,,10000
+"farm_id","animal_tag","region","subregion","population"
+"farm_1","random_goat","france",,10000

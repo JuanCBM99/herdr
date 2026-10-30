@@ -1,1 +1,10 @@
-animal_tag,region,subregion,class_flex,animal_type,animal_subtype,production_role,diet_tag,cfi_maintenance,frac_fat_pct,frac_protein_pct,eggs_per_year,egg_weight_g,fertility_rate,alpha,piglets_born,piglets_suckling,replacement_rate
+"farm_id","animal_tag","region","subregion","animal_type","animal_subtype","production_role","diet_tag","cfi_maintenance","frac_fat_pct","frac_protein_pct","eggs_per_year","egg_weight_g","fertility_rate","alpha","piglets_born","piglets_suckling","replacement_rate"
+"farm_1","broilers",,,"poultry","meat","slaughter",,,,,,,,,,,
+"farm_1","replacement_meat_pullets",,,"poultry","meat","replacement",,,,,,,,,,,
+"farm_1","breeder_meat_hens",,,"poultry","meat","mature",,,,,,,,,,,1.2126
+"farm_1","replacement_layer_pullets",,,"poultry","layer","replacement",,,,,,,,,,,
+"farm_1","laying_hens",,,"poultry","layer","mature",,,,,,,,,,,0.714
+"farm_1","fattening_pigs",,,"swine","meat","slaughter",,,,,,,,,,,
+"farm_1","replacement_sows",,,"swine","meat","replacement",,,,,,,,,,,
+"farm_1","breeder_sows",,,"swine","meat","mature",,,,,,,,,,,0.25
+"farm_1","boars",,,"swine","meat","mature",,,,,,,,,,,0.3
