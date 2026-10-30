@@ -17,7 +17,7 @@ test_that("calculate_feed_emissions calculates footprints accurately", {
 
   # Check columns
   expected_cols <- c(
-    "region", "subregion", "animal_tag", "class_flex", "animal_type", "animal_subtype", "population",
+    "region", "subregion", "animal_tag", "animal_type", "animal_subtype", "population",
     "feed_dmi_kg_year", "feed_fresh_kg_year",
     "feed_CO2e_total_kg_year", "feed_CO2e_fossil_kg_year", "feed_CO2e_luc_kg_year",
     "feed_water_m3_year", "feed_CO2e_per_head_year", "feed_water_per_head_year"

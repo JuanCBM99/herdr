@@ -23,7 +23,7 @@ test_that("calculate_population_goat returns correct structure", {
 
   expect_s3_class(results, "data.frame")
   expect_true(any(grepl("kid", results$animal_tag)))
-  expect_true(all(c("region", "subregion", "class_flex", "animal_tag", "population") %in% colnames(results)))
+  expect_true(all(c("farm_id", "region", "subregion", "animal_tag", "population") %in% colnames(results)))
 })
 
 test_that("goat population correctly calculates replacement cohorts", {
@@ -34,7 +34,7 @@ test_that("goat population correctly calculates replacement cohorts", {
       animal_tag == "mature_goat_female_dairy" ~ 1000,
       animal_tag == "mature_goat_male_dairy"   ~ 100,
       TRUE ~ 0
-    ), class_flex = "grazing")
+    ))
 
   mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(grepl("goat", animal_tag)) %>%
@@ -76,8 +76,8 @@ test_that("goat function filters zero populations automatically", {
 
 test_that("calculate_population_goat handles accelerated kidding cycles and slaughter AAP scaling", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_goat_female_dairy", "spain", "andalucia", NA_character_, 1000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_goat_female_dairy", "spain", "andalucia", 1000
   )
 
   mock_rates <- tibble::tribble(

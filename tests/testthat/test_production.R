@@ -27,7 +27,7 @@ test_that("calculate_production executes and returns expected schema and non-neg
   expect_true(nrow(res) > 0)
 
   expected_cols <- c(
-    "region", "subregion", "animal_tag", "class_flex",
+    "region", "subregion", "animal_tag",
     "animal_type", "animal_subtype", "population", "N_exit",
     "milk_fresh_kg", "milk_FPCM_kg", "meat_live_weight_kg",
     "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg",

@@ -49,7 +49,7 @@ test_that("calculate_weighted_variable handles integrity errors and biological w
   )
 })
 
-test_that("calculate_weighted_variable works with normalized diets without region/subregion/class_flex", {
+test_that("calculate_weighted_variable works with normalized diets without region/subregion", {
   temp_test_dir <- tempfile()
   dir.create(temp_test_dir)
   file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
@@ -60,8 +60,8 @@ test_that("calculate_weighted_variable works with normalized diets without regio
   original_diets <- read_csv(diet_path, show_col_types = FALSE)
   original_ingrs <- read_csv(ingr_path, show_col_types = FALSE)
 
-  clean_diets <- original_diets %>% dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex")))
-  clean_ingrs <- original_ingrs %>% dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex")))
+  clean_diets <- original_diets %>% dplyr::select(-dplyr::any_of(c("region", "subregion")))
+  clean_ingrs <- original_ingrs %>% dplyr::select(-dplyr::any_of(c("region", "subregion")))
 
   write_csv(clean_diets, diet_path)
   write_csv(clean_ingrs, ingr_path)

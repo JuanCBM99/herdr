@@ -17,7 +17,7 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_null(plot_herdr_results(ge_results, group_cols = c("non_existent_group")))
 
   # 5. Assertions: Universal plot with dynamic dictionary
-  p_ge <- plot_herdr_results(ge_results, group_cols = c("animal_tag", "class_flex"), func_name = "calculate_ge")
+  p_ge <- plot_herdr_results(ge_results, group_cols = c("animal_tag", "region"), func_name = "calculate_ge")
   expect_s3_class(p_ge, "ggplot")
   expect_match(p_ge$labels$title, "Results for GE MJday")
   expect_true("plot_label" %in% names(p_ge$data))
@@ -31,7 +31,6 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     animal_tag = c("cow_dairy", "sheep_meat"),
     region = c("Europe", "Europe"),
     subregion = c("Spain", "Spain"),
-    class_flex = c("dairy", "meat"),
     ch4_enteric = c(120.5, 15.2),
     ch4_manure = c(30.1, 3.0),
     n2o_manure = c(10.4, 1.1)
@@ -46,7 +45,6 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     animal_tag = c("tag_1", "tag_1"),
     region = c("Europe", "Europe"),
     subregion = c("Spain", "Spain"),
-    class_flex = c("dairy", "dairy"),
     GE_MJday = c(100, 200),
     DE_pct = c(60, 80)
   )
@@ -84,7 +82,6 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     animal_tag = c("dairy_cow", "broiler_chicken"),
     region = c("spain", "spain"),
     subregion = c("north", "south"),
-    class_flex = c("dairy", "meat"),
     milk_protein_kg = c(2500, 0),
     meat_protein_kg = c(300, 800),
     egg_protein_kg = c(0, 0),
@@ -100,7 +97,6 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     animal_tag = c("dairy_cows", "fattening_pigs"),
     region = c("spain", "spain"),
     subregion = c("north", "south"),
-    class_flex = c("dairy", "meat"),
     CH4_enteric_Gg = c(2.5, 0.05),
     CH4_manure_Gg = c(0.6, 0.4),
     N2O_direct_Gg = c(0.03, 0.02),
@@ -173,7 +169,6 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     animal_tag = c("dairy_cow", "beef_heifer"),
     region = c("Europe", "Europe"),
     subregion = c("Spain", "Spain"),
-    class_flex = c("dairy", "beef"),
     population = c(100, 50),
     feed_dmi_kg_year = c(700000, 150000),
     feed_fresh_kg_year = c(1800000, 350000),
@@ -226,5 +221,69 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   p_water_prot <- plot_herdr_results(cradle_intensities_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "water_protein")
   expect_s3_class(p_water_prot, "ggplot")
   expect_match(p_water_prot$labels$x, "Water Intensity")
+
+  # 17. Assertions: Direct Table 2 (list(totals, intensities)) plotting
+  sim_list <- list(
+    totals = cradle_df %>% dplyr::mutate(
+      farm_id = "farm_1",
+      animal_type = c("cattle", "swine"),
+      animal_subtype = c("dairy", "meat"),
+      production_role = c("mature", "slaughter"),
+      population = c(1000, 5000),
+      CO2eq_enteric = CH4_enteric_Gg * 28,
+      CO2eq_manure = CH4_manure_Gg * 28,
+      CO2eq_N2O_direct = N2O_direct_Gg * 265,
+      CO2eq_N2O_indirect = (N2O_vol_Gg + N2O_lea_Gg) * 265,
+      Land_other_m2 = c(0, 0)
+    ),
+    intensities = tibble::tibble(
+      farm_id = c("farm_1", "farm_1"),
+      region = c("spain", "spain"),
+      subregion = c("north", "south"),
+      animal_tag = c("dairy_cows", "fattening_pigs"),
+      animal_type = c("cattle", "swine"),
+      animal_subtype = c("dairy", "meat"),
+      production_role = c("mature", "slaughter"),
+      population = c(1000, 5000),
+      milk_FPCM_kg = c(8000000, 0),
+      meat_carcass_weight_kg = c(200000, 450000),
+      egg_fresh_kg = c(0, 0),
+      wool_kg = c(0, 0),
+      total_protein_kg = c(260000, 80000),
+      GHG_intensity_milk = c(1.12, NA_real_),
+      GHG_cradle_to_farm_milk = c(1.45, NA_real_),
+      Land_intensity_milk = c(0.62, NA_real_),
+      Water_intensity_milk = c(0.01, NA_real_),
+      GHG_intensity_meat = c(4.50, 2.73),
+      GHG_cradle_to_farm_meat = c(5.80, 5.21),
+      Land_intensity_meat = c(2.50, 3.33),
+      Water_intensity_meat = c(0.04, 0.03),
+      GHG_intensity_egg = c(NA_real_, NA_real_),
+      GHG_cradle_to_farm_egg = c(NA_real_, NA_real_),
+      Land_intensity_egg = c(NA_real_, NA_real_),
+      Water_intensity_egg = c(NA_real_, NA_real_),
+      GHG_intensity_wool = c(NA_real_, NA_real_),
+      GHG_cradle_to_farm_wool = c(NA_real_, NA_real_),
+      Land_intensity_wool = c(NA_real_, NA_real_),
+      Water_intensity_wool = c(NA_real_, NA_real_),
+      GHG_intensity_protein = c(34.5, 15.3),
+      GHG_cradle_to_farm_protein = c(44.6, 29.3),
+      Land_intensity_protein = c(19.2, 18.7),
+      Water_intensity_protein = c(0.32, 0.19),
+      Protein_FCR_total = c(3.50, 4.00),
+      Protein_FCR_cropland = c(2.50, 1.00)
+    )
+  )
+
+  p_t2_milk <- plot_herdr_results(sim_list, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "milk", impact_category = "ghg")
+  expect_s3_class(p_t2_milk, "ggplot")
+  # Only dairy_cows produces milk (fattening_pigs NA is filtered out)
+  expect_equal(length(unique(p_t2_milk$data$plot_label)), 1)
+
+  p_t2_prot_ov <- plot_herdr_results(sim_list, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "protein", impact_category = "overview")
+  expect_s3_class(p_t2_prot_ov, "ggplot")
+  expect_true("GHG Intensity (kg CO2e / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
+  expect_true("Land Footprint (m2 / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
+  expect_true("Water Intensity (m³ depriv. / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
 })
 

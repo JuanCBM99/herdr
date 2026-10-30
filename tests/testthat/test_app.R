@@ -15,16 +15,16 @@ if (file.exists(local_app)) {
   app_file <- system.file("app", "app.R", package = "herdr")
 }
 
-# If the app is structured as a standalone script, source it in a clean environment
-app_env <- new.env()
-sys.source(app_file, envir = app_env)
-app_server <- app_env$server
-
 test_that("Shiny server initializes tables and runs calculation cycle safely", {
   temp_test_dir <- tempfile()
   dir.create(temp_test_dir)
   file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
   withr::local_dir(temp_test_dir)
+
+  # If the app is structured as a standalone script, source it in a clean environment
+  app_env <- new.env()
+  sys.source(app_file, envir = app_env)
+  app_server <- app_env$server
 
   # Anti-download shield: prevent triggering 187 MB FAO trade matrix download during tests
   path_diet <- "user_data/diet_ingredients.csv"
@@ -54,7 +54,7 @@ test_that("Shiny server initializes tables and runs calculation cycle safely", {
       auto_cycle = FALSE,
       farm_country = "Spain",
       year = 2022,
-      plot_groups = c("animal_tag", "class_flex"),
+      plot_groups = c("animal_tag", "region"),
       calculate = 1
     )
 

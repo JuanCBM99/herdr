@@ -28,7 +28,7 @@ test_that("calculate_population_sheep returns correct structure and math from CS
   results <- calculate_population_sheep(mock_census, mock_defs)
 
   expect_s3_class(results, "data.frame")
-  expect_true(all(c("region", "subregion", "animal_tag", "population") %in% colnames(results)))
+  expect_true(all(c("farm_id", "region", "subregion", "animal_tag", "population") %in% colnames(results)))
 
   meat_slaughter <- results %>%
     filter(animal_tag == "lamb_meat_slaughter") %>%
@@ -58,8 +58,8 @@ test_that("calculate_population_sheep filters out zero populations using CSV str
 
 test_that("calculate_population_sheep handles accelerated lambing cycles and slaughter AAP scaling", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_sheep_female_meat", "spain", "aragon", NA_character_, 1000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_sheep_female_meat", "spain", "aragon", 1000
   )
 
   mock_rates <- tibble::tribble(

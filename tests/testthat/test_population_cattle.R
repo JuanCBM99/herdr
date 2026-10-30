@@ -10,7 +10,7 @@ test_that("population math follows biological sex-ratio and replacement rules", 
 
   mock_census <- read_csv(path_census, show_col_types = FALSE) %>%
     filter(animal_tag == "mature_dairy_cattle") %>%
-    mutate(population = 1000, class_flex = "lactation")
+    mutate(population = 1000)
 
   mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
     filter(animal_tag == "mature_dairy_cattle") %>%
@@ -28,28 +28,10 @@ test_that("population math follows biological sex-ratio and replacement rules", 
   expect_equal(repl_females, 100)
 })
 
-test_that("class_flex is preserved for mature animals and NA for offspring", {
-
-  mock_census <- read_csv(path_census, show_col_types = FALSE) %>%
-    filter(animal_tag == "mature_dairy_cattle") %>%
-    mutate(class_flex = "grazing_test")
-
-  mock_defs <- read_csv(path_defs, show_col_types = FALSE) %>%
-    filter(animal_tag == "mature_dairy_cattle")
-
-  res <- calculate_population_cattle(mock_census, mock_defs)
-
-  mature_entry <- res %>% filter(animal_tag == "mature_dairy_cattle")
-  expect_equal(mature_entry$class_flex[1], "grazing_test")
-
-  calf_entry <- res %>% filter(animal_tag == "feedlot_calves_male")
-  expect_true(is.na(calf_entry$class_flex[1]))
-})
-
-test_that("subregion is preserved from parents for all offspring including feedlot", {
+test_that("region and subregion are preserved from parents for all offspring including feedlot", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_dairy_cattle", "spain", "Gipuzkoa", "lactation", 100
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_dairy_cattle", "spain", "Gipuzkoa", 100
   )
 
   mock_rates <- tibble::tribble(
@@ -61,19 +43,23 @@ test_that("subregion is preserved from parents for all offspring including feedl
   res <- calculate_population_cattle(mock_census, mock_rates)
 
   feedlot_males <- res %>% filter(animal_tag == "feedlot_calves_male")
+  expect_equal(feedlot_males$farm_id[1], "farm_1")
+  expect_equal(feedlot_males$region[1], "spain")
   expect_equal(feedlot_males$subregion[1], "Gipuzkoa")
 
   feedlot_females <- res %>% filter(animal_tag == "feedlot_calves_female")
+  expect_equal(feedlot_females$farm_id[1], "farm_1")
   expect_equal(feedlot_females$subregion[1], "Gipuzkoa")
 
   repl_females <- res %>% filter(animal_tag == "dairy_calves_female_replacement")
+  expect_equal(repl_females$farm_id[1], "farm_1")
   expect_equal(repl_females$subregion[1], "Gipuzkoa")
 })
 
 test_that("demographic warning is triggered and negative populations are prevented when replacement > births", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_dairy_cattle", "spain", NA_character_, "lactation", 100
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_dairy_cattle", "spain", NA_character_, 100
   )
 
   # Calving rate = 0.50 (female calves = 25), replacement rate = 0.40 (demand = 40)
@@ -97,8 +83,8 @@ test_that("demographic warning is triggered and negative populations are prevent
 
 test_that("feedlot and slaughter calves are scaled to AAP according to productive_period_days", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_dairy_cattle", "spain", NA_character_, "lactation", 1000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_dairy_cattle", "spain", NA_character_, 1000
   )
 
   mock_rates <- tibble::tribble(
@@ -131,15 +117,15 @@ test_that("feedlot and slaughter calves are scaled to AAP according to productiv
 
 test_that("demographic parameters vary dynamically across strata and years without val[1] lock", {
   mock_census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "mature_dairy_cattle", "spain_1990", "north", "lactation", 1000,
-    "mature_dairy_cattle", "spain_2015", "north", "lactation", 1000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "mature_dairy_cattle", "spain_1990", "north", 1000,
+    "farm_1", "mature_dairy_cattle", "spain_2015", "north", 1000
   )
 
   mock_defs <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~pregnancy_rate, ~replacement_rate,
-    "mature_dairy_cattle", "spain_1990", "north", "lactation", 1.0, 0.19,
-    "mature_dairy_cattle", "spain_2015", "north", "lactation", 1.0, 0.27
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~pregnancy_rate, ~replacement_rate,
+    "farm_1", "mature_dairy_cattle", "spain_1990", "north", 1.0, 0.19,
+    "farm_1", "mature_dairy_cattle", "spain_2015", "north", 1.0, 0.27
   )
 
   res <- calculate_population_cattle(mock_census, mock_defs)

@@ -48,16 +48,18 @@ test_that("reference data paths prioritize local data_dir when present", {
 test_that("herdr_validate_manure_allocation verifies cohort allocation constraints", {
   # 1. Valid allocation exactly 1.0 (no error, no warning)
   valid_manure <- data.frame(
+    farm_id = "farm_1",
     region = "spain", subregion = NA_character_,
-    animal_tag = "mature_dairy_cattle", class_flex = NA_character_,
+    animal_tag = "mature_dairy_cattle",
     allocation = c(0.4, 0.6)
   )
   expect_silent(herdr_validate_manure_allocation(valid_manure))
 
   # 2. Over-allocation > 1.001 (must throw error)
   over_manure <- data.frame(
+    farm_id = "farm_1",
     region = "spain", subregion = NA_character_,
-    animal_tag = "mature_dairy_cattle", class_flex = NA_character_,
+    animal_tag = "mature_dairy_cattle",
     allocation = c(0.7, 0.5)
   )
   expect_error(
@@ -67,8 +69,9 @@ test_that("herdr_validate_manure_allocation verifies cohort allocation constrain
 
   # 3. Under-allocation < 0.999 (must throw error)
   under_manure <- data.frame(
+    farm_id = "farm_1",
     region = "spain", subregion = NA_character_,
-    animal_tag = "mature_dairy_cattle", class_flex = NA_character_,
+    animal_tag = "mature_dairy_cattle",
     allocation = c(0.3, 0.4)
   )
   expect_error(
@@ -78,8 +81,9 @@ test_that("herdr_validate_manure_allocation verifies cohort allocation constrain
 
   # 4. Valid allocation within tolerance (silent)
   approx_manure <- data.frame(
+    farm_id = "farm_1",
     region = "spain", subregion = NA_character_,
-    animal_tag = "mature_dairy_cattle", class_flex = NA_character_,
+    animal_tag = "mature_dairy_cattle",
     allocation = c(0.3333, 0.3333, 0.3334)
   )
   expect_silent(herdr_validate_manure_allocation(approx_manure))
@@ -156,13 +160,15 @@ test_that("herdr_validate_manure_systems verifies system keys, b_0 tags, and ani
     coefficient = c("b_0", "b_0")
   )
   valid_manure <- data.frame(
-    region = "spain", subregion = NA_character_, animal_tag = "cow", class_flex = NA_character_,
+    farm_id = "farm_1",
+    region = "spain", subregion = NA_character_, animal_tag = "cow",
     system_base = "Liquid/Slurry", management_months = "1-6", system_climate = "Cool",
     system_subclimate = "Temperate", climate_zone = "Temperate", system_variant = "natural crust",
     climate_moisture = "Moist", b_0 = "dairy cattle_high_productivity"
   )
   animal_meta <- data.frame(
-    region = "spain", subregion = NA_character_, animal_tag = "cow", class_flex = NA_character_,
+    farm_id = "farm_1",
+    region = "spain", subregion = NA_character_, animal_tag = "cow",
     animal_type = "cattle", animal_subtype = "dairy"
   )
 
@@ -187,7 +193,8 @@ test_that("herdr_validate_manure_systems verifies system keys, b_0 tags, and ani
 
   # 4. Species not supported for that system throws error
   incompatible_animal_meta <- data.frame(
-    region = "spain", subregion = NA_character_, animal_tag = "cow", class_flex = NA_character_,
+    farm_id = "farm_1",
+    region = "spain", subregion = NA_character_, animal_tag = "cow",
     animal_type = "poultry", animal_subtype = "broilers"
   )
   expect_error(

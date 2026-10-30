@@ -7,17 +7,17 @@ library(tibble)
 test_that("calculate_population_swine generates only existing swine tags without extra categories", {
   # Mock definitions matching standard monogastric CSV
   definitions <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~animal_type, ~animal_subtype, ~piglets_born, ~piglets_suckling,
-    "breeder_sows", "spain", NA_character_, NA_character_, "swine", NA_character_, 16.26, 13.05,
-    "boars", "spain", NA_character_, NA_character_, "swine", NA_character_, NA_real_, NA_real_,
-    "replacement_sows", "spain", NA_character_, NA_character_, "swine", NA_character_, NA_real_, NA_real_,
-    "fattening_pigs", "spain", NA_character_, NA_character_, "swine", NA_character_, NA_real_, NA_real_
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~animal_type, ~animal_subtype, ~piglets_born, ~piglets_suckling,
+    "farm_1", "breeder_sows", "spain", NA_character_, "swine", "meat", 16.26, 13.05,
+    "farm_1", "boars", "spain", NA_character_, "swine", "meat", NA_real_, NA_real_,
+    "farm_1", "replacement_sows", "spain", NA_character_, "swine", "meat", NA_real_, NA_real_,
+    "farm_1", "fattening_pigs", "spain", NA_character_, "swine", "meat", NA_real_, NA_real_
   )
 
   census_swine <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_sows", "spain", NA_character_, NA_character_, 1000,
-    "boars", "spain", NA_character_, NA_character_, 20
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_sows", "spain", NA_character_, 1000,
+    "farm_1", "boars", "spain", NA_character_, 20
   )
 
   rate_parameters <- tibble::tribble(
@@ -58,14 +58,14 @@ test_that("calculate_population_swine generates only existing swine tags without
 test_that("calculate_population_swine respects definitions if replacement_sows is not defined", {
   # Definitions WITHOUT replacement_sows
   definitions_limited <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~animal_type, ~animal_subtype, ~piglets_born, ~piglets_suckling,
-    "breeder_sows", "spain", NA_character_, NA_character_, "swine", NA_character_, 16.26, 13.05,
-    "fattening_pigs", "spain", NA_character_, NA_character_, "swine", NA_character_, NA_real_, NA_real_
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~animal_type, ~animal_subtype, ~piglets_born, ~piglets_suckling,
+    "farm_1", "breeder_sows", "spain", NA_character_, "swine", "meat", 16.26, 13.05,
+    "farm_1", "fattening_pigs", "spain", NA_character_, "swine", "meat", NA_real_, NA_real_
   )
 
   census_swine <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_sows", "spain", NA_character_, NA_character_, 500
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_sows", "spain", NA_character_, 500
   )
 
   rate_parameters <- tibble::tribble(
@@ -83,13 +83,13 @@ test_that("calculate_population_swine respects definitions if replacement_sows i
 
 test_that("calculate_population_swine handles feedlot-only swine farm gracefully", {
   definitions <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~animal_type, ~animal_subtype,
-    "fattening_pigs", "spain", NA_character_, NA_character_, "swine", NA_character_
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~animal_type, ~animal_subtype,
+    "farm_1", "fattening_pigs", "spain", NA_character_, "swine", "meat"
   )
 
   census_swine <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "fattening_pigs", "spain", NA_character_, NA_character_, 5000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "fattening_pigs", "spain", NA_character_, 5000
   )
 
   rate_parameters <- tibble::tibble(animal_tag = character(), parameter = character(), value = character())

@@ -5,8 +5,8 @@ library(tibble)
 
 test_that("calculate_population_poultry preserves broilers without generating pullets if no mature hens present", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "broilers", "spain", NA_character_, NA_character_, 20000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "broilers", "spain", NA_character_, 20000
   )
 
   rate_parameters <- tibble::tibble(
@@ -25,14 +25,15 @@ test_that("calculate_population_poultry preserves broilers without generating pu
   res <- calculate_population_poultry(census, rate_parameters, definitions)
 
   expect_equal(nrow(res), 1)
+  expect_equal(res$farm_id, "farm_1")
   expect_equal(res$animal_tag, "broilers")
   expect_equal(res$population, 20000)
 })
 
 test_that("calculate_population_poultry models breeder_meat_hens to replacement_meat_pullets", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", "north", NA_character_, 10000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", "north", 10000
   )
 
   rate_parameters <- tibble::tribble(
@@ -58,8 +59,8 @@ test_that("calculate_population_poultry models breeder_meat_hens to replacement_
 
 test_that("calculate_population_poultry models laying_hens to replacement_layer_pullets", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "laying_hens", "spain", NA_character_, NA_character_, 50000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "laying_hens", "spain", NA_character_, 50000
   )
 
   rate_parameters <- tibble::tribble(
@@ -85,9 +86,9 @@ test_that("calculate_population_poultry models laying_hens to replacement_layer_
 
 test_that("calculate_population_poultry preserves broilers in mixed farm with breeder hens", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", NA_character_, NA_character_, 10000,
-    "broilers", "spain", NA_character_, NA_character_, 30000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", NA_character_, 10000,
+    "farm_1", "broilers", "spain", NA_character_, 30000
   )
 
   rate_parameters <- tibble::tribble(
@@ -111,8 +112,8 @@ test_that("calculate_population_poultry preserves broilers in mixed farm with br
 
 test_that("calculate_population_poultry strictly respects user definitions", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", NA_character_, NA_character_, 10000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", NA_character_, 10000
   )
 
   rate_parameters <- tibble::tribble(
@@ -135,8 +136,8 @@ test_that("calculate_population_poultry strictly respects user definitions", {
 
 test_that("calculate_population_poultry automatically estimates replacement rate from laying cycle days when missing", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "laying_hens", "spain", NA_character_, NA_character_, 10000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "laying_hens", "spain", NA_character_, 10000
   )
 
   rate_parameters <- tibble::tibble(
@@ -162,8 +163,8 @@ test_that("calculate_population_poultry automatically estimates replacement rate
 
 test_that("calculate_population_poultry automatically models broilers from breeder_meat_hens when definitions include broilers", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", NA_character_, NA_character_, 10000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", NA_character_, 10000
   )
 
   rate_parameters <- tibble::tribble(
@@ -194,8 +195,8 @@ test_that("calculate_population_poultry automatically models broilers from breed
 
 test_that("calculate_population_poultry uses default fallbacks for egg_weight_g and fertility_rate when omitted", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", NA_character_, NA_character_, 5000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", NA_character_, 5000
   )
 
   rate_parameters <- tibble::tribble(
@@ -222,8 +223,8 @@ test_that("calculate_population_poultry uses default fallbacks for egg_weight_g 
 
 test_that("calculate_population_poultry accepts eggs_per_year and models broilers correctly", {
   census <- tibble::tribble(
-    ~animal_tag, ~region, ~subregion, ~class_flex, ~population,
-    "breeder_meat_hens", "spain", NA_character_, NA_character_, 10000
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_meat_hens", "spain", NA_character_, 10000
   )
 
   rate_parameters <- tibble::tribble(
@@ -248,6 +249,3 @@ test_that("calculate_population_poultry accepts eggs_per_year and models broiler
   expected_broilers <- 10000 * (211.7 / 365) * 0.83 * 42
   expect_equal(broiler_pop, expected_broilers, tolerance = 1e-2)
 })
-
-
-

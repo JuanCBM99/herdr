@@ -28,7 +28,7 @@ test_that("calculate_NEa computes activity energy correctly with test data", {
 test_that("calculate_NEa handles population mapping", {
   withr::local_dir(test_path("test_data"))
 
-  results <- calculate_NEm(saveoutput = FALSE)
+  results <- calculate_NEa(saveoutput = FALSE)
 
   # Just verify it returns a valid data frame with expected keys
   expect_true(all(c("region", "animal_tag") %in% colnames(results)))

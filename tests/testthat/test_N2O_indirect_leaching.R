@@ -31,7 +31,6 @@ test_that("calculate_N2O_indirect_leaching integrates correctly using CSV data",
     # We test the first row to ensure the conversion factor is applied
     res1 <- results[1, ]
     if(res1$N_leaching_kg_year > 0) {
-      expected_n2o <- res1$EF4 * res1$N_volatilization_kg_year * (44 / 28) # Note: Use EF5 for leaching
       # Stoichiometric check for Leaching specifically:
       expected_leach_n2o <- res1$EF5 * res1$N_leaching_kg_year * (44 / 28)
       expect_equal(res1$N2O_leach_kgyear, expected_leach_n2o, tolerance = 0.001)

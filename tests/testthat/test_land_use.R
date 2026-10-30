@@ -170,7 +170,7 @@ test_that("calculate_land_use uses Spanish forage yield as proxy fallback for ot
   )
 })
 
-test_that("calculate_land_use works with normalized diets without region/subregion/class_flex", {
+test_that("calculate_land_use works with normalized diets without region/subregion", {
   temp_test_dir <- tempfile()
   dir.create(temp_test_dir)
   file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
@@ -189,11 +189,11 @@ test_that("calculate_land_use works with normalized diets without region/subregi
   path_diet <- "user_data/diet_ingredients.csv"
   if (file.exists(path_prof) && file.exists(path_diet)) {
     read_csv(path_prof, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
       write_csv(path_prof)
 
     read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion", "class_flex"))) %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
       mutate(custom_yield_kg_ha = "5000", country_of_origin = "Spain") %>%
       write_csv(path_diet)
   }

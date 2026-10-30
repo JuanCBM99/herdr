@@ -44,7 +44,7 @@ test_that("calculate_population populates animal_type and animal_subtype even wh
   expect_true(nrow(calves) > 0)
   expect_true(all(calves$animal_type == "cattle"))
   expect_true(all(!is.na(calves$animal_subtype)))
-  expect_true(all(calves$animal_subtype %in% c("dairy", "beef", "feedlot")))
+  expect_true(all(calves$animal_subtype %in% c("dairy", "meat")))
 })
 
 test_that("calculate_population retrieves replacement rates directly from definitions", {
