@@ -99,214 +99,223 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>The <strong><code>herdr</code> Shiny application</strong> provides a
-visual environment for modeling livestock greenhouse gas (GHG)
-emissions, energy requirements, and agricultural land use.</p>
-<p>Instead of manually modifying multiple CSV files in a text editor,
-this interactive guide will walk you through how to set up, edit, and
-evaluate your livestock system using the application’s interface.</p>
+<p>The <strong><code>herdr</code> Shiny application</strong> provides an
+interactive spreadsheet and visualization environment for modeling
+livestock greenhouse gas (GHG) emissions, upstream feed LCA &amp; water
+deprivation (EF 3.1 / AWARE), energy requirements, agroecological land
+competition, and edible protein outputs.</p>
+<p>Instead of manually editing multiple CSV files in a text editor, this
+guide walks you through setting up, validating, and evaluating your
+livestock system using the graphical interface.</p>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="initializing-your-workspace">1. Initializing Your Workspace<a class="anchor" aria-label="anchor" href="#initializing-your-workspace"></a>
 </h2>
-<p>Before building your farm scenario, you need to launch the
-application and set up your baseline parameters.</p>
+<p>Before building your farm scenario, launch the application and
+configure your baseline parameters:</p>
 <ul>
 <li>
-<strong>Launch the application:</strong> Open the tool via your R
-console by running <code><a href="../reference/run_herdr_app.html">herdr::run_herdr_app()</a></code>. Alternatively,
-access the cloud-hosted version directly from your web browser at <a href="https://juancbm99.shinyapps.io/herdr/" class="external-link">juancbm99.shinyapps.io/herdr</a>.</li>
+<strong>Launch the application:</strong> Open the tool from your R
+console by running <code><a href="../reference/run_herdr_app.html">herdr::run_herdr_app()</a></code>, or access the
+cloud-hosted version at <a href="https://juancbm99.shinyapps.io/herdr/" class="external-link">juancbm99.shinyapps.io/herdr</a>.</li>
 <li>
-<strong>Establish your baseline:</strong> Navigate to the
-<strong>Step 1: Data Source</strong> panel on the sidebar. Choose to
-load a predefined package example, upload your existing CSV project
-files, or clear all data to build a new assessment entirely from
-scratch.</li>
+<strong>Establish your baseline
+(<code>Step 1: Data Source</code>):</strong> Choose to load a predefined
+package example (<code>Blank_IPCC_2019</code>,
+<code>Level1_Spain_Dairy_Cattle_2015</code>,
+<code>Level2_Spain_Dairy_Cattle_2015</code>,
+<code>Monogastric_Example</code>, <code>Video_Example</code>), upload
+your existing CSV project files, or clear all data to start from
+scratch.
+<ul>
 <li>
-<strong>Configure farm parameters:</strong> In the <strong>Step 2:
-Configuration</strong> section, specify the farm’s country location and
-the FAO reference year for trade data. Decide whether to check the
-<strong>Use automatic herd cycle</strong> box if you want the model to
-calculate replacement and offspring dynamics automatically. See the <a href="Herd_Demography.html">Herd Demography &amp; Population
-Dynamics</a> guide for the complete decision matrix.</li>
+<em>Tip:</em> Loading <strong><code>Blank_IPCC_2019</code></strong>
+provides all 42 standard ruminant and monogastric
+<code>animal_tag</code> cohorts pre-populated with their valid
+<code>animal_type</code>, <code>animal_subtype</code>,
+<code>production_role</code>, and default <code>replacement_rate</code>
+values (<code>population = 0</code>), so you only need to enter
+headcounts for the cohorts present on your farm!</li>
+</ul>
+</li>
+<li>
+<strong>Configure farm parameters
+(<code>Step 2: Configuration</code>):</strong> Specify the farm’s
+country (<code>farm_country</code>), the FAO reference year
+(<code>year</code>), and the IPCC Global Warming Potential standard
+(<code>AR6</code>, <code>AR5</code>, <code>AR4</code>, or
+<code>SAR</code>). Check <strong>Use automatic herd cycle</strong> if
+you only declare adult breeding animals in <code>Census</code> and want
+<code>herdr</code> to calculate replacement and offspring populations
+automatically (see <a href="Herd_Demography.html">Herd Demography &amp;
+Population Dynamics</a>).</li>
 </ul>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="building-your-farm-scenario">2. Building Your Farm Scenario<a class="anchor" aria-label="anchor" href="#building-your-farm-scenario"></a>
 </h2>
-<p>Navigate left-to-right through the top data tabs. Follow this
-sequence to accurately map your livestock system. <em>Note: The exact
-combination of <code>animal_tag</code>, <code>region</code>,
-<code>subregion</code>, and <code>class_flex</code> acts as a unique
-identifier for each cohort across all tables.</em></p>
+<p>Navigate left-to-right through the top tabs. Every cohort is uniquely
+identified across tables by the four keys
+<strong><code>farm_id</code></strong>,
+<strong><code>animal_tag</code></strong>,
+<strong><code>region</code></strong>, and
+<strong><code>subregion</code></strong>.</p>
 <ul>
 <li>
 <strong>Declare your herd (<code>Census</code>):</strong> Create a
-new row for each distinct animal group.
+row for each distinct animal cohort.
 <ul>
-<li>Type a clear <code>animal_tag</code> (e.g., ‘dairy_cows’).</li>
-<li>Optionally add region, subregion and/or class_flex for more specific
-definition of the group.</li>
-<li>Enter the total head count in the <code>population</code> column.
-The model strictly requires this data to calculate aggregated
-environmental impacts.</li>
+<li>Enter <code>farm_id</code> (e.g., <code>farm_1</code>),
+<code>animal_tag</code> (e.g., <code>mature_dairy_cattle</code>), and
+optionally <code>region</code> and <code>subregion</code>.</li>
+<li>Enter the Average Annual Population (AAP) in
+<code>population</code>.</li>
+<li>
+<strong>Row Order Matters:</strong> The top-to-bottom row order you
+set in <code>Census</code> is preserved in both output tables and all
+bar charts.</li>
 </ul>
 </li>
 <li>
 <strong>Structure the diets (<code>Diet Profiles</code>):</strong>
-Link your animal cohorts to a specific ration by typing a name in the
-<code>diet_tag</code> column (e.g., ‘winter_ration’). Define the
-nutritional macro-composition by allocating percentages to forage,
-concentrate, and milk/milk replacers. <strong>Ensure these fractions sum
-exactly to 100%</strong>.</li>
+Link your cohorts to a ration via <code>diet_tag</code> and define dry
+matter macro-shares (<code>forage_share</code>,
+<code>concentrate_share</code>, <code>milk_share</code>,
+<code>milk_replacer_share</code>). <strong>Ensure these four shares sum
+to 100%</strong>.</li>
 <li>
-<strong>Specify feed items (<code>Diet Ingredients</code>):</strong>
-Detail the exact crops or forages consumed by mapping them to your
-<code>diet_tag</code>.
+<strong>Specify feed items (<code>Ingredients</code>):</strong> Map
+specific feedstuffs to each <code>diet_tag</code>.
 <ul>
-<li>Add a row for each ingredient (e.g., ‘Corn silage’) and specify its
-<code>ingredient_share</code> within its ingredient_type (e.g., 100% of
-the forage fraction).</li>
-<li>Leave both the <code>custom_yield_kg_ha</code> and
-<code>country_of_origin</code> columns blank to let the model
-dynamically trace the feed using FAO trade data. To override the
-database, you can either input a specific nation in the
-<code>country_of_origin</code> column, or bypass FAO statistics entirely
-by entering an exact farm yield into the <code>custom_yield_kg_ha</code>
-column.</li>
-<li>
-<em>Note on background databases:</em> The bilateral trade database
-(<code>fao_trade_matrix.parquet</code>, ~187 MB) is downloaded
-automatically from GitHub Releases the first time an assessment requires
-trade resolution – see <a href="Technical_reference.html#fao_trade_matrix">Technical
-Reference</a>. Similarly, statutory crop yields
-(<code>fao_crops.parquet</code>, ~24 MB) are downloaded automatically to
-the central user cache when required, ensuring the core package download
-remains lightweight.</li>
+<li>Select <code>ingredient_type</code> first (<code>forage</code>,
+<code>concentrate</code>, <code>milk</code>,
+<code>milk_replacer</code>); the <code>ingredient</code> dropdown
+automatically filters to matching feeds from
+<code>Feed Char.</code>.</li>
+<li>Ensure <code>ingredient_share</code> values sum to
+<strong>100%</strong> within each <code>ingredient_type</code>.</li>
+<li>Leave <code>country_of_origin</code> and
+<code>custom_yield_kg_ha</code> blank to let <code>herdr</code> trace
+origin dynamically via FAO trade data, or override either column with
+known farm data.</li>
 </ul>
 </li>
 <li>
-<strong>Input productive traits (<code>Definitions</code> &amp;
-<code>Weights</code>):</strong> Navigate to the ruminant/monogastric
-definitions and weights tabs to enter performance metrics for your
-cohorts.
+<strong>Input productive traits (<code>Ruminants</code>,
+<code>Monogastrics</code> &amp; <code>Weights</code>):</strong>
 <ul>
 <li>
-<strong>Weights:</strong> You must provide starting, ending, and
-adult mature body weights, as well as
-<code>productive_period_days</code> (for adult breeding females except
-laying hens: the inter-parturition interval, e.g. 365 days; for laying
-hens: the commercial laying cycle duration; for all other cohorts: their
-life cycle / days on feed, e.g. 110 days for fattening pigs).</li>
+<strong>Strict Taxonomy Dropdowns:</strong> To prevent
+classification errors, <code>animal_type</code>,
+<code>animal_subtype</code>, and <code>production_role</code> use strict
+dropdowns:
+<ul>
 <li>
-<strong>Definitions:</strong> Enter species-specific yields (such as
-milk kg/year, wool, or eggs) and select the appropriate IPCC
-coefficients from the dropdown menus to accurately calculate energy
-requirements.</li>
+<strong>Ruminants (<code>cattle</code>, <code>sheep</code>,
+<code>goat</code>):</strong> <code>animal_subtype</code> must be
+<code>dairy</code> or <code>meat</code>.</li>
+<li>
+<strong>Monogastrics (<code>swine</code>,
+<code>poultry</code>):</strong> <code>animal_subtype</code>
+automatically restricts to <code>meat</code> when
+<code>animal_type</code> is <code>swine</code>, and <code>meat</code> or
+<code>layer</code> when <code>animal_type</code> is
+<code>poultry</code>.</li>
+<li>
+<strong><code>production_role</code>:</strong> Strictly
+<code>mature</code> (breeding/milking/laying adults),
+<code>replacement</code> (growing future breeders), or
+<code>slaughter</code> (growing animals for meat).</li>
 </ul>
 </li>
 <li>
-<strong>Manage waste (<code>Manure Management</code>):</strong>
-Specify how each cohort’s manure is stored and treated.
-<ul>
-<li>Use the cascading dropdowns to select valid combinations of
-<code>system_base</code> (e.g., ‘Liquid/Slurry’) and subsequent
-columns.</li>
-<li>Distribute the fraction of manure across different systems. If a
-cohort spends half the year outdoors and half indoors, create two rows
-for the same animal group and set the <code>allocation</code> to 0.5 for
-each. <strong>Ensure the total allocation for each animal group equals
-exactly 1.0</strong>.</li>
+<strong>Weights:</strong> Provide <code>adult_weight_kg</code>,
+<code>initial_weight_kg</code>, <code>final_weight_kg</code>, and
+<code>productive_period_days</code> (inter-parturition interval for
+breeding females except laying hens; commercial flock laying cycle for
+laying hens; days on feed for growing/slaughter stock).</li>
 </ul>
 </li>
+<li>
+<strong>Manage waste (<code>Manure</code>):</strong> Use the
+cascading dropdowns (<code>system_base</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>system_variant</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>management_months</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>system_climate</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>system_subclimate</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>climate_zone</code>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mo>→</mo><annotation encoding="application/x-tex">\rightarrow</annotation></semantics></math><code>climate_moisture</code>) to select valid IPCC configurations, and
+ensure <code>allocation</code> sums to <strong>1.0</strong> per
+cohort.</li>
 </ul>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="interactive-spreadsheet-features">3. Interactive Spreadsheet Features<a class="anchor" aria-label="anchor" href="#interactive-spreadsheet-features"></a>
+<h2 id="interactive-spreadsheet-pre-flight-health-checks">3. Interactive Spreadsheet &amp; Pre-Flight Health Checks<a class="anchor" aria-label="anchor" href="#interactive-spreadsheet-pre-flight-health-checks"></a>
 </h2>
-<p>While entering data, take advantage of the grid’s interactive
-features to prevent errors:</p>
 <ul>
 <li>
-<strong>Direct Editing:</strong> Click any cell to modify its
-content, similar to Excel. Alternatively, click the <strong>Add
-Record</strong> button to use a guided form with dropdowns and
-explanatory tooltips.</li>
+<strong>Direct Grid Editing &amp; Guided Modal:</strong> Edit cells
+directly like Excel, or click <strong>Add Record</strong> to use a
+guided form with tooltips.</li>
 <li>
-<strong>Unsaved Indicators:</strong> Watch for a small dot next to a
-tab title; this indicates unsaved edits are present in that table.</li>
+<strong>Column Header Tooltips:</strong> Hover over the info icon
+(<code>i</code>) next to any column header to view its definition and
+physical units, or consult the <strong>Data Dictionary</strong>
+tab.</li>
 <li>
-<strong>Validation Alerts:</strong> Pay attention to real-time
-warning banners. Red banners indicate missing cohorts (an animal
-declared in the Census lacks trait or manure data), while yellow banners
-flag unrecognized tags that do not match your Census.</li>
+<strong>Real-Time Pre-Flight Validation:</strong> Before running
+calculations, <code>herdr</code> continuously checks cohort keys, strict
+taxonomy values (<code>animal_type</code>, <code>animal_subtype</code>,
+<code>production_role</code>), IPCC coefficient compatibility, diet 100%
+sums, and manure 1.0 allocations. If any issue is detected, a badge
+appears on the tab and a <strong>Review</strong> button in the sidebar
+lets you jump straight to the table that needs attention.</li>
 </ul>
 <hr>
 </div>
 <div class="section level2">
 <h2 id="executing-and-analyzing-calculations">4. Executing and Analyzing Calculations<a class="anchor" aria-label="anchor" href="#executing-and-analyzing-calculations"></a>
 </h2>
-<p>Once your farm data is completely filled out and validated, proceed
-to calculate the impacts:</p>
 <ul>
 <li>
-<strong>Run the model:</strong> Go to the <strong>Step 3:
-Calculate</strong> panel in the sidebar. Select either a complete impact
-assessment (<code>generate_impact_assessment</code>) or a specific
-physiological module (e.g., Land Use, Enteric CH4). Click the
-<strong>Run Selected</strong> button.</li>
+<strong>Run the model (<code>Step 3: Calculate</code>):</strong>
+Select <strong>Full Assessment
+(<code>generate_impact_assessment</code>)</strong> or any individual
+physiological module and click <strong>Run Selected</strong>.</li>
 <li>
-<strong>Analyze the output:</strong> The interface will
-automatically switch to the <strong>Results</strong> tab once the
-calculation finishes:
+<strong>Explore the <code>Results</code> Tab:</strong>
 <ul>
 <li>
-<strong>Dynamic Grouping:</strong> Use the <strong>Group Chart
-By</strong> selector to aggregate visual bars by broad species category
-(<code>animal_type</code>), production subtype
-(<code>animal_subtype</code>), individual cohort
-(<code>animal_tag</code>), or administrative region
-(<code>region</code>, <code>subregion</code>,
-<code>class_flex</code>).</li>
+<strong>Group Chart By:</strong> Aggregate bars dynamically by
+<code>farm_id</code>, <code>animal_tag</code>, <code>animal_type</code>,
+<code>animal_subtype</code>, <code>region</code>, or
+<code>subregion</code>.</li>
 <li>
-<strong>Functional Unit Toggle:</strong> When evaluating a full
-assessment, choose your preferred benchmarking metric from the
-<strong>Functional Unit / Metric</strong> dropdown:
-<ul>
+<strong>Impact Category Selector:</strong> Switch between
+<strong>Carbon Footprint (GHG)</strong> (Scope 1 + Feed Fossil + Feed
+LUC), <strong>Land Use Footprint</strong> (Cropland
+vs. Convertible/Unconvertible Grassland), <strong>Water Deprivation
+(AWARE)</strong>, <strong>Multi-Impact Overview</strong> (3-panel
+comparison), and <strong>Protein Feed Efficiency (Mottet
+FCR)</strong>.</li>
 <li>
-<em>Total Emissions &amp; Land:</em> Absolute inventory (Gg CO2e and
-ha).</li>
+<strong>Functional Unit Selector:</strong> Benchmark impacts as
+<strong>Total Inventory</strong> (<code>Gg CO2e</code>, <code>ha</code>,
+<code>Mm3 depriv.</code>), <strong>Per Commercial Product</strong>
+(<code>milk</code>, <code>meat</code>, <code>egg</code>,
+<code>wool</code>), <strong>Per kg Edible Protein</strong>, or
+<strong>Per Animal Head</strong>.</li>
 <li>
-<em>Per kg Edible Protein:</em> Nutritional efficiency (kg CO2e and
-m2 per kg human edible protein).</li>
-<li>
-<em>Per Commercial Product:</em> Commercial footprint per kg FPCM
-milk, carcass meat, or fresh eggs (applying IDF 2022 Net Energy physical
-allocation for dairy herds).</li>
-<li>
-<em>Per Animal Head:</em> Annual impact per live head (kg CO2e and
-m2 per animal per year).</li>
-<li>
-<em>Protein Feed Efficiency (Mottet FCR):</em> Dual-bar comparison
-of Total Biological Protein FCR vs Cropland Protein FCR (with dashed red
-1.0 threshold line separating net food producers from competitors).</li>
-</ul>
-</li>
-<li>
-<strong>Detailed Output Table:</strong> Inspect the interactive
-preview table below the chart. In addition to GHG gas breakdowns, the
-table reports species-level feed protein efficiency and food security
-metrics (<code>feed_CP_total_kg</code>,
-<code>feed_CP_cropland_kg</code>, <code>Protein_FCR_total</code>,
-<code>Protein_FCR_cropland</code>) and complete agroecological land use
-partitioning (<code>Land_cropland_m2</code>,
-<code>Land_grassland_convertible_m2</code>,
-<code>Land_grassland_unconvertible_m2</code>,
-<code>Land_other_m2</code>). Click any column header to sort or select
-cells to copy.</li>
+<strong>Dual Output Tables (<code>Table 1: Totals</code>
+vs. <code>Table 2: Product Intensities</code>):</strong> Toggle between
+the <strong>Absolute Bio-Environmental Inventory
+(<code>totals</code>)</strong> and the <strong>Enterprise-Integrated
+Product Intensities (<code>intensities</code>)</strong> table below the
+chart (the table switches automatically when you select product,
+protein, or FCR views).</li>
 </ul>
 </li>
 </ul>
@@ -318,74 +327,20 @@ cells to copy.</li>
 <blockquote>
 <p>⚠️ <strong>Important Session Note:</strong> On the hosted web
 instance, all modifications reside temporarily in browser memory. Always
-download your files before closing or refreshing your browser tab to
-avoid losing your work.</p>
+download your files before closing or refreshing your browser tab.</p>
 </blockquote>
 <ul>
 <li>
-<strong>Extract your results:</strong> Use the download buttons in
-the results panel to save your generated charts as publication-ready PNG
-files and export the final numerical assessment as a standard CSV
-report.</li>
+<strong>Download Chart &amp; Active Table:</strong> Export
+high-resolution PNG charts (<code>300 DPI</code>) and download either
+Table 1 (<code>herdr_results_*.csv</code>) or Table 2
+(<code>herdr_product_intensities_*.csv</code>).</li>
 <li>
-<strong>Back up your session:</strong> Navigate to <strong>Step 4:
-Downloads</strong> in the sidebar and click <strong>Download Input Data
-(ZIP)</strong>. This bundles all your modified CSV tables into a
-compressed file. To resume your work, unzip this file and upload the
-CSVs using the upload button in Step 1.</li>
+<strong>Back up your session
+(<code>Step 4: Downloads</code>):</strong> Click <strong>Download Input
+Data (ZIP)</strong> to bundle all your edited CSV tables into a ZIP
+archive that you can re-upload in future sessions.</li>
 </ul>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="troubleshooting-guide">6. Troubleshooting Guide<a class="anchor" aria-label="anchor" href="#troubleshooting-guide"></a>
-</h2>
-<p>If you encounter issues during your workflow, consult this quick
-reference:</p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Issue / Alert</th>
-<th align="left">Root Cause</th>
-<th align="left">Solution</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">🔴 <strong>Red Banner: Missing Cohorts</strong>
-</td>
-<td align="left">An <code>animal_tag</code> in <code>Census</code> is
-absent from definitions, weights, or manure tables.</td>
-<td align="left">Add a matching row with identical
-<code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
-and <code>class_flex</code> keys in the required tab.</td>
-</tr>
-<tr class="even">
-<td align="left">🟡 <strong>Yellow Banner: Unrecognized
-Cohorts</strong>
-</td>
-<td align="left">A row in a definition table has no corresponding entry
-in <code>Census</code>.</td>
-<td align="left">Correct spelling typos in the tag or add the cohort to
-the Census table.</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong>Sum of Shares / Allocations Error</strong></td>
-<td align="left">Diet proportions do not sum to 100%, or manure
-allocations do not sum to 1.0.</td>
-<td align="left">Adjust the percentage values so that their sum equals
-exactly 100% (diets) or 1.0 (manure).</td>
-</tr>
-<tr class="even">
-<td align="left"><strong>Ignored CSV Upload</strong></td>
-<td align="left">The uploaded file has a modified filename.</td>
-<td align="left">Ensure filenames inside your ZIP match standard
-templates (e.g., <code>livestock_census.csv</code>).</td>
-</tr>
-</tbody>
-</table>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

@@ -102,11 +102,11 @@
 <p>This guide walks you through building and executing a complete
 livestock environmental and nutritional assessment in R from scratch
 using <strong><code>herdr</code></strong>.</p>
-<p>Whether you are modeling a single dairy farm, an intensive swine
-operation, or a national inventory across regions, following this
-structured workflow ensures full consistency across IPCC Tier 2
-greenhouse gases, agroecological land competition, and edible protein
-outputs.</p>
+<p>Whether you are modeling a single dairy farm, an intensive swine or
+poultry operation, or a national inventory across regions, following
+this structured workflow ensures full consistency across IPCC Tier 2
+greenhouse gases, upstream feed LCA &amp; water deprivation (EF 3.1 /
+AWARE), agroecological land competition, and edible protein outputs.</p>
 <hr>
 </div>
 <div class="section level2">
@@ -143,45 +143,123 @@ Background databases (<code>forages.parquet</code>,
 assets and central cache.</li>
 <li>
 <strong><code>Examples/</code></strong>: Pre-configured baseline
-datasets across species (dairy cattle, beef cattle, swine, sheep) ready
-to use as templates.</li>
+datasets (<code>Blank_IPCC_2019</code>,
+<code>Level1_Spain_Dairy_Cattle_2015</code>,
+<code>Level2_Spain_Dairy_Cattle_2015</code>,
+<code>Monogastric_Example</code>, <code>Video_Example</code>) ready to
+use as templates.</li>
 <li>
 <strong><code>output/</code></strong>: Destination directory where
-results, emission inventories, and land-use summaries are automatically
-saved.</li>
+results (<code>total_emissions_and_land_use.csv</code> and
+<code>product_intensities.csv</code>) are automatically saved.</li>
 </ul>
 <hr>
 </div>
 </div>
 <div class="section level2">
-<h2 id="project-architecture-demographic-keys">2. Project Architecture &amp; Demographic Keys<a class="anchor" aria-label="anchor" href="#project-architecture-demographic-keys"></a>
+<h2 id="project-architecture-demographic-keys-strict-taxonomy">2. Project Architecture, Demographic Keys &amp; Strict Taxonomy<a class="anchor" aria-label="anchor" href="#project-architecture-demographic-keys-strict-taxonomy"></a>
 </h2>
 <p>All data tables in <code>herdr</code> are linked using <strong>four
-standardized demographic keys</strong>:</p>
+primary demographic cohort keys</strong>:</p>
 <pre class="text"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              PRIMARY DEMOGRAPHIC COHORT KEYS                           │
-├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
-│  animal_tag     │  region      │  subregion      │  class_flex                         │
-│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
-│  e.g., "dairy"  │  e.g., spain │  e.g., galicia  │  e.g., "lactation_phase"            │
-└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘</code></pre>
+│                          PRIMARY DEMOGRAPHIC COHORT KEYS                               │
+├─────────────────┬─────────────────────────┬──────────────┬─────────────────────────────┤
+│  farm_id        │  animal_tag             │  region      │  subregion                  │
+│  (Mandatory)    │  (Mandatory)            │  (Optional)  │  (Optional)                 │
+│  e.g., "farm_1" │  e.g., "dairy_cows"     │  e.g., spain │  e.g., "north"              │
+└─────────────────┴─────────────────────────┴──────────────┴─────────────────────────────┘</code></pre>
 <blockquote>
-<p>⚠️ <strong>Critical Join Rule:</strong> Every unique combination of
-<code>animal_tag</code>, <code>region</code>, <code>subregion</code>,
-and <code>class_flex</code> declared in
-<code>livestock_census.csv</code> must match the definition, weight, and
-manure tables exactly. Identifiers are <strong>strictly
-lowercase</strong> with <strong>underscores</strong> (no spaces or
-uppercase letters).</p>
+<p>⚠️ <strong>Critical Join &amp; Ordering Rules:</strong> 1.
+<strong>Exact Key Matching:</strong> Every unique combination of
+<code>farm_id</code>, <code>animal_tag</code>, <code>region</code>, and
+<code>subregion</code> declared in <code>livestock_census.csv</code>
+must match the definition, weight, and manure tables exactly.
+Identifiers are <strong>strictly lowercase</strong> with
+<strong>underscores</strong> (no spaces or uppercase letters). 2.
+<strong>Spatial vs. Management Grouping:</strong> Together,
+<code>(farm_id, region, subregion)</code> define a physical
+farm/location. Different management phases or housing variants within
+the same farm (e.g., lactating vs. dry cows, or caged vs. free-range
+hens) should share the same <code>(farm_id, region, subregion)</code>
+and be distinguished via <code>animal_tag</code> so their enterprise
+intensities integrate properly in output tables. 3. <strong>Preserved
+Row Order:</strong> The top-to-bottom row order in
+<code>livestock_census.csv</code> is preserved in all output tables
+(<code>results$totals</code>, <code>results$intensities</code>) and bar
+charts (<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code>).</p>
 </blockquote>
+<div class="section level4">
+<h4 id="strict-taxonomy-animal_type-animal_subtype-production_role">Strict Taxonomy (<code>animal_type</code>,
+<code>animal_subtype</code>, <code>production_role</code>)<a class="anchor" aria-label="anchor" href="#strict-taxonomy-animal_type-animal_subtype-production_role"></a>
+</h4>
+<p>To guarantee unambiguous biophysical allocation and manure factor
+lookups, <code>herdr</code> enforces strict values in
+<code>ruminant_definitions.csv</code> and
+<code>monogastric_definitions.csv</code> (no legacy aliases or empty
+strings allowed):</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Table</th>
+<th align="left">
+<code>animal_type</code> (Strict)</th>
+<th align="left">
+<code>animal_subtype</code> (Strict)</th>
+<th align="left">
+<code>production_role</code> (Strict)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong><code>ruminant_definitions.csv</code></strong></td>
+<td align="left">
+<code>cattle</code>, <code>sheep</code>,
+<code>goat</code>
+</td>
+<td align="left">
+<code>dairy</code> or <code>meat</code>
+</td>
+<td align="left">
+<code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><code>monogastric_definitions.csv</code></strong></td>
+<td align="left"><code>swine</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left">
+<code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>
+</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong><code>monogastric_definitions.csv</code></strong></td>
+<td align="left"><code>poultry</code></td>
+<td align="left">
+<code>meat</code> or <code>layer</code>
+</td>
+<td align="left">
+<code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>
+</td>
+</tr>
+</tbody>
+</table>
 <hr>
+</div>
 </div>
 <div class="section level2">
 <h2 id="preparing-input-tables-user_data">3. Preparing Input Tables (<code>user_data/</code>)<a class="anchor" aria-label="anchor" href="#preparing-input-tables-user_data"></a>
 </h2>
 <p>You can edit the CSV templates located in <code>user_data/</code>
-using any spreadsheet editor (Excel, LibreOffice) or programmatically in
-R. For the full column-by-column schema, see the <a href="Technical_reference.html">Technical Data Dictionary</a>.</p>
+using any spreadsheet editor, the interactive Shiny App
+(<code><a href="../reference/run_herdr_app.html">run_herdr_app()</a></code>), or programmatically in R. For the full
+column-by-column schema, see the <a href="Technical_reference.html">Technical Data Dictionary</a>.</p>
 <div class="section level4">
 <h4 id="summary-of-required-input-tables">Summary of Required Input Tables:<a class="anchor" aria-label="anchor" href="#summary-of-required-input-tables"></a>
 </h4>
@@ -202,22 +280,34 @@ R. For the full column-by-column schema, see the <a href="Technical_reference.ht
 <tr class="odd">
 <td align="left"><strong>1. Population</strong></td>
 <td align="left"><code>livestock_census.csv</code></td>
-<td align="left">Animal head counts</td>
-<td align="left"></td>
+<td align="left">Animal head counts (AAP) &amp; display order</td>
+<td align="left">
+<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>,
+<code>population</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>2. Body Weights</strong></td>
 <td align="left"><code>livestock_weights.csv</code></td>
 <td align="left">Weight boundaries &amp; cycle lengths</td>
-<td align="left"></td>
+<td align="left">
+<code>adult_weight_kg</code>,
+<code>productive_period_days</code>, <code>initial_weight_kg</code>,
+<code>final_weight_kg</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>3. Definitions</strong></td>
 <td align="left">
 <code>ruminant_definitions.csv</code> <br><code>monogastric_definitions.csv</code>
 </td>
-<td align="left">Species traits &amp; milk/egg targets</td>
-<td align="left"></td>
+<td align="left">Species taxonomy, IPCC/FEDNA traits &amp; yields</td>
+<td align="left">
+<code>animal_type</code>, <code>animal_subtype</code>,
+<code>production_role</code>, <code>diet_tag</code>,
+<code>replacement_rate</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong>4. Feeding Rations</strong></td>
@@ -225,13 +315,21 @@ R. For the full column-by-column schema, see the <a href="Technical_reference.ht
 <code>diet_profiles.csv</code> <br><code>diet_ingredients.csv</code>
 </td>
 <td align="left">Macro shares &amp; micro feedstuffs</td>
-<td align="left"></td>
+<td align="left">
+<code>forage_share</code>,
+<code>concentrate_share</code>, <code>ingredient</code>,
+<code>ingredient_share</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>5. Manure Systems</strong></td>
 <td align="left"><code>manure_management.csv</code></td>
 <td align="left">Housing, storage &amp; pasture shares</td>
-<td align="left"></td>
+<td align="left">
+<code>system_base</code>, <code>system_variant</code>,
+<code>system_climate</code>, <code>b_0</code>,
+<code>allocation</code>
+</td>
 </tr>
 </tbody>
 </table>
@@ -242,10 +340,11 @@ R. For the full column-by-column schema, see the <a href="Technical_reference.ht
 <ol style="list-style-type: decimal">
 <li>
 <strong>Diet Proportions:</strong> In
-<code>diet_profiles.csv</code>, forage + concentrate + milk +
-milk_replacer must sum to <strong>100%</strong>. In
-<code>diet_ingredients.csv</code>, ingredient shares must sum to
-<strong>100%</strong> within each category.</li>
+<code>diet_profiles.csv</code>,
+<code>forage_share + concentrate_share + milk_share + milk_replacer_share</code>
+must sum to <strong>100%</strong>. In <code>diet_ingredients.csv</code>,
+<code>ingredient_share</code> values must sum to <strong>100%</strong>
+within each active category.</li>
 <li>
 <strong>Manure Allocations:</strong> In
 <code>manure_management.csv</code>, the sum of <code>allocation</code>
@@ -262,11 +361,25 @@ for each unique cohort must equal exactly <strong>1.0</strong>
 <h3 id="consolidated-pipeline-generate_impact_assessment">4.1. Consolidated Pipeline
 (<code>generate_impact_assessment</code>)<a class="anchor" aria-label="anchor" href="#consolidated-pipeline-generate_impact_assessment"></a>
 </h3>
-<p>The fastest and most reliable way to run the model is
+<p>The fastest and most complete way to run the model is
 <code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>. It executes the entire
 upstream chain (energy balance, DMI, enteric fermentation, manure
-management, land use, and GLEAM production) and compiles multi-metric
-outputs in one call:</p>
+management, upstream feed LCA &amp; water deprivation, agroecological
+land use, and GLEAM production) and returns a <strong>named list with
+two dataframes</strong>:</p>
+<ul>
+<li>
+<strong><code>results$totals</code></strong> (saved to
+<code>output/total_emissions_and_land_use.csv</code>): <strong>Table 1 —
+Absolute Bio-Environmental Inventory &amp; Per-Head Metrics</strong> for
+every cohort.</li>
+<li>
+<strong><code>results$intensities</code></strong> (saved to
+<code>output/product_intensities.csv</code>): <strong>Table 2 —
+Enterprise-Integrated Commercial &amp; Nutritional Intensities</strong>
+across milk, meat, eggs, wool, edible protein, and Mottet (2017) Protein
+FCRs.</li>
+</ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
@@ -279,42 +392,70 @@ outputs in one call:</p>
 <span>  saveoutput      <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Preview generated summary table</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># Inspect Table 1: Absolute cohort inventory &amp; per-head footprints</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">totals</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect Table 2: Enterprise-integrated product &amp; protein intensities</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span><span class="op">)</span></span></code></pre></div>
 <div class="section level4">
-<h4 id="key-output-metrics-returned">Key Output Metrics Returned:<a class="anchor" aria-label="anchor" href="#key-output-metrics-returned"></a>
+<h4 id="how-table-1-totals-and-table-2-intensities-work-together">How Table 1 (<code>totals</code>) and Table 2
+(<code>intensities</code>) Work Together:<a class="anchor" aria-label="anchor" href="#how-table-1-totals-and-table-2-intensities-work-together"></a>
 </h4>
-<ul>
-<li>
-<strong>Greenhouse Gas Emissions (Gg CO2e):</strong>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Output Table</th>
+<th align="left">Scope &amp; Purpose</th>
+<th align="left">Key Columns</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong>Table 1
+(<code>results$totals</code>)</strong></td>
+<td align="left">
+<strong>Direct Cohort Inventory:</strong> Reports the
+exact direct emissions, feed intake, land use, water deprivation, and
+per-head footprint of each individual cohort (<code>mature</code>,
+<code>replacement</code>, <code>slaughter</code>).</td>
+<td align="left">
 <code>CO2eq_enteric</code>, <code>CO2eq_manure</code>,
-<code>CO2eq_N2O_direct</code>, <code>CO2eq_N2O_indirect</code>, and
-<code>CO2eq_Total_Gg</code>.</li>
-<li>
-<strong>Agroecological Land Footprint (m2):</strong>
+<code>CO2eq_N2O_direct</code>, <code>CO2eq_N2O_indirect</code>,
+<code>CO2eq_feed_fossil_Gg</code>, <code>CO2eq_feed_luc_Gg</code>,
+<code>CO2eq_Total_Gg</code>, <code>CO2eq_cradle_to_farm_Gg</code>,
 <code>Land_cropland_m2</code>,
 <code>Land_grassland_convertible_m2</code>,
-<code>Land_grassland_unconvertible_m2</code>,
-<code>Land_other_m2</code>, and <code>Land_m2</code>.</li>
-<li>
-<strong>Physical &amp; Edible Protein Production:</strong>
-<code>milk_FPCM_kg</code>, <code>meat_carcass_weight_kg</code>,
-<code>egg_fresh_kg</code>, <code>wool_kg</code>, and
-<code>total_protein_kg</code>.</li>
-<li>
-<strong>Protein Feed Conversion &amp; Food Security (Mottet et
-al. 2017):</strong> <code>Protein_FCR_total</code> (total CP intake /
-edible protein) and <code>Protein_FCR_cropland</code> (cropland CP
-intake / edible protein).</li>
-<li>
-<strong>Intensities across Functional Units:</strong>
-<code>GHG_intensity_protein</code>, <code>Land_intensity_protein</code>,
-product-specific intensities (<code>GHG_intensity_milk</code>,
-<code>GHG_intensity_meat</code>, <code>GHG_intensity_wool</code>,
-<code>GHG_intensity_egg</code> and their respective land footprints),
-<code>GHG_intensity_head</code>, and
-<code>Land_intensity_head</code>.</li>
-</ul>
+<code>Land_grassland_unconvertible_m2</code>, <code>Land_m2</code>,
+<code>Water_feed_m3</code>, <code>CO2eq_Total_head</code>,
+<code>CO2eq_cradle_to_farm_head</code>, <code>Land_head</code>,
+<code>Water_head</code>
+</td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Table 2
+(<code>results$intensities</code>)</strong></td>
+<td align="left">
+<strong>Enterprise-Integrated Intensities:</strong>
+Groups cohorts by enterprise
+<code>(farm_id, region, subregion, animal_type, animal_subtype)</code>
+and attributes non-commercial rearing/breeding overhead
+(<code>replacement</code> and <code>mature</code> breeders) to
+commercial outputs (<code>milk</code>, <code>meat</code>,
+<code>egg</code>, <code>wool</code>, <code>protein</code>).</td>
+<td align="left">
+<code>milk_FPCM_kg</code>,
+<code>meat_carcass_weight_kg</code>, <code>egg_fresh_kg</code>,
+<code>wool_kg</code>, <code>total_protein_kg</code>,
+<code>GHG_intensity_*</code>, <code>GHG_cradle_to_farm_*</code>,
+<code>Land_intensity_*</code>, <code>Water_intensity_*</code>,
+<code>Protein_FCR_total</code>, <code>Protein_FCR_cropland</code>
+</td>
+</tr>
+</tbody>
+</table>
 <hr>
 </div>
 </div>
@@ -330,25 +471,30 @@ individual modules sequentially:</p>
 <span><span class="co"># 2. Weighted Nutritional Diet Characteristics</span></span>
 <span><span class="va">feed_vars</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Gross Energy Intake (GE)</span></span>
+<span><span class="co"># 3. Gross Energy Intake (GE) &amp; Monogastric Metabolizable Energy (ME)</span></span>
 <span><span class="va">ge_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_ge.html">calculate_ge</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">mono_me</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_monogastric_energy.html">calculate_monogastric_energy</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 4. Dry Matter Intake (DMI)</span></span>
+<span><span class="co"># 4. Dry Matter Intake (DMI) &amp; Volatile Solids (VS)</span></span>
 <span><span class="va">dmi_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_DMI.html">calculate_DMI</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">vs_data</span>  <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_vs.html">calculate_vs</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5. Enteric Methane Emissions (CH4)</span></span>
 <span><span class="va">enteric_emiss</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_emissions_enteric.html">calculate_emissions_enteric</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 6. Manure Methane &amp; Nitrous Oxide (CH4, Direct &amp; Indirect N2O)</span></span>
-<span><span class="va">manure_ch4</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_CH4_manure.html">calculate_CH4_manure</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">manure_ch4</span>     <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_CH4_manure.html">calculate_CH4_manure</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">manure_n2o_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_N2O_direct_manure.html">calculate_N2O_direct_manure</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">manure_n2o_vol</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_N2O_indirect_volatilization.html">calculate_N2O_indirect_volatilization</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="va">manure_n2o_lea</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_N2O_indirect_leaching.html">calculate_N2O_indirect_leaching</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 7. Feed Land Use Footprint &amp; FAO Trade Origin</span></span>
+<span><span class="co"># 7. Upstream Feed LCA (Fossil vs LUC CO2e) &amp; AWARE Water Deprivation</span></span>
+<span><span class="va">feed_lca</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_feed_emissions.html">calculate_feed_emissions</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 8. Feed Land Use Footprint &amp; FAO Trade Origin</span></span>
 <span><span class="va">land_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_land_use.html">calculate_land_use</a></span><span class="op">(</span>farm_country <span class="op">=</span> <span class="st">"Spain"</span>, year <span class="op">=</span> <span class="fl">2024</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 8. Animal Productivity &amp; Edible Human Protein (GLEAM)</span></span>
+<span><span class="co"># 9. Animal Productivity &amp; Edible Human Protein (GLEAM)</span></span>
 <span><span class="va">prod_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/calculate_production.html">calculate_production</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -356,58 +502,67 @@ individual modules sequentially:</p>
 <div class="section level2">
 <h2 id="visualizing-benchmarking-results">5. Visualizing &amp; Benchmarking Results<a class="anchor" aria-label="anchor" href="#visualizing-benchmarking-results"></a>
 </h2>
-<p>Use <code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> to generate publication-ready
-stacked ggplot2 charts. The function allows dynamic aggregation across
-any demographic or species grouping, and supports <strong>five
-standardized functional units</strong>:</p>
+<p>Pass <code>results</code> directly to
+<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> to generate publication-ready stacked
+<code>ggplot2</code> charts. You can combine any
+<strong><code>impact_category</code></strong> (<code>"ghg"</code>,
+<code>"land"</code>, <code>"water"</code>, <code>"overview"</code>,
+<code>"fcr"</code>) with any
+<strong><code>functional_unit</code></strong> (<code>"total"</code>,
+<code>"product"</code>, <code>"milk"</code>, <code>"meat"</code>,
+<code>"egg"</code>, <code>"wool"</code>, <code>"protein"</code>,
+<code>"head"</code>, <code>"fcr"</code>):</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 1. Absolute whole-inventory footprint (Gg CO2e and ha)</span></span>
-<span><span class="va">p_total</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="co"># 1. Multi-Impact Overview (Carbon, Land, and Water panels side by side)</span></span>
+<span><span class="va">p_overview</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"region"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"overview"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"total"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Commercial product intensity (kg CO2e and m2 per kg milk, carcass meat, or eggs)</span></span>
-<span><span class="co"># Applying IDF Bulletin 520/2022 physical Net Energy allocation for dairy herds</span></span>
-<span><span class="va">p_product</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span><span class="co"># 2. Carbon Footprint per kg Commercial Product (Scope 1 + Feed Fossil + Feed LUC)</span></span>
+<span><span class="va">p_product_ghg</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"animal_subtype"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"product"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Nutritional edible protein intensity (kg CO2e and m2 per kg human protein)</span></span>
-<span><span class="va">p_protein</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span><span class="co"># 3. Agroecological Land Footprint per kg Edible Protein (m2 / kg human protein)</span></span>
+<span><span class="va">p_protein_land</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_tag"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"land"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"protein"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 4. Per animal head footprint (kg CO2e and m2 per head per year)</span></span>
-<span><span class="va">p_head</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span><span class="co"># 4. AWARE Water Deprivation per Animal Head (m3 depriv. / head / year)</span></span>
+<span><span class="va">p_head_water</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"water"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"head"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 5. Protein Feed Conversion &amp; Human Food Competition (Mottet et al. 2017)</span></span>
-<span><span class="co"># Renders dual bars: Biological FCR vs Cropland FCR with a 1.0 food producer threshold line</span></span>
 <span><span class="va">p_fcr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"animal_subtype"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"fcr"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"fcr"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Display chart</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p_product</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p_product_ghg</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Export chart to disk</span></span>
-<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"output/product_intensity_chart.png"</span>, plot <span class="op">=</span> <span class="va">p_product</span>, width <span class="op">=</span> <span class="fl">10</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
+<span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggsave.html" class="external-link">ggsave</a></span><span class="op">(</span><span class="st">"output/product_intensity_chart.png"</span>, plot <span class="op">=</span> <span class="va">p_product_ghg</span>, width <span class="op">=</span> <span class="fl">10</span>, height <span class="op">=</span> <span class="fl">6</span>, dpi <span class="op">=</span> <span class="fl">300</span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
 <div class="section level2">
@@ -426,29 +581,41 @@ standardized functional units</strong>:</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><strong>Missing Cohorts Warning</strong></td>
+<td align="left"><strong>Missing Cohorts Error</strong></td>
 <td align="left">An <code>animal_tag</code> in Census is missing in
 definitions, weights, or manure tables.</td>
-<td align="left">Ensure all four keys (<code>animal_tag</code>,
-<code>region</code>, <code>subregion</code>, <code>class_flex</code>)
+<td align="left">Ensure all 4 keys (<code>farm_id</code>,
+<code>animal_tag</code>, <code>region</code>, <code>subregion</code>)
 match across all input tables.</td>
 </tr>
 <tr class="even">
+<td align="left"><strong>Invalid <code>animal_subtype</code> or
+<code>production_role</code></strong></td>
+<td align="left">A non-standard value (e.g. <code>beef</code>,
+<code>other</code>, or blank) was entered in definitions.</td>
+<td align="left">Use strictly <code>dairy</code> or <code>meat</code>
+for ruminants, <code>meat</code> for swine, <code>meat</code> or
+<code>layer</code> for poultry, and <code>mature</code>,
+<code>replacement</code>, or <code>slaughter</code> for
+<code>production_role</code>.</td>
+</tr>
+<tr class="odd">
 <td align="left"><strong>Shares do not sum to 100%</strong></td>
 <td align="left">Diet category or ingredient proportions do not sum to
 100.</td>
 <td align="left">Adjust <code>forage_share</code>,
 <code>concentrate_share</code>, etc. in <code>diet_profiles.csv</code>,
-or ingredient shares in <code>diet_ingredients.csv</code>.</td>
+or <code>ingredient_share</code> in
+<code>diet_ingredients.csv</code>.</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><strong>Manure allocation != 1.0</strong></td>
 <td align="left">Allocations for a cohort do not sum to 1.0.</td>
 <td align="left">Adjust <code>allocation</code> values in
 <code>manure_management.csv</code> so their sum equals exactly 1.0 per
 cohort.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><strong>Unknown Ingredient</strong></td>
 <td align="left">An ingredient in diets is missing in reference
 libraries.</td>
@@ -476,7 +643,8 @@ Dynamics</a> — reproductive cycles, AAP rules, and automatic
 closures.</li>
 <li>
 <a href="Theoretical_basis.html">Theoretical Basis</a> — complete
-mathematical formulation (IPCC Tier 2, GLEAM, and IDF 2022).</li>
+mathematical formulation (IPCC Tier 2, GLEAM, IDF 2022, and Enterprise
+Attribution).</li>
 </ul>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

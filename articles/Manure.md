@@ -14,7 +14,7 @@ assign emission factors.
 This guide provides the complete decision matrix of valid paths for your
 `manure_management.csv`. For the mathematical emission equations, see
 the [Theoretical
-Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide).
+Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html#iii-methane-module).
 
 ------------------------------------------------------------------------
 
@@ -22,9 +22,9 @@ Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html#iv-manu
 
 #### Rule 1: Allocation Must Equal Exactly 1.0 per Cohort
 
-For each unique animal cohort (defined by `animal_tag`, `region`,
-`subregion`, and `class_flex`), the sum of the `allocation` column
-across all assigned manure systems must equal **1.0** (100%):
+For each unique animal cohort (defined by `animal_tag`, `region`, and
+`subregion`), the sum of the `allocation` column across all assigned
+manure systems must equal **1.0** (100%):
 
 ``` math
 \sum \text{allocation} = 1.0
@@ -122,6 +122,6 @@ those columns blank.
   Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
   how manure calculations integrate into the modeling pipeline.
 - [Theoretical
-  Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide)
+  Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.html#iii-methane-module)
   — full mathematical equations for $`VS`$, $`B_0`$, $`MCF`$, $`EF_3`$,
   $`EF_4`$, and $`EF_5`$.

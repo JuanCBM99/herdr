@@ -703,6 +703,11 @@ gain in kcal/day.</em></p>
 </h4>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi><mo>=</mo><mfrac><mrow><mi>G</mi><mi>E</mi><mo>⋅</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><msub><mi>Y</mi><mi>m</mi></msub><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>⋅</mo><mn>365</mn></mrow><mn>55.65</mn></mfrac></mrow><annotation encoding="application/x-tex">EF = \frac{GE \cdot \left( \frac{Y_m}{100} \right) \cdot 365}{55.65}</annotation></semantics></math></p>
 <table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">Variable</th>
 <th align="left">Description</th>
@@ -723,7 +728,7 @@ gain in kcal/day.</em></p>
 <tr class="odd">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math></td>
 <td align="left">Methane conversion factor (%)</td>
-<td align="left"><code>feed_characteristics.csv</code></td>
+<td align="left">Calculated from diet NDF &amp; DE</td>
 </tr>
 </tbody>
 </table>
@@ -768,17 +773,11 @@ gain in kcal/day.</em></p>
 <h4 id="swine-enteric-fermentation-ipcc-2019-refinement-table-10-10">Swine Enteric Fermentation (IPCC 2019 Refinement Table 10.10)<a class="anchor" aria-label="anchor" href="#swine-enteric-fermentation-ipcc-2019-refinement-table-10-10"></a>
 </h4>
 <p>For swine, enteric methane emissions are estimated using the IPCC
-Tier 1 methodology with metabolic liveweight scaling relative to the
-standard reference market pig (72 kg):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mtext mathvariant="normal">swine</mtext></msub><mo>=</mo><mn>1.5</mn><mo>×</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>L</mi><mi>i</mi><mi>v</mi><mi>e</mi><mi>W</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi></mrow><mn>72</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>0.75</mn></msup></mrow><annotation encoding="application/x-tex">EF_{\text{swine}} = 1.5 \times \left( \frac{LiveWeight}{72} \right)^{0.75}</annotation></semantics></math></p>
-<p>Where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">EF</annotation></semantics></math>
-is in kg
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">CH_4</annotation></semantics></math>/head/year,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1.5</mn><annotation encoding="application/x-tex">1.5</annotation></semantics></math>
-is the baseline IPCC emission factor for market swine, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>i</mi><mi>v</mi><mi>e</mi><mi>W</mi><mi>e</mi><mi>i</mi><mi>g</mi><mi>h</mi><mi>t</mi></mrow><annotation encoding="application/x-tex">LiveWeight</annotation></semantics></math>
-(kg) is derived from <code>livestock_weights.csv</code>.</p>
+Tier 1 methodology for high-productivity systems (IPCC 2019 Refinement,
+Vol. 4, Ch. 10, Table 10.10 and Eq. 10.19):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mtext mathvariant="normal">swine</mtext></msub><mo>=</mo><mn>1.5</mn><mspace width="0.278em"></mspace><mrow><mtext mathvariant="normal">kg </mtext><mspace width="0.333em"></mspace></mrow><mi>C</mi><msub><mi>H</mi><mn>4</mn></msub><mi>/</mi><mtext mathvariant="normal">head</mtext><mi>/</mi><mtext mathvariant="normal">year</mtext></mrow><annotation encoding="application/x-tex">EF_{\text{swine}} = 1.5 \; \text{kg } CH_4 / \text{head} / \text{year}</annotation></semantics></math></p>
+<p>For poultry, enteric fermentation emissions are negligible
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mtext mathvariant="normal">poultry</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">EF_{\text{poultry}} = 0</annotation></semantics></math>).</p>
 <hr>
 </div>
 </div>
@@ -975,228 +974,40 @@ being excreted.</p>
 <div class="section level5">
 <h5 id="cattle">Cattle<a class="anchor" aria-label="anchor" href="#cattle"></a>
 </h5>
-<p>Milk protein concentration is estimated as:</p>
+<p>Milk protein concentration is taken from
+<code>protein_content_pct</code> in
+<code>ruminant_definitions.csv</code>, or estimated via IPCC regression
+if omitted:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>i</mi><mi>l</mi><msub><mi>k</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>t</mi><mi>e</mi><mi>i</mi><mi>n</mi></mrow></msub><mo>=</mo><mn>1.9</mn><mo>+</mo><mn>0.4</mn><mo>×</mo><mi>F</mi><mi>a</mi><msub><mi>t</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Milk_{protein} = 1.9 + 0.4 \times Fat_{content}</annotation></semantics></math></p>
 <p>For lactating and growing animals:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mfrac><mrow><mi>M</mi><mi>i</mi><mi>l</mi><mi>k</mi><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mi>M</mi><mi>i</mi><mi>l</mi><msub><mi>k</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>t</mi><mi>e</mi><mi>i</mi><mi>n</mi></mrow></msub><mi>/</mi><mn>100</mn><mo stretchy="false" form="postfix">)</mo></mrow><mn>6.38</mn></mfrac><mo>+</mo><mfrac><mrow><mi>W</mi><mi>G</mi><mrow><mo stretchy="true" form="prefix">(</mo><mn>268</mn><mo>−</mo><mfrac><mrow><mn>7.03</mn><mo>×</mo><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub></mrow><mrow><mi>W</mi><mi>G</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mi>/</mi><mn>1000</mn></mrow><mn>6.25</mn></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = \frac{Milk \times (Milk_{protein}/100)}{6.38} + \frac{WG \left(268-\frac{7.03 \times NE_g}{WG}\right)/1000}{6.25}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">N_{retention}</annotation></semantics></math></td>
-<td align="left">Daily nitrogen retained (kg N/head/day)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>i</mi><mi>l</mi><mi>k</mi></mrow><annotation encoding="application/x-tex">Milk</annotation></semantics></math></td>
-<td align="left">Daily milk yield (kg/day)</td>
-<td align="left"><code>ruminant_definitions.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><mi>i</mi><mi>l</mi><msub><mi>k</mi><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>t</mi><mi>e</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Milk_{protein}</annotation></semantics></math></td>
-<td align="left">Estimated milk protein concentration (%)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>a</mi><msub><mi>t</mi><mrow><mi>c</mi><mi>o</mi><mi>n</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Fat_{content}</annotation></semantics></math></td>
-<td align="left">Milk fat content (%)</td>
-<td align="left"><code>ruminant_definitions.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">WG</annotation></semantics></math></td>
-<td align="left">Daily body weight gain (kg/day)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub></mrow><annotation encoding="application/x-tex">NE_g</annotation></semantics></math></td>
-<td align="left">Net energy for growth (MJ/day)</td>
-<td align="left">Calculated</td>
-</tr>
-</tbody>
-</table>
-<p><em>For mature lactating animals, only the milk term is considered.
-For growing animals, only the growth term is considered.</em></p>
 </div>
 <div class="section level5">
 <h5 id="sheep-and-goats">Sheep and Goats<a class="anchor" aria-label="anchor" href="#sheep-and-goats"></a>
 </h5>
 <p>Following the IPCC Tier 2 methodology, nitrogen retention is assumed
-to be a constant value:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mn>0.1</mn></mrow><annotation encoding="application/x-tex">N_{retention} = 0.1</annotation></semantics></math></p>
+to be a constant fraction of nitrogen intake
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>0.10</mn><annotation encoding="application/x-tex">0.10</annotation></semantics></math>).</p>
 </div>
 <div class="section level5">
 <h5 id="poultry-1">Poultry<a class="anchor" aria-label="anchor" href="#poultry-1"></a>
 </h5>
 <p>For growing birds:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>−</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mn>0.028</mn></mrow><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = \frac{(BW_{final} - BW_{initial}) \times 0.028}{Days}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">BW_{final}</annotation></semantics></math></td>
-<td align="left">Final body weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">BW_{initial}</annotation></semantics></math></td>
-<td align="left">Initial body weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Days</annotation></semantics></math></td>
-<td align="left">Life-stage feeding duration / cycle
-(<code>productive_period_days</code>)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-</tbody>
-</table>
 <p>For laying hens:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mn>0.028</mn><mo>×</mo><mi>W</mi><mi>G</mi><mo>+</mo><mfrac><mrow><mn>0.0185</mn><mo>×</mo><mi>E</mi><mi>g</mi><msub><mi>g</mi><mrow><mi>m</mi><mi>a</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow><mn>1000</mn></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = 0.028 \times WG + \frac{0.0185 \times Egg_{mass}}{1000}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>G</mi></mrow><annotation encoding="application/x-tex">WG</annotation></semantics></math></td>
-<td align="left">Daily body weight gain (kg/day)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>g</mi><msub><mi>g</mi><mrow><mi>m</mi><mi>a</mi><mi>s</mi><mi>s</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Egg_{mass}</annotation></semantics></math></td>
-<td align="left">Daily egg mass production (g/day)</td>
-<td align="left"><code>monogastric_definitions.csv</code></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level5">
 <h5 id="swine-1">Swine<a class="anchor" aria-label="anchor" href="#swine-1"></a>
 </h5>
 <p>For growing pigs:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mfrac><mrow><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>−</mo><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msub><mi>N</mi><mrow><mi>g</mi><mi>a</mi><mi>i</mi><mi>n</mi></mrow></msub></mrow><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = \frac{(BW_{final} - BW_{initial}) \times N_{gain}}{Days}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><msub><mi>W</mi><mrow><mi>f</mi><mi>i</mi><mi>n</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">BW_{final}</annotation></semantics></math></td>
-<td align="left">Final body weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><msub><mi>W</mi><mrow><mi>i</mi><mi>n</mi><mi>i</mi><mi>t</mi><mi>i</mi><mi>a</mi><mi>l</mi></mrow></msub></mrow><annotation encoding="application/x-tex">BW_{initial}</annotation></semantics></math></td>
-<td align="left">Initial body weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>a</mi><mi>y</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Days</annotation></semantics></math></td>
-<td align="left">Life-stage feeding duration / cycle
-(<code>productive_period_days</code>)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>g</mi><mi>a</mi><mi>i</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">N_{gain}</annotation></semantics></math></td>
-<td align="left">Nitrogen retention coefficient according to final body
-weight</td>
-<td align="left">IPCC (2019)</td>
-</tr>
-</tbody>
-</table>
 <p>For breeding sows:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>=</mo><mfrac><mrow><msub><mi>N</mi><mrow><mi>g</mi><mi>a</mi><mi>i</mi><mi>n</mi><mo>,</mo><mi>s</mi><mi>o</mi><mi>w</mi></mrow></msub><mo>+</mo><msub><mi>N</mi><mrow><mi>w</mi><mi>e</mi><mi>a</mi><mi>n</mi><mi>e</mi><mi>d</mi></mrow></msub></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">N_{retention} = \frac{N_{gain,sow} + N_{weaned}}{365}</annotation></semantics></math></p>
 <p>with</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>g</mi><mi>a</mi><mi>i</mi><mi>n</mi><mo>,</mo><mi>s</mi><mi>o</mi><mi>w</mi></mrow></msub><mo>=</mo><mn>0.025</mn><mo>×</mo><mi>F</mi><mi>R</mi><mo>×</mo><msub><mi>S</mi><mrow><mi>k</mi><mi>g</mi></mrow></msub></mrow><annotation encoding="application/x-tex">N_{gain,sow} = 0.025 \times FR \times S_{kg}</annotation></semantics></math></p>
 <p>and</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>w</mi><mi>e</mi><mi>a</mi><mi>n</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>=</mo><mfrac><mrow><mn>0.025</mn><mo>×</mo><mi>P</mi><mi>i</mi><mi>g</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>s</mi><mo>×</mo><mi>F</mi><mi>R</mi><mo>×</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>W</mi><mrow><mi>w</mi><mi>e</mi><mi>a</mi><mi>n</mi><mi>i</mi><mi>n</mi><mi>g</mi></mrow></msub><mo>−</mo><msub><mi>W</mi><mrow><mi>b</mi><mi>i</mi><mi>r</mi><mi>t</mi><mi>h</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><mn>0.98</mn></mfrac></mrow><annotation encoding="application/x-tex">N_{weaned} = \frac{0.025 \times Piglets \times FR \times (W_{weaning} - W_{birth})}{0.98}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>g</mi><mi>a</mi><mi>i</mi><mi>n</mi><mo>,</mo><mi>s</mi><mi>o</mi><mi>w</mi></mrow></msub><annotation encoding="application/x-tex">N_{gain,sow}</annotation></semantics></math></td>
-<td align="left">Annual nitrogen retained in sow body tissues (kg
-N/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>w</mi><mi>e</mi><mi>a</mi><mi>n</mi><mi>e</mi><mi>d</mi></mrow></msub><annotation encoding="application/x-tex">N_{weaned}</annotation></semantics></math></td>
-<td align="left">Annual nitrogen retained in weaned piglets (kg
-N/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>R</mi></mrow><annotation encoding="application/x-tex">FR</annotation></semantics></math></td>
-<td align="left">Annual farrowing rate
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>,
-where <code>productive_period_days</code> is the farrowing
-interval)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>S</mi><mrow><mi>k</mi><mi>g</mi></mrow></msub><annotation encoding="application/x-tex">S_{kg}</annotation></semantics></math></td>
-<td align="left">Sow body weight change between consecutive parturitions
-(kg/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mi>i</mi><mi>g</mi><mi>l</mi><mi>e</mi><mi>t</mi><mi>s</mi></mrow><annotation encoding="application/x-tex">Piglets</annotation></semantics></math></td>
-<td align="left">Number of piglets born per litter</td>
-<td align="left"><code>monogastric_definitions.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>w</mi><mi>e</mi><mi>a</mi><mi>n</mi><mi>i</mi><mi>n</mi><mi>g</mi></mrow></msub><annotation encoding="application/x-tex">W_{weaning}</annotation></semantics></math></td>
-<td align="left">Piglet weaning weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>W</mi><mrow><mi>b</mi><mi>i</mi><mi>r</mi><mi>t</mi><mi>h</mi></mrow></msub><annotation encoding="application/x-tex">W_{birth}</annotation></semantics></math></td>
-<td align="left">Piglet birth weight (kg)</td>
-<td align="left"><code>livestock_weights.csv</code></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 </div>
@@ -1210,35 +1021,6 @@ excretion is calculated as:</p>
 <p>For <strong>sheep and goats</strong>, the IPCC assumes a fixed
 nitrogen retention fraction of 10%:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>=</mo><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><mo>×</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mn>0.1</mn><mo stretchy="false" form="postfix">)</mo><mo>×</mo><mn>365</mn></mrow><annotation encoding="application/x-tex">N_{excreted} = N_{intake} \times (1 - 0.1) \times 365</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><annotation encoding="application/x-tex">N_{excreted}</annotation></semantics></math></td>
-<td align="left">Annual nitrogen excreted (kg N/head/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>i</mi><mi>n</mi><mi>t</mi><mi>a</mi><mi>k</mi><mi>e</mi></mrow></msub><annotation encoding="application/x-tex">N_{intake}</annotation></semantics></math></td>
-<td align="left">Daily nitrogen intake (kg N/head/day)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><annotation encoding="application/x-tex">N_{retention}</annotation></semantics></math></td>
-<td align="left">Daily nitrogen retained (kg N/head/day)</td>
-<td align="left">Calculated</td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 <div class="section level4">
@@ -1249,41 +1031,6 @@ Emissions<a class="anchor" aria-label="anchor" href="#direct-n_2o-emissions"></a
 <p>Direct nitrous oxide emissions from manure management are calculated
 following IPCC (2019, Eq. 10.25):</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><msub><mi>O</mi><mrow><mi>d</mi><mi>i</mi><mi>r</mi><mi>e</mi><mi>c</mi><mi>t</mi></mrow></msub><mo>=</mo><mi>P</mi><mi>o</mi><mi>p</mi><mi>u</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>×</mo><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><mo>×</mo><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>×</mo><mi>E</mi><msub><mi>F</mi><mn>3</mn></msub><mo>×</mo><mfrac><mn>44</mn><mn>28</mn></mfrac></mrow><annotation encoding="application/x-tex">N_2O_{direct} = Population \times N_{excreted} \times Allocation \times EF_3 \times \frac{44}{28}</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>P</mi><mi>o</mi><mi>p</mi><mi>u</mi><mi>l</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Population</annotation></semantics></math></td>
-<td align="left">Number of animals</td>
-<td align="left"><code>livestock_census.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi><mi>c</mi><mi>r</mi><mi>e</mi><mi>t</mi><mi>e</mi><mi>d</mi></mrow></msub><annotation encoding="application/x-tex">N_{excreted}</annotation></semantics></math></td>
-<td align="left">Annual nitrogen excreted (kg N/head/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><annotation encoding="application/x-tex">Allocation</annotation></semantics></math></td>
-<td align="left">Fraction of manure assigned to a management system</td>
-<td align="left"><code>manure_management.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>3</mn></msub></mrow><annotation encoding="application/x-tex">EF_3</annotation></semantics></math></td>
-<td align="left">Direct emission factor for the manure management
-system</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 </div>
@@ -1301,31 +1048,6 @@ system</td>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>i</mi><mi>n</mi><mi>g</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><annotation encoding="application/x-tex">N_{leaching-MMS}</annotation></semantics></math>)
 (Eq. 10.27)</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>=</mo><mo>∑</mo><mrow><mo stretchy="true" form="prefix">[</mo><mo stretchy="false" form="prefix">(</mo><mi>N</mi><mo>⋅</mo><msub><mi>N</mi><mrow><mi>e</mi><mi>x</mi></mrow></msub><mo>⋅</mo><mi>A</mi><mi>W</mi><mi>M</mi><mi>S</mi><mo stretchy="false" form="postfix">)</mo><mo>⋅</mo><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>L</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>M</mi><mi>S</mi></mrow></msub><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">N_{leach-MMS} = \sum \left[ (N \cdot N_{ex} \cdot AWMS) \cdot Frac_{LeachMS} \right]</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>G</mi><mi>a</mi><mi>s</mi><mi>M</mi><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Frac_{GasMS}</annotation></semantics></math></td>
-<td align="left">Fraction of N lost as volatilized gas
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>H</mi><mn>3</mn></msub><mo>+</mo><mi>N</mi><msub><mi>O</mi><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">NH_3 + NO_x</annotation></semantics></math>)</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>a</mi><msub><mi>c</mi><mrow><mi>L</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mi>M</mi><mi>S</mi></mrow></msub></mrow><annotation encoding="application/x-tex">Frac_{LeachMS}</annotation></semantics></math></td>
-<td align="left">Fraction of N lost via leaching into water</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-</tr>
-</tbody>
-</table>
 </div>
 <div class="section level4">
 <h4 id="indirect-n_2o-calculation-eq--10-2810-29">2.2 Indirect
@@ -1342,29 +1064,6 @@ Calculation (Eq. 10.28/10.29)<a class="anchor" aria-label="anchor" href="#indire
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><msub><mi>O</mi><mrow><mi>L</mi><mo stretchy="false" form="prefix">(</mo><mi>m</mi><mi>m</mi><mo stretchy="false" form="postfix">)</mo></mrow></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><msub><mi>N</mi><mrow><mi>l</mi><mi>e</mi><mi>a</mi><mi>c</mi><mi>h</mi><mo>−</mo><mi>M</mi><mi>M</mi><mi>S</mi></mrow></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mn>5</mn></msub><mo stretchy="false" form="postfix">)</mo><mo>⋅</mo><mfrac><mn>44</mn><mn>28</mn></mfrac></mrow><annotation encoding="application/x-tex">N_2O_{L(mm)} = (N_{leach-MMS} \cdot EF_5) \cdot \frac{44}{28}</annotation></semantics></math>
 </li>
 </ul>
-<table class="table">
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>4</mn></msub></mrow><annotation encoding="application/x-tex">EF_4</annotation></semantics></math></td>
-<td align="left">Indirect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
-factor for volatilization</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mn>5</mn></msub></mrow><annotation encoding="application/x-tex">EF_5</annotation></semantics></math></td>
-<td align="left">Indirect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mn>2</mn></msub><mi>O</mi></mrow><annotation encoding="application/x-tex">N_2O</annotation></semantics></math>
-factor for leaching</td>
-<td align="left"><code>ipcc_mm.csv</code></td>
-</tr>
-</tbody>
-</table>
 <hr>
 </div>
 </div>
@@ -1454,30 +1153,14 @@ and ingredient share
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> ha</mtext></mrow><mo>=</mo><mn>10</mn><mo>,</mo><mn>000</mn><msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow><mn>2</mn></msup></mrow><annotation encoding="application/x-tex">1\text{ ha} = 10{,}000\text{ m}^2</annotation></semantics></math>)
 is:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mi>/</mi><mtext mathvariant="normal">head</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>×</mo><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>×</mo><mn>10</mn><mo>,</mo><mn>000</mn></mrow><annotation encoding="application/x-tex">LandUsePerAnimal_i \; (\text{m}^2/\text{head}) = AdjustedLandPerKg_i \times AnnualConsumption_i \times 10{,}000</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><msub><mi>e</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>U</mi><mi>s</mi><mi>e</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">TotalLandUse_i \; (\text{m}^2) = LandUsePerAnimal_i \times AAP</annotation></semantics></math></p>
-</div>
-</div>
-<div class="section level3">
-<h3 id="dynamic-international-trade-traceback">3. Dynamic International Trade Traceback<a class="anchor" aria-label="anchor" href="#dynamic-international-trade-traceback"></a>
-</h3>
-<p>When <code>country_of_origin</code> is unspecified (<code>NA</code>),
-<code>herdr</code> resolves production nations dynamically: 1.
-<strong>Self-Sufficiency Ratio (SSR):</strong> Assesses domestic
-production against apparent consumption:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>,</mo><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi><mo>+</mo><mi>I</mi><mi>m</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo>−</mo><mi>E</mi><mi>x</mi><mi>p</mi><mi>o</mi><mi>r</mi><mi>t</mi><mi>s</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">ApparentConsumption = \max(1, Production + Imports - Exports)</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>=</mo><mfrac><mrow><mi>P</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow><mrow><mi>A</mi><mi>p</mi><mi>p</mi><mi>a</mi><mi>r</mi><mi>e</mi><mi>n</mi><mi>t</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></mfrac></mrow><annotation encoding="application/x-tex">SSR = \frac{Production}{ApparentConsumption}</annotation></semantics></math>
-2. <strong>Recursive Traceback:</strong> If
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>S</mi><mi>S</mi><mi>R</mi><mo>&lt;</mo><mn>0.70</mn></mrow><annotation encoding="application/x-tex">SSR &lt; 0.70</annotation></semantics></math>
-(70%), the crop is inferred as imported and traced recursively through
-bilateral trade flows (<code>fao_trade_matrix.parquet</code>) to
-identify primary producing origins beyond transit hubs
-(e.g. Rotterdam).</p>
 <hr>
+</div>
 </div>
 </div>
 <div class="section level2">
 <h2 id="vi--animal-productivity-edible-protein-engine-faogleam">VI. Animal Productivity &amp; Edible Protein Engine (FAO/GLEAM)<a class="anchor" aria-label="anchor" href="#vi--animal-productivity-edible-protein-engine-faogleam"></a>
 </h2>
-<p>In addition to greenhouse gas emissions and land use,
-<code>herdr</code> computes physical livestock productivity and
+<p><code>herdr</code> computes physical livestock productivity and
 nutritional protein output using the <strong>FAO Global Livestock
 Environmental Assessment Model (GLEAM v3.0)</strong> framework and
 International Dairy Federation (IDF) standards.</p>
@@ -1489,15 +1172,16 @@ International Dairy Federation (IDF) standards.</p>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><annotation encoding="application/x-tex">N_{\text{exit}}</annotation></semantics></math>)
 is calculated from the Annual Average Population
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">AAP</annotation></semantics></math>)
-based on functional cohort roles:</p>
+based on strict functional cohort roles
+(<code>production_role</code>):</p>
 <ul>
 <li>
 <strong>Replacement stock (<code>replacement</code>):</strong>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">N_{\text{exit}} = 0</annotation></semantics></math>
-(animals enter the adult herd to maintain stability).</li>
+(animals enter the adult breeding herd to maintain stability).</li>
 <li>
-<strong>Mature breeding females (<code>mature</code>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">replacement_rate</mtext></mrow><annotation encoding="application/x-tex">N_{\text{exit}} = AAP \times \text{replacement\_rate}</annotation></semantics></math><em>(For layer hens where replacement rate is omitted,
+<strong>Mature breeding stock (<code>mature</code>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">replacement_rate</mtext></mrow><annotation encoding="application/x-tex">N_{\text{exit}} = AAP \times \text{replacement\_rate}</annotation></semantics></math><em>(For layer hens where <code>replacement_rate</code> is omitted,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mfrac><mn>365</mn><mtext mathvariant="normal">productive_period_days</mtext></mfrac></mrow><annotation encoding="application/x-tex">N_{\text{exit}} = AAP \times \frac{365}{\text{productive\_period\_days}}</annotation></semantics></math>).</em>
 </li>
 <li>
@@ -1512,12 +1196,6 @@ based on functional cohort roles:</p>
 </h3>
 <p>Total fresh milk is computed as:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">milk_yield_kg_year</mtext></mrow><annotation encoding="application/x-tex">\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}</annotation></semantics></math></p>
-<p>Milk crude protein content
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><annotation encoding="application/x-tex">\text{Protein}_{\text{milk}}</annotation></semantics></math>)
-is entered directly by the user in <code>ruminant_definitions.csv</code>
-(<code>protein_content_pct</code>). When omitted or left at zero, it is
-estimated using the standard IPCC Tier 2 regression:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mn>1.9</mn><mo>+</mo><mn>0.4</mn><mo>×</mo><msub><mtext mathvariant="normal">Fat</mtext><mtext mathvariant="normal">content</mtext></msub><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{milk}} (\%) = 1.9 + 0.4 \times \text{Fat}_{\text{content}} (\%)</annotation></semantics></math></p>
 <p>To standardize milk across breeds and diets, Fat and Protein
 Corrected Milk (FPCM) is calculated following the <strong>IDF
 (2015)</strong> standard:
@@ -1526,28 +1204,22 @@ Corrected Milk (FPCM) is calculated following the <strong>IDF
 <div class="section level3">
 <h3 id="meat-production-carcass-metrics">3. Meat Production &amp; Carcass Metrics<a class="anchor" aria-label="anchor" href="#meat-production-carcass-metrics"></a>
 </h3>
-<p>Meat output transforms live animals leaving the farm into edible
-protein:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Live weight at slaughter:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>=</mo><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>×</mo><msub><mtext mathvariant="normal">Weight</mtext><mtext mathvariant="normal">slaughter</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>=</mo><msub><mi>N</mi><mtext mathvariant="normal">exit</mtext></msub><mo>×</mo><msub><mtext mathvariant="normal">Weight</mtext><mtext mathvariant="normal">slaughter</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}} = N_{\text{exit}} \times \text{Weight}_{\text{slaughter}}</annotation></semantics></math>
 </li>
 <li>
 <strong>Carcass weight:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">carcass</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>P</mi><mi>%</mi></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)</annotation></semantics></math>
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>P</mi><mi>%</mi></mrow><annotation encoding="application/x-tex">DP\%</annotation></semantics></math>
-is the species dressing percentage (FAO GLEAM Table 9.1).</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">carcass</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>P</mi><mi>%</mi></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{carcass}} = \text{Meat}_{\text{LW}} \times \left( \frac{DP\%}{100} \right)</annotation></semantics></math>
+</li>
 <li>
 <strong>Boneless meat:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">boneless</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">carcass</mtext></msub><mo>×</mo><mi>B</mi><mi>F</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM</annotation></semantics></math>
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>B</mi><mi>F</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">BFM</annotation></semantics></math>
-is the boneless fraction of carcass meat.</li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">boneless</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">carcass</mtext></msub><mo>×</mo><mi>B</mi><mi>F</mi><mi>M</mi></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{boneless}} = \text{Meat}_{\text{carcass}} \times BFM</annotation></semantics></math>
+</li>
 <li>
 <strong>Meat edible protein:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">boneless</mtext></msub><mo>×</mo><mtext mathvariant="normal">MEAT_prot</mtext></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}</annotation></semantics></math>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">boneless</mtext></msub><mo>×</mo><mtext mathvariant="normal">MEAT_prot</mtext></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{meat}} = \text{Meat}_{\text{boneless}} \times \text{MEAT\_prot}</annotation></semantics></math>
 </li>
 </ol>
 <table class="table">
@@ -1609,413 +1281,163 @@ is the boneless fraction of carcass meat.</li>
 </table>
 </div>
 <div class="section level3">
-<h3 id="egg-production-poultry-1">4. Egg Production (Poultry)<a class="anchor" aria-label="anchor" href="#egg-production-poultry-1"></a>
+<h3 id="egg-production-total-edible-protein">4. Egg Production &amp; Total Edible Protein<a class="anchor" aria-label="anchor" href="#egg-production-total-edible-protein"></a>
 </h3>
-<p>Annual fresh egg yield and protein content:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mtext mathvariant="normal">Egg</mtext><mtext mathvariant="normal">mass</mtext></msub><mo>×</mo><mn>365</mn></mrow><mn>1000</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>×</mo><mn>0.1240</mn></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240</annotation></semantics></math></p>
-</div>
-<div class="section level3">
-<h3 id="total-edible-human-protein">5. Total Edible Human Protein<a class="anchor" aria-label="anchor" href="#total-edible-human-protein"></a>
-</h3>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mtext mathvariant="normal">Egg</mtext><mtext mathvariant="normal">mass</mtext></msub><mo>×</mo><mn>365</mn></mrow><mn>1000</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>×</mo><mn>0.1240</mn></mrow><annotation encoding="application/x-tex">\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP, \qquad \text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}</annotation></semantics></math></p>
 <hr>
 </div>
 </div>
 <div class="section level2">
-<h2 id="vii--demographic-herd-dynamics-aap-rule">VII. Demographic &amp; Herd Dynamics (AAP Rule)<a class="anchor" aria-label="anchor" href="#vii--demographic-herd-dynamics-aap-rule"></a>
+<h2 id="vii--enterprise-attribution-biophysical-allocation-feed-efficiency-generate_impact_assessment">VII. Enterprise Attribution, Biophysical Allocation &amp; Feed
+Efficiency (<code>generate_impact_assessment</code>)<a class="anchor" aria-label="anchor" href="#vii--enterprise-attribution-biophysical-allocation-feed-efficiency-generate_impact_assessment"></a>
 </h2>
-<p>For fast-growing and batch-reared cohorts, the census standing
-population in <code>livestock_census.csv</code> must always represent
-the <strong>Annual Average Population
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">AAP</annotation></semantics></math>)</strong>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><mi>P</mi><mo>=</mo><mfrac><mrow><munderover><mo>∑</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><mi>M</mi></munderover><msub><mi>N</mi><mi>i</mi></msub><mo>×</mo><msub><mi>D</mi><mi>i</mi></msub></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">AAP = \frac{\sum_{i=1}^{M} N_i \times D_i}{365}</annotation></semantics></math></p>
-<p>Where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>N</mi><mi>i</mi></msub><annotation encoding="application/x-tex">N_i</annotation></semantics></math>
-is the number of animals in batch
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
+<p>The consolidated assessment engine
+(<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) produces two tables:</p>
+<ul>
+<li>
+<strong>Table 1 (<code>totals</code>):</strong> Direct cohort-level
+emissions, feed intake, land use, water deprivation, and per-head
+footprints.</li>
+<li>
+<strong>Table 2 (<code>intensities</code>):</strong>
+Enterprise-integrated commercial and nutritional intensities grouped by
+<code>(farm_id, region, subregion, animal_type, animal_subtype)</code>.</li>
+</ul>
+<div class="section level3">
+<h3 id="enterprise-footprint-attribution-across-mature-replacement-and-slaughter">1. Enterprise Footprint Attribution Across <code>mature</code>,
+<code>replacement</code>, and <code>slaughter</code><a class="anchor" aria-label="anchor" href="#enterprise-footprint-attribution-across-mature-replacement-and-slaughter"></a>
+</h3>
+<p>Within each enterprise
+<code>(farm_id, region, subregion, animal_type, animal_subtype)</code>,
+non-commercial rearing and breeding overheads are integrated into the
+commercial outputs according to three system archetypes:</p>
+<div class="section level4">
+<h4 id="a--dairy-systems-animal_subtype-dairy">A. Dairy Systems (<code>animal_subtype == "dairy"</code>)<a class="anchor" aria-label="anchor" href="#a--dairy-systems-animal_subtype-dairy"></a>
+</h4>
+<ul>
+<li>
+<strong>Breeding &amp; Milking Pool (<code>mature</code> +
+<code>replacement</code>):</strong> Replacement heifers, ewe lambs, and
+doeling kids (<code>replacement</code>) produce zero commercial output
+on their own; they exist to sustain the milking herd. Their footprint is
+pooled with <code>mature</code> dairy cohorts and allocated between
+<strong>milk</strong> (<code>milk_FPCM_kg</code>) and <strong>culled
+adult meat</strong> (<code>meat_carcass_weight_kg</code>) via
+<strong>IDF (2022) Net Energy physical allocation</strong>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Cattle</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>4.6</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Sheep</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>3.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Goat</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable></mrow><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>=</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW, cull</mtext></msub></mrow><annotation encoding="application/x-tex">\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} &amp; (\text{Cattle}) \\ 4.6 \times \text{Milk}_{\text{fresh}} &amp; (\text{Sheep}) \\ 3.0 \times \text{Milk}_{\text{fresh}} &amp; (\text{Goat}) \end{cases}, \qquad \text{E}_{\text{cull}} = 15.0 \times \text{Meat}_{\text{LW, cull}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \frac{\text{E}_{\text{milk}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}, \qquad \text{AF}_{\text{cull}} = \frac{\text{E}_{\text{cull}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}</annotation></semantics></math>
+</li>
+<li>
+<strong>Multiple Milking Cohorts:</strong> If a farm declares more
+than one <code>mature</code> milking cohort within the same enterprise
+(e.g., stabled vs. grazing dairy cows), each milking cohort retains its
+own direct footprint plus a population-proportional share
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><msub><mi>P</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>A</mi><mi>A</mi><msub><mi>P</mi><mtext mathvariant="normal">milking</mtext></msub></mrow><annotation encoding="application/x-tex">AAP_i / \sum AAP_{\text{milking}}</annotation></semantics></math>)
+of non-milking <code>replacement</code>/<code>mature</code>
+cohorts.</li>
+<li>
+<strong>Dairy Surplus Fattening Stock
+(<code>slaughter</code>):</strong> Surplus dairy calves, lambs, or kids
+finished for meat (<code>production_role == "slaughter"</code>,
+<code>animal_subtype == "dairy"</code>) are evaluated on their own
+direct fattening footprint
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1.0</annotation></semantics></math>).</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="b--egg-layer-systems-animal_type-poultry-animal_subtype-layer">B. Egg Layer Systems (<code>animal_type == "poultry"</code>,
+<code>animal_subtype == "layer"</code>)<a class="anchor" aria-label="anchor" href="#b--egg-layer-systems-animal_type-poultry-animal_subtype-layer"></a>
+</h4>
+<ul>
+<li>Each <code>mature</code> laying cohort (<code>laying_hens</code>,
+<code>free_range_laying_hens</code>) retains its own direct footprint
+plus a population-proportional share
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><msub><mi>P</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>A</mi><mi>A</mi><msub><mi>P</mi><mtext mathvariant="normal">mature</mtext></msub></mrow><annotation encoding="application/x-tex">AAP_i / \sum AAP_{\text{mature}}</annotation></semantics></math>)
+of <code>replacement</code> layer pullets
+(<code>replacement_layer_pullets</code>), divided by its fresh egg
+output (<code>egg_fresh_kg</code>).</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="c--meat-systems-animal_subtype-meat">C. Meat Systems (<code>animal_subtype == "meat"</code>)<a class="anchor" aria-label="anchor" href="#c--meat-systems-animal_subtype-meat"></a>
+</h4>
+<ul>
+<li>
+<strong>Integrated Breeding + Finishing Enterprise:</strong> When a
+meat enterprise includes a breeding herd (<code>mature</code> and/or
+<code>replacement</code> cohorts alongside <code>slaughter</code>
+cohorts—e.g., <code>breeder_sows</code> + <code>boars</code> +
+<code>replacement_sows</code> + <code>fattening_pigs</code>, or
+<code>mature_beef_cattle</code> + replacements +
+<code>beef_calves</code>), the breeding herd overhead
+(<code>mature + replacement</code>) is distributed across
+<code>slaughter</code> cohorts in proportion to their carcass weight
+output
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>W</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>C</mi><msub><mi>W</mi><mtext mathvariant="normal">slaughter</mtext></msub></mrow><annotation encoding="application/x-tex">CW_i / \sum CW_{\text{slaughter}}</annotation></semantics></math>).
+Both <code>slaughter</code> and <code>mature</code> rows display the
+integrated meat intensity (including culled breeder meat in the
+denominator).</li>
+<li>
+<strong>Pure Finishing / Feedlot Operation:</strong> When no
+breeding herd is present on the farm (only <code>slaughter</code>
+cohorts), each <code>slaughter</code> cohort is evaluated on its own
+direct fattening footprint.</li>
+<li>
+<strong>Meat &amp; Wool Co-Allocation in Sheep:</strong> For meat
+sheep producing greasy wool
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{Wool}_{\text{kg}} &gt; 0</annotation></semantics></math>
 and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>D</mi><mi>i</mi></msub><annotation encoding="application/x-tex">D_i</annotation></semantics></math>
-is their duration on farm in days. Conversely, the annual total number
-of finished animals produced by a fixed barn capacity
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>)
-operated continuously is:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">Annual Batches Produced</mtext><mo>=</mo><mi>C</mi><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>365</mn><mrow><mtext mathvariant="normal">productive_period_days</mtext><mo>+</mo><mtext mathvariant="normal">empty_period_days</mtext></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Annual Batches Produced} = C \times \left( \frac{365}{\text{productive\_period\_days} + \text{empty\_period\_days}} \right)</annotation></semantics></math></p>
-<hr>
-</div>
-<div class="section level2">
-<h2 id="viii--consolidated-assessment-biophysical-allocation-feed-efficiency">VIII. Consolidated Assessment, Biophysical Allocation &amp; Feed
-Efficiency<a class="anchor" aria-label="anchor" href="#viii--consolidated-assessment-biophysical-allocation-feed-efficiency"></a>
-</h2>
-<p>The consolidated assessment engine in <code>herdr</code>
-(<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) integrates all upstream Tier
-2 GHG emissions, agroecological land footprints, and physical production
-outputs into multi-metric indicators.</p>
-<div class="section level3">
-<h3 id="biophysical-allocation-for-dairy-systems-idf-bulletin-5202022">1. Biophysical Allocation for Dairy Systems (IDF Bulletin
-520/2022)<a class="anchor" aria-label="anchor" href="#biophysical-allocation-for-dairy-systems-idf-bulletin-5202022"></a>
-</h3>
-<p>Dairy farming produces both milk and meat (from culled cows and
-surplus calves). To allocate emissions, land occupation, and feed intake
-between milk and meat co-products based on underlying physical
-relationships (ISO 14044 Step 2), <code>herdr</code> implements the
-updated <strong>International Dairy Federation (IDF) physical Net Energy
-allocation</strong> method (Bulletin 520/2022):</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">MJ</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{NEL}_{\text{total}} = 3.1 \times \text{Milk}_{\text{FPCM}} \quad (\text{MJ})</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NEG</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">MJ</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{NEG}_{\text{total}} = 15.0 \times \text{Meat}_{\text{LW}} \quad (\text{MJ})</annotation></semantics></math></p>
-<p>Where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><annotation encoding="application/x-tex">\text{Milk}_{\text{FPCM}}</annotation></semantics></math>
-is Fat and Protein Corrected Milk (kg),
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}}</annotation></semantics></math>
-is annual live weight sold (kg),
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>3.1</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">3.1 \text{ MJ/kg}</annotation></semantics></math>
-is the net energy content of standard milk, and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0 \text{ MJ/kg}</annotation></semantics></math>
-is the net energy content of live weight gain.</p>
-<p>The allocation factors are:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mrow><msub><mtext mathvariant="normal">NEL</mtext><mtext mathvariant="normal">total</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">NEG</mtext><mtext mathvariant="normal">total</mtext></msub></mrow></mfrac><mo>=</mo><mfrac><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mrow><mrow><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mo>+</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \frac{\text{NEL}_{\text{total}}}{\text{NEL}_{\text{total}} + \text{NEG}_{\text{total}}} = \frac{3.1 \times \text{Milk}_{\text{FPCM}}}{3.1 \times \text{Milk}_{\text{FPCM}} + 15.0 \times \text{Meat}_{\text{LW}}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{milk}}</annotation></semantics></math></p>
-<p>For specialized meat cohorts (including feedlot calves or lambs
-originating from dairy breeding herds where
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}} &gt; 0</annotation></semantics></math>),
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1.0</annotation></semantics></math>;
-for laying hens,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{egg}} = 1.0</annotation></semantics></math>.
-Conversely, non-milking and non-meat maintenance phases (such as
-<code>dry_phase</code> cows where both milk and meat outputs are zero)
-have
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = 0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 0</annotation></semantics></math>,
-leaving product intensities as <code>NA</code> (displayed as empty bars
-in charts) to avoid erroneously attributing dry-period emissions
-entirely to cull meat.</p>
+physical net energy allocation splits the footprint between wool
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>24.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg wool</mtext></mrow></mrow><annotation encoding="application/x-tex">24.0\text{ MJ/kg wool}</annotation></semantics></math>)
+and meat
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg live weight</mtext></mrow></mrow><annotation encoding="application/x-tex">11.0\text{ MJ/kg live weight}</annotation></semantics></math>):
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><mfrac><mrow><mn>24.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub></mrow><mrow><mn>24.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>+</mo><mn>11.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{wool}} = \frac{24.0 \times \text{Wool}_{\text{kg}}}{24.0 \times \text{Wool}_{\text{kg}} + 11.0 \times \text{Meat}_{\text{LW}}}, \qquad \text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{wool}}</annotation></semantics></math>
+</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="d--replacement-cohorts-production_role-replacement">D. Replacement Cohorts
+(<code>production_role == "replacement"</code>)<a class="anchor" aria-label="anchor" href="#d--replacement-cohorts-production_role-replacement"></a>
+</h4>
+<ul>
+<li>In Table 1 (<code>totals</code>), <code>replacement</code> cohorts
+show their full direct emissions, land use, water deprivation, and
+per-head footprints.</li>
+<li>In Table 2 (<code>intensities</code>), <code>replacement</code>
+cohorts show <code>NA</code> for commercial product intensities because
+their footprint is already absorbed into the <code>mature</code> or
+<code>slaughter</code> cohorts of their enterprise, preventing double
+counting.</li>
+</ul>
+<hr>
+</div>
 </div>
 <div class="section level3">
 <h3 id="protein-feed-conversion-and-human-food-competition-mottet-et-al--2017">2. Protein Feed Conversion and Human Food Competition (Mottet et
 al., 2017)<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-and-human-food-competition-mottet-et-al--2017"></a>
 </h3>
-<p>Following the protein-to-protein framework of Mottet et al. (2017,
-<em>Global Food Security</em>, 14, 1-8), <code>herdr</code> evaluates
-feed conversion efficiency and human food security via two key
-indicators:</p>
+<p>Following Mottet et al. (2017, <em>Global Food Security</em>, 14,
+1–8), <code>herdr</code> evaluates protein conversion efficiency via two
+indicators on producing cohorts (<code>mature</code> and
+<code>slaughter</code>):</p>
 <ol style="list-style-type: decimal">
-<li><p><strong>Total Protein Feed Conversion Ratio
+<li>
+<strong>Total Protein Feed Conversion Ratio
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}}</annotation></semantics></math>):</strong>
-Evaluates system-wide biological nitrogen conversion efficiency by
-dividing total feed crude protein (CP) consumed by all edible animal
-protein produced:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math></p></li>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math>
+</li>
 <li>
-<p><strong>Cropland Protein Feed Conversion Ratio
+<strong>Cropland Protein Feed Conversion Ratio
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}}</annotation></semantics></math>):</strong>
-Measures direct competition with human food by considering only crude
-protein derived from arable cropland crops:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg cropland feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})</annotation></semantics></math></p>
-<ul>
-<li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>
-is calculated strictly from feed ingredients tagged as
-<code>land_type == "cropland"</code> in
-<code>feed_characteristics.csv</code> (e.g., cereals, oilseeds, pulses,
-and arable forage crops).</li>
-<li>Feed sources tagged as <code>grassland_convertible</code> or
-<code>grassland_unconvertible</code> (permanent pastures, rangelands,
-native grasslands) and <code>none</code> (animal meals, urea/NPN,
-synthetic amino acids, minerals, and industrial coproducts requiring no
-dedicated arable land) are excluded from
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>,
-reflecting zero direct competition for arable food crops.</li>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg cropland feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
 <li>When
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &lt; 1.0</annotation></semantics></math>,
-the livestock system is a <strong>net producer</strong> of protein for
-human consumption.</li>
-<li>When
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&gt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &gt; 1.0</annotation></semantics></math>,
-the livestock system consumes more human-edible/cropland protein than it
-generates.</li>
+the cohort/system is a <strong>net producer</strong> of human-edible
+protein relative to arable cropland protein consumed.</li>
 </ul>
 </li>
 </ol>
-</div>
-<div class="section level3">
-<h3 id="standardized-functional-units">3. Standardized Functional Units<a class="anchor" aria-label="anchor" href="#standardized-functional-units"></a>
-</h3>
-<p><code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code> and
-<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> support standardized functional units
-across all three environmental impact dimensions:</p>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Functional Unit (<code>functional_unit</code>)</th>
-<th align="left">GHG Emissions Metric</th>
-<th align="left">Land Footprint Metric</th>
-<th align="left">Water Deprivation Metric (AWARE / EF 3.1)</th>
-<th align="left">Allocation / Normalization</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left">
-<strong><code>total</code></strong> (Default)</td>
-<td align="left">Absolute Gg
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
-</td>
-<td align="left">Absolute hectares (ha)</td>
-<td align="left">Absolute
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">Mm</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{Mm}^3\text{ depriv.}</annotation></semantics></math>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mn>10</mn><mn>6</mn></msup><msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> m</mtext></mrow><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow><mo>=</mo><mn>1</mn><msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> hm</mtext></mrow><mn>3</mn></msup></mrow><annotation encoding="application/x-tex">10^6\text{ m}^3\text{ depriv.} = 1\text{ hm}^3</annotation></semantics></math>)</td>
-<td align="left">Whole-inventory absolute footprint</td>
-</tr>
-<tr class="even">
-<td align="left"><strong><code>product</code></strong></td>
-<td align="left">kg
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
-/ kg commercial product</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
-/ kg commercial product</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>
-/ kg commercial product</td>
-<td align="left">IDF Net Energy physical allocation for dairy</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong><code>protein</code></strong></td>
-<td align="left">kg
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
-/ kg edible protein</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
-/ kg edible protein</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>
-/ kg edible protein</td>
-<td align="left">Total human edible protein output</td>
-</tr>
-<tr class="even">
-<td align="left"><strong><code>head</code></strong></td>
-<td align="left">kg
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>
-/ head / year</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>
-/ head / year</td>
-<td align="left">
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>
-/ head / year</td>
-<td align="left">Annual average population (AAP)</td>
-</tr>
-<tr class="odd">
-<td align="left"><strong><code>fcr</code></strong></td>
-<td align="left">Total Protein FCR (Biological)</td>
-<td align="left">Cropland Protein FCR (Human Competition)</td>
-<td align="left">—</td>
-<td align="left">Mottet et al. (2017) feed protein conversion ratio
-(threshold at 1.0)</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level3">
-<h3 id="agroecological-land-footprint-breakdown">4. Agroecological Land Footprint Breakdown<a class="anchor" aria-label="anchor" href="#agroecological-land-footprint-breakdown"></a>
-</h3>
-<p>Land use requirement is partitioned into four agroecological
-categories based on the feed competition framework (Mottet et al.,
-2017):</p>
-<ul>
-<li>
-<strong><code>Land_cropland_m2</code>:</strong> Cultivated arable
-land suitable for direct human food production.</li>
-<li>
-<strong><code>Land_grassland_convertible_m2</code>:</strong>
-Pastures on fertile soils convertible to arable cropping.</li>
-<li>
-<strong><code>Land_grassland_unconvertible_m2</code>:</strong>
-Permanent native rangelands and marginal/upland terrain.</li>
-<li>
-<strong><code>Land_other_m2</code>:</strong> Silvopastoral zones,
-fallow, farm infrastructure, or unclassified land.</li>
-</ul>
-</div>
-<div class="section level3">
-<h3 id="feed-upstream-life-cycle-assessment-ghg-water-deprivation">5. Feed Upstream Life Cycle Assessment (GHG &amp; Water
-Deprivation)<a class="anchor" aria-label="anchor" href="#feed-upstream-life-cycle-assessment-ghg-water-deprivation"></a>
-</h3>
-<p>For each feed ingredient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>,
-upstream environmental burdens are quantified using the <strong>INRAE /
-ADEME ECOALIM v9</strong> (EF 3.1) database.</p>
-<div class="section level4">
-<h4 id="fresh-feed-intake-fresh_i">5.1 Fresh Feed Intake
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Fresh_i</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#fresh-feed-intake-fresh_i"></a>
-</h4>
-<p>Life cycle emission factors are reported per kilogram of fresh weight
-as fed:</p>
-<p><strong>Formula:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mo>=</mo><mfrac><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg fresh / head / year</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">Fresh_i = \frac{AnnualConsumption_i}{\left( \frac{DM\_pct_i}{100} \right)} \quad (\text{kg fresh / head / year})</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Fresh_i</annotation></semantics></math></td>
-<td align="left">Annual fresh feed intake per animal (kg
-fresh/year)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>C</mi><mi>o</mi><mi>n</mi><mi>s</mi><mi>u</mi><mi>m</mi><mi>p</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">AnnualConsumption_i</annotation></semantics></math></td>
-<td align="left">Annual dry matter intake of ingredient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-</td>
-<td align="left">Result of Section V.2.C</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">DM\_pct_i</annotation></semantics></math></td>
-<td align="left">Dry matter percentage of ingredient
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>i</mi><annotation encoding="application/x-tex">i</annotation></semantics></math>
-(%)</td>
-<td align="left"><code>feed_characteristics.csv</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="water-deprivation-footprint-water_i">5.2 Water Deprivation Footprint
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><msub><mi>r</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Water_i</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#water-deprivation-footprint-water_i"></a>
-</h4>
-<p>Freshwater deprivation characterized via the international
-<strong>AWARE</strong> model (EF 3.1):</p>
-<p><strong>Formula:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>=</mo><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mrow><mi>w</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mo>,</mo><mi>i</mi></mrow></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv. / head / year</mtext></mrow><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">WaterPerAnimal_i = Fresh_i \cdot EF_{water, i} \quad (\text{m}^3\text{ depriv. / head / year})</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><msub><mi>r</mi><mi>i</mi></msub><mo>=</mo><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>⋅</mo><mi>A</mi><mi>A</mi><mi>P</mi><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv. / year</mtext></mrow><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">TotalWater_i = WaterPerAnimal_i \cdot AAP \quad (\text{m}^3\text{ depriv. / year})</annotation></semantics></math></p>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">WaterPerAnimal_i</annotation></semantics></math></td>
-<td align="left">Water deprivation per head
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>W</mi><mi>a</mi><mi>t</mi><mi>e</mi><msub><mi>r</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">TotalWater_i</annotation></semantics></math></td>
-<td align="left">Total cohort water deprivation
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Fresh_i</annotation></semantics></math></td>
-<td align="left">Annual fresh feed intake (kg)</td>
-<td align="left">Result of Eq. 5.1</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mrow><mi>w</mi><mi>a</mi><mi>t</mi><mi>e</mi><mi>r</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EF_{water, i}</annotation></semantics></math></td>
-<td align="left">Water deprivation characterization factor
-(<code>Water use (m3 depriv.)</code>)</td>
-<td align="left"><code>ecoalim.parquet</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">AAP</annotation></semantics></math></td>
-<td align="left">Annual Average Population</td>
-<td align="left"><code>livestock_census.csv</code></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="feed-greenhouse-gas-emissions-ghg_i">5.3 Feed Greenhouse Gas Emissions
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>H</mi><msub><mi>G</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">GHG_i</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#feed-greenhouse-gas-emissions-ghg_i"></a>
-</h4>
-<p>Cradle-to-farm-gate feed greenhouse gas emissions partitioned by
-origin:</p>
-<p><strong>Formula:</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>H</mi><mi>G</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>=</mo><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mrow><mi>c</mi><mi>l</mi><mi>i</mi><mi>m</mi><mi>a</mi><mi>t</mi><mi>e</mi><mo>,</mo><mi>i</mi></mrow></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><msub><mtext mathvariant="normal">kg CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e / head / year</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">GHGPerAnimal_i = Fresh_i \cdot EF_{climate, i} \quad (\text{kg CO}_2\text{e / head / year})</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>G</mi><mi>H</mi><msub><mi>G</mi><mi>i</mi></msub><mo>=</mo><mi>G</mi><mi>H</mi><mi>G</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub><mo>⋅</mo><mi>A</mi><mi>A</mi><mi>P</mi><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><msub><mtext mathvariant="normal">kg CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e / year</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">TotalGHG_i = GHGPerAnimal_i \cdot AAP \quad (\text{kg CO}_2\text{e / year})</annotation></semantics></math></p>
-<ul>
-<li>
-<strong>Fossil inputs:</strong>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>H</mi><msub><mi>G</mi><mrow><mtext mathvariant="normal">fossil</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mrow><mtext mathvariant="normal">fossil</mtext><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">GHG_{\text{fossil}, i} = Fresh_i \cdot EF_{\text{fossil}, i}</annotation></semantics></math>
-</li>
-<li>
-<strong>Land-use change / deforestation:</strong>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>H</mi><msub><mi>G</mi><mrow><mtext mathvariant="normal">luc</mtext><mo>,</mo><mi>i</mi></mrow></msub><mo>=</mo><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mo>⋅</mo><mi>E</mi><msub><mi>F</mi><mrow><mtext mathvariant="normal">luc</mtext><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">GHG_{\text{luc}, i} = Fresh_i \cdot EF_{\text{luc}, i}</annotation></semantics></math>
-</li>
-</ul>
-<table class="table">
-<colgroup>
-<col width="33%">
-<col width="33%">
-<col width="33%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">Variable</th>
-<th align="left">Description</th>
-<th align="left">Source in the Package</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>G</mi><mi>H</mi><mi>G</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>A</mi><mi>n</mi><mi>i</mi><mi>m</mi><mi>a</mi><msub><mi>l</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">GHGPerAnimal_i</annotation></semantics></math></td>
-<td align="left">Feed GHG emissions per head
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">kg CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{kg CO}_2\text{e}</annotation></semantics></math>)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>T</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi><mi>G</mi><mi>H</mi><msub><mi>G</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">TotalGHG_i</annotation></semantics></math></td>
-<td align="left">Total cohort feed GHG emissions
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">kg CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{kg CO}_2\text{e}</annotation></semantics></math>)</td>
-<td align="left">Calculated</td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Fresh_i</annotation></semantics></math></td>
-<td align="left">Annual fresh feed intake (kg)</td>
-<td align="left">Result of Eq. 5.1</td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mrow><mi>c</mi><mi>l</mi><mi>i</mi><mi>m</mi><mi>a</mi><mi>t</mi><mi>e</mi><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EF_{climate, i}</annotation></semantics></math></td>
-<td align="left">Climate change characterization factor
-(<code>Climate change - EF 3.1</code>)</td>
-<td align="left"><code>ecoalim.parquet</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mrow><mtext mathvariant="normal">fossil</mtext><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EF_{\text{fossil}, i}</annotation></semantics></math></td>
-<td align="left">Fossil climate change factor
-(<code>Climate change - Fossil</code>)</td>
-<td align="left"><code>ecoalim.parquet</code></td>
-</tr>
-<tr class="even">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mrow><mtext mathvariant="normal">luc</mtext><mo>,</mo><mi>i</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EF_{\text{luc}, i}</annotation></semantics></math></td>
-<td align="left">Land-use change factor
-(<code>Climate change - Land use and LU change</code>)</td>
-<td align="left"><code>ecoalim.parquet</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">AAP</annotation></semantics></math></td>
-<td align="left">Annual Average Population</td>
-<td align="left"><code>livestock_census.csv</code></td>
-</tr>
-</tbody>
-</table>
 <hr>
-</div>
 <div class="section level4">
 <h4 id="references">📚 References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h4>

@@ -8,7 +8,7 @@ aesthetics
 ``` r
 plot_herdr_results(
   df,
-  group_cols = c("animal_tag", "region", "subregion", "class_flex"),
+  group_cols = c("farm_id", "animal_tag", "region", "subregion"),
   func_name = NULL,
   gwp_report = "AR5",
   ar = NULL,

@@ -100,9 +100,10 @@
 <h2 id="moderate-assessment-northsouth-regional-split">Moderate Assessment: North/South Regional Split<a class="anchor" aria-label="anchor" href="#moderate-assessment-northsouth-regional-split"></a>
 </h2>
 <p>This guide walks through a <strong>Moderate Assessment</strong> for
-<strong>mature dairy cattle in Spain (2015)</strong>, using the
-multi-regional structure (North and South) to improve precision over a
-single national figure.</p>
+<strong>mature dairy cattle in Spain (2015)</strong>, using a multi-farm
+/ multi-regional structure (<code>North</code> vs. <code>South</code>)
+to capture differences in diet composition, milk yield, and manure
+climate zones.</p>
 <blockquote>
 <p>📂 <strong>All files referenced below live in <code>user_data/</code>
 and correspond to the pre-configured
@@ -151,36 +152,39 @@ only)</em>
 </table>
 <p>Full details on every file above are in the <a href="Technical_reference.html">Technical Reference</a> vignette. This
 guide builds on the <a href="Easy_Example.html">Basic Assessment</a> —
-start there first if this is your first time using herdr.</p>
+start there first if this is your first time using
+<code>herdr</code>.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-1-the-census">Step 1 — The Census<a class="anchor" aria-label="anchor" href="#step-1-the-census"></a>
+<h3 id="step-1-the-census-livestock_census-csv">Step 1 — The Census (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#step-1-the-census-livestock_census-csv"></a>
 </h3>
 <p>Open <code>livestock_census.csv</code>. Here we split the Spanish
-dairy population into two climatic regions using
-<code>subregion</code>.</p>
+dairy population into two climatic subregions (<code>north</code> and
+<code>south</code>) and two farm identifiers (<code>farm_north</code>
+and <code>farm_south</code>). The row order you declare here is
+preserved from top to bottom in all output tables and charts.</p>
 <table class="table">
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="right">population</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
-<td align="left"></td>
 <td align="right">536,987</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_south</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
-<td align="left"></td>
 <td align="right">311,699</td>
 </tr>
 </tbody>
@@ -188,10 +192,11 @@ dairy population into two climatic regions using
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-2-designing-the-diet">Step 2 — Designing the Diet<a class="anchor" aria-label="anchor" href="#step-2-designing-the-diet"></a>
+<h3 id="step-2-designing-regional-diets">Step 2 — Designing Regional Diets<a class="anchor" aria-label="anchor" href="#step-2-designing-regional-diets"></a>
 </h3>
-<p>Forage availability differs between North and South, so separate
-diets are defined for each region.</p>
+<p>Forage availability differs between Atlantic/Northern Spain and
+Mediterranean/Southern Spain, so separate diets are defined for each
+region.</p>
 <div class="section level4">
 <h4 id="a--define-the-profile-diet_profiles-csv">A. Define the profile — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#a--define-the-profile-diet_profiles-csv"></a>
 </h4>
@@ -234,8 +239,8 @@ diets are defined for each region.</p>
 <h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
 <p>Within each <code>ingredient_type</code>,
-<code>ingredient_share</code> must sum to 100%. Here’s the concentrate
-portion for Spain South:</p>
+<code>ingredient_share</code> must sum to 100%. Here is an excerpt of
+the concentrate portion for Spain South:</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="16%">
@@ -256,7 +261,7 @@ portion for Spain South:</p>
 <tbody>
 <tr class="odd">
 <td align="left"><code>diet_dairy_mature_south</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>corn</code></td>
 <td align="right">44.85</td>
 <td align="left"><code>spain</code></td>
@@ -264,7 +269,7 @@ portion for Spain South:</p>
 </tr>
 <tr class="even">
 <td align="left"><code>diet_dairy_mature_south</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>soybean_meal_44_cp</code></td>
 <td align="right">17.12</td>
 <td align="left"><code>NA</code></td>
@@ -272,7 +277,7 @@ portion for Spain South:</p>
 </tr>
 <tr class="odd">
 <td align="left"><code>diet_dairy_mature_south</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>rapeseed_meal_00_33_cp</code></td>
 <td align="right">28.71</td>
 <td align="left"><code>NA</code></td>
@@ -282,46 +287,55 @@ portion for Spain South:</p>
 </table>
 <blockquote>
 <p>🌍 <strong>Missing origins:</strong> <code>country_of_origin</code>
-for the soybean and rapeseed meals is left as <code>NA</code>. herdr
-resolves both automatically using the FAO dynamic background allocation
-engine and a 70% self-sufficiency rule — see <a href="land_use.html">Land Use Methodology</a> for how.</p>
-<p>🎯 <strong>Overriding the yield:</strong> the rapeseed meal row sets
-<code>custom_yield_kg_ha</code> to <code>3200</code>, so herdr uses that
-figure directly for its land-use footprint instead of looking up a
-FAO/trade-based yield — regardless of what
-<code>country_of_origin</code> says.</p>
+for soybean and rapeseed meals is left as <code>NA</code>.
+<code>herdr</code> resolves both automatically using the FAO dynamic
+bilateral trade engine and a 70% domestic self-sufficiency threshold —
+see <a href="land_use.html">Land Use Methodology</a>.</p>
+<p>🎯 <strong>Overriding the yield:</strong> setting
+<code>custom_yield_kg_ha = 3200</code> instructs <code>herdr</code> to
+use that farm-specific dry matter yield directly instead of querying
+FAOSTAT.</p>
 </blockquote>
 <hr>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-3-animal-categories-and-coefficients">Step 3 — Animal Categories and Coefficients<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients"></a>
+<h3 id="step-3-animal-categories-and-coefficients-ruminant_definitions-csv">Step 3 — Animal Categories and Coefficients
+(<code>ruminant_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients-ruminant_definitions-csv"></a>
 </h3>
-<p>Open <code>ruminant_definitions.csv</code>. This file links your
-animal tags to the IPCC physiological equations — each of
-<code>cfi</code>, <code>ca</code>, <code>c</code>, and
-<code>c_pregnancy_cattle</code> is a separate lookup into
-<code>ipcc_coefficients.csv</code>.</p>
-<table style="width:100%;" class="table">
+<p>Open <code>ruminant_definitions.csv</code>. Each cohort specifies its
+canonical taxonomy (<code>animal_type = "cattle"</code>,
+<code>animal_subtype = "dairy"</code>,
+<code>production_role = "mature"</code>), its diet, milk yield, and IPCC
+coefficients.</p>
+<table class="table">
 <colgroup>
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
+<th align="left">animal_type</th>
+<th align="left">animal_subtype</th>
+<th align="left">production_role</th>
 <th align="left">diet_tag</th>
 <th align="left">cfi</th>
 <th align="left">ca</th>
@@ -330,14 +344,18 @@ animal tags to the IPCC physiological equations — each of
 <th align="right">fat_content_pct</th>
 <th align="right">protein_content_pct</th>
 <th align="left">c_pregnancy_cattle</th>
-<th align="left">animal_type</th>
-<th align="left">animal_subtype</th>
+<th align="right">pregnancy_rate</th>
+<th align="right">replacement_rate</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
+<td align="left"><code>cattle</code></td>
+<td align="left"><code>dairy</code></td>
+<td align="left"><code>mature</code></td>
 <td align="left"><code>diet_dairy_mature_north</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
@@ -346,13 +364,17 @@ animal tags to the IPCC physiological equations — each of
 <td align="right">3.73</td>
 <td align="right">3.39</td>
 <td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="right">0.90</td>
+<td align="right">0.27</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_south</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
+<td align="left"><code>cattle</code></td>
+<td align="left"><code>dairy</code></td>
+<td align="left"><code>mature</code></td>
 <td align="left"><code>diet_dairy_mature_south</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
@@ -361,30 +383,33 @@ animal tags to the IPCC physiological equations — each of
 <td align="right">3.73</td>
 <td align="right">3.39</td>
 <td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="right">0.90</td>
+<td align="right">0.27</td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-4-body-weights">Step 4 — Body Weights<a class="anchor" aria-label="anchor" href="#step-4-body-weights"></a>
+<h3 id="step-4-body-weights-livestock_weights-csv">Step 4 — Body Weights (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-4-body-weights-livestock_weights-csv"></a>
 </h3>
-<p>Open <code>livestock_weights.csv</code>. Make sure the identifying
-keys match the census exactly — these weights validate the dry matter
-intake (DMI) limits.</p>
-<table style="width:100%;" class="table">
+<p>Open <code>livestock_weights.csv</code>. Make sure the four primary
+demographic keys (<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>) match the census
+exactly.</p>
+<table class="table">
 <colgroup>
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
-<col width="14%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
+<col width="12%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
@@ -395,6 +420,7 @@ intake (DMI) limits.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
@@ -404,6 +430,7 @@ intake (DMI) limits.</p>
 <td align="right">675</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_south</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
@@ -414,18 +441,6 @@ intake (DMI) limits.</p>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>ℹ️ <strong>About <code>productive_period_days</code>:</strong><br>
-* For <strong>adult breeding females (except laying hens)</strong>, this
-represents the <strong>inter-parturition interval</strong> in days
-(here, <code>365</code> days corresponds to an annual calving
-interval).<br>
-* For <strong>laying hens</strong>, it represents the <strong>commercial
-laying cycle duration</strong> until depopulation.<br>
-* For <strong>all other cohorts (growing, fattening,
-replacement)</strong>, it represents their <strong>life cycle /
-life-stage duration</strong> (days on feed).</p>
-</blockquote>
 <hr>
 </div>
 <div class="section level3">
@@ -433,24 +448,29 @@ life-stage duration</strong> (days on feed).</p>
 </h3>
 <p>You can define multiple manure systems for the same cohort by
 splitting the <code>allocation</code> across rows — the sum per
-<code>animal_tag</code>/<code>region</code>/<code>subregion</code>
-combination must equal 1.0.</p>
-<table class="table">
+<code>(farm_id, animal_tag, region, subregion)</code> cohort must equal
+exactly <strong>1.0</strong>. Notice how <code>system_climate</code>
+(<code>cool</code> in the North vs. <code>warm</code> in the South) and
+<code>climate_moisture</code> (<code>wet</code> vs. <code>dry</code>)
+reflect regional agroclimatic conditions:</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
@@ -466,6 +486,7 @@ combination must equal 1.0.</p>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
@@ -480,6 +501,7 @@ combination must equal 1.0.</p>
 <td align="right">0.0537</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
@@ -494,6 +516,7 @@ combination must equal 1.0.</p>
 <td align="right">0.3432</td>
 </tr>
 <tr class="odd">
+<td align="left"><code>farm_north</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>north</code></td>
@@ -508,6 +531,7 @@ combination must equal 1.0.</p>
 <td align="right">0.3551</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_south</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>south</code></td>
@@ -524,29 +548,38 @@ combination must equal 1.0.</p>
 </tbody>
 </table>
 <blockquote>
-<p>⚠️ <strong>Illustrative snippet:</strong> the rows above don’t sum to
-1.0 per cohort — some rows were omitted here for brevity. In a real
-project, always check that <code>allocation</code> sums to exactly 1.0
-for every
-<code>animal_tag</code>/<code>region</code>/<code>subregion</code>
-combination before running the model.</p>
+<p>⚠️ <strong>Illustrative snippet:</strong> Some rows were omitted
+above for brevity. In
+<code>inst/Examples/Level2_Spain_Dairy_Cattle_2015/manure_management.csv</code>,
+all allocations for <code>farm_north</code> and <code>farm_south</code>
+sum to exactly <strong>1.0</strong>.</p>
 </blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-6-running-the-analysis">Step 6 — Running the Analysis<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis"></a>
+<h3 id="step-6-running-the-analysis-comparing-regions">Step 6 — Running the Analysis &amp; Comparing Regions<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis-comparing-regions"></a>
 </h3>
-<p>Once your CSVs are updated in <code>user_data/</code>, run the
-assessment. herdr automatically performs biological validations
-(e.g. checking that DMI doesn’t exceed ~5.5% of body weight) and assigns
-trade impacts for any missing origins.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2015</span>,</span>
+<span>  gwp_report      <span class="op">=</span> <span class="st">"AR5"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect regional totals and product intensities</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">totals</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span></span>
+<span></span>
+<span><span class="co"># Compare North vs. South milk carbon intensity (kg CO2e / kg FPCM milk)</span></span>
+<span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"farm_id"</span>, <span class="st">"subregion"</span><span class="op">)</span>,</span>
+<span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"milk"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -558,9 +591,10 @@ trade impacts for any missing origins.</p>
 <a href="Easy_Example.html">Basic Assessment</a> — the single-region
 version this example builds on.</li>
 <li>
-<a href="Difficult_Example.html">Advanced Assessment</a> — adds
-physiological life stages (<code>class_flex</code>) on top of this
-North/South split.</li>
+<a href="Difficult_Example.html">Advanced Multi-Cohort Example</a> —
+multi-cohort swine &amp; poultry assessment demonstrating
+<code>mature</code>, <code>replacement</code>, and
+<code>slaughter</code> lifecycle integration.</li>
 <li>
 <a href="Technical_reference.html">Technical Reference</a> — every
 file and column explained in detail.</li>

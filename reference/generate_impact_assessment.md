@@ -1,17 +1,20 @@
-# Summarize CH4, N2O Emissions, and Land Use
+# Summarize CH4, N2O Emissions, Land Use, and Farm Product Intensities
 
-Summarize CH4, N2O Emissions, and Land Use
+Integrates all upstream Tier 2 GHG emissions, agroecological land
+footprints, and GLEAM production outputs. Generates two distinct
+reports: an absolute environmental inventory (totals) and farm-level
+product, nutritional, and per-head environmental intensities.
 
 ## Usage
 
 ``` r
 generate_impact_assessment(
   automatic_cycle = FALSE,
+  farm_id = NULL,
   region = NULL,
   subregion = NULL,
   animal = NULL,
   type = NULL,
-  class_flex = NULL,
   saveoutput = TRUE,
   group_by_identification = TRUE,
   farm_country = "Spain",
@@ -26,36 +29,45 @@ generate_impact_assessment(
 
 - automatic_cycle:
 
-  Logical. TRUE for built-in model, FALSE for manual
+  Logical. TRUE for built-in demographic models, FALSE for manual
   livestock_census.csv.
+
+- farm_id:
+
+  Character vector to filter by farm_id. Default is NULL.
 
 - region:
 
-  Character/Numeric vector to filter.
+  Character/Numeric vector to filter by geographical region (e.g.,
+  country or province). Together with `subregion`, defines the spatial
+  location of the farm; management or housing variants within the same
+  farm must be distinguished via `animal_tag`, not `subregion`. Default
+  is NULL.
 
 - subregion:
 
-  Character vector to filter.
+  Character vector to filter by geographical subregion (e.g.,
+  municipality or district). Default is NULL.
 
 - animal:
 
-  Livestock type (animal_type).
+  Livestock type (animal_type). Default is NULL.
 
 - type:
 
-  Livestock subtype (animal_subtype).
-
-- class_flex:
-
-  Management class (e.g., 'grazing', 'stall').
+  Livestock subtype (animal_subtype). Default is NULL.
 
 - saveoutput:
 
-  If TRUE saves to output folder.
+  If TRUE saves to output folder:
+  'output/total_emissions_and_land_use.csv' and
+  'output/product_intensities.csv'.
 
 - group_by_identification:
 
-  If TRUE returns by animal_tag.
+  If TRUE returns the inventory totals by individual animal_tag cohort.
+  If FALSE aggregates totals by farm_id, region, subregion, animal_type,
+  animal_subtype.
 
 - farm_country:
 
@@ -65,7 +77,7 @@ generate_impact_assessment(
 - year:
 
   Numeric. The reference year for FAO trade data calculation if origins
-  are missing. Default is 2022.
+  are missing. Default is 2024.
 
 - gwp_report:
 
@@ -84,3 +96,16 @@ generate_impact_assessment(
 
   Path to the directory containing input CSV/data files. Defaults to
   \`"user_data"\`.
+
+## Value
+
+A named list containing two dataframes:
+
+- totals:
+
+  Absolute environmental inventory of emissions, feed, and land use.
+
+- intensities:
+
+  Farm-level product, nutritional, and per-head environmental
+  intensities.

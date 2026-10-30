@@ -1,164 +1,194 @@
-# Dairy Cattle Spain: North/South in different Life Stages
+# Intensive Multi-Cohort Assessment: Swine & Poultry Systems
 
-## Advanced Assessment: Managing Complexity with `class_flex`
+## Advanced Assessment: Multi-Cohort Swine & Poultry Systems (`Monogastric_Example`)
 
-This guide tackles a high-complexity scenario for **mature dairy
-cattle**, splitting the population both by **geography** (North
-vs. South Spain) and by **physiological state**, using the `class_flex`
-column to distinguish the **lactation phase** from the **dry phase**.
+This guide walks through an **Advanced Multi-Cohort Assessment** for
+**monogastric livestock in Spain (`swine` and `poultry`)**,
+demonstrating how `herdr` models full pyramidal herd structures
+combining **`mature`** breeding stock, **`replacement`** rearing
+cohorts, and **`slaughter`** finishing cohorts within a single project.
 
-> 📂 **All files referenced below live in `user_data/` and correspond to
-> the pre-configured `inst/Examples/Level3_Spain_Dairy_Cattle_2015/`
-> baseline.**
+> 📂 **All files referenced below correspond to the pre-configured
+> `inst/Examples/Monogastric_Example/` dataset.**
 
 ### What you’ll edit
 
 | Category | Files |
 |:---|:---|
-| **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `ruminant_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
-| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `forages.parquet` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` · `ecoalim.parquet` |
-
-Full details on every file above are in the [Technical
-Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
-vignette. This guide builds directly on the [Moderate
-Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
-— start there first if you haven’t used `class_flex` before.
+| **User inputs** *(fill these in)* | `livestock_census.csv` · `diet_profiles.csv` · `diet_ingredients.csv` · `monogastric_definitions.csv` · `livestock_weights.csv` · `manure_management.csv` |
+| **Reference libraries** *(consult only)* | `feed_characteristics.csv` · `mapping.csv` · `fao_crops.parquet` · `ipcc_coefficients.csv` · `ipcc_mm.csv` · `ecoalim.parquet` |
 
 ------------------------------------------------------------------------
 
-### Step 1 — Multi-Dimensional Census (`livestock_census.csv`)
+### Step 1 — Multi-Cohort Census (`livestock_census.csv`)
 
-The census links each population figure to a subregion **and** a
-physiological state — essential for accurate annual emission averages.
+In `livestock_census.csv`, we declare the **Annual Average Population
+(AAP)**—i.e., the average number of occupied barn places present on any
+given day of the year—for 10 cohorts across three distinct monogastric
+production enterprises on `farm_1`:
 
-| animal_tag            | region  | subregion | class_flex        | population |
-|:----------------------|:--------|:----------|:------------------|-----------:|
-| `mature_dairy_cattle` | `spain` | `north`   | `dry_phase`       |  88,065.87 |
-| `mature_dairy_cattle` | `spain` | `north`   | `lactation_phase` | 448,921.13 |
-| `mature_dairy_cattle` | `spain` | `south`   | `dry_phase`       |  51,118.64 |
-| `mature_dairy_cattle` | `spain` | `south`   | `lactation_phase` | 260,580.36 |
+1.  **Poultry Meat Enterprise (`poultry` / `meat`):** `broilers`
+    (`slaughter`), `replacement_meat_pullets` (`replacement`), and
+    `breeder_meat_hens` (`mature`).
+2.  **Poultry Layer Enterprise (`poultry` / `layer`):**
+    `replacement_layer_pullets` (`replacement`), `laying_hens`
+    (`mature`), and `free_range_laying_hens` (`mature`).
+3.  **Swine Meat Enterprise (`swine` / `meat`):** `fattening_pigs`
+    (`slaughter`), `replacement_sows` (`replacement`), `breeder_sows`
+    (`mature`), and `boars` (`mature`).
 
-------------------------------------------------------------------------
+| farm_id  | animal_tag                  | region  | subregion | population |
+|:---------|:----------------------------|:--------|:----------|-----------:|
+| `farm_1` | `broilers`                  | `spain` |           | 73,219,430 |
+| `farm_1` | `replacement_meat_pullets`  | `spain` |           |  2,088,485 |
+| `farm_1` | `breeder_meat_hens`         | `spain` |           |  3,999,963 |
+| `farm_1` | `replacement_layer_pullets` | `spain` |           |  9,265,000 |
+| `farm_1` | `laying_hens`               | `spain` |           | 35,640,000 |
+| `farm_1` | `free_range_laying_hens`    | `spain` |           |  3,960,000 |
+| `farm_1` | `fattening_pigs`            | `spain` |           |  5,237,113 |
+| `farm_1` | `replacement_sows`          | `spain` |           |    287,689 |
+| `farm_1` | `breeder_sows`              | `spain` |           |  1,299,996 |
+| `farm_1` | `boars`                     | `spain` |           |     17,187 |
 
-### Step 2 — Phase-Specific Nutrition
-
-Diets are defined directly with distinct `diet_tag` identifiers
-reflecting each region and production phase (`class_flex`).
-
-#### A. Diet profiles — `diet_profiles.csv`
-
-| diet_tag | forage_share | concentrate_share | milk_share | milk_replacer_share |
-|:---|---:|---:|---:|---:|
-| `diet_dairy_mature_north_dry_phase` | 70 | 30 | 0 | 0 |
-| `diet_dairy_mature_north_lactation_phase` | 55 | 45 | 0 | 0 |
-| `diet_dairy_mature_south_dry_phase` | 54 | 46 | 0 | 0 |
-| `diet_dairy_mature_south_lactation_phase` | 50 | 50 | 0 | 0 |
-
-#### B. Ingredient breakdown — `diet_ingredients.csv`
-
-Ingredients are linked directly via `diet_tag`. Here are the primary
-ingredients for the South lactation profile (excerpted from the full
-dataset):
-
-| diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
-|:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature_south_lactation_phase` | concentrate | `corn` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature_south_lactation_phase` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature_south_lactation_phase` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
-| `diet_dairy_mature_south_lactation_phase` | forage | `corn_silage_25_30` | 71.40 | `spain` | 12000 |
-| `diet_dairy_mature_south_lactation_phase` | forage | `cereals_silage_wheat_barley_oat_triticale` | 28.60 | `spain` | `NA` |
-
-> ℹ️ **Illustrative excerpt:** In the complete
-> `Level3_Spain_Dairy_Cattle_2015` template, remaining concentrate
-> shares (9.32%) consist of macro-minerals and vitamins, ensuring both
-> concentrate and forage categories sum to exactly 100.0%.
->
-> 🌍 **Missing origins:** As before, an `NA` in `country_of_origin` is
-> resolved automatically by the dynamic FAO background allocation engine
-> — see [Land Use
-> Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
-> for how.
->
-> 🎯 **Overriding the yield:** The corn silage row sets
-> `custom_yield_kg_ha` to `12000`, so herdr uses that farm-specific
-> figure directly for the land-use footprint instead of a
-> FAO/trade-based lookup.
+> 📌 **Preserving Input Order:** `herdr` preserves the exact row order
+> of `livestock_census.csv` from top to bottom in both `results$totals`
+> (Table 1), `results$intensities` (Table 2), and all
+> [`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
+> bar charts.
 
 ------------------------------------------------------------------------
 
-### Step 3 — Physiological Definitions (`ruminant_definitions.csv`)
+### Step 2 — Monogastric Definitions & Strict Role Taxonomy (`monogastric_definitions.csv`)
 
-This is the most technical file — it determines energy requirements
-under IPCC Tier 2. Notice how `milk_yield_kg_year` and `cfi` change
-between phases.
+In `monogastric_definitions.csv`, every cohort is assigned:
 
-| animal_tag | region | subregion | class_flex | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
-|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `diet_dairy_mature_north_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | `diet_dairy_mature_north_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | `diet_dairy_mature_south_lactation_phase` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `diet_dairy_mature_south_dry_phase` | `cattle/buffalo` | `stall` | `females` | 0 | 0 | 0 | `cattle and buffalo` | `cattle` | `dairy` |
+- **`animal_type`**: strictly `poultry` or `swine`.
+- **`animal_subtype`**:
+  - For `swine`: strictly **`meat`**.
+  - For `poultry`: strictly **`meat`** or **`layer`**.
+- **`production_role`**: strictly **`mature`**, **`replacement`**, or
+  **`slaughter`**.
 
-------------------------------------------------------------------------
-
-### Step 4 — Body Weights (`livestock_weights.csv`)
-
-Accurate weights are essential to calculate Maintenance Energy
-($`NE_m`$) and to validate the animal’s maximum physical intake capacity
-(DMI as % of body weight).
-
-| animal_tag | region | subregion | class_flex | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg |
-|:---|:---|:---|:---|---:|---:|---:|---:|
-| `mature_dairy_cattle` | `spain` | `north` | `dry_phase` | 675 | 365 | 675 | 675 |
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | 675 | 365 | 675 | 675 |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | 675 | 365 | 675 | 675 |
-| `mature_dairy_cattle` | `spain` | `south` | `lactation_phase` | 675 | 365 | 675 | 675 |
-
-> ℹ️ **About `productive_period_days`:**  
-> \* For **adult breeding females (except laying hens)**, this
-> represents the **inter-parturition interval** in days (here, `365`
-> days corresponds to an annual calving interval).  
-> \* For **laying hens**, it represents the **commercial laying cycle
-> duration** until depopulation.  
-> \* For **all other cohorts (growing, fattening, replacement)**, it
-> represents their **life cycle / life-stage duration** (days on feed).
+| farm_id | animal_tag | region | animal_type | animal_subtype | production_role | diet_tag | cfi_maintenance | frac_fat_pct | frac_protein_pct | eggs_per_year | egg_weight_g | fertility_rate | alpha | piglets_born | piglets_suckling | replacement_rate |
+|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `farm_1` | `broilers` | `spain` | `poultry` | `meat` | `slaughter` | `diet_broilers` | 113 | 0.115 | 0.181 | 0 | — | — | — | — | — | — |
+| `farm_1` | `replacement_meat_pullets` | `spain` | `poultry` | `meat` | `replacement` | `diet_replacement_meat_pullets` | 113 | 0.085 | 0.140 | 0 | — | — | — | — | — | — |
+| `farm_1` | `breeder_meat_hens` | `spain` | `poultry` | `meat` | `mature` | `diet_breeder_meat_hens` | 125 | 0.175 | 0.166 | 211.70 | 64 | 0.83 | — | — | — | 1.2126 |
+| `farm_1` | `replacement_layer_pullets` | `spain` | `poultry` | `layer` | `replacement` | `diet_replacement_layer_pullets` | 113 | 0.085 | 0.140 | 0 | — | — | — | — | — | — |
+| `farm_1` | `laying_hens` | `spain` | `poultry` | `layer` | `mature` | `diet_laying_white_hens` | 125 | 0.175 | 0.166 | 297.62 | 60 | — | — | — | — | 0.7140 |
+| `farm_1` | `free_range_laying_hens` | `spain` | `poultry` | `layer` | `mature` | `diet_free_range_laying_hens` | 131 | 0.175 | 0.166 | 313.82 | 60 | — | — | — | — | 0.7140 |
+| `farm_1` | `fattening_pigs` | `spain` | `swine` | `meat` | `slaughter` | `diet_fattening_pigs_80_to_109_kg` | 206 | 0.266 | 0.153 | 0 | — | — | 0.60 | — | — | — |
+| `farm_1` | `replacement_sows` | `spain` | `swine` | `meat` | `replacement` | `diet_replacement_sows` | 206 | 0.280 | 0.153 | 0 | — | — | 0.60 | — | — | — |
+| `farm_1` | `breeder_sows` | `spain` | `swine` | `meat` | `mature` | `diet_gest2_sows` | 104.5 | 0.000 | 0.000 | 0 | — | — | 0.75 | 16.26 | 13.05 | 0.2500 |
+| `farm_1` | `boars` | `spain` | `swine` | `meat` | `mature` | `diet_boar_adult` | 104.5 | 0.203 | 0.161 | 0 | — | — | 0.75 | — | — | 0.3000 |
 
 ------------------------------------------------------------------------
 
-### Step 5 — Advanced Manure Management (`manure_management.csv`)
+### Step 3 — Weights & Batch Turnover (`livestock_weights.csv`)
 
-At this level of granularity you can specify climate zone and system
-variant per cohort, which determines the methane conversion factors
-used.
+For short-cycle monogastrics, `productive_period_days` controls both
+**Average Daily Gain (ADG)** for FEDNA Metabolizable Energy equations
+and **annual batch turnover**
+($`365 / \text{productive\_period\_days}`$) for slaughter output:
 
-| animal_tag | region | subregion | class_flex | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
-|:---|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.0537 |
-| `mature_dairy_cattle` | `spain` | `north` | `lactation_phase` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.3432 |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `solid_storage` | — | — | `warm` | — | — | `dry` | `dairy_cattle_high_productivity` | 0.0694 |
-| `mature_dairy_cattle` | `spain` | `south` | `dry_phase` | `deep_bedding` | `no_mixing` | `>1` | `warm` | `temperate` | `zone_dry` | `dry` | `dairy_cattle_high_productivity` | 0.0131 |
+- **`broilers` (`slaughter`):** `productive_period_days = 42` days
+  ($`365 / 42 \approx 8.69`$ batches finished per barn place per year,
+  from `0.044` kg to `2.60` kg).
+- **`fattening_pigs` (`slaughter`):** `productive_period_days = 110`
+  days ($`365 / 110 \approx 3.32`$ batches finished per barn place per
+  year, from `20.0` kg to `111.82` kg).
+- **`breeder_sows` (`mature`):** `productive_period_days = 148.9` days
+  (farrowing interval, yielding $`365 / 148.9 \approx 2.45`$ litters per
+  sow per year), with `sows_gestation_days = 115.1` and
+  `sows_lactation_days = 25`.
 
-> ⚠️ **Illustrative snippet:** as in the Moderate example, the rows
-> above don’t sum to 1.0 per cohort — some rows were omitted here for
-> brevity. In a real project, `allocation` must sum to exactly 1.0 for
-> every `animal_tag`/`region`/`subregion`/`class_flex` combination.
+| farm_id | animal_tag | region | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg | sows_gestation_days | sows_lactation_days | piglet_birth_weight_kg | piglet_weaning_weight_kg | sow_reserve_gain_kg |
+|:---|:---|:---|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| `farm_1` | `broilers` | `spain` | 2.60 | 42.0 | 0.044 | 2.60 | — | — | — | — | — |
+| `farm_1` | `replacement_meat_pullets` | `spain` | 2.17 | 140.0 | 0.044 | 2.17 | — | — | — | — | — |
+| `farm_1` | `breeder_meat_hens` | `spain` | 4.00 | 301.0 | 2.170 | 4.00 | — | — | — | — | — |
+| `farm_1` | `replacement_layer_pullets` | `spain` | 1.24 | 119.0 | 0.038 | 1.24 | — | — | — | — | — |
+| `farm_1` | `laying_hens` | `spain` | 1.72 | 511.0 | 1.240 | 1.72 | — | — | — | — | — |
+| `farm_1` | `free_range_laying_hens` | `spain` | 2.15 | 441.0 | 1.400 | 2.15 | — | — | — | — | — |
+| `farm_1` | `fattening_pigs` | `spain` | — | 110.0 | 20.000 | 111.82 | — | — | — | — | — |
+| `farm_1` | `replacement_sows` | `spain` | — | 74.7 | 111.820 | 145.93 | — | — | — | — | — |
+| `farm_1` | `breeder_sows` | `spain` | — | 148.9 | 200.840 | 223.19 | 115.1 | 25 | 1.4 | 5.89 | 5.0 |
+| `farm_1` | `boars` | `spain` | — | 365.0 | 237.500 | 287.50 | — | — | — | — | — |
 
 ------------------------------------------------------------------------
 
-### Step 6 — Final Execution
+### Step 4 — How `herdr` Attributes Intensities in Table 2 (`results$intensities`)
 
-When running the analysis, herdr processes each row as a unique
-“animal–state–region” combination before aggregating the results.
+When you run
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md),
+`herdr` produces two complementary tables:
+
+1.  **Table 1 (`results$totals`):** Shows the **direct physical
+    inventory** of each of the 10 cohorts (enteric $`\text{CH}_4`$,
+    manure $`\text{CH}_4`$, direct/indirect $`\text{N}_2\text{O}`$,
+    upstream feed fossil & LUC $`\text{CO}_2\text{e}`$, agroecological
+    land, AWARE water, and per-head footprints).
+2.  **Table 2 (`results$intensities`):** Computes
+    **enterprise-integrated product and protein intensities** within
+    each `(farm_id, region, subregion, animal_type, animal_subtype)`
+    group:
+    - **Poultry Meat (`poultry`, `meat`):** The overhead footprint of
+      `breeder_meat_hens` (`mature`) and `replacement_meat_pullets`
+      (`replacement`) is integrated with `broilers` (`slaughter`) over
+      the total meat produced (broilers + culled breeders).
+      `replacement_meat_pullets` shows `NA` for product intensities
+      because its emissions are already absorbed into the meat
+      enterprise.
+    - **Poultry Layers (`poultry`, `layer`):** Each laying cohort
+      (`laying_hens` and `free_range_laying_hens`) keeps its own direct
+      footprint plus a population-proportional share (`90%` and `10%`,
+      respectively) of the `replacement_layer_pullets` overhead, divided
+      by its respective egg production (`egg_fresh_kg`).
+    - **Swine Meat (`swine`, `meat`):** The breeding herd overhead
+      (`breeder_sows` + `boars` + `replacement_sows`) is integrated with
+      `fattening_pigs` over total carcass pork output (finished pigs +
+      culled sows/boars).
+
+------------------------------------------------------------------------
+
+### Step 5 — Running the Assessment & Visualizing Results
 
 ``` r
 
 library(herdr)
 
-# The model calculates impact for each phase separately
+# Run assessment directly on the bundled Monogastric_Example
+mono_dir <- system.file("Examples/Monogastric_Example", package = "herdr")
+
 results <- generate_impact_assessment(
+  data_dir        = mono_dir,
   automatic_cycle = FALSE,
-  farm_country = "Spain",
-  year = 2015
+  farm_country    = "Spain",
+  year            = 2024,
+  gwp_report      = "AR5",
+  saveoutput      = FALSE
+)
+
+# Inspect Table 1 (Cohort Totals) and Table 2 (Enterprise Product Intensities)
+results$totals
+results$intensities
+
+# 1. Compare Carbon Footprint per kg of Edible Protein across cohorts
+plot_herdr_results(
+  df              = results,
+  group_cols      = "animal_tag",
+  func_name       = "generate_impact_assessment",
+  impact_category = "ghg",
+  functional_unit = "protein"
+)
+
+# 2. Compare Egg Carbon Intensity between caged/barn vs. free-range hens
+plot_herdr_results(
+  df              = results,
+  group_cols      = "animal_tag",
+  func_name       = "generate_impact_assessment",
+  impact_category = "ghg",
+  functional_unit = "egg"
 )
 ```
 
@@ -166,12 +196,15 @@ results <- generate_impact_assessment(
 
 ### Next steps
 
-- [Moderate
-  Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
-  — the North/South split this example builds on, without `class_flex`.
+- [Herd Demography & Life
+  Cycles](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
+  — how `automatic_cycle = TRUE` derives `replacement_sows`,
+  `fattening_pigs`, and `broilers` automatically from breeding stock.
 - [Basic
   Assessment](https://juancbm99.github.io/herdr/articles/Easy_Example.md)
-  — the simplest single-region starting point.
+  / [Moderate
+  Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
+  — dairy cattle case studies.
 - [Technical
   Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
-  — every file and column explained in detail.
+  — complete column-by-column dictionary.

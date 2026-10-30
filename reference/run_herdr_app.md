@@ -8,4 +8,6 @@ data private.
 
 ``` r
 run_herdr_app()
+
+run_app()
 ```

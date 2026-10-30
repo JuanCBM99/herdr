@@ -102,7 +102,7 @@ something else – soybean meal alongside soybean oil, or a cereal grain
 alongside its straw. Attributing the *entire* cultivated area to the
 feed ingredient would overstate its footprint, so `herdr` applies the
 `economic_allocation` factor from
-[`mapping.csv`](https://juancbm99.github.io/herdr/articles/Technical_reference.html#mapping.csv--database-connector)
+[`mapping.csv`](https://juancbm99.github.io/herdr/articles/Technical_reference.html#mapping)
 ($`EconomicAllocation_i \in [0, 1]`$):
 
 ``` math
@@ -255,7 +255,7 @@ To prevent this, `herdr` uses a bounded recursive traceback algorithm:
 > **Note:** The bilateral trade database (`fao_trade_matrix.parquet`,
 > ~187 MB) is downloaded automatically from GitHub Releases the first
 > time an assessment requires trade resolution – see [Technical
-> Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.html#fao_trade_matrixparquet--dynamic-trade-background-auto-downloaded).
+> Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.html#fao_trade_matrix).
 
 ------------------------------------------------------------------------
 
@@ -313,7 +313,7 @@ agroecological and spatial breakdown:
 
 | Column | Description |
 |:---|:---|
-| `region`, `subregion`, `animal_tag`, `class_flex` | Cohort identification and geographic stratum |
+| `farm_id`, `region`, `subregion`, `animal_tag` | Farm and cohort identification and geographic stratum |
 | `animal_type`, `animal_subtype` | Species and production system category |
 | `ingredient` | Specific feedstuff name from diet |
 | `land_type` | Agroecological classification (`cropland`, `grassland_convertible`, `grassland_unconvertible`, `none`) |

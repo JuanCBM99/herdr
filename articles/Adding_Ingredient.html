@@ -254,18 +254,18 @@ and proximate analysis
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">EE</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">NDF</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ash</annotation></semantics></math>).
-See the exact regression formulas in the <a href="Technical_reference.html#feed_characteristics.csv--nutritional-values">Technical
+See the exact regression formulas in the <a href="Technical_reference.html#feed_characteristics">Technical
 Reference: Feed Characteristics</a>.</li>
 <li>
 <strong>Gross Energy (<code>GE_feed_kcal_kg</code>)</strong>: If
 unmeasured by bomb calorimetry, calculate using the NRC (1989) Ewan
-equation documented in the <a href="Technical_reference.html#feed_characteristics.csv--nutritional-values">Technical
+equation documented in the <a href="Technical_reference.html#feed_characteristics">Technical
 Reference</a>.</li>
 <li>Leave the swine/poultry energy columns as <code>NA</code> if the
 ingredient is only fed to ruminants (as here) — herdr only needs them
 for monogastric diets.</li>
 </ul>
-<p>See the <a href="Technical_reference.html#feed_characteristics.csv--nutritional-values">Technical
+<p>See the <a href="Technical_reference.html#feed_characteristics">Technical
 Reference</a> vignette for the full column definitions.</p>
 <hr>
 </div>
@@ -391,9 +391,9 @@ resulting in zero consumption and zero land use.</p></li>
 any given diet (<code>diet_tag</code>) and <code>ingredient_type</code>,
 the sum of <code>ingredient_share</code> values must total 100%
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>±</mi><mn>0.1</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\pm 0.1\%</annotation></semantics></math>).
-Herdr validates this before computing and throws a warning if shares do
-not total 100%:</p>
-<pre><code>⚠️ Ingredient shares do not sum to 100% in: diet_dairy_mature</code></pre>
+Herdr validates this strictly before computing and stops with an
+informative error if shares do not total 100%:</p>
+<pre><code>Error: Ingredient Error: Shares do not sum to 100% within a category in 'diet_ingredients.csv' for: diet_dairy_mature (concentrate = 95%)</code></pre>
 </li>
 <li>
 <p><strong>Country of Origin &amp; Yield Resolution</strong>:</p>
@@ -468,8 +468,8 @@ one of <code>forage</code>, <code>concentrate</code>, <code>milk</code>,
 <code>milk_replacer</code>.</td>
 </tr>
 <tr class="even">
-<td align="left">Warning:
-<code>Ingredient shares do not sum to 100%</code>
+<td align="left">Error:
+<code>Ingredient Error: Shares do not sum to 100%</code>
 </td>
 <td align="left">Values in <code>ingredient_share</code> within that
 diet cohort and <code>ingredient_type</code> do not total 100</td>

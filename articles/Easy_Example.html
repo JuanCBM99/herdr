@@ -153,23 +153,24 @@ only)</em>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-1-the-census">Step 1 — The Census<a class="anchor" aria-label="anchor" href="#step-1-the-census"></a>
+<h3 id="step-1-the-census-livestock_census-csv">Step 1 — The Census (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#step-1-the-census-livestock_census-csv"></a>
 </h3>
 <p>Open <code>livestock_census.csv</code>. This is where you define who
-is on the farm. For this basic example, we work at national level, so
-<code>subregion</code> and <code>class_flex</code> are left blank.</p>
+is on the farm and in what row order you want cohorts displayed in
+output tables and charts. For this basic example, we work at national
+level, so <code>subregion</code> is left blank.</p>
 <table class="table">
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="right">population</th>
 </tr></thead>
 <tbody><tr class="odd">
+<td align="left"><code>farm_1</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"></td>
 <td align="left"></td>
 <td align="right">848,686</td>
 </tr></tbody>
@@ -186,7 +187,7 @@ is on the farm. For this basic example, we work at national level, so
 </h4>
 <p>Open <code>feed_characteristics.csv</code> to see the list of
 available feed items. You can also add new ingredients here, as long as
-every required column is filled in.</p>
+every required column is filled in (see <a href="Adding_Ingredient.html">Adding a New Ingredient</a>).</p>
 </div>
 <div class="section level4">
 <h4 id="b--define-the-profile-diet_profiles-csv">B. Define the profile — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#b--define-the-profile-diet_profiles-csv"></a>
@@ -239,7 +240,7 @@ every required column is filled in.</p>
 <tbody>
 <tr class="odd">
 <td align="left"><code>diet_dairy_mature</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>corn</code></td>
 <td align="right">44.85</td>
 <td align="left"><code>spain</code></td>
@@ -247,7 +248,7 @@ every required column is filled in.</p>
 </tr>
 <tr class="even">
 <td align="left"><code>diet_dairy_mature</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>soybean_meal_44_cp</code></td>
 <td align="right">17.12</td>
 <td align="left"><code>NA</code></td>
@@ -255,7 +256,7 @@ every required column is filled in.</p>
 </tr>
 <tr class="odd">
 <td align="left"><code>diet_dairy_mature</code></td>
-<td align="left">concentrate</td>
+<td align="left"><code>concentrate</code></td>
 <td align="left"><code>rapeseed_meal_00_33_cp</code></td>
 <td align="right">28.71</td>
 <td align="left"><code>NA</code></td>
@@ -266,48 +267,61 @@ every required column is filled in.</p>
 <blockquote>
 <p>✅ <strong>Shares sum to 100% <em>within</em> each category</strong>
 — ensure all <code>ingredient_share</code> values within
-<code>concentrate</code> total 100%.</p>
+<code>concentrate</code> and <code>forage</code> each total 100%.</p>
 <p>🌍 <strong>Missing origins:</strong> leave
 <code>country_of_origin</code> as <code>NA</code> when you don’t know
-where a feed comes from. herdr resolves it automatically using FAO trade
-data — see <a href="land_use.html">Land Use Methodology</a> for how.</p>
+where a feed comes from. <code>herdr</code> resolves it automatically
+using FAO trade data — see <a href="land_use.html">Land Use
+Methodology</a> for how.</p>
 <p>🎯 <strong>Overriding the yield:</strong>
 <code>custom_yield_kg_ha</code> lets you skip the FAO/trade lookup
 entirely for a given ingredient. If you already know the real yield for
 your farm or region — e.g. <code>3200</code> kg DM/ha — enter it here
-and herdr uses that value directly for the land-use calculation,
-ignoring <code>country_of_origin</code> and any FAO database lookup for
-that row.</p>
+and <code>herdr</code> uses that value directly for the land-use
+calculation.</p>
 </blockquote>
 <hr>
 </div>
 </div>
 <div class="section level3">
-<h3 id="step-3-animal-categories-and-coefficients">Step 3 — Animal Categories and Coefficients<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients"></a>
+<h3 id="step-3-animal-categories-and-coefficients-ruminant_definitions-csv">Step 3 — Animal Categories and Coefficients
+(<code>ruminant_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#step-3-animal-categories-and-coefficients-ruminant_definitions-csv"></a>
 </h3>
-<p>Open <code>ruminant_definitions.csv</code>. This file links your
-animal to the IPCC Tier 2 equations — each of <code>cfi</code>,
-<code>ca</code>, <code>c</code>, and <code>c_pregnancy_cattle</code> is
-a separate lookup into <code>ipcc_coefficients.csv</code>, so use the
-<strong>exact description</strong> for each as it appears there.</p>
+<p>Open <code>ruminant_definitions.csv</code>. This file classifies your
+cohort’s species (<code>animal_type</code>), production target
+(<code>animal_subtype</code>: strictly <code>dairy</code> or
+<code>meat</code>), and lifecycle role (<code>production_role</code>:
+strictly <code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>), and links it to the IPCC Tier 2 equations
+(<code>cfi</code>, <code>ca</code>, <code>c</code>,
+<code>c_pregnancy_cattle</code> in
+<code>ipcc_coefficients.csv</code>).</p>
 <table class="table">
 <colgroup>
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
+<col width="6%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
+<th align="left">animal_type</th>
+<th align="left">animal_subtype</th>
+<th align="left">production_role</th>
 <th align="left">diet_tag</th>
 <th align="left">cfi</th>
 <th align="left">ca</th>
@@ -316,12 +330,16 @@ a separate lookup into <code>ipcc_coefficients.csv</code>, so use the
 <th align="right">fat_content_pct</th>
 <th align="right">protein_content_pct</th>
 <th align="left">c_pregnancy_cattle</th>
-<th align="left">animal_type</th>
-<th align="left">animal_subtype</th>
+<th align="right">pregnancy_rate</th>
+<th align="right">replacement_rate</th>
 </tr></thead>
 <tbody><tr class="odd">
+<td align="left"><code>farm_1</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
+<td align="left"><code>cattle</code></td>
+<td align="left"><code>dairy</code></td>
+<td align="left"><code>mature</code></td>
 <td align="left"><code>diet_dairy_mature</code></td>
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
@@ -330,27 +348,39 @@ a separate lookup into <code>ipcc_coefficients.csv</code>, so use the
 <td align="right">3.73</td>
 <td align="right">3.39</td>
 <td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="right">0.90</td>
+<td align="right">0.27</td>
 </tr></tbody>
 </table>
+<blockquote>
+<p>💡 <strong>Why <code>replacement_rate = 0.27</code> matters even when
+<code>automatic_cycle = FALSE</code>:</strong><br>
+In a dairy herd, 27% of mature cows are culled annually and sold for
+meat. <code>herdr</code> uses <code>replacement_rate</code> to compute
+annual culled cow carcass output (<code>meat_carcass_weight_kg</code>)
+and applies the <strong>IDF (2022) Net Energy physical
+allocation</strong> between milk (<code>milk_FPCM_kg</code>) and cull
+meat.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-4-body-weights">Step 4 — Body Weights<a class="anchor" aria-label="anchor" href="#step-4-body-weights"></a>
+<h3 id="step-4-body-weights-livestock_weights-csv">Step 4 — Body Weights (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-4-body-weights-livestock_weights-csv"></a>
 </h3>
 <p>Open <code>livestock_weights.csv</code>. Make sure the identifying
 keys match the census exactly.</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
+<col width="14%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="right">adult_weight_kg</th>
@@ -359,6 +389,7 @@ keys match the census exactly.</p>
 <th align="right">final_weight_kg</th>
 </tr></thead>
 <tbody><tr class="odd">
+<td align="left"><code>farm_1</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="right">675</td>
@@ -387,27 +418,28 @@ life-stage duration</strong> (days on feed).</p>
 <ol style="list-style-type: decimal">
 <li>Check <code>ipcc_mm.csv</code> for valid <code>system_base</code>,
 <code>system_variant</code>, and <code>climate_zone</code> combinations
-— or browse the <a href="Manure.html">Manure System Guide</a> for the
-same information in narrative form.</li>
+— or browse the <a href="Manure.html">Manure System Guide</a>.</li>
 <li>If a cohort splits its manure across more than one system,
 <strong>duplicate the row</strong> and divide the
 <code>allocation</code> between them so it sums to 1.0.</li>
 </ol>
 <table class="table">
 <colgroup>
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
-<col width="9%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">system_base</th>
@@ -422,6 +454,7 @@ same information in narrative form.</li>
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_1</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>liquid_slurry</code></td>
@@ -435,6 +468,7 @@ same information in narrative form.</li>
 <td align="right">0.3</td>
 </tr>
 <tr class="even">
+<td align="left"><code>farm_1</code></td>
 <td align="left"><code>mature_dairy_cattle</code></td>
 <td align="left"><code>spain</code></td>
 <td align="left"><code>solid_storage</code></td>
@@ -449,25 +483,36 @@ same information in narrative form.</li>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>ℹ️ <code>solid_storage</code> is a Standard system (see the <a href="Manure.html">Manure System Guide</a>) — it doesn’t need
-<code>management_months</code>, <code>system_variant</code>,
-<code>system_subclimate</code>, or <code>climate_zone</code>, so those
-columns are left blank.</p>
-</blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-6-running-the-analysis">Step 6 — Running the Analysis<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis"></a>
+<h3 id="step-6-running-the-analysis-inspecting-outputs">Step 6 — Running the Analysis &amp; Inspecting Outputs<a class="anchor" aria-label="anchor" href="#step-6-running-the-analysis-inspecting-outputs"></a>
 </h3>
-<p>Once every CSV above is complete, run the assessment from R:</p>
+<p>Once every CSV above is complete, run the consolidated assessment
+from R:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2015</span>,</span>
+<span>  gwp_report      <span class="op">=</span> <span class="st">"AR5"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Table 1: Absolute GHG emissions (Gg CO2e), land (m2), water (m3), and per-head footprints</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">totals</span></span>
+<span></span>
+<span><span class="co"># Table 2: Product intensities (per kg FPCM milk, per kg cull meat, per kg protein) &amp; Protein FCR</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span></span>
+<span></span>
+<span><span class="co"># Visualize Milk Carbon Footprint (Scope 1 + Feed Fossil + Feed LUC per kg FPCM milk)</span></span>
+<span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"farm_id"</span>, <span class="st">"animal_tag"</span><span class="op">)</span>,</span>
+<span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"milk"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -477,13 +522,17 @@ columns are left blank.</p>
 <ul>
 <li>
 <a href="Workflow.html">General Workflow</a> — the full step-by-step
-guide this example is based on.</li>
+scripting guide.</li>
+<li>
+<a href="Moderate_Example.html">Moderate Example</a> —
+multi-regional dairy assessment (North vs. South Spain).</li>
+<li>
+<a href="Difficult_Example.html">Advanced Multi-Cohort Example</a> —
+multi-cohort swine &amp; poultry assessment with <code>mature</code>,
+<code>replacement</code>, and <code>slaughter</code> integration.</li>
 <li>
 <a href="Technical_reference.html">Technical Reference</a> — every
 file and column explained in detail.</li>
-<li>
-<a href="Moderate_Example.html">Moderate Example</a> / <a href="Difficult_Example.html">Advanced Assessment</a> — build on this
-with multi-region herds and mixed manure systems.</li>
 </ul>
 </div>
 </div>

@@ -33,49 +33,60 @@ flows into a **single, internally consistent modeling engine**.
 
 1.  **IPCC Tier 2 Greenhouse Gas Inventories:** Implements the *2019
     Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas
-    Inventories* for ruminants (cattle, sheep, goats) and monogastrics
-    (swine, poultry, adopting FEDNA nutritional standards).
+    Inventories* for ruminants (`cattle`, `sheep`, `goat`) and
+    monogastrics (`swine`, `poultry`, adopting FEDNA nutritional
+    standards).
 2.  **Agroecological Land Footprint & Competition:** Quantifies feed
-    land requirements (m2) and classifies land according to human food
-    competition (Mottet et al., 2017) into **Cropland**, **Convertible
-    Grassland**, **Unconvertible Rangeland**, and **Other**. When
-    ingredient origins are unspecified, `herdr` traces true producer
-    countries using recursive FAO bilateral trade matrices and national
-    self-sufficiency thresholds.
-3.  **Animal Productivity & Edible Human Protein:** Implements the **FAO
-    GLEAM v3.0** methodology to translate herd throughput into physical
+    land requirements ($`\text{m}^2`$) and classifies land according to
+    human food competition (Mottet et al., 2017) into **Cropland**,
+    **Convertible Grassland**, **Unconvertible Rangeland**, and
+    **None**. When ingredient origins are unspecified, `herdr` traces
+    true producer countries using recursive FAO bilateral trade matrices
+    and national self-sufficiency thresholds.
+3.  **Animal Productivity & Edible Human Protein:** Implements the
+    **FAO** methodology to translate herd throughput across functional
+    roles (`mature`, `replacement`, `slaughter`) into physical
     commodities (Fat and Protein Corrected Milk, cold dressed carcass
-    weight, boneless meat, and fresh eggs) and total digestible human
-    protein (kg protein/year).
-4.  **Biophysical Co-Product Allocation & Protein Feed Efficiency
-    (Mottet et al., 2017):** Applies the updated **International Dairy
-    Federation (IDF Bulletin 520/2022)** Net Energy physical allocation
+    weight, boneless meat, greasy wool, and fresh eggs) and total
+    digestible human protein (kg protein/year).
+4.  **Enterprise Attribution, Biophysical Co-Product Allocation &
+    Protein Feed Efficiency:** Automatically integrates non-commercial
+    rearing and breeding overheads (`replacement` and `mature` breeders)
+    into commercial outputs, applies the **International Dairy
+    Federation (IDF Bulletin 520/2022)** Net Energy physical allocation,
     and reports protein conversion and human food competition metrics
     (`Protein_FCR_total` and `Protein_FCR_cropland`).
 5.  **Upstream Feed LCA & Water Deprivation (EF 3.1 / AWARE):**
     Integrates INRAE/ADEME **ECOALIM v9** to evaluate upstream feed
     carbon footprints (fossil emissions vs. deforestation LUC) and
-    freshwater deprivation ($`m^3\text{ depriv.}`$) characterized via
-    the international **AWARE** model.
+    freshwater deprivation ($`\text{m}^3\text{ depriv.}`$) characterized
+    via the international **AWARE** model.
 
 ------------------------------------------------------------------------
 
-## Supported Livestock Species
+## Supported Livestock Species & Canonical Taxonomy
 
-`herdr` natively supports full life cycles across major domestic
-species:
+`herdr` natively supports full life cycles across five major domestic
+species using a strict, standardized taxonomy:
 
-- 🐄 **Cattle:** Mature dairy cows (lactating & dry phases), replacement
-  heifers, breeding bulls, suckler beef cows, and feedlot fattening
-  calves.
-- 🐑 **Sheep:** Dairy ewes, meat ewes, breeding rams, replacement
-  hoggets, and slaughter lambs.
-- 🐐 **Goats:** Dairy does, meat does, bucks, kids for replacement, and
-  dairy/meat fattening kids.
-- 🐖 **Swine:** Breeding sows (gestation & lactation phases), service
-  boars, replacement gilts, weaners, and fattening pigs.
-- 🐔 **Poultry:** Commercial layer flocks, layer replacement pullets,
-  broiler meat flocks, and meat breeder hens.
+- 🐄 **Cattle (`cattle` \| `dairy` or `meat`):** Mature dairy cows
+  (`mature`), suckler beef cows and breeding bulls (`mature`),
+  replacement calves and yearling heifers (`replacement`), and
+  feedlot/beef fattening calves (`slaughter`).
+- 🐑 **Sheep (`sheep` \| `dairy` or `meat`):** Dairy ewes, meat ewes,
+  and breeding rams (`mature`), replacement lambs (`replacement`), and
+  slaughter lambs (`slaughter`).
+- 🐐 **Goats (`goat` \| `dairy` or `meat`):** Dairy does, meat does, and
+  bucks (`mature`), replacement kids (`replacement`), and dairy/meat
+  fattening kids (`slaughter`).
+- 🐖 **Swine (`swine` \| `meat`):** Breeding sows and service boars
+  (`mature`), replacement gilts (`replacement`), and fattening pigs
+  (`slaughter`).
+- 🐔 **Poultry (`poultry` \| `meat` or `layer`):** Commercial laying
+  hens and free-range layers (`layer` / `mature`), layer replacement
+  pullets (`layer` / `replacement`), meat breeder hens (`meat` /
+  `mature`), meat replacement pullets (`meat` / `replacement`), and
+  broilers (`meat` / `slaughter`).
 
 ------------------------------------------------------------------------
 
@@ -97,9 +108,9 @@ herdr_init()
 run_herdr_app()
 ```
 
-The Shiny app provides guided forms, real-time input validation,
-interactive stacked charts, and one-click data downloads. See the
-[Interactive App
+The Shiny app provides guided forms, strict dropdowns, real-time
+pre-flight validation, interactive stacked charts, and one-click CSV/PNG
+downloads. See the [Interactive App
 Guide](https://juancbm99.github.io/herdr/articles/app.md) for a complete
 walkthrough.
 
@@ -119,12 +130,17 @@ results <- generate_impact_assessment(
   gwp_report   = "AR5"
 )
 
-# 3. Visualize results by species across functional units
+# Inspect Table 1 (Cohort Totals) and Table 2 (Enterprise Product Intensities)
+results$totals
+results$intensities
+
+# 3. Visualize results across impact categories and functional units
 p <- plot_herdr_results(
   df              = results,
   group_cols      = c("animal_type", "region"),
   func_name       = "generate_impact_assessment",
-  functional_unit = "protein" # kg CO2e and m2 per kg edible protein
+  impact_category = "ghg",
+  functional_unit = "protein" # kg CO2e per kg edible protein
 )
 
 print(p)
@@ -152,6 +168,6 @@ to support different stages of your work:
 |  | [Adding a Custom Feed Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md) | How to expand nutritional and LCA reference databases with custom feedstuffs. |
 | **Case Studies** | [1. Dairy Cattle (Basic)](https://juancbm99.github.io/herdr/articles/Easy_Example.md) | Single-farm assessment highlighting FPCM and IDF co-product allocation. |
 |  | [2. Regional Variations (Moderate)](https://juancbm99.github.io/herdr/articles/Moderate_Example.md) | Multi-farm spatial stratification across diverse climatic regions. |
-|  | [3. Intensive Multi-Cohort AAP (Advanced)](https://juancbm99.github.io/herdr/articles/Difficult_Example.md) | High-throughput batch rearing in swine and poultry systems. |
-| **Methodology & Reference** | [Technical Data Dictionary](https://juancbm99.github.io/herdr/articles/Technical_reference.md) | Comprehensive field-by-field schema of all CSV templates and background databases. |
-|  | [Theoretical Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) | Complete mathematical formulations, IPCC Tier 2 equations, and GLEAM algorithms. |
+|  | [3. Intensive Multi-Cohort AAP (Advanced)](https://juancbm99.github.io/herdr/articles/Difficult_Example.md) | Multi-cohort swine and poultry systems demonstrating `mature`, `replacement`, and `slaughter` integration. |
+| **Methodology & Reference** | [Technical Data Dictionary](https://juancbm99.github.io/herdr/articles/Technical_reference.md) | Comprehensive field-by-field schema of all CSV templates, outputs, and background databases. |
+|  | [Theoretical Basis](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md) | Complete mathematical formulations, IPCC Tier 2 equations, GLEAM algorithms, and enterprise attribution. |

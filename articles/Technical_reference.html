@@ -110,22 +110,28 @@ scenario.</li>
 <strong>Reference Libraries:</strong> Package-bundled reference
 databases (<code>.csv</code> and <code>.parquet</code>) providing
 official IPCC coefficients, nutritional tables (FEDNA), crop
-productivities (FAOSTAT / MAPA), and bilateral trade flows.</li>
+productivities (FAOSTAT / MAPA), bilateral trade flows, and feed life
+cycle inventories (ECOALIM v9 / AGRIBALYSE v3.1).</li>
 </ol>
 <pre class="text"><code>┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                              PRIMARY DEMOGRAPHIC COHORT KEYS                           │
-├─────────────────┬──────────────┬─────────────────┬─────────────────────────────────────┤
-│  animal_tag     │  region      │  subregion      │  class_flex                         │
-│  (Mandatory)    │  (Optional)  │  (Optional)     │  (Optional)                         │
-│  e.g., "dairy"  │  e.g., spain │  e.g., galicia  │  e.g., "lactation_phase"            │
-└─────────────────┴──────────────┴─────────────────┴─────────────────────────────────────┘</code></pre>
+│                          PRIMARY DEMOGRAPHIC COHORT KEYS                               │
+├─────────────────┬─────────────────────────┬──────────────┬─────────────────────────────┤
+│  farm_id        │  animal_tag             │  region      │  subregion                  │
+│  (Mandatory)    │  (Mandatory)            │  (Optional)  │  (Optional)                 │
+│  e.g., "farm_1" │  e.g., "dairy_cows"     │  e.g., spain │  e.g., "north"              │
+└─────────────────┴─────────────────────────┴──────────────┴─────────────────────────────┘</code></pre>
 <blockquote>
-<p>⚠️ <strong>Critical Rule on Identifiers:</strong> All table joins
-rely on exact string matching across the four demographic keys.
-Identifiers are <strong>strictly lowercase</strong> and use
-<strong>underscores</strong> instead of spaces (e.g.,
-<code>mature_dairy_cattle</code>, NOT
-<code>Mature Dairy Cattle</code>).</p>
+<p>⚠️ <strong>Critical Rules on Identifiers &amp; Ordering:</strong> 1.
+All table joins rely on exact string matching across the four
+demographic keys (<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>). Identifiers are
+<strong>strictly lowercase</strong> and use <strong>underscores</strong>
+instead of spaces (e.g., <code>mature_dairy_cattle</code>, NOT
+<code>Mature Dairy Cattle</code>). 2. The row order in
+<code>livestock_census.csv</code> defines the exact top-to-bottom order
+of cohorts in all output tables (<code>totals</code> and
+<code>intensities</code>) and plots
+(<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code>).</p>
 </blockquote>
 <hr>
 </div>
@@ -135,7 +141,8 @@ Identifiers are <strong>strictly lowercase</strong> and use
 <div class="section level3">
 <h3 id="herd-census-livestock_census-csv">1. Herd Census (<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#herd-census-livestock_census-csv"></a>
 </h3>
-<p>Declares the standing population count for each animal group.</p>
+<p>Declares the standing population count for each animal group and
+establishes the display order across outputs.</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="17%">
@@ -153,6 +160,14 @@ Identifiers are <strong>strictly lowercase</strong> and use
 </tr></thead>
 <tbody>
 <tr class="odd">
+<td align="left"><code>farm_id</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center"><strong>Yes</strong></td>
+<td align="left">Farm or enterprise holding identifier (e.g.,
+<code>farm_1</code>, <code>farm_north</code>).</td>
+</tr>
+<tr class="even">
 <td align="left"><code>animal_tag</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -160,7 +175,7 @@ Identifiers are <strong>strictly lowercase</strong> and use
 <td align="left">Primary cohort identifier (e.g.,
 <code>mature_dairy_cattle</code>, <code>fattening_pigs</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>region</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -168,21 +183,13 @@ Identifiers are <strong>strictly lowercase</strong> and use
 <td align="left">Broad geographic stratum or country (e.g.,
 <code>spain</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>subregion</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center">No</td>
-<td align="left">Administrative province, autonomous community, or farm
-ID.</td>
-</tr>
-<tr class="even">
-<td align="left"><code>class_flex</code></td>
-<td align="center">character</td>
-<td align="center">—</td>
-<td align="center">No</td>
-<td align="left">Physiological status, life stage, or management
-variant.</td>
+<td align="left">Administrative province, autonomous community, or
+regional sub-unit (e.g., <code>north</code>, <code>south</code>).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>population</code></td>
@@ -220,8 +227,8 @@ maintenance energy, growth, and throughput modeling.</p>
 <tbody>
 <tr class="odd">
 <td align="left">
-<code>animal_tag</code>, <code>region</code>,
-<code>subregion</code>, <code>class_flex</code>
+<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>
 </td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -333,8 +340,8 @@ yields, and reproductive traits.</p>
 <tbody>
 <tr class="odd">
 <td align="left">
-<code>animal_tag</code>, <code>region</code>,
-<code>subregion</code>, <code>class_flex</code>
+<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>
 </td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -347,15 +354,15 @@ yields, and reproductive traits.</p>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Broad species: <code>cattle</code>, <code>sheep</code>,
-or <code>goat</code>.</td>
+<td align="left">Broad species (strict): <code>cattle</code>,
+<code>sheep</code>, or <code>goat</code>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>animal_subtype</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Production target: <code>dairy</code> or
+<td align="left">Production target (strict): <code>dairy</code> or
 <code>meat</code>.</td>
 </tr>
 <tr class="even">
@@ -363,8 +370,9 @@ or <code>goat</code>.</td>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Functional role: <code>mature</code>,
-<code>replacement</code>, or <code>slaughter</code>.</td>
+<td align="left">Functional lifecycle role (strict):
+<code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>diet_tag</code></td>
@@ -394,18 +402,28 @@ or <code>goat</code>.</td>
 <td align="left"><code>c</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
-<td align="center">Ruminant</td>
-<td align="left">Growth coefficient category (e.g. <code>females</code>,
-<code>castrates</code>, <code>bulls</code>).</td>
+<td align="center">Cattle</td>
+<td align="left">Growth coefficient category for cattle
+(<code>females</code>, <code>castrates</code>, <code>bulls</code>).</td>
 </tr>
 <tr class="odd">
+<td align="left">
+<code>a</code>, <code>b</code>
+</td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Sheep/Goat</td>
+<td align="left">Growth constants <code>a</code> and <code>b</code> for
+sheep and goats matching <code>ipcc_coefficients.csv</code>.</td>
+</tr>
+<tr class="even">
 <td align="left"><code>milk_yield_kg_year</code></td>
 <td align="center">numeric</td>
 <td align="center">kg/head/yr</td>
 <td align="center">Dairy</td>
 <td align="left">Annual average fresh milk yield per cow/ewe/doe.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>fat_content_pct</code></td>
 <td align="center">numeric</td>
 <td align="center">%</td>
@@ -413,7 +431,7 @@ or <code>goat</code>.</td>
 <td align="left">Milk fat content percentage
 (e.g. <code>3.8</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>protein_content_pct</code></td>
 <td align="center">numeric</td>
 <td align="center">%</td>
@@ -421,7 +439,7 @@ or <code>goat</code>.</td>
 <td align="left">Milk crude protein percentage (e.g. <code>3.4</code>).
 If left blank or <code>0</code>, estimated via IPCC fat regression.</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>wool_yield_kg_year</code></td>
 <td align="center">numeric</td>
 <td align="center">kg/head/yr</td>
@@ -429,7 +447,7 @@ If left blank or <code>0</code>, estimated via IPCC fat regression.</td>
 <td align="left">Annual greasy wool shorn per head
 (e.g. <code>3.0</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>work_hours</code></td>
 <td align="center">numeric</td>
 <td align="center">h/day</td>
@@ -437,13 +455,21 @@ If left blank or <code>0</code>, estimated via IPCC fat regression.</td>
 <td align="left">Daily hours worked by draft animals (default:
 <code>0</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>pr_sheep_goat</code></td>
 <td align="center">numeric</td>
 <td align="center">kids/litter</td>
 <td align="center">Sheep/Goats</td>
 <td align="left">Prolificacy: average kids or lambs born per litter
 (e.g. <code>1.5</code>).</td>
+</tr>
+<tr class="even">
+<td align="left"><code>c_pregnancy_cattle</code></td>
+<td align="center">character</td>
+<td align="center">—</td>
+<td align="center">Cattle</td>
+<td align="left">Pregnancy coefficient descriptor matching
+<code>ipcc_coefficients.csv</code>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>pregnancy_rate</code></td>
@@ -490,8 +516,8 @@ nutritional standards.</p>
 <tbody>
 <tr class="odd">
 <td align="left">
-<code>animal_tag</code>, <code>region</code>,
-<code>subregion</code>, <code>class_flex</code>
+<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>
 </td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -504,7 +530,7 @@ nutritional standards.</p>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Broad species: <code>swine</code> or
+<td align="left">Broad species (strict): <code>swine</code> or
 <code>poultry</code>.</td>
 </tr>
 <tr class="odd">
@@ -512,16 +538,18 @@ nutritional standards.</p>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Subtype: <code>meat</code> (swine, broilers) or
-<code>layer</code> (laying hens).</td>
+<td align="left">Subtype (strict): <code>meat</code> for
+<code>swine</code>; <code>meat</code> or <code>layer</code> for
+<code>poultry</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>production_role</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Functional role: <code>mature</code>,
-<code>replacement</code>, or <code>slaughter</code>.</td>
+<td align="left">Functional lifecycle role (strict):
+<code>mature</code>, <code>replacement</code>, or
+<code>slaughter</code>.</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>diet_tag</code></td>
@@ -534,26 +562,27 @@ nutritional standards.</p>
 <tr class="even">
 <td align="left"><code>cfi_maintenance</code></td>
 <td align="center">numeric</td>
-<td align="center">kcal/kg^0.75</td>
+<td align="center">kcal/kg^alpha</td>
 <td align="center"><strong>Yes</strong></td>
-<td align="left">Daily net energy maintenance requirement
-(e.g. <code>106</code> for swine).</td>
+<td align="left">Daily metabolizable energy maintenance requirement
+(e.g. <code>104.5</code>–<code>206</code> for swine,
+<code>113</code>–<code>131</code> for poultry).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>frac_fat_pct</code></td>
 <td align="center">numeric</td>
-<td align="center">%</td>
+<td align="center">fraction</td>
 <td align="center">Monogastric</td>
-<td align="left">Percentage of live weight gain deposited as fat
-tissue.</td>
+<td align="left">Fraction of live weight gain deposited as fat tissue
+(e.g. <code>0.266</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>frac_protein_pct</code></td>
 <td align="center">numeric</td>
-<td align="center">%</td>
+<td align="center">fraction</td>
 <td align="center">Monogastric</td>
-<td align="left">Percentage of live weight gain deposited as protein
-tissue.</td>
+<td align="left">Fraction of live weight gain deposited as protein
+tissue (e.g. <code>0.153</code>).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>eggs_per_year</code></td>
@@ -561,7 +590,8 @@ tissue.</td>
 <td align="center">eggs/hen/yr</td>
 <td align="center">Poultry</td>
 <td align="left">Annual egg production per hen
-(e.g. <code>310</code>).</td>
+(e.g. <code>297</code>–<code>314</code> for layers, <code>211.7</code>
+for meat breeders).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>egg_weight_g</code></td>
@@ -569,7 +599,7 @@ tissue.</td>
 <td align="center">g/egg</td>
 <td align="center">Poultry</td>
 <td align="left">Average weight of one fresh egg
-(e.g. <code>62.5</code>).</td>
+(e.g. <code>60</code>–<code>64</code>).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>fertility_rate</code></td>
@@ -577,31 +607,41 @@ tissue.</td>
 <td align="center">0.0–1.0</td>
 <td align="center">Breeders</td>
 <td align="left">Hatching / fertility success rate in breeder flocks
-(e.g. <code>0.85</code>).</td>
+(e.g. <code>0.83</code>).</td>
 </tr>
 <tr class="even">
+<td align="left"><code>alpha</code></td>
+<td align="center">numeric</td>
+<td align="center">—</td>
+<td align="center">Swine</td>
+<td align="left">Metabolic weight exponent (e.g. <code>0.60</code> for
+growing pigs, <code>0.75</code> for adult sows/boars; fixed at
+<code>0.75</code> for poultry).</td>
+</tr>
+<tr class="odd">
 <td align="left"><code>piglets_born</code></td>
 <td align="center">numeric</td>
 <td align="center">piglets/litter</td>
 <td align="center">Swine Sows</td>
 <td align="left">Total piglets born per farrowing
-(e.g. <code>14.5</code>).</td>
+(e.g. <code>16.26</code>).</td>
 </tr>
-<tr class="odd">
+<tr class="even">
 <td align="left"><code>piglets_suckling</code></td>
 <td align="center">numeric</td>
 <td align="center">piglets/litter</td>
 <td align="center">Swine Sows</td>
 <td align="left">Piglets weaned per farrowing litter
-(e.g. <code>12.5</code>).</td>
+(e.g. <code>13.05</code>).</td>
 </tr>
-<tr class="even">
+<tr class="odd">
 <td align="left"><code>replacement_rate</code></td>
 <td align="center">numeric</td>
-<td align="center">0.0–1.0</td>
+<td align="center">0.0–1.5</td>
 <td align="center">Breeding</td>
 <td align="left">Annual replacement or culling fraction
-(e.g. <code>0.25</code> for sows, or custom layer replacement).</td>
+(e.g. <code>0.25</code> for sows, <code>0.714</code> for layers,
+<code>1.2126</code> for meat breeders).</td>
 </tr>
 </tbody>
 </table>
@@ -633,7 +673,7 @@ tissue.</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
 <td align="left">Unique diet identifier (e.g.,
-<code>diet_lactating_cows</code>).</td>
+<code>diet_dairy_mature</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>forage_share</code></td>
@@ -769,8 +809,8 @@ statistics and tags origin as <code>"Custom Data"</code>.</td>
 <tbody>
 <tr class="odd">
 <td align="left">
-<code>animal_tag</code>, <code>region</code>,
-<code>subregion</code>, <code>class_flex</code>
+<code>farm_id</code>, <code>animal_tag</code>,
+<code>region</code>, <code>subregion</code>
 </td>
 <td align="center">character</td>
 <td align="center">—</td>
@@ -784,24 +824,27 @@ statistics and tags origin as <code>"Custom Data"</code>.</td>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
 <td align="left">IPCC base system (e.g. <code>liquid_slurry</code>,
-<code>solid_storage</code>, <code>pasture_range_paddock</code>).</td>
+<code>solid_storage</code>, <code>pasture_range_paddock</code>,
+<code>poultry_manure</code>).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>system_variant</code></td>
 <td align="center">character</td>
 <td align="center">—</td>
 <td align="center">Varies</td>
-<td align="left">System subtype (e.g. <code>with_cover</code>,
-<code>without_cover</code>, <code>compacted</code>).</td>
+<td align="left">System subtype
+(e.g. <code>with_natural_crust_cover</code>, <code>with_cover</code>,
+<code>with_litter</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>management_months</code></td>
-<td align="center">integer</td>
+<td align="center">character/int</td>
 <td align="center">months</td>
 <td align="center">Varies</td>
 <td align="left">Storage duration in months (<code>1</code>,
-<code>3</code>, <code>4</code>, <code>6</code>, or <code>12</code> for
-slurry).</td>
+<code>3</code>, <code>4</code>, <code>6</code>, <code>12</code> for
+slurry/pit; <code>&gt;1</code> or <code>&lt;1</code> for deep
+bedding).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>system_climate</code></td>
@@ -825,7 +868,8 @@ slurry).</td>
 <td align="center">—</td>
 <td align="center">Varies</td>
 <td align="left">Moisture zone: <code>zone_dry</code>,
-<code>zone_moist</code>, or <code>zone_wet</code>.</td>
+<code>zone_moist</code>, <code>zone_wet</code>, or
+<code>zone_montane</code>.</td>
 </tr>
 <tr class="even">
 <td align="left"><code>climate_moisture</code></td>
@@ -859,33 +903,140 @@ valid IPCC combinations.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="ii--reference-libraries-consult-only">II. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#ii--reference-libraries-consult-only"></a>
+<h2 id="ii--output-schema-generate_impact_assessment">II. Output Schema (<code>generate_impact_assessment()</code>)<a class="anchor" aria-label="anchor" href="#ii--output-schema-generate_impact_assessment"></a>
+</h2>
+<p>Running <code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code> returns a list with
+two tables (<code>results$totals</code> and
+<code>results$intensities</code>) and writes them to
+<code>output/</code>:</p>
+<div class="section level4">
+<h4 id="table-1-resultstotals-outputtotal_emissions_and_land_use-csv">1. Table 1: <code>results$totals</code>
+(<code>output/total_emissions_and_land_use.csv</code>)<a class="anchor" aria-label="anchor" href="#table-1-resultstotals-outputtotal_emissions_and_land_use-csv"></a>
+</h4>
+<p>Reports the direct physical inventory and per-head footprint of each
+cohort:</p>
+<ul>
+<li>
+<strong>Identification &amp; Role:</strong> <code>farm_id</code>,
+<code>region</code>, <code>subregion</code>, <code>animal_tag</code>,
+<code>animal_type</code>, <code>animal_subtype</code>,
+<code>production_role</code>, <code>population</code>.</li>
+<li>
+<strong>Feed &amp; Protein Intake:</strong> <code>DMI_kgday</code>
+(kg DM/head/day), <code>feed_intake_kg</code> (kg DM/year),
+<code>feed_CP_total_kg</code> (kg CP/year),
+<code>feed_CP_cropland_kg</code> (kg arable cropland CP/year).</li>
+<li>
+<strong>Native Gas Emissions (Gg/year):</strong>
+<code>CH4_enteric_Gg</code>, <code>CH4_manure_Gg</code>,
+<code>N2O_direct_Gg</code>, <code>N2O_vol_Gg</code>,
+<code>N2O_lea_Gg</code>, <code>N2O_indirect_Gg</code>.</li>
+<li>
+<strong>Scope 1 &amp; Scope 3 Feed Carbon Footprints (Gg
+CO2e/year):</strong> <code>CO2eq_enteric</code>,
+<code>CO2eq_manure</code>, <code>CO2eq_N2O_direct</code>,
+<code>CO2eq_N2O_indirect</code>, <code>CO2eq_N2O</code>,
+<code>CO2eq_feed_fossil_Gg</code>, <code>CO2eq_feed_luc_Gg</code>,
+<code>CO2eq_feed_Gg</code>, <code>CO2eq_Total_Gg</code> (Scope 1),
+<code>CO2eq_cradle_to_farm_Gg</code> (Scope 1 + Feed).</li>
+<li>
+<strong>Agroecological Land &amp; Water Footprints:</strong>
+<code>Land_cropland_m2</code>,
+<code>Land_grassland_convertible_m2</code>,
+<code>Land_grassland_unconvertible_m2</code>,
+<code>Land_other_m2</code>, <code>Land_m2</code>,
+<code>Water_feed_m3</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>).</li>
+<li>
+<strong>Per-Head Annual Intensities:</strong>
+<code>CO2eq_Total_head</code> (kg CO2e/head/yr),
+<code>CO2eq_cradle_to_farm_head</code> (kg CO2e/head/yr),
+<code>Land_head</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>/head/yr),
+<code>Water_head</code>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>/head/yr).</li>
+</ul>
+</div>
+<div class="section level4">
+<h4 id="table-2-resultsintensities-outputproduct_intensities-csv">2. Table 2: <code>results$intensities</code>
+(<code>output/product_intensities.csv</code>)<a class="anchor" aria-label="anchor" href="#table-2-resultsintensities-outputproduct_intensities-csv"></a>
+</h4>
+<p>Reports physical outputs and enterprise-integrated intensities for
+each cohort:</p>
+<ul>
+<li>
+<strong>Physical Outputs (kg/year):</strong>
+<code>milk_FPCM_kg</code>, <code>meat_carcass_weight_kg</code>,
+<code>egg_fresh_kg</code>, <code>wool_kg</code>,
+<code>total_protein_kg</code>.</li>
+<li>
+<strong>Commercial Product Intensities:</strong>
+<ul>
+<li>
+<strong>Milk (per kg FPCM):</strong>
+<code>GHG_intensity_milk</code>, <code>GHG_cradle_to_farm_milk</code>,
+<code>Land_intensity_milk</code>,
+<code>Water_intensity_milk</code>.</li>
+<li>
+<strong>Meat (per kg carcass weight):</strong>
+<code>GHG_intensity_meat</code>, <code>GHG_cradle_to_farm_meat</code>,
+<code>Land_intensity_meat</code>,
+<code>Water_intensity_meat</code>.</li>
+<li>
+<strong>Eggs (per kg fresh eggs):</strong>
+<code>GHG_intensity_egg</code>, <code>GHG_cradle_to_farm_egg</code>,
+<code>Land_intensity_egg</code>, <code>Water_intensity_egg</code>.</li>
+<li>
+<strong>Wool (per kg greasy wool):</strong>
+<code>GHG_intensity_wool</code>, <code>GHG_cradle_to_farm_wool</code>,
+<code>Land_intensity_wool</code>,
+<code>Water_intensity_wool</code>.</li>
+</ul>
+</li>
+<li>
+<strong>Nutritional Protein Intensities (per kg edible
+protein):</strong> <code>GHG_intensity_protein</code>,
+<code>GHG_cradle_to_farm_protein</code>,
+<code>Land_intensity_protein</code>,
+<code>Water_intensity_protein</code>.</li>
+<li>
+<strong>Protein Feed Efficiency (Mottet et al. 2017):</strong>
+<code>Protein_FCR_total</code>, <code>Protein_FCR_cropland</code>.</li>
+</ul>
+<hr>
+</div>
+</div>
+<div class="section level2">
+<h2 id="iii--reference-libraries-consult-only">III. Reference Libraries (Consult Only)<a class="anchor" aria-label="anchor" href="#iii--reference-libraries-consult-only"></a>
 </h2>
 <p>These internal datasets supply standard constants and parameters.
 <strong>Do not modify these files</strong> unless adding custom research
 extensions.</p>
 <div class="section level4">
-<h4 id="feed_characteristics-csv-nutritional-reference-table">1. <code>feed_characteristics.csv</code> — Nutritional Reference
-Table<a class="anchor" aria-label="anchor" href="#feed_characteristics-csv-nutritional-reference-table"></a>
+<h4 id="feed_characteristics">1. <code>feed_characteristics.csv</code> — Nutritional Reference
+Table<a class="anchor" aria-label="anchor" href="#feed_characteristics"></a>
 </h4>
 <p>Comprehensive nutritional composition library derived from
 <strong>FEDNA (2019)</strong> and Feedipedia: * <code>ingredient</code>:
 Canonical identifier (lowercase with underscores). *
-<code>land_type</code>: Agroecological land category:
-<code>cropland</code>, <code>grassland_convertible</code>,
+<code>ingredient_type</code>: Macro category (<code>forage</code>,
+<code>concentrate</code>, <code>milk</code>,
+<code>milk_replacer</code>). * <code>land_type</code>: Agroecological
+land category: <code>cropland</code>,
+<code>grassland_convertible</code>,
 <code>grassland_unconvertible</code>, or <code>none</code>. *
 <code>DM_pct</code>: Dry matter content percentage (% as-fed). *
 <code>CP_pct</code>, <code>NDF_pct</code>, <code>ASH_pct</code>,
 <code>EE_pct</code>: Crude Protein, Neutral Detergent Fiber, Ash, and
 Ether Extract (% DM). * <code>DE_pct</code>: Energy digestibility
-percentage (% DE). * <code>GE_feed_kcal_kg</code>: Gross energy content
-(kcal/kg DM). * <code>swine_DE_kcal_kg</code>,
+percentage for ruminants (% DE). * <code>GE_feed_kcal_kg</code>: Gross
+energy content (kcal/kg DM). * <code>swine_DE_kcal_kg</code>,
 <code>swine_ME_kcal_kg</code>: Digestible and metabolizable energy for
-pigs. * <code>poultry_ME_kcal_kg</code>: Metabolizable energy for
-poultry.</p>
+pigs (kcal/kg DM). * <code>poultry_ME_kcal_kg</code>: Metabolizable
+energy for poultry (kcal/kg DM).</p>
 </div>
 <div class="section level4">
-<h4 id="mapping-csv-agricultural-lca-connector">2. <code>mapping.csv</code> — Agricultural &amp; LCA Connector<a class="anchor" aria-label="anchor" href="#mapping-csv-agricultural-lca-connector"></a>
+<h4 id="mapping">2. <code>mapping.csv</code> — Agricultural &amp; LCA Connector<a class="anchor" aria-label="anchor" href="#mapping"></a>
 </h4>
 <p>Connects diet ingredients to statutory crop yield statistics and Life
 Cycle Assessment databases: * <code>ingredient</code>: Name in
@@ -913,10 +1064,7 @@ fresh weight. * <code>Water use (m3 depriv.)</code>: Freshwater
 deprivation characterized with the international <strong>AWARE</strong>
 model
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow><mo>=</mo><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> world-eq</mtext></mrow><mi>/</mi><mtext mathvariant="normal">kg</mtext></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}</annotation></semantics></math>
-fresh weight). * Powers <code><a href="../reference/calculate_feed_emissions.html">calculate_feed_emissions()</a></code>,
-cradle-to-farm-gate breakdowns in
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>, and dedicated feed
-environmental footprint visualizations.</p>
+fresh weight).</p>
 </div>
 <div class="section level4">
 <h4 id="forages-parquet-curated-national-forage-database">4. <code>forages.parquet</code> — Curated National Forage
@@ -924,10 +1072,7 @@ Database<a class="anchor" aria-label="anchor" href="#forages-parquet-curated-nat
 </h4>
 <p>Official national forage productivities from the Spanish Ministry of
 Agriculture (<strong>MAPA 2024</strong>, Anuario de Estadística Agraria)
-and BC3 research: * Contains real dry matter yields (kg DM/ha) for
-Atlantic, Mediterranean, and Mountain pastures, annual silages, and
-hays. * Serves as statutory proxy fallback when international studies
-lack local pasture productivity data.</p>
+and BC3 research (reported on a 100% dry matter basis, kg DM/ha).</p>
 </div>
 <div class="section level4">
 <h4 id="fao_crops">5. <code>fao_crops.parquet</code> — Statutory Crop Yields
@@ -936,98 +1081,57 @@ lack local pasture productivity data.</p>
 <p>Auto-downloaded crop productivity database (~24 MB) queried from
 FAOSTAT Production statistics across countries and reporting years (kg
 fresh weight/ha, automatically converted to dry matter via
-<code>DM_pct</code>). Downloaded automatically from GitHub Releases to
-the central user cache upon first requirement to keep the core package
-lightweight.</p>
+<code>DM_pct</code>).</p>
 </div>
 <div class="section level4">
 <h4 id="fao_trade_matrix">6. <code>fao_trade_matrix.parquet</code> — Dynamic Trade Background
 (Auto-Downloaded)<a class="anchor" aria-label="anchor" href="#fao_trade_matrix"></a>
 </h4>
 <p>Auto-downloaded international bilateral trade matrix (~187 MB)
-recording export and import flows. Downloaded automatically from GitHub
-Releases to the central user cache the first time an assessment requires
-trade resolution. Powers the recursive traceback algorithm to allocate
-feed consumption back to primary producing nations under a 70%
-self-sufficiency threshold.</p>
+recording export and import flows. Powers the recursive traceback
+algorithm to allocate feed consumption back to primary producing nations
+under a 70% self-sufficiency threshold.</p>
 </div>
 <div class="section level4">
-<h4 id="ipcc_coefficients">6. <code>ipcc_coefficients.csv</code> — IPCC Biological &amp; Tier 2
+<h4 id="ipcc_coefficients">7. <code>ipcc_coefficients.csv</code> — IPCC Biological &amp; Tier 2
 Constants<a class="anchor" aria-label="anchor" href="#ipcc_coefficients"></a>
 </h4>
 <p>Statutory biological constants from IPCC (2019 Refinement / 2006
 Guidelines) Chapter 10 (Livestock): * <code>description</code>:
 Canonical descriptor matched against user inputs in
 <code>ruminant_definitions.csv</code> and
-<code>manure_management.csv</code> (e.g. <code>pasture</code>,
-<code>stall</code>, <code>cattle/buffalo</code>,
-<code>dairy cattle_high_productivity</code>). * <code>value</code>:
-Numerical Tier 2 constant. * <code>coefficient</code>: Biological
-parameter symbol: * <code>cfi</code>: Net energy coefficient for
-maintenance
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>f</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Cf_i</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">MJ/day/kg</mtext><annotation encoding="application/x-tex">\text{MJ/day/kg}</annotation></semantics></math>).
-* <code>ca</code>: Feeding situation activity coefficient
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mi>a</mi></msub><annotation encoding="application/x-tex">C_a</annotation></semantics></math>,
-dimensionless or
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">MJ/day/kg</mtext><annotation encoding="application/x-tex">\text{MJ/day/kg}</annotation></semantics></math>).
-* <code>c</code>: Growth energy coefficient for cattle
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mi>C</mi><annotation encoding="application/x-tex">C</annotation></semantics></math>).
-* <code>c_pregnancy</code>: Gestation energy coefficient
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mtext mathvariant="normal">pregnancy</mtext></msub><annotation encoding="application/x-tex">C_{\text{pregnancy}}</annotation></semantics></math>).
-* <code>b_0</code>: Maximum methane producing capacity
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><msub><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> CH</mtext></mrow><mn>4</mn></msub><mtext mathvariant="normal">/kg VS</mtext></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ CH}_4\text{/kg VS}</annotation></semantics></math>).
-* <code>units</code>: Measurement units
-(e.g. <code>Dimensionless</code>, <code>MJ/day/kg</code>,
-<code>m³ CH₄/kg VS</code>).</p>
+<code>manure_management.csv</code>. * <code>value</code>: Numerical Tier
+2 constant. * <code>coefficient</code>: Biological parameter symbol
+(<code>cfi</code>, <code>ca</code>, <code>c</code>, <code>a</code>,
+<code>b</code>, <code>c_pregnancy</code>, <code>b_0</code>). *
+<code>animal_type</code>: Species applicability (<code>cattle</code>,
+<code>sheep</code>, <code>goat</code>, <code>swine</code>,
+<code>poultry</code>). * <code>units</code>: Measurement units
+(<code>Dimensionless</code>, <code>MJ/day/kg</code>,
+<code>m3 CH4/kg VS</code>).</p>
 </div>
 <div class="section level4">
-<h4 id="ipcc_mm">7. <code>ipcc_mm.csv</code> — IPCC Manure Management Reference
+<h4 id="ipcc_mm">8. <code>ipcc_mm.csv</code> — IPCC Manure Management Reference
 Matrix<a class="anchor" aria-label="anchor" href="#ipcc_mm"></a>
 </h4>
 <p>Complete statutory master matrix defining valid combinations of
 manure management systems, climate zones, and emission parameters: *
-<code>system_base</code>: Base manure storage/treatment technology
-(e.g. <code>liquid_slurry</code>, <code>solid_storage</code>,
-<code>pasture_range_paddock</code>, <code>daily_spread</code>,
-<code>anaerobic_lagoon</code>, <code>pit_storage</code>,
-<code>composting</code>, <code>deep_bedding</code>,
-<code>aerobic_treatment</code>, <code>incineration</code>,
-<code>poultry_manure</code>). * <code>system_variant</code>: Storage
-variant or crust cover (e.g. <code>with_natural_crust_cover</code>,
-<code>without_natural_crust_cover</code>, <code>uncovered</code>,
-<code>covered</code>, <code>in_vessel</code>). *
-<code>management_months</code>: Storage duration in months (for liquid
-slurry systems with crust or cover). * <code>climate_zone</code> &amp;
-<code>climate_moisture</code>: Agroclimatic classification
-(<code>zone_moist</code>, <code>zone_dry</code>,
-<code>zone_montane</code>, <code>wet</code>, <code>dry</code>). *
-<code>animal_type</code> &amp; <code>animal_subtype</code>: Target
-animal species and category (<code>cattle</code>, <code>swine</code>,
-<code>sheep</code>, <code>goat</code>, <code>poultry</code>,
-<code>dairy</code>, <code>other</code>). * <code>MCF_pct</code>: Methane
+<code>system_base</code>, <code>system_variant</code>,
+<code>management_months</code>, <code>system_climate</code>,
+<code>system_subclimate</code>, <code>climate_zone</code>,
+<code>climate_moisture</code>. * <code>animal_type</code> &amp;
+<code>animal_subtype</code>: Target animal species (<code>cattle</code>,
+<code>sheep</code>, <code>goat</code>, <code>swine</code>,
+<code>poultry</code>) and strict subtype (<code>dairy</code>,
+<code>meat</code>, <code>layer</code>). * <code>MCF_pct</code>: Methane
 Conversion Factor (% of
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>
 realized as
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">CH</mtext><mn>4</mn></msub><annotation encoding="application/x-tex">\text{CH}_4</annotation></semantics></math>).
-* <code>EF3</code>: Direct
+* <code>EF3</code>, <code>EF4</code>, <code>EF5</code>,
+<code>frac_gas</code>, <code>frac_leach</code>: Direct and indirect
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O</mtext></mrow><annotation encoding="application/x-tex">\text{N}_2\text{O}</annotation></semantics></math>
-emission factor
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">kg N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O-N / kg N</mtext></mrow><annotation encoding="application/x-tex">\text{kg N}_2\text{O-N / kg N}</annotation></semantics></math>).
-* <code>frac_gas</code>: Fraction of manure N volatilized as
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">NH</mtext><mn>3</mn></msub><mo>+</mo><msub><mtext mathvariant="normal">NO</mtext><mi>x</mi></msub></mrow><annotation encoding="application/x-tex">\text{NH}_3 + \text{NO}_x</annotation></semantics></math>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Frac</mtext><mtext mathvariant="normal">GasMS</mtext></msub><annotation encoding="application/x-tex">\text{Frac}_{\text{GasMS}}</annotation></semantics></math>).
-* <code>frac_leach</code>: Fraction of manure N lost via leaching and
-runoff
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Frac</mtext><mtext mathvariant="normal">LeachMS</mtext></msub><annotation encoding="application/x-tex">\text{Frac}_{\text{LeachMS}}</annotation></semantics></math>).
-* <code>EF4</code> &amp; <code>EF5</code>: Indirect
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O</mtext></mrow><annotation encoding="application/x-tex">\text{N}_2\text{O}</annotation></semantics></math>
-emission factors for atmospheric deposition (0.010) and aquatic leaching
-(0.011).</p>
-<p><em>See the <a href="Manure.html">Manure Management Guide</a> for a
-complete visual walkthrough and decision flowchart of every supported
-combination.</em></p>
+emission factors and nitrogen loss fractions.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

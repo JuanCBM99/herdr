@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>Dairy Cattle Spain: North/South in different Life Stages • herdr</title>
+<title>Intensive Multi-Cohort Assessment: Swine &amp; Poultry Systems • herdr</title>
 <!-- favicons --><link rel="icon" type="image/png" sizes="96x96" href="../favicon-96x96.png">
 <link rel="icon" type="”image/svg+xml”" href="../favicon.svg">
 <link rel="apple-touch-icon" sizes="180x180" href="../apple-touch-icon.png">
@@ -15,7 +15,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Dairy Cattle Spain: North/South in different Life Stages">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Intensive Multi-Cohort Assessment: Swine &amp; Poultry Systems">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -87,7 +87,7 @@
 
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
-      <img src="../logo.png" class="logo" alt=""><h1>Dairy Cattle Spain: North/South in different Life Stages</h1>
+      <img src="../logo.png" class="logo" alt=""><h1>Intensive Multi-Cohort Assessment: Swine &amp; Poultry Systems</h1>
             
       
 
@@ -97,20 +97,21 @@
     
     
 <div class="section level2">
-<h2 id="advanced-assessment-managing-complexity-with-class_flex">Advanced Assessment: Managing Complexity with
-<code>class_flex</code><a class="anchor" aria-label="anchor" href="#advanced-assessment-managing-complexity-with-class_flex"></a>
+<h2 id="advanced-assessment-multi-cohort-swine-poultry-systems-monogastric_example">Advanced Assessment: Multi-Cohort Swine &amp; Poultry Systems
+(<code>Monogastric_Example</code>)<a class="anchor" aria-label="anchor" href="#advanced-assessment-multi-cohort-swine-poultry-systems-monogastric_example"></a>
 </h2>
-<p>This guide tackles a high-complexity scenario for <strong>mature
-dairy cattle</strong>, splitting the population both by
-<strong>geography</strong> (North vs. South Spain) and by
-<strong>physiological state</strong>, using the <code>class_flex</code>
-column to distinguish the <strong>lactation phase</strong> from the
-<strong>dry phase</strong>.</p>
+<p>This guide walks through an <strong>Advanced Multi-Cohort
+Assessment</strong> for <strong>monogastric livestock in Spain
+(<code>swine</code> and <code>poultry</code>)</strong>, demonstrating
+how <code>herdr</code> models full pyramidal herd structures combining
+<strong><code>mature</code></strong> breeding stock,
+<strong><code>replacement</code></strong> rearing cohorts, and
+<strong><code>slaughter</code></strong> finishing cohorts within a
+single project.</p>
 <blockquote>
-<p>📂 <strong>All files referenced below live in <code>user_data/</code>
-and correspond to the pre-configured
-<code>inst/Examples/Level3_Spain_Dairy_Cattle_2015/</code>
-baseline.</strong></p>
+<p>📂 <strong>All files referenced below correspond to the
+pre-configured <code>inst/Examples/Monogastric_Example/</code>
+dataset.</strong></p>
 </blockquote>
 <div class="section level3">
 <h3 id="what-youll-edit">What you’ll edit<a class="anchor" aria-label="anchor" href="#what-youll-edit"></a>
@@ -133,7 +134,7 @@ in)</em>
 <td align="left">
 <code>livestock_census.csv</code> ·
 <code>diet_profiles.csv</code> · <code>diet_ingredients.csv</code> ·
-<code>ruminant_definitions.csv</code> ·
+<code>monogastric_definitions.csv</code> ·
 <code>livestock_weights.csv</code> ·
 <code>manure_management.csv</code>
 </td>
@@ -145,532 +146,694 @@ only)</em>
 </td>
 <td align="left">
 <code>feed_characteristics.csv</code> ·
-<code>mapping.csv</code> · <code>forages.parquet</code> ·
-<code>fao_crops.parquet</code> · <code>ipcc_coefficients.csv</code> ·
-<code>ipcc_mm.csv</code> · <code>ecoalim.parquet</code>
+<code>mapping.csv</code> · <code>fao_crops.parquet</code> ·
+<code>ipcc_coefficients.csv</code> · <code>ipcc_mm.csv</code> ·
+<code>ecoalim.parquet</code>
 </td>
 </tr>
 </tbody>
 </table>
-<p>Full details on every file above are in the <a href="Technical_reference.html">Technical Reference</a> vignette. This
-guide builds directly on the <a href="Moderate_Example.html">Moderate
-Example</a> — start there first if you haven’t used
-<code>class_flex</code> before.</p>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-1-multi-dimensional-census-livestock_census-csv">Step 1 — Multi-Dimensional Census
-(<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#step-1-multi-dimensional-census-livestock_census-csv"></a>
+<h3 id="step-1-multi-cohort-census-livestock_census-csv">Step 1 — Multi-Cohort Census
+(<code>livestock_census.csv</code>)<a class="anchor" aria-label="anchor" href="#step-1-multi-cohort-census-livestock_census-csv"></a>
 </h3>
-<p>The census links each population figure to a subregion
-<strong>and</strong> a physiological state — essential for accurate
-annual emission averages.</p>
+<p>In <code>livestock_census.csv</code>, we declare the <strong>Annual
+Average Population (AAP)</strong>—i.e., the average number of occupied
+barn places present on any given day of the year—for 10 cohorts across
+three distinct monogastric production enterprises on
+<code>farm_1</code>:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Poultry Meat Enterprise (<code>poultry</code> /
+<code>meat</code>):</strong> <code>broilers</code>
+(<code>slaughter</code>), <code>replacement_meat_pullets</code>
+(<code>replacement</code>), and <code>breeder_meat_hens</code>
+(<code>mature</code>).</li>
+<li>
+<strong>Poultry Layer Enterprise (<code>poultry</code> /
+<code>layer</code>):</strong> <code>replacement_layer_pullets</code>
+(<code>replacement</code>), <code>laying_hens</code>
+(<code>mature</code>), and <code>free_range_laying_hens</code>
+(<code>mature</code>).</li>
+<li>
+<strong>Swine Meat Enterprise (<code>swine</code> /
+<code>meat</code>):</strong> <code>fattening_pigs</code>
+(<code>slaughter</code>), <code>replacement_sows</code>
+(<code>replacement</code>), <code>breeder_sows</code>
+(<code>mature</code>), and <code>boars</code>
+(<code>mature</code>).</li>
+</ol>
 <table class="table">
-<colgroup>
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-</colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
 <th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="right">population</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>broilers</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="right">88,065.87</td>
+<td align="left"></td>
+<td align="right">73,219,430</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_meat_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="right">448,921.13</td>
+<td align="left"></td>
+<td align="right">2,088,485</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_meat_hens</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="right">51,118.64</td>
+<td align="left"></td>
+<td align="right">3,999,963</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_layer_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="right">260,580.36</td>
+<td align="left"></td>
+<td align="right">9,265,000</td>
 </tr>
-</tbody>
-</table>
-<hr>
-</div>
-<div class="section level3">
-<h3 id="step-2-phase-specific-nutrition">Step 2 — Phase-Specific Nutrition<a class="anchor" aria-label="anchor" href="#step-2-phase-specific-nutrition"></a>
-</h3>
-<p>Diets are defined directly with distinct <code>diet_tag</code>
-identifiers reflecting each region and production phase
-(<code>class_flex</code>).</p>
-<div class="section level4">
-<h4 id="a--diet-profiles-diet_profiles-csv">A. Diet profiles — <code>diet_profiles.csv</code><a class="anchor" aria-label="anchor" href="#a--diet-profiles-diet_profiles-csv"></a>
-</h4>
-<table class="table">
-<colgroup>
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-<col width="20%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">diet_tag</th>
-<th align="right">forage_share</th>
-<th align="right">concentrate_share</th>
-<th align="right">milk_share</th>
-<th align="right">milk_replacer_share</th>
-</tr></thead>
-<tbody>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature_north_dry_phase</code></td>
-<td align="right">70</td>
-<td align="right">30</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"></td>
+<td align="right">35,640,000</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature_north_lactation_phase</code></td>
-<td align="right">55</td>
-<td align="right">45</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>free_range_laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"></td>
+<td align="right">3,960,000</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>diet_dairy_mature_south_dry_phase</code></td>
-<td align="right">54</td>
-<td align="right">46</td>
-<td align="right">0</td>
-<td align="right">0</td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>fattening_pigs</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"></td>
+<td align="right">5,237,113</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="right">50</td>
-<td align="right">50</td>
-<td align="right">0</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="section level4">
-<h4 id="b--ingredient-breakdown-diet_ingredients-csv">B. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#b--ingredient-breakdown-diet_ingredients-csv"></a>
-</h4>
-<p>Ingredients are linked directly via <code>diet_tag</code>. Here are
-the primary ingredients for the South lactation profile (excerpted from
-the full dataset):</p>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">diet_tag</th>
-<th align="left">ingredient_type</th>
-<th align="left">ingredient</th>
-<th align="right">ingredient_share</th>
-<th align="left">country_of_origin</th>
-<th align="right">custom_yield_kg_ha</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left">concentrate</td>
-<td align="left"><code>corn</code></td>
-<td align="right">44.85</td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_sows</code></td>
 <td align="left"><code>spain</code></td>
-<td align="right"><code>NA</code></td>
+<td align="left"></td>
+<td align="right">287,689</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_sows</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"></td>
+<td align="right">1,299,996</td>
 </tr>
 <tr class="even">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left">concentrate</td>
-<td align="left"><code>soybean_meal_44_cp</code></td>
-<td align="right">17.12</td>
-<td align="left"><code>NA</code></td>
-<td align="right"><code>NA</code></td>
-</tr>
-<tr class="odd">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left">concentrate</td>
-<td align="left"><code>rapeseed_meal_00_33_cp</code></td>
-<td align="right">28.71</td>
-<td align="left"><code>NA</code></td>
-<td align="right"><code>NA</code></td>
-</tr>
-<tr class="even">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left">forage</td>
-<td align="left"><code>corn_silage_25_30</code></td>
-<td align="right">71.40</td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>boars</code></td>
 <td align="left"><code>spain</code></td>
-<td align="right">12000</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left">forage</td>
-<td align="left"><code>cereals_silage_wheat_barley_oat_triticale</code></td>
-<td align="right">28.60</td>
-<td align="left"><code>spain</code></td>
-<td align="right"><code>NA</code></td>
+<td align="left"></td>
+<td align="right">17,187</td>
 </tr>
 </tbody>
 </table>
 <blockquote>
-<p>ℹ️ <strong>Illustrative excerpt:</strong> In the complete
-<code>Level3_Spain_Dairy_Cattle_2015</code> template, remaining
-concentrate shares (9.32%) consist of macro-minerals and vitamins,
-ensuring both concentrate and forage categories sum to exactly
-100.0%.</p>
-<p>🌍 <strong>Missing origins:</strong> As before, an <code>NA</code> in
-<code>country_of_origin</code> is resolved automatically by the dynamic
-FAO background allocation engine — see <a href="land_use.html">Land Use
-Methodology</a> for how.</p>
-<p>🎯 <strong>Overriding the yield:</strong> The corn silage row sets
-<code>custom_yield_kg_ha</code> to <code>12000</code>, so herdr uses
-that farm-specific figure directly for the land-use footprint instead of
-a FAO/trade-based lookup.</p>
+<p>📌 <strong>Preserving Input Order:</strong> <code>herdr</code>
+preserves the exact row order of <code>livestock_census.csv</code> from
+top to bottom in both <code>results$totals</code> (Table 1),
+<code>results$intensities</code> (Table 2), and all
+<code><a href="../reference/plot_herdr_results.html">plot_herdr_results()</a></code> bar charts.</p>
 </blockquote>
 <hr>
 </div>
-</div>
 <div class="section level3">
-<h3 id="step-3-physiological-definitions-ruminant_definitions-csv">Step 3 — Physiological Definitions
-(<code>ruminant_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#step-3-physiological-definitions-ruminant_definitions-csv"></a>
+<h3 id="step-2-monogastric-definitions-strict-role-taxonomy-monogastric_definitions-csv">Step 2 — Monogastric Definitions &amp; Strict Role Taxonomy
+(<code>monogastric_definitions.csv</code>)<a class="anchor" aria-label="anchor" href="#step-2-monogastric-definitions-strict-role-taxonomy-monogastric_definitions-csv"></a>
 </h3>
-<p>This is the most technical file — it determines energy requirements
-under IPCC Tier 2. Notice how <code>milk_yield_kg_year</code> and
-<code>cfi</code> change between phases.</p>
-<table style="width:100%;" class="table">
+<p>In <code>monogastric_definitions.csv</code>, every cohort is
+assigned:</p>
+<ul>
+<li>
+<strong><code>animal_type</code></strong>: strictly
+<code>poultry</code> or <code>swine</code>.</li>
+<li>
+<strong><code>animal_subtype</code></strong>:
+<ul>
+<li>For <code>swine</code>: strictly
+<strong><code>meat</code></strong>.</li>
+<li>For <code>poultry</code>: strictly
+<strong><code>meat</code></strong> or
+<strong><code>layer</code></strong>.</li>
+</ul>
+</li>
+<li>
+<strong><code>production_role</code></strong>: strictly
+<strong><code>mature</code></strong>,
+<strong><code>replacement</code></strong>, or
+<strong><code>slaughter</code></strong>.</li>
+</ul>
+<table class="table">
 <colgroup>
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
+<col width="5%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
-<th align="left">diet_tag</th>
-<th align="left">cfi</th>
-<th align="left">ca</th>
-<th align="left">c</th>
-<th align="right">milk_yield_kg_year</th>
-<th align="right">fat_content_pct</th>
-<th align="right">protein_content_pct</th>
-<th align="left">c_pregnancy_cattle</th>
 <th align="left">animal_type</th>
 <th align="left">animal_subtype</th>
+<th align="left">production_role</th>
+<th align="left">diet_tag</th>
+<th align="right">cfi_maintenance</th>
+<th align="right">frac_fat_pct</th>
+<th align="right">frac_protein_pct</th>
+<th align="right">eggs_per_year</th>
+<th align="right">egg_weight_g</th>
+<th align="right">fertility_rate</th>
+<th align="right">alpha</th>
+<th align="right">piglets_born</th>
+<th align="right">piglets_suckling</th>
+<th align="right">replacement_rate</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>broilers</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>diet_dairy_mature_north_lactation_phase</code></td>
-<td align="left"><code>cattle_buffalo [lactating cows]</code></td>
-<td align="left"><code>stall</code></td>
-<td align="left"><code>females</code></td>
-<td align="right">8,295</td>
-<td align="right">3.73</td>
-<td align="right">3.39</td>
-<td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>slaughter</code></td>
+<td align="left"><code>diet_broilers</code></td>
+<td align="right">113</td>
+<td align="right">0.115</td>
+<td align="right">0.181</td>
+<td align="right">0</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_meat_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="left"><code>diet_dairy_mature_north_dry_phase</code></td>
-<td align="left"><code>cattle/buffalo</code></td>
-<td align="left"><code>stall</code></td>
-<td align="left"><code>females</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>replacement</code></td>
+<td align="left"><code>diet_replacement_meat_pullets</code></td>
+<td align="right">113</td>
+<td align="right">0.085</td>
+<td align="right">0.140</td>
 <td align="right">0</td>
-<td align="right">0</td>
-<td align="right">0</td>
-<td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_meat_hens</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>diet_dairy_mature_south_lactation_phase</code></td>
-<td align="left"><code>cattle_buffalo [lactating cows]</code></td>
-<td align="left"><code>stall</code></td>
-<td align="left"><code>females</code></td>
-<td align="right">9,044</td>
-<td align="right">3.73</td>
-<td align="right">3.39</td>
-<td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>mature</code></td>
+<td align="left"><code>diet_breeder_meat_hens</code></td>
+<td align="right">125</td>
+<td align="right">0.175</td>
+<td align="right">0.166</td>
+<td align="right">211.70</td>
+<td align="right">64</td>
+<td align="right">0.83</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">1.2126</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_layer_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="left"><code>diet_dairy_mature_south_dry_phase</code></td>
-<td align="left"><code>cattle/buffalo</code></td>
-<td align="left"><code>stall</code></td>
-<td align="left"><code>females</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>layer</code></td>
+<td align="left"><code>replacement</code></td>
+<td align="left"><code>diet_replacement_layer_pullets</code></td>
+<td align="right">113</td>
+<td align="right">0.085</td>
+<td align="right">0.140</td>
 <td align="right">0</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>layer</code></td>
+<td align="left"><code>mature</code></td>
+<td align="left"><code>diet_laying_white_hens</code></td>
+<td align="right">125</td>
+<td align="right">0.175</td>
+<td align="right">0.166</td>
+<td align="right">297.62</td>
+<td align="right">60</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.7140</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>free_range_laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>poultry</code></td>
+<td align="left"><code>layer</code></td>
+<td align="left"><code>mature</code></td>
+<td align="left"><code>diet_free_range_laying_hens</code></td>
+<td align="right">131</td>
+<td align="right">0.175</td>
+<td align="right">0.166</td>
+<td align="right">313.82</td>
+<td align="right">60</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.7140</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>fattening_pigs</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>swine</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>slaughter</code></td>
+<td align="left"><code>diet_fattening_pigs_80_to_109_kg</code></td>
+<td align="right">206</td>
+<td align="right">0.266</td>
+<td align="right">0.153</td>
 <td align="right">0</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.60</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_sows</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>swine</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>replacement</code></td>
+<td align="left"><code>diet_replacement_sows</code></td>
+<td align="right">206</td>
+<td align="right">0.280</td>
+<td align="right">0.153</td>
 <td align="right">0</td>
-<td align="left"><code>cattle and buffalo</code></td>
-<td align="left"><code>cattle</code></td>
-<td align="left"><code>dairy</code></td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.60</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_sows</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>swine</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>mature</code></td>
+<td align="left"><code>diet_gest2_sows</code></td>
+<td align="right">104.5</td>
+<td align="right">0.000</td>
+<td align="right">0.000</td>
+<td align="right">0</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.75</td>
+<td align="right">16.26</td>
+<td align="right">13.05</td>
+<td align="right">0.2500</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>boars</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>swine</code></td>
+<td align="left"><code>meat</code></td>
+<td align="left"><code>mature</code></td>
+<td align="left"><code>diet_boar_adult</code></td>
+<td align="right">104.5</td>
+<td align="right">0.203</td>
+<td align="right">0.161</td>
+<td align="right">0</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.75</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">0.3000</td>
 </tr>
 </tbody>
 </table>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-4-body-weights-livestock_weights-csv">Step 4 — Body Weights (<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-4-body-weights-livestock_weights-csv"></a>
+<h3 id="step-3-weights-batch-turnover-livestock_weights-csv">Step 3 — Weights &amp; Batch Turnover
+(<code>livestock_weights.csv</code>)<a class="anchor" aria-label="anchor" href="#step-3-weights-batch-turnover-livestock_weights-csv"></a>
 </h3>
-<p>Accurate weights are essential to calculate Maintenance Energy
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_m</annotation></semantics></math>)
-and to validate the animal’s maximum physical intake capacity (DMI as %
-of body weight).</p>
+<p>For short-cycle monogastrics, <code>productive_period_days</code>
+controls both <strong>Average Daily Gain (ADG)</strong> for FEDNA
+Metabolizable Energy equations and <strong>annual batch
+turnover</strong>
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mtext mathvariant="normal">productive_period_days</mtext></mrow><annotation encoding="application/x-tex">365 / \text{productive\_period\_days}</annotation></semantics></math>)
+for slaughter output:</p>
+<ul>
+<li>
+<strong><code>broilers</code> (<code>slaughter</code>):</strong>
+<code>productive_period_days = 42</code> days
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mn>42</mn><mo>≈</mo><mn>8.69</mn></mrow><annotation encoding="application/x-tex">365 / 42 \approx 8.69</annotation></semantics></math>
+batches finished per barn place per year, from <code>0.044</code> kg to
+<code>2.60</code> kg).</li>
+<li>
+<strong><code>fattening_pigs</code>
+(<code>slaughter</code>):</strong>
+<code>productive_period_days = 110</code> days
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mn>110</mn><mo>≈</mo><mn>3.32</mn></mrow><annotation encoding="application/x-tex">365 / 110 \approx 3.32</annotation></semantics></math>
+batches finished per barn place per year, from <code>20.0</code> kg to
+<code>111.82</code> kg).</li>
+<li>
+<strong><code>breeder_sows</code> (<code>mature</code>):</strong>
+<code>productive_period_days = 148.9</code> days (farrowing interval,
+yielding
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>365</mn><mi>/</mi><mn>148.9</mn><mo>≈</mo><mn>2.45</mn></mrow><annotation encoding="application/x-tex">365 / 148.9 \approx 2.45</annotation></semantics></math>
+litters per sow per year), with <code>sows_gestation_days = 115.1</code>
+and <code>sows_lactation_days = 25</code>.</li>
+</ul>
 <table class="table">
 <colgroup>
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
-<col width="12%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
+<col width="8%">
 </colgroup>
 <thead><tr class="header">
+<th align="left">farm_id</th>
 <th align="left">animal_tag</th>
 <th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
 <th align="right">adult_weight_kg</th>
 <th align="right">productive_period_days</th>
 <th align="right">initial_weight_kg</th>
 <th align="right">final_weight_kg</th>
+<th align="right">sows_gestation_days</th>
+<th align="right">sows_lactation_days</th>
+<th align="right">piglet_birth_weight_kg</th>
+<th align="right">piglet_weaning_weight_kg</th>
+<th align="right">sow_reserve_gain_kg</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>broilers</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="right">675</td>
-<td align="right">365</td>
-<td align="right">675</td>
-<td align="right">675</td>
+<td align="right">2.60</td>
+<td align="right">42.0</td>
+<td align="right">0.044</td>
+<td align="right">2.60</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_meat_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="right">675</td>
-<td align="right">365</td>
-<td align="right">675</td>
-<td align="right">675</td>
+<td align="right">2.17</td>
+<td align="right">140.0</td>
+<td align="right">0.044</td>
+<td align="right">2.17</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 <tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_meat_hens</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="right">675</td>
-<td align="right">365</td>
-<td align="right">675</td>
-<td align="right">675</td>
+<td align="right">4.00</td>
+<td align="right">301.0</td>
+<td align="right">2.170</td>
+<td align="right">4.00</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 <tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_layer_pullets</code></td>
 <td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="right">675</td>
-<td align="right">365</td>
-<td align="right">675</td>
-<td align="right">675</td>
+<td align="right">1.24</td>
+<td align="right">119.0</td>
+<td align="right">0.038</td>
+<td align="right">1.24</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">1.72</td>
+<td align="right">511.0</td>
+<td align="right">1.240</td>
+<td align="right">1.72</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>free_range_laying_hens</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">2.15</td>
+<td align="right">441.0</td>
+<td align="right">1.400</td>
+<td align="right">2.15</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>fattening_pigs</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">—</td>
+<td align="right">110.0</td>
+<td align="right">20.000</td>
+<td align="right">111.82</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>replacement_sows</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">—</td>
+<td align="right">74.7</td>
+<td align="right">111.820</td>
+<td align="right">145.93</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>breeder_sows</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">—</td>
+<td align="right">148.9</td>
+<td align="right">200.840</td>
+<td align="right">223.19</td>
+<td align="right">115.1</td>
+<td align="right">25</td>
+<td align="right">1.4</td>
+<td align="right">5.89</td>
+<td align="right">5.0</td>
+</tr>
+<tr class="even">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>boars</code></td>
+<td align="left"><code>spain</code></td>
+<td align="right">—</td>
+<td align="right">365.0</td>
+<td align="right">237.500</td>
+<td align="right">287.50</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
+<td align="right">—</td>
 </tr>
 </tbody>
 </table>
-<blockquote>
-<p>ℹ️ <strong>About <code>productive_period_days</code>:</strong><br>
-* For <strong>adult breeding females (except laying hens)</strong>, this
-represents the <strong>inter-parturition interval</strong> in days
-(here, <code>365</code> days corresponds to an annual calving
-interval).<br>
-* For <strong>laying hens</strong>, it represents the <strong>commercial
-laying cycle duration</strong> until depopulation.<br>
-* For <strong>all other cohorts (growing, fattening,
-replacement)</strong>, it represents their <strong>life cycle /
-life-stage duration</strong> (days on feed).</p>
-</blockquote>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-5-advanced-manure-management-manure_management-csv">Step 5 — Advanced Manure Management
-(<code>manure_management.csv</code>)<a class="anchor" aria-label="anchor" href="#step-5-advanced-manure-management-manure_management-csv"></a>
+<h3 id="step-4-how-herdr-attributes-intensities-in-table-2-resultsintensities">Step 4 — How <code>herdr</code> Attributes Intensities in Table 2
+(<code>results$intensities</code>)<a class="anchor" aria-label="anchor" href="#step-4-how-herdr-attributes-intensities-in-table-2-resultsintensities"></a>
 </h3>
-<p>At this level of granularity you can specify climate zone and system
-variant per cohort, which determines the methane conversion factors
-used.</p>
-<table style="width:100%;" class="table">
-<colgroup>
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-<col width="7%">
-</colgroup>
-<thead><tr class="header">
-<th align="left">animal_tag</th>
-<th align="left">region</th>
-<th align="left">subregion</th>
-<th align="left">class_flex</th>
-<th align="left">system_base</th>
-<th align="left">system_variant</th>
-<th align="right">management_months</th>
-<th align="left">system_climate</th>
-<th align="left">system_subclimate</th>
-<th align="left">climate_zone</th>
-<th align="left">climate_moisture</th>
-<th align="left">b_0</th>
-<th align="right">allocation</th>
-</tr></thead>
-<tbody>
-<tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>anaerobic_lagoon</code></td>
-<td align="left"><code>uncovered</code></td>
-<td align="right">—</td>
-<td align="left"><code>cool</code></td>
-<td align="left"><code>temperate</code></td>
-<td align="left"><code>zone_moist</code></td>
-<td align="left"><code>wet</code></td>
-<td align="left"><code>dairy_cattle_high_productivity</code></td>
-<td align="right">0.0537</td>
-</tr>
-<tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>north</code></td>
-<td align="left"><code>lactation_phase</code></td>
-<td align="left"><code>liquid_slurry</code></td>
-<td align="left"><code>with_natural_crust_cover</code></td>
-<td align="right">3</td>
-<td align="left"><code>cool</code></td>
-<td align="left"><code>temperate</code></td>
-<td align="left"><code>zone_moist</code></td>
-<td align="left"><code>wet</code></td>
-<td align="left"><code>dairy_cattle_high_productivity</code></td>
-<td align="right">0.3432</td>
-</tr>
-<tr class="odd">
-<td align="left"><code>mature_dairy_cattle</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="left"><code>solid_storage</code></td>
-<td align="left">—</td>
-<td align="right">—</td>
-<td align="left"><code>warm</code></td>
-<td align="left">—</td>
-<td align="left">—</td>
-<td align="left"><code>dry</code></td>
-<td align="left"><code>dairy_cattle_high_productivity</code></td>
-<td align="right">0.0694</td>
-</tr>
-<tr class="even">
-<td align="left"><code>mature_dairy_cattle</code></td>
-<td align="left"><code>spain</code></td>
-<td align="left"><code>south</code></td>
-<td align="left"><code>dry_phase</code></td>
-<td align="left"><code>deep_bedding</code></td>
-<td align="left"><code>no_mixing</code></td>
-<td align="right"><code>&gt;1</code></td>
-<td align="left"><code>warm</code></td>
-<td align="left"><code>temperate</code></td>
-<td align="left"><code>zone_dry</code></td>
-<td align="left"><code>dry</code></td>
-<td align="left"><code>dairy_cattle_high_productivity</code></td>
-<td align="right">0.0131</td>
-</tr>
-</tbody>
-</table>
-<blockquote>
-<p>⚠️ <strong>Illustrative snippet:</strong> as in the Moderate example,
-the rows above don’t sum to 1.0 per cohort — some rows were omitted here
-for brevity. In a real project, <code>allocation</code> must sum to
-exactly 1.0 for every
-<code>animal_tag</code>/<code>region</code>/<code>subregion</code>/<code>class_flex</code>
-combination.</p>
-</blockquote>
+<p>When you run <code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>,
+<code>herdr</code> produces two complementary tables:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Table 1 (<code>results$totals</code>):</strong> Shows the
+<strong>direct physical inventory</strong> of each of the 10 cohorts
+(enteric
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">CH</mtext><mn>4</mn></msub><annotation encoding="application/x-tex">\text{CH}_4</annotation></semantics></math>,
+manure
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">CH</mtext><mn>4</mn></msub><annotation encoding="application/x-tex">\text{CH}_4</annotation></semantics></math>,
+direct/indirect
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">N</mtext><mn>2</mn></msub><mtext mathvariant="normal">O</mtext></mrow><annotation encoding="application/x-tex">\text{N}_2\text{O}</annotation></semantics></math>,
+upstream feed fossil &amp; LUC
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">CO</mtext><mn>2</mn></msub><mtext mathvariant="normal">e</mtext></mrow><annotation encoding="application/x-tex">\text{CO}_2\text{e}</annotation></semantics></math>,
+agroecological land, AWARE water, and per-head footprints).</li>
+<li>
+<strong>Table 2 (<code>results$intensities</code>):</strong>
+Computes <strong>enterprise-integrated product and protein
+intensities</strong> within each
+<code>(farm_id, region, subregion, animal_type, animal_subtype)</code>
+group:
+<ul>
+<li>
+<strong>Poultry Meat (<code>poultry</code>,
+<code>meat</code>):</strong> The overhead footprint of
+<code>breeder_meat_hens</code> (<code>mature</code>) and
+<code>replacement_meat_pullets</code> (<code>replacement</code>) is
+integrated with <code>broilers</code> (<code>slaughter</code>) over the
+total meat produced (broilers + culled breeders).
+<code>replacement_meat_pullets</code> shows <code>NA</code> for product
+intensities because its emissions are already absorbed into the meat
+enterprise.</li>
+<li>
+<strong>Poultry Layers (<code>poultry</code>,
+<code>layer</code>):</strong> Each laying cohort
+(<code>laying_hens</code> and <code>free_range_laying_hens</code>) keeps
+its own direct footprint plus a population-proportional share
+(<code>90%</code> and <code>10%</code>, respectively) of the
+<code>replacement_layer_pullets</code> overhead, divided by its
+respective egg production (<code>egg_fresh_kg</code>).</li>
+<li>
+<strong>Swine Meat (<code>swine</code>, <code>meat</code>):</strong>
+The breeding herd overhead (<code>breeder_sows</code> +
+<code>boars</code> + <code>replacement_sows</code>) is integrated with
+<code>fattening_pigs</code> over total carcass pork output (finished
+pigs + culled sows/boars).</li>
+</ul>
+</li>
+</ol>
 <hr>
 </div>
 <div class="section level3">
-<h3 id="step-6-final-execution">Step 6 — Final Execution<a class="anchor" aria-label="anchor" href="#step-6-final-execution"></a>
+<h3 id="step-5-running-the-assessment-visualizing-results">Step 5 — Running the Assessment &amp; Visualizing Results<a class="anchor" aria-label="anchor" href="#step-5-running-the-assessment-visualizing-results"></a>
 </h3>
-<p>When running the analysis, herdr processes each row as a unique
-“animal–state–region” combination before aggregating the results.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># The model calculates impact for each phase separately</span></span>
+<span><span class="co"># Run assessment directly on the bundled Monogastric_Example</span></span>
+<span><span class="va">mono_dir</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"Examples/Monogastric_Example"</span>, package <span class="op">=</span> <span class="st">"herdr"</span><span class="op">)</span></span>
+<span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span></span>
+<span>  data_dir        <span class="op">=</span> <span class="va">mono_dir</span>,</span>
 <span>  automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  farm_country <span class="op">=</span> <span class="st">"Spain"</span>,</span>
-<span>  year <span class="op">=</span> <span class="fl">2015</span></span>
+<span>  farm_country    <span class="op">=</span> <span class="st">"Spain"</span>,</span>
+<span>  year            <span class="op">=</span> <span class="fl">2024</span>,</span>
+<span>  gwp_report      <span class="op">=</span> <span class="st">"AR5"</span>,</span>
+<span>  saveoutput      <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Inspect Table 1 (Cohort Totals) and Table 2 (Enterprise Product Intensities)</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">totals</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span></span>
+<span></span>
+<span><span class="co"># 1. Compare Carbon Footprint per kg of Edible Protein across cohorts</span></span>
+<span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="st">"animal_tag"</span>,</span>
+<span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"protein"</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># 2. Compare Egg Carbon Intensity between caged/barn vs. free-range hens</span></span>
+<span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
+<span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="st">"animal_tag"</span>,</span>
+<span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"egg"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>
@@ -679,15 +842,16 @@ combination.</p>
 </h3>
 <ul>
 <li>
-<a href="Moderate_Example.html">Moderate Example</a> — the
-North/South split this example builds on, without
-<code>class_flex</code>.</li>
+<a href="Herd_Demography.html">Herd Demography &amp; Life Cycles</a>
+— how <code>automatic_cycle = TRUE</code> derives
+<code>replacement_sows</code>, <code>fattening_pigs</code>, and
+<code>broilers</code> automatically from breeding stock.</li>
 <li>
-<a href="Easy_Example.html">Basic Assessment</a> — the simplest
-single-region starting point.</li>
+<a href="Easy_Example.html">Basic Assessment</a> / <a href="Moderate_Example.html">Moderate Example</a> — dairy cattle case
+studies.</li>
 <li>
-<a href="Technical_reference.html">Technical Reference</a> — every
-file and column explained in detail.</li>
+<a href="Technical_reference.html">Technical Reference</a> —
+complete column-by-column dictionary.</li>
 </ul>
 </div>
 </div>

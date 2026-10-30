@@ -24,15 +24,16 @@ vignette.
 
 ------------------------------------------------------------------------
 
-### Step 1 — The Census
+### Step 1 — The Census (`livestock_census.csv`)
 
-Open `livestock_census.csv`. This is where you define who is on the
-farm. For this basic example, we work at national level, so `subregion`
-and `class_flex` are left blank.
+Open `livestock_census.csv`. This is where you define who is on the farm
+and in what row order you want cohorts displayed in output tables and
+charts. For this basic example, we work at national level, so
+`subregion` is left blank.
 
-| animal_tag            | region  | subregion | class_flex | population |
-|:----------------------|:--------|:----------|:-----------|-----------:|
-| `mature_dairy_cattle` | `spain` |           |            |    848,686 |
+| farm_id  | animal_tag            | region  | subregion | population |
+|:---------|:----------------------|:--------|:----------|-----------:|
+| `farm_1` | `mature_dairy_cattle` | `spain` |           |    848,686 |
 
 ------------------------------------------------------------------------
 
@@ -45,7 +46,8 @@ The diet is filled in manually based on nutritional reports
 
 Open `feed_characteristics.csv` to see the list of available feed items.
 You can also add new ingredients here, as long as every required column
-is filled in.
+is filled in (see [Adding a New
+Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)).
 
 #### B. Define the profile — `diet_profiles.csv`
 
@@ -59,15 +61,16 @@ Repeat the same `diet_tag` once per ingredient.
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature` | concentrate | `corn` | 44.85 | `spain` | `NA` |
-| `diet_dairy_mature` | concentrate | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | concentrate | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| `diet_dairy_mature` | `concentrate` | `corn` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
+| `diet_dairy_mature` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
 > ✅ **Shares sum to 100% *within* each category** — ensure all
-> `ingredient_share` values within `concentrate` total 100%.
+> `ingredient_share` values within `concentrate` and `forage` each total
+> 100%.
 >
 > 🌍 **Missing origins:** leave `country_of_origin` as `NA` when you
-> don’t know where a feed comes from. herdr resolves it automatically
+> don’t know where a feed comes from. `herdr` resolves it automatically
 > using FAO trade data — see [Land Use
 > Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
 > for how.
@@ -75,33 +78,42 @@ Repeat the same `diet_tag` once per ingredient.
 > 🎯 **Overriding the yield:** `custom_yield_kg_ha` lets you skip the
 > FAO/trade lookup entirely for a given ingredient. If you already know
 > the real yield for your farm or region — e.g. `3200` kg DM/ha — enter
-> it here and herdr uses that value directly for the land-use
-> calculation, ignoring `country_of_origin` and any FAO database lookup
-> for that row.
+> it here and `herdr` uses that value directly for the land-use
+> calculation.
 
 ------------------------------------------------------------------------
 
-### Step 3 — Animal Categories and Coefficients
+### Step 3 — Animal Categories and Coefficients (`ruminant_definitions.csv`)
 
-Open `ruminant_definitions.csv`. This file links your animal to the IPCC
-Tier 2 equations — each of `cfi`, `ca`, `c`, and `c_pregnancy_cattle` is
-a separate lookup into `ipcc_coefficients.csv`, so use the **exact
-description** for each as it appears there.
+Open `ruminant_definitions.csv`. This file classifies your cohort’s
+species (`animal_type`), production target (`animal_subtype`: strictly
+`dairy` or `meat`), and lifecycle role (`production_role`: strictly
+`mature`, `replacement`, or `slaughter`), and links it to the IPCC Tier
+2 equations (`cfi`, `ca`, `c`, `c_pregnancy_cattle` in
+`ipcc_coefficients.csv`).
 
-| animal_tag | region | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | animal_type | animal_subtype |
-|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|:---|:---|
-| `mature_dairy_cattle` | `spain` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,894.38 | 3.73 | 3.39 | `cattle and buffalo` | `cattle` | `dairy` |
+| farm_id | animal_tag | region | animal_type | animal_subtype | production_role | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | pregnancy_rate | replacement_rate |
+|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|---:|---:|
+| `farm_1` | `mature_dairy_cattle` | `spain` | `cattle` | `dairy` | `mature` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,894.38 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
+
+> 💡 **Why `replacement_rate = 0.27` matters even when
+> `automatic_cycle = FALSE`:**  
+> In a dairy herd, 27% of mature cows are culled annually and sold for
+> meat. `herdr` uses `replacement_rate` to compute annual culled cow
+> carcass output (`meat_carcass_weight_kg`) and applies the **IDF (2022)
+> Net Energy physical allocation** between milk (`milk_FPCM_kg`) and
+> cull meat.
 
 ------------------------------------------------------------------------
 
-### Step 4 — Body Weights
+### Step 4 — Body Weights (`livestock_weights.csv`)
 
 Open `livestock_weights.csv`. Make sure the identifying keys match the
 census exactly.
 
-| animal_tag | region | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg |
-|:---|:---|---:|---:|---:|---:|
-| `mature_dairy_cattle` | `spain` | 675 | 365 | 675 | 675 |
+| farm_id | animal_tag | region | adult_weight_kg | productive_period_days | initial_weight_kg | final_weight_kg |
+|:---|:---|:---|---:|---:|---:|---:|
+| `farm_1` | `mature_dairy_cattle` | `spain` | 675 | 365 | 675 | 675 |
 
 > ℹ️ **About `productive_period_days`:**  
 > \* For **adult breeding females (except laying hens)**, this
@@ -118,28 +130,22 @@ census exactly.
 
 1.  Check `ipcc_mm.csv` for valid `system_base`, `system_variant`, and
     `climate_zone` combinations — or browse the [Manure System
-    Guide](https://juancbm99.github.io/herdr/articles/Manure.md) for the
-    same information in narrative form.
+    Guide](https://juancbm99.github.io/herdr/articles/Manure.md).
 2.  If a cohort splits its manure across more than one system,
     **duplicate the row** and divide the `allocation` between them so it
     sums to 1.0.
 
-| animal_tag | region | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
-|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy_cattle_high_productivity` | 0.3 |
-| `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.7 |
-
-> ℹ️ `solid_storage` is a Standard system (see the [Manure System
-> Guide](https://juancbm99.github.io/herdr/articles/Manure.md)) — it
-> doesn’t need `management_months`, `system_variant`,
-> `system_subclimate`, or `climate_zone`, so those columns are left
-> blank.
+| farm_id | animal_tag | region | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
+|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
+| `farm_1` | `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy_cattle_high_productivity` | 0.3 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.7 |
 
 ------------------------------------------------------------------------
 
-### Step 6 — Running the Analysis
+### Step 6 — Running the Analysis & Inspecting Outputs
 
-Once every CSV above is complete, run the assessment from R:
+Once every CSV above is complete, run the consolidated assessment from
+R:
 
 ``` r
 
@@ -147,8 +153,24 @@ library(herdr)
 
 results <- generate_impact_assessment(
   automatic_cycle = FALSE,
-  farm_country = "Spain",
-  year = 2015
+  farm_country    = "Spain",
+  year            = 2015,
+  gwp_report      = "AR5"
+)
+
+# Table 1: Absolute GHG emissions (Gg CO2e), land (m2), water (m3), and per-head footprints
+results$totals
+
+# Table 2: Product intensities (per kg FPCM milk, per kg cull meat, per kg protein) & Protein FCR
+results$intensities
+
+# Visualize Milk Carbon Footprint (Scope 1 + Feed Fossil + Feed LUC per kg FPCM milk)
+plot_herdr_results(
+  df              = results,
+  group_cols      = c("farm_id", "animal_tag"),
+  func_name       = "generate_impact_assessment",
+  impact_category = "ghg",
+  functional_unit = "milk"
 )
 ```
 
@@ -158,12 +180,14 @@ results <- generate_impact_assessment(
 
 - [General
   Workflow](https://juancbm99.github.io/herdr/articles/Workflow.md) —
-  the full step-by-step guide this example is based on.
+  the full step-by-step scripting guide.
+- [Moderate
+  Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
+  — multi-regional dairy assessment (North vs. South Spain).
+- [Advanced Multi-Cohort
+  Example](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
+  — multi-cohort swine & poultry assessment with `mature`,
+  `replacement`, and `slaughter` integration.
 - [Technical
   Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
   — every file and column explained in detail.
-- [Moderate
-  Example](https://juancbm99.github.io/herdr/articles/Moderate_Example.md)
-  / [Advanced
-  Assessment](https://juancbm99.github.io/herdr/articles/Difficult_Example.md)
-  — build on this with multi-region herds and mixed manure systems.

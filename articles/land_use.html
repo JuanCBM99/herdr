@@ -219,7 +219,7 @@ discounts.</li>
 something else – soybean meal alongside soybean oil, or a cereal grain
 alongside its straw. Attributing the <em>entire</em> cultivated area to
 the feed ingredient would overstate its footprint, so <code>herdr</code>
-applies the <code>economic_allocation</code> factor from <a href="Technical_reference.html#mapping.csv--database-connector"><code>mapping.csv</code></a>
+applies the <code>economic_allocation</code> factor from <a href="Technical_reference.html#mapping"><code>mapping.csv</code></a>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">EconomicAllocation_i \in [0, 1]</annotation></semantics></math>):</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>0</mn></mtd><mtd columnalign="left" style="text-align: left"><mrow><mtext mathvariant="normal">if </mtext><mspace width="0.333em"></mspace></mrow><mi>l</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>_</mi><mi>t</mi><mi>y</mi><mi>p</mi><msub><mi>e</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mtext mathvariant="normal">none</mtext><mo>,</mo><mtext mathvariant="normal">no_land</mtext><mo stretchy="false" form="postfix">}</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>×</mo><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mtd><mtd columnalign="left" style="text-align: left"><mtext mathvariant="normal">otherwise</mtext></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">
 AdjustedLandPerKg_i =
@@ -400,7 +400,7 @@ Mix (Top 3 Producers)</strong> described above, or
 <p><strong>Note:</strong> The bilateral trade database
 (<code>fao_trade_matrix.parquet</code>, ~187 MB) is downloaded
 automatically from GitHub Releases the first time an assessment requires
-trade resolution – see <a href="Technical_reference.html#fao_trade_matrixparquet--dynamic-trade-background-auto-downloaded">Technical
+trade resolution – see <a href="Technical_reference.html#fao_trade_matrix">Technical
 Reference</a>.</p>
 </blockquote>
 <hr>
@@ -480,10 +480,11 @@ a complete agroecological and spatial breakdown:</p>
 <tbody>
 <tr class="odd">
 <td align="left">
-<code>region</code>, <code>subregion</code>,
-<code>animal_tag</code>, <code>class_flex</code>
+<code>farm_id</code>, <code>region</code>,
+<code>subregion</code>, <code>animal_tag</code>
 </td>
-<td align="left">Cohort identification and geographic stratum</td>
+<td align="left">Farm and cohort identification and geographic
+stratum</td>
 </tr>
 <tr class="even">
 <td align="left">

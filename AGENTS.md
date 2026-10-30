@@ -9,7 +9,8 @@ coding assistants.
 ## 1. Project Overview
 
 - **Package**: `herdr`
-- **Type**: R Package (\>= 4.1.0) with Shiny GUI support (`run_app()`).
+- **Type**: R Package (\>= 4.1.0) with Shiny GUI support
+  ([`run_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)).
 - **Domain**: Livestock greenhouse gas (GHG) emissions and feed-related
   land use footprint accounting based on **IPCC Tier 2** methodologies
   and nutritional guidelines (ruminants and monogastrics).

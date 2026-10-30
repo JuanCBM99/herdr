@@ -37,8 +37,8 @@ multi-cohort systems.
   Guide](https://juancbm99.github.io/herdr/articles/Easy_Example.md):
 - [Dairy Cattle Spain:
   North/South](https://juancbm99.github.io/herdr/articles/Moderate_Example.md):
-- [Dairy Cattle Spain: North/South in different Life
-  Stages](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
+- [Intensive Multi-Cohort Assessment: Swine & Poultry
+  Systems](https://juancbm99.github.io/herdr/articles/Difficult_Example.md):
 
 ### Methodology & Reference
 

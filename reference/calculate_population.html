@@ -113,7 +113,7 @@ for each species. Default is <code>FALSE</code>.</p></dd>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A tibble containing the complete animal population structure with columns:
-  <code>region</code>, <code>subregion</code>, <code>animal_tag</code>, <code>class_flex</code>,
+  <code>farm_id</code>, <code>region</code>, <code>subregion</code>, <code>animal_tag</code>,
   <code>animal_type</code>, <code>animal_subtype</code>, and <code>population</code>.</p>
     </div>
     <div class="section level2">
@@ -125,7 +125,9 @@ for each species. Default is <code>FALSE</code>.</p></dd>
 <code>mature_goat_female_dairy</code>, <code>breeder_sows</code>, <code>breeder_meat_hens</code>, <code>laying_hens</code>).
 All generated offspring automatically inherit the <code>region</code> and <code>subregion</code> of their
 parent cohorts, ensuring seamless downstream integration with diets, weights, and manure management.</p>
-    </div>
+<ul><li><p><code>farm_id</code>: Farm or production system identifier.</p></li>
+<li><p><code>region</code> and <code>subregion</code>: Strictly geographical location identifiers (e.g., country/province/municipality) that define the spatial unit of the farm. Different housing or management variants within the same geographical farm must be distinguished via <code>animal_tag</code> (e.g., <code>laying_hens</code> vs. <code>free_range_laying_hens</code>), not via <code>subregion</code>.</p></li>
+</ul></div>
 
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>

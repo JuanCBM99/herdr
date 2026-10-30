@@ -43,8 +43,8 @@ calculate_population(
 ## Value
 
 A tibble containing the complete animal population structure with
-columns: `region`, `subregion`, `animal_tag`, `class_flex`,
-`animal_type`, `animal_subtype`, and `population`.
+columns: `farm_id`, `region`, `subregion`, `animal_tag`, `animal_type`,
+`animal_subtype`, and `population`.
 
 ## Automatic Demographic Modeling
 
@@ -55,3 +55,11 @@ categories (e.g., `mature_dairy_cattle`, `mature_beef_cattle`,
 automatically inherit the `region` and `subregion` of their parent
 cohorts, ensuring seamless downstream integration with diets, weights,
 and manure management.
+
+- `farm_id`: Farm or production system identifier.
+
+- `region` and `subregion`: Strictly geographical location identifiers
+  (e.g., country/province/municipality) that define the spatial unit of
+  the farm. Different housing or management variants within the same
+  geographical farm must be distinguished via `animal_tag` (e.g.,
+  `laying_hens` vs. `free_range_laying_hens`), not via `subregion`.

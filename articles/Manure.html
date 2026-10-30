@@ -111,7 +111,7 @@ official IPCC system definitions and climate combinations recorded in
 model cannot assign emission factors.</p>
 <p>This guide provides the complete decision matrix of valid paths for
 your <code>manure_management.csv</code>. For the mathematical emission
-equations, see the <a href="Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide">Theoretical
+equations, see the <a href="Theoretical_basis.html#iii-methane-module">Theoretical
 Basis</a>.</p>
 <hr>
 </div>
@@ -122,10 +122,9 @@ Basis</a>.</p>
 <h4 id="rule-1-allocation-must-equal-exactly-1-0-per-cohort">Rule 1: Allocation Must Equal Exactly 1.0 per Cohort<a class="anchor" aria-label="anchor" href="#rule-1-allocation-must-equal-exactly-1-0-per-cohort"></a>
 </h4>
 <p>For each unique animal cohort (defined by <code>animal_tag</code>,
-<code>region</code>, <code>subregion</code>, and
-<code>class_flex</code>), the sum of the <code>allocation</code> column
-across all assigned manure systems must equal <strong>1.0</strong>
-(100%):</p>
+<code>region</code>, and <code>subregion</code>), the sum of the
+<code>allocation</code> column across all assigned manure systems must
+equal <strong>1.0</strong> (100%):</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mtext mathvariant="normal">allocation</mtext><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\sum \text{allocation} = 1.0</annotation></semantics></math></p>
 <p><em>Example:</em> If dairy cows spend 7 months indoors with liquid
 slurry and 5 months grazing on pasture, declare two rows for that
@@ -612,7 +611,7 @@ data schema for <code>manure_management.csv</code> and
 <a href="Workflow.html">General Workflow</a> — how manure
 calculations integrate into the modeling pipeline.</li>
 <li>
-<a href="Theoretical_basis.html#iv-manure-management-methane--nitrous-oxide">Theoretical
+<a href="Theoretical_basis.html#iii-methane-module">Theoretical
 Basis</a> — full mathematical equations for
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>V</mi><mi>S</mi></mrow><annotation encoding="application/x-tex">VS</annotation></semantics></math>,
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>B</mi><mn>0</mn></msub><annotation encoding="application/x-tex">B_0</annotation></semantics></math>,

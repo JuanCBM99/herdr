@@ -131,29 +131,35 @@ modeling engine</strong>.</p>
 <li>
 <strong>IPCC Tier 2 Greenhouse Gas Inventories:</strong> Implements
 the <em>2019 Refinement to the 2006 IPCC Guidelines for National
-Greenhouse Gas Inventories</em> for ruminants (cattle, sheep, goats) and
-monogastrics (swine, poultry, adopting FEDNA nutritional
+Greenhouse Gas Inventories</em> for ruminants (<code>cattle</code>,
+<code>sheep</code>, <code>goat</code>) and monogastrics
+(<code>swine</code>, <code>poultry</code>, adopting FEDNA nutritional
 standards).</li>
 <li>
 <strong>Agroecological Land Footprint &amp; Competition:</strong>
-Quantifies feed land requirements (m2) and classifies land according to
-human food competition (Mottet et al., 2017) into
-<strong>Cropland</strong>, <strong>Convertible Grassland</strong>,
-<strong>Unconvertible Rangeland</strong>, and <strong>Other</strong>.
-When ingredient origins are unspecified, <code>herdr</code> traces true
-producer countries using recursive FAO bilateral trade matrices and
-national self-sufficiency thresholds.</li>
+Quantifies feed land requirements
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msup><mtext mathvariant="normal">m</mtext><mn>2</mn></msup><annotation encoding="application/x-tex">\text{m}^2</annotation></semantics></math>)
+and classifies land according to human food competition (Mottet et al.,
+2017) into <strong>Cropland</strong>, <strong>Convertible
+Grassland</strong>, <strong>Unconvertible Rangeland</strong>, and
+<strong>None</strong>. When ingredient origins are unspecified,
+<code>herdr</code> traces true producer countries using recursive FAO
+bilateral trade matrices and national self-sufficiency thresholds.</li>
 <li>
 <strong>Animal Productivity &amp; Edible Human Protein:</strong>
-Implements the <strong>FAO GLEAM v3.0</strong> methodology to translate
-herd throughput into physical commodities (Fat and Protein Corrected
-Milk, cold dressed carcass weight, boneless meat, and fresh eggs) and
-total digestible human protein (kg protein/year).</li>
+Implements the <strong>FAO</strong> methodology to translate herd
+throughput across functional roles (<code>mature</code>,
+<code>replacement</code>, <code>slaughter</code>) into physical
+commodities (Fat and Protein Corrected Milk, cold dressed carcass
+weight, boneless meat, greasy wool, and fresh eggs) and total digestible
+human protein (kg protein/year).</li>
 <li>
-<strong>Biophysical Co-Product Allocation &amp; Protein Feed
-Efficiency (Mottet et al., 2017):</strong> Applies the updated
+<strong>Enterprise Attribution, Biophysical Co-Product Allocation
+&amp; Protein Feed Efficiency:</strong> Automatically integrates
+non-commercial rearing and breeding overheads (<code>replacement</code>
+and <code>mature</code> breeders) into commercial outputs, applies the
 <strong>International Dairy Federation (IDF Bulletin 520/2022)</strong>
-Net Energy physical allocation and reports protein conversion and human
+Net Energy physical allocation, and reports protein conversion and human
 food competition metrics (<code>Protein_FCR_total</code> and
 <code>Protein_FCR_cropland</code>).</li>
 <li>
@@ -161,29 +167,41 @@ food competition metrics (<code>Protein_FCR_total</code> and
 AWARE):</strong> Integrates INRAE/ADEME <strong>ECOALIM v9</strong> to
 evaluate upstream feed carbon footprints (fossil emissions
 vs. deforestation LUC) and freshwater deprivation
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.}</annotation></semantics></math>)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mtext mathvariant="normal">m</mtext><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow></mrow><annotation encoding="application/x-tex">\text{m}^3\text{ depriv.}</annotation></semantics></math>)
 characterized via the international <strong>AWARE</strong> model.</li>
 </ol>
 <hr>
 </div>
 <div class="section level2">
-<h2 id="supported-livestock-species">Supported Livestock Species<a class="anchor" aria-label="anchor" href="#supported-livestock-species"></a>
+<h2 id="supported-livestock-species-canonical-taxonomy">Supported Livestock Species &amp; Canonical Taxonomy<a class="anchor" aria-label="anchor" href="#supported-livestock-species-canonical-taxonomy"></a>
 </h2>
-<p><code>herdr</code> natively supports full life cycles across major
-domestic species:</p>
+<p><code>herdr</code> natively supports full life cycles across five
+major domestic species using a strict, standardized taxonomy:</p>
 <ul>
-<li>🐄 <strong>Cattle:</strong> Mature dairy cows (lactating &amp; dry
-phases), replacement heifers, breeding bulls, suckler beef cows, and
-feedlot fattening calves.</li>
-<li>🐑 <strong>Sheep:</strong> Dairy ewes, meat ewes, breeding rams,
-replacement hoggets, and slaughter lambs.</li>
-<li>🐐 <strong>Goats:</strong> Dairy does, meat does, bucks, kids for
-replacement, and dairy/meat fattening kids.</li>
-<li>🐖 <strong>Swine:</strong> Breeding sows (gestation &amp; lactation
-phases), service boars, replacement gilts, weaners, and fattening
-pigs.</li>
-<li>🐔 <strong>Poultry:</strong> Commercial layer flocks, layer
-replacement pullets, broiler meat flocks, and meat breeder hens.</li>
+<li>🐄 <strong>Cattle (<code>cattle</code> | <code>dairy</code> or
+<code>meat</code>):</strong> Mature dairy cows (<code>mature</code>),
+suckler beef cows and breeding bulls (<code>mature</code>), replacement
+calves and yearling heifers (<code>replacement</code>), and feedlot/beef
+fattening calves (<code>slaughter</code>).</li>
+<li>🐑 <strong>Sheep (<code>sheep</code> | <code>dairy</code> or
+<code>meat</code>):</strong> Dairy ewes, meat ewes, and breeding rams
+(<code>mature</code>), replacement lambs (<code>replacement</code>), and
+slaughter lambs (<code>slaughter</code>).</li>
+<li>🐐 <strong>Goats (<code>goat</code> | <code>dairy</code> or
+<code>meat</code>):</strong> Dairy does, meat does, and bucks
+(<code>mature</code>), replacement kids (<code>replacement</code>), and
+dairy/meat fattening kids (<code>slaughter</code>).</li>
+<li>🐖 <strong>Swine (<code>swine</code> | <code>meat</code>):</strong>
+Breeding sows and service boars (<code>mature</code>), replacement gilts
+(<code>replacement</code>), and fattening pigs
+(<code>slaughter</code>).</li>
+<li>🐔 <strong>Poultry (<code>poultry</code> | <code>meat</code> or
+<code>layer</code>):</strong> Commercial laying hens and free-range
+layers (<code>layer</code> / <code>mature</code>), layer replacement
+pullets (<code>layer</code> / <code>replacement</code>), meat breeder
+hens (<code>meat</code> / <code>mature</code>), meat replacement pullets
+(<code>meat</code> / <code>replacement</code>), and broilers
+(<code>meat</code> / <code>slaughter</code>).</li>
 </ul>
 <hr>
 </div>
@@ -204,9 +222,10 @@ scripts.</p>
 <span></span>
 <span><span class="co"># Launch the interactive Shiny interface</span></span>
 <span><span class="fu"><a href="../reference/run_herdr_app.html">run_herdr_app</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>The Shiny app provides guided forms, real-time input validation,
-interactive stacked charts, and one-click data downloads. See the <a href="app.html">Interactive App Guide</a> for a complete
-walkthrough.</p>
+<p>The Shiny app provides guided forms, strict dropdowns, real-time
+pre-flight validation, interactive stacked charts, and one-click CSV/PNG
+downloads. See the <a href="app.html">Interactive App Guide</a> for a
+complete walkthrough.</p>
 </div>
 <div class="section level4">
 <h4 id="option-b-scripted-r-pipeline-reproducible-research">Option B: Scripted R Pipeline (Reproducible Research)<a class="anchor" aria-label="anchor" href="#option-b-scripted-r-pipeline-reproducible-research"></a>
@@ -224,12 +243,17 @@ walkthrough.</p>
 <span>  gwp_report   <span class="op">=</span> <span class="st">"AR5"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 3. Visualize results by species across functional units</span></span>
+<span><span class="co"># Inspect Table 1 (Cohort Totals) and Table 2 (Enterprise Product Intensities)</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">totals</span></span>
+<span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span></span>
+<span></span>
+<span><span class="co"># 3. Visualize results across impact categories and functional units</span></span>
 <span><span class="va">p</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"region"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
-<span>  functional_unit <span class="op">=</span> <span class="st">"protein"</span> <span class="co"># kg CO2e and m2 per kg edible protein</span></span>
+<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"protein"</span> <span class="co"># kg CO2e per kg edible protein</span></span>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">p</span><span class="op">)</span></span></code></pre></div>
@@ -319,22 +343,23 @@ climatic regions.</td>
 <td align="left"></td>
 <td align="left"><a href="Difficult_Example.html">3. Intensive
 Multi-Cohort AAP (Advanced)</a></td>
-<td align="left">High-throughput batch rearing in swine and poultry
-systems.</td>
+<td align="left">Multi-cohort swine and poultry systems demonstrating
+<code>mature</code>, <code>replacement</code>, and
+<code>slaughter</code> integration.</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong>Methodology &amp; Reference</strong></td>
 <td align="left"><a href="Technical_reference.html">Technical Data
 Dictionary</a></td>
 <td align="left">Comprehensive field-by-field schema of all CSV
-templates and background databases.</td>
+templates, outputs, and background databases.</td>
 </tr>
 <tr class="even">
 <td align="left"></td>
 <td align="left"><a href="Theoretical_basis.html">Theoretical
 Basis</a></td>
 <td align="left">Complete mathematical formulations, IPCC Tier 2
-equations, and GLEAM algorithms.</td>
+equations, GLEAM algorithms, and enterprise attribution.</td>
 </tr>
 </tbody>
 </table>

@@ -55,7 +55,7 @@
 - [`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
   : Calculate Weighted Nutritional Variables
 - [`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)
-  : Summarize CH4, N2O Emissions, and Land Use
+  : Summarize CH4, N2O Emissions, Land Use, and Farm Product Intensities
 - [`herdr_cache_dir()`](https://juancbm99.github.io/herdr/reference/herdr_cache_dir.md)
   : Get herdr user data cache directory
 - [`herdr_get_ecoalim_path()`](https://juancbm99.github.io/herdr/reference/herdr_get_ecoalim_path.md)
@@ -73,4 +73,5 @@
   : Plot herdr results dynamically with custom grouping and premium
   aesthetics
 - [`run_herdr_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)
+  [`run_app()`](https://juancbm99.github.io/herdr/reference/run_herdr_app.md)
   : Launch the herdr Interactive Application
