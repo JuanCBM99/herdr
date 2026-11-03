@@ -393,34 +393,54 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
       sys_wool_kg <- sum(df_enterprise$wool_kg, na.rm = TRUE)
       sys_prot_kg <- sum(df_enterprise$total_protein_kg, na.rm = TRUE)
 
-      if (cur_type == "sheep" && sys_wool_kg > 0 && sys_meat_lw > 0) {
-        ewool_sys <- 24.0 * sys_wool_kg
-        emeat_sys <- 11.0 * sys_meat_lw
-        etot_sys <- ewool_sys + emeat_sys
-        af_wool_sys <- round(ewool_sys / etot_sys, 4)
-        af_meat_sys <- round(emeat_sys / etot_sys, 4)
-      } else {
-        af_wool_sys <- 0.0
-        af_meat_sys <- 1.0
+      # --- Canonical Biophysical Energy Allocation Helpers (IDF 2015/2022, FAO GLEAM) ---
+      calc_intensities <- function(pool, alloc_factor, denom) {
+        if (is.na(denom) || denom <= 0 || is.na(alloc_factor) || alloc_factor <= 0) {
+          return(c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_))
+        }
+        c(
+          ghg_s1 = round((pool$s1 * alloc_factor) / denom, 3),
+          ghg_c2f = round((pool$c2f * alloc_factor) / denom, 3),
+          land = round((pool$land * alloc_factor) / denom, 3),
+          water = round((pool$water * alloc_factor) / denom, 3)
+        )
       }
 
-      # Biophysical allocation factors for dairy breeding enterprise (IDF 2022)
-      if (is_dairy) {
-        energy_milk_mj <- dplyr::case_when(
-          cur_type == "sheep" ~ 4.6 * tot_milk_fresh,
-          cur_type == "goat" ~ 3.0 * tot_milk_fresh,
-          TRUE ~ 3.1 * tot_milk_fpcm
-        )
-        energy_cull_mj <- 15.0 * tot_cull_lw
-        energy_dairy_tot <- energy_milk_mj + energy_cull_mj
-
-        if (energy_dairy_tot > 0 && tot_milk_fpcm > 0) {
-          af_milk_dairy <- energy_milk_mj / energy_dairy_tot
-          af_cull_dairy <- energy_cull_mj / energy_dairy_tot
+      calc_sheep_wool_meat_af <- function(wool_kg, meat_lw) {
+        if (wool_kg > 0 && meat_lw > 0) {
+          ewool <- 24.0 * wool_kg
+          emeat <- 11.0 * meat_lw
+          etot <- ewool + emeat
+          c(af_wool = round(ewool / etot, 4), af_meat = round(emeat / etot, 4))
         } else {
-          af_milk_dairy <- 0.0
-          af_cull_dairy <- 0.0
+          c(af_wool = 0.0, af_meat = 1.0)
         }
+      }
+
+      calc_dairy_milk_cull_af <- function(cur_type, milk_fpcm, milk_fresh, cull_lw) {
+        emilk <- dplyr::case_when(
+          cur_type == "sheep" ~ 4.6 * milk_fresh,
+          cur_type == "goat"  ~ 3.0 * milk_fresh,
+          TRUE                ~ 3.1 * milk_fpcm
+        )
+        ecull <- 15.0 * cull_lw
+        etot <- emilk + ecull
+        if (etot > 0 && (milk_fpcm > 0 || milk_fresh > 0)) {
+          c(af_milk = emilk / etot, af_cull = ecull / etot)
+        } else {
+          c(af_milk = 0.0, af_cull = 0.0)
+        }
+      }
+
+      # Enterprise allocation factors
+      af_sheep_sys <- calc_sheep_wool_meat_af(sys_wool_kg, sys_meat_lw)
+      af_wool_sys  <- af_sheep_sys[["af_wool"]]
+      af_meat_sys  <- af_sheep_sys[["af_meat"]]
+
+      if (is_dairy) {
+        af_dairy_sys  <- calc_dairy_milk_cull_af(cur_type, tot_milk_fpcm, tot_milk_fresh, tot_cull_lw)
+        af_milk_dairy <- af_dairy_sys[["af_milk"]]
+        af_cull_dairy <- af_dairy_sys[["af_cull"]]
       }
 
       # Compute row by row for each animal cohort
@@ -439,30 +459,11 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
         wool_kg_i <- 0
         prot_kg_i <- 0
 
-        ghg_milk_s1 <- NA_real_
-        ghg_milk_c2f <- NA_real_
-        land_milk <- NA_real_
-        water_milk <- NA_real_
-
-        ghg_meat_s1 <- NA_real_
-        ghg_meat_c2f <- NA_real_
-        land_meat <- NA_real_
-        water_meat <- NA_real_
-
-        ghg_egg_s1 <- NA_real_
-        ghg_egg_c2f <- NA_real_
-        land_egg <- NA_real_
-        water_egg <- NA_real_
-
-        ghg_wool_s1 <- NA_real_
-        ghg_wool_c2f <- NA_real_
-        land_wool <- NA_real_
-        water_wool <- NA_real_
-
-        ghg_prot_s1 <- NA_real_
-        ghg_prot_c2f <- NA_real_
-        land_prot <- NA_real_
-        water_prot <- NA_real_
+        int_milk <- c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_)
+        int_meat <- c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_)
+        int_egg  <- c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_)
+        int_wool <- c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_)
+        int_prot <- c(ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_)
 
         fcr_tot <- NA_real_
         fcr_crop <- NA_real_
@@ -478,135 +479,65 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
 
           if (role_i == "mature") {
             if (is_dairy) {
-              # Mature dairy: milk and cull meat (desvieje).
-              # If multiple milking cohorts exist in the same farm (e.g. stabled vs grazing cows),
-              # each milking cohort retains its own direct footprint + proportional share of non-milking breeding/replacement stock.
+              # Mature dairy: milk and cull meat (desvieje)
               milk_fpcm_i <- row_i$milk_FPCM_kg
               meat_cw_i <- row_i$meat_carcass_weight_kg
 
               if (n_dairy_milk_cohorts > 1 && milk_fpcm_i > 0) {
                 non_milk_idx <- breed_idx & (df_enterprise$milk_FPCM_kg == 0)
-                nm_s1 <- sum(df_enterprise$CO2eq_Total_Gg[non_milk_idx], na.rm = TRUE) * 1e6
-                nm_c2f <- sum(df_enterprise$CO2eq_cradle_to_farm_Gg[non_milk_idx], na.rm = TRUE) * 1e6
-                nm_land <- sum(df_enterprise$Land_m2[non_milk_idx], na.rm = TRUE)
-                nm_water <- sum(df_enterprise$Water_feed_m3[non_milk_idx], na.rm = TRUE)
-                nm_cull_cw <- sum(df_enterprise$meat_carcass_weight_kg[non_milk_idx], na.rm = TRUE)
-                nm_cull_lw <- sum(df_enterprise$meat_live_weight_kg[non_milk_idx], na.rm = TRUE)
-                nm_prot <- sum(df_enterprise$total_protein_kg[non_milk_idx], na.rm = TRUE)
-
                 tot_milk_pop <- sum(df_enterprise$population[mat_idx & df_enterprise$milk_FPCM_kg > 0], na.rm = TRUE)
                 sh_d <- if (tot_milk_pop > 0) pop_i / tot_milk_pop else 0
 
-                d_s1_i <- (row_i$CO2eq_Total_Gg * 1e6) + (nm_s1 * sh_d)
-                d_c2f_i <- (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (nm_c2f * sh_d)
-                d_land_i <- row_i$Land_m2 + (nm_land * sh_d)
-                d_water_i <- row_i$Water_feed_m3 + (nm_water * sh_d)
-                d_cull_cw_i <- meat_cw_i + (nm_cull_cw * sh_d)
-                d_cull_lw_i <- row_i$meat_live_weight_kg + (nm_cull_lw * sh_d)
-                d_prot_i <- prot_kg_i + (nm_prot * sh_d)
-
-                emilk_i <- dplyr::case_when(
-                  cur_type == "sheep" ~ 4.6 * row_i$milk_fresh_kg,
-                  cur_type == "goat" ~ 3.0 * row_i$milk_fresh_kg,
-                  TRUE ~ 3.1 * milk_fpcm_i
+                pool_d <- list(
+                  s1    = (row_i$CO2eq_Total_Gg * 1e6) + (sum(df_enterprise$CO2eq_Total_Gg[non_milk_idx], na.rm = TRUE) * 1e6 * sh_d),
+                  c2f   = (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (sum(df_enterprise$CO2eq_cradle_to_farm_Gg[non_milk_idx], na.rm = TRUE) * 1e6 * sh_d),
+                  land  = row_i$Land_m2 + (sum(df_enterprise$Land_m2[non_milk_idx], na.rm = TRUE) * sh_d),
+                  water = row_i$Water_feed_m3 + (sum(df_enterprise$Water_feed_m3[non_milk_idx], na.rm = TRUE) * sh_d)
                 )
-                ecull_i <- 15.0 * d_cull_lw_i
-                etot_i <- emilk_i + ecull_i
-                af_m_i <- if (etot_i > 0) emilk_i / etot_i else 0
-                af_c_i <- if (etot_i > 0) ecull_i / etot_i else 0
+                d_cull_cw_i <- meat_cw_i + (sum(df_enterprise$meat_carcass_weight_kg[non_milk_idx], na.rm = TRUE) * sh_d)
+                d_cull_lw_i <- row_i$meat_live_weight_kg + (sum(df_enterprise$meat_live_weight_kg[non_milk_idx], na.rm = TRUE) * sh_d)
+                d_prot_i    <- prot_kg_i + (sum(df_enterprise$total_protein_kg[non_milk_idx], na.rm = TRUE) * sh_d)
 
-                ghg_milk_s1 <- round((d_s1_i * af_m_i) / milk_fpcm_i, 3)
-                ghg_milk_c2f <- round((d_c2f_i * af_m_i) / milk_fpcm_i, 3)
-                land_milk <- round((d_land_i * af_m_i) / milk_fpcm_i, 3)
-                water_milk <- round((d_water_i * af_m_i) / milk_fpcm_i, 3)
-
-                if (d_cull_cw_i > 0) {
-                  ghg_meat_s1 <- round((d_s1_i * af_c_i) / d_cull_cw_i, 3)
-                  ghg_meat_c2f <- round((d_c2f_i * af_c_i) / d_cull_cw_i, 3)
-                  land_meat <- round((d_land_i * af_c_i) / d_cull_cw_i, 3)
-                  water_meat <- round((d_water_i * af_c_i) / d_cull_cw_i, 3)
-                }
-                if (d_prot_i > 0) {
-                  ghg_prot_s1 <- round(d_s1_i / d_prot_i, 3)
-                  ghg_prot_c2f <- round(d_c2f_i / d_prot_i, 3)
-                  land_prot <- round(d_land_i / d_prot_i, 3)
-                  water_prot <- round(d_water_i / d_prot_i, 3)
-                }
+                af_d_i   <- calc_dairy_milk_cull_af(cur_type, milk_fpcm_i, row_i$milk_fresh_kg, d_cull_lw_i)
+                int_milk <- calc_intensities(pool_d, af_d_i[["af_milk"]], milk_fpcm_i)
+                int_meat <- calc_intensities(pool_d, af_d_i[["af_cull"]], d_cull_cw_i)
+                int_prot <- calc_intensities(pool_d, 1.0, d_prot_i)
               } else {
-                if (tot_milk_fpcm > 0) {
-                  ghg_milk_s1 <- round((breed_s1 * af_milk_dairy) / tot_milk_fpcm, 3)
-                  ghg_milk_c2f <- round((breed_c2f * af_milk_dairy) / tot_milk_fpcm, 3)
-                  land_milk <- round((breed_land * af_milk_dairy) / tot_milk_fpcm, 3)
-                  water_milk <- round((breed_water * af_milk_dairy) / tot_milk_fpcm, 3)
-                }
-                if (tot_cull_cw > 0) {
-                  ghg_meat_s1 <- round((breed_s1 * af_cull_dairy) / tot_cull_cw, 3)
-                  ghg_meat_c2f <- round((breed_c2f * af_cull_dairy) / tot_cull_cw, 3)
-                  land_meat <- round((breed_land * af_cull_dairy) / tot_cull_cw, 3)
-                  water_meat <- round((breed_water * af_cull_dairy) / tot_cull_cw, 3)
-                }
-                if (tot_breed_prot > 0 && prot_kg_i > 0) {
-                  ghg_prot_s1 <- round(breed_s1 / tot_breed_prot, 3)
-                  ghg_prot_c2f <- round(breed_c2f / tot_breed_prot, 3)
-                  land_prot <- round(breed_land / tot_breed_prot, 3)
-                  water_prot <- round(breed_water / tot_breed_prot, 3)
-                }
+                pool_b   <- list(s1 = breed_s1, c2f = breed_c2f, land = breed_land, water = breed_water)
+                int_milk <- calc_intensities(pool_b, af_milk_dairy, tot_milk_fpcm)
+                int_meat <- calc_intensities(pool_b, af_cull_dairy, tot_cull_cw)
+                int_prot <- calc_intensities(pool_b, 1.0, tot_breed_prot)
               }
             } else if (is_layer) {
-              # Mature layer: each laying cohort retains its own direct footprint + proportional share of replacement pullets
+              # Mature layer: direct footprint + proportional share of replacement pullets
               egg_kg_i <- row_i$egg_fresh_kg
               meat_cw_i <- row_i$meat_carcass_weight_kg
               repl_share_i <- if (tot_mat_pop > 0) pop_i / tot_mat_pop else 0
 
-              layer_s1_i <- (row_i$CO2eq_Total_Gg * 1e6) + (repl_s1 * repl_share_i)
-              layer_c2f_i <- (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (repl_c2f * repl_share_i)
-              layer_land_i <- row_i$Land_m2 + (repl_land * repl_share_i)
-              layer_water_i <- row_i$Water_feed_m3 + (repl_water * repl_share_i)
-
-              if (egg_kg_i > 0) {
-                ghg_egg_s1 <- round(layer_s1_i / egg_kg_i, 3)
-                ghg_egg_c2f <- round(layer_c2f_i / egg_kg_i, 3)
-                land_egg <- round(layer_land_i / egg_kg_i, 3)
-                water_egg <- round(layer_water_i / egg_kg_i, 3)
-              }
-              if (prot_kg_i > 0) {
-                ghg_prot_s1 <- round(layer_s1_i / prot_kg_i, 3)
-                ghg_prot_c2f <- round(layer_c2f_i / prot_kg_i, 3)
-                land_prot <- round(layer_land_i / prot_kg_i, 3)
-                water_prot <- round(layer_water_i / prot_kg_i, 3)
-              }
+              pool_l <- list(
+                s1    = (row_i$CO2eq_Total_Gg * 1e6) + (repl_s1 * repl_share_i),
+                c2f   = (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (repl_c2f * repl_share_i),
+                land  = row_i$Land_m2 + (repl_land * repl_share_i),
+                water = row_i$Water_feed_m3 + (repl_water * repl_share_i)
+              )
+              int_egg  <- calc_intensities(pool_l, 1.0, egg_kg_i)
+              int_prot <- calc_intensities(pool_l, 1.0, prot_kg_i)
             } else {
-              # Mature meat breeding stock (suckler cows, breeder sows, breeder hens, meat ewes/does):
-              # Integrates entire meat enterprise (mature + replacement + slaughter) over total meat & wool
+              # Mature meat breeding stock (suckler cows, breeder sows, breeder hens, meat ewes/does)
               meat_cw_i <- row_i$meat_carcass_weight_kg
               wool_kg_i <- row_i$wool_kg
 
-              if (sys_meat_cw > 0 && meat_cw_i > 0) {
-                ghg_meat_s1 <- round((sys_s1 * af_meat_sys) / sys_meat_cw, 3)
-                ghg_meat_c2f <- round((sys_c2f * af_meat_sys) / sys_meat_cw, 3)
-                land_meat <- round((sys_land * af_meat_sys) / sys_meat_cw, 3)
-                water_meat <- round((sys_water * af_meat_sys) / sys_meat_cw, 3)
-              }
-              if (sys_wool_kg > 0 && af_wool_sys > 0 && wool_kg_i > 0) {
-                ghg_wool_s1 <- round((sys_s1 * af_wool_sys) / sys_wool_kg, 3)
-                ghg_wool_c2f <- round((sys_c2f * af_wool_sys) / sys_wool_kg, 3)
-                land_wool <- round((sys_land * af_wool_sys) / sys_wool_kg, 3)
-                water_wool <- round((sys_water * af_wool_sys) / sys_wool_kg, 3)
-              }
-              if (sys_prot_kg > 0 && prot_kg_i > 0) {
-                ghg_prot_s1 <- round((sys_s1 * af_meat_sys) / sys_prot_kg, 3)
-                ghg_prot_c2f <- round((sys_c2f * af_meat_sys) / sys_prot_kg, 3)
-                land_prot <- round((sys_land * af_meat_sys) / sys_prot_kg, 3)
-                water_prot <- round((sys_water * af_meat_sys) / sys_prot_kg, 3)
-              }
+              pool_sys <- list(s1 = sys_s1, c2f = sys_c2f, land = sys_land, water = sys_water)
+              int_meat <- calc_intensities(pool_sys, af_meat_sys, sys_meat_cw)
+              int_wool <- calc_intensities(pool_sys, af_wool_sys, sys_wool_kg)
+              int_prot <- calc_intensities(pool_sys, af_meat_sys, sys_prot_kg)
             }
           } else if (role_i == "slaughter") {
             meat_cw_i <- row_i$meat_carcass_weight_kg
             wool_kg_i <- row_i$wool_kg
 
             if (is_meat && has_breeding) {
-              # Integrated meat enterprise (breeding herd + fattening cohorts):
-              # Each slaughter cohort retains its own direct fattening footprint + proportional share of breeding herd (mature + replacement)
+              # Integrated meat enterprise (breeding herd + fattening cohorts)
               slau_share_i <- if (tot_slau_cw > 0) {
                 meat_cw_i / tot_slau_cw
               } else if (tot_slau_pop > 0) {
@@ -615,85 +546,36 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
                 1.0
               }
 
-              slau_s1_i <- (row_i$CO2eq_Total_Gg * 1e6) + (breed_s1 * slau_share_i)
-              slau_c2f_i <- (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (breed_c2f * slau_share_i)
-              slau_land_i <- row_i$Land_m2 + (breed_land * slau_share_i)
-              slau_water_i <- row_i$Water_feed_m3 + (breed_water * slau_share_i)
-
-              slau_cw_tot_i <- meat_cw_i + (tot_cull_cw * slau_share_i)
-              slau_lw_tot_i <- row_i$meat_live_weight_kg + (tot_cull_lw * slau_share_i)
+              pool_slau <- list(
+                s1    = (row_i$CO2eq_Total_Gg * 1e6) + (breed_s1 * slau_share_i),
+                c2f   = (row_i$CO2eq_cradle_to_farm_Gg * 1e6) + (breed_c2f * slau_share_i),
+                land  = row_i$Land_m2 + (breed_land * slau_share_i),
+                water = row_i$Water_feed_m3 + (breed_water * slau_share_i)
+              )
+              slau_cw_tot_i   <- meat_cw_i + (tot_cull_cw * slau_share_i)
+              slau_lw_tot_i   <- row_i$meat_live_weight_kg + (tot_cull_lw * slau_share_i)
               slau_wool_tot_i <- wool_kg_i + (tot_wool_kg * slau_share_i)
               slau_prot_tot_i <- prot_kg_i + (tot_breed_prot * slau_share_i)
 
-              if (cur_type == "sheep" && slau_wool_tot_i > 0 && slau_lw_tot_i > 0) {
-                ew_i <- 24.0 * slau_wool_tot_i
-                em_i <- 11.0 * slau_lw_tot_i
-                et_i <- ew_i + em_i
-                af_wool_slau <- round(ew_i / et_i, 4)
-                af_meat_slau <- round(em_i / et_i, 4)
-              } else {
-                af_wool_slau <- 0.0
-                af_meat_slau <- 1.0
-              }
+              af_slau <- if (cur_type == "sheep") calc_sheep_wool_meat_af(slau_wool_tot_i, slau_lw_tot_i) else c(af_wool = 0.0, af_meat = 1.0)
 
-              if (slau_cw_tot_i > 0 && meat_cw_i > 0) {
-                ghg_meat_s1 <- round((slau_s1_i * af_meat_slau) / slau_cw_tot_i, 3)
-                ghg_meat_c2f <- round((slau_c2f_i * af_meat_slau) / slau_cw_tot_i, 3)
-                land_meat <- round((slau_land_i * af_meat_slau) / slau_cw_tot_i, 3)
-                water_meat <- round((slau_water_i * af_meat_slau) / slau_cw_tot_i, 3)
-              }
-              if (slau_wool_tot_i > 0 && af_wool_slau > 0 && wool_kg_i > 0) {
-                ghg_wool_s1 <- round((slau_s1_i * af_wool_slau) / slau_wool_tot_i, 3)
-                ghg_wool_c2f <- round((slau_c2f_i * af_wool_slau) / slau_wool_tot_i, 3)
-                land_wool <- round((slau_land_i * af_wool_slau) / slau_wool_tot_i, 3)
-                water_wool <- round((slau_water_i * af_wool_slau) / slau_wool_tot_i, 3)
-              }
-              if (slau_prot_tot_i > 0 && prot_kg_i > 0) {
-                ghg_prot_s1 <- round((slau_s1_i * af_meat_slau) / slau_prot_tot_i, 3)
-                ghg_prot_c2f <- round((slau_c2f_i * af_meat_slau) / slau_prot_tot_i, 3)
-                land_prot <- round((slau_land_i * af_meat_slau) / slau_prot_tot_i, 3)
-                water_prot <- round((slau_water_i * af_meat_slau) / slau_prot_tot_i, 3)
-              }
+              int_meat <- calc_intensities(pool_slau, af_slau[["af_meat"]], slau_cw_tot_i)
+              int_wool <- calc_intensities(pool_slau, af_slau[["af_wool"]], slau_wool_tot_i)
+              int_prot <- calc_intensities(pool_slau, af_slau[["af_meat"]], slau_prot_tot_i)
             } else {
-              # Pure fattening / feedlot (no breeding herd) or dairy/layer surplus calves/lambs:
-              # Evaluated on its own direct fattening footprint
-              s1_i <- row_i$CO2eq_Total_Gg * 1e6
-              c2f_i <- row_i$CO2eq_cradle_to_farm_Gg * 1e6
-              land_i <- row_i$Land_m2
-              water_i <- row_i$Water_feed_m3
+              # Standalone fattening / feedlot (no breeding herd)
+              pool_dir <- list(
+                s1    = row_i$CO2eq_Total_Gg * 1e6,
+                c2f   = row_i$CO2eq_cradle_to_farm_Gg * 1e6,
+                land  = row_i$Land_m2,
+                water = row_i$Water_feed_m3
+              )
+              af_dir <- if (cur_type == "sheep") calc_sheep_wool_meat_af(wool_kg_i, row_i$meat_live_weight_kg) else c(af_wool = 0.0, af_meat = 1.0)
 
-              if (cur_type == "sheep" && wool_kg_i > 0 && row_i$meat_live_weight_kg > 0) {
-                ewool <- 24.0 * wool_kg_i
-                emeat <- 11.0 * row_i$meat_live_weight_kg
-                etot <- ewool + emeat
-                af_wool_i <- round(ewool / etot, 4)
-                af_meat_i <- round(emeat / etot, 4)
-              } else {
-                af_wool_i <- 0.0
-                af_meat_i <- 1.0
-              }
-
-              if (meat_cw_i > 0) {
-                ghg_meat_s1 <- round((s1_i * af_meat_i) / meat_cw_i, 3)
-                ghg_meat_c2f <- round((c2f_i * af_meat_i) / meat_cw_i, 3)
-                land_meat <- round((land_i * af_meat_i) / meat_cw_i, 3)
-                water_meat <- round((water_i * af_meat_i) / meat_cw_i, 3)
-              }
-              if (wool_kg_i > 0 && af_wool_i > 0) {
-                ghg_wool_s1 <- round((s1_i * af_wool_i) / wool_kg_i, 3)
-                ghg_wool_c2f <- round((c2f_i * af_wool_i) / wool_kg_i, 3)
-                land_wool <- round((land_i * af_wool_i) / wool_kg_i, 3)
-                water_wool <- round((water_i * af_wool_i) / wool_kg_i, 3)
-              }
-              if (prot_kg_i > 0) {
-                ghg_prot_s1 <- round((s1_i * af_meat_i) / prot_kg_i, 3)
-                ghg_prot_c2f <- round((c2f_i * af_meat_i) / prot_kg_i, 3)
-                land_prot <- round((land_i * af_meat_i) / prot_kg_i, 3)
-                water_prot <- round((water_i * af_meat_i) / prot_kg_i, 3)
-              }
+              int_meat <- calc_intensities(pool_dir, af_dir[["af_meat"]], meat_cw_i)
+              int_wool <- calc_intensities(pool_dir, af_dir[["af_wool"]], wool_kg_i)
+              int_prot <- calc_intensities(pool_dir, af_dir[["af_meat"]], prot_kg_i)
             }
-          } else {
-            # Replacement cohorts: non-commercial rearing stock, intensities NA
           }
         }
 
@@ -710,34 +592,34 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
           total_protein_kg            = prot_kg_i,
 
           # Product Intensities: Milk (per kg FPCM)
-          GHG_intensity_milk          = ghg_milk_s1,
-          GHG_cradle_to_farm_milk     = ghg_milk_c2f,
-          Land_intensity_milk         = land_milk,
-          Water_intensity_milk        = water_milk,
+          GHG_intensity_milk          = int_milk[["ghg_s1"]],
+          GHG_cradle_to_farm_milk     = int_milk[["ghg_c2f"]],
+          Land_intensity_milk         = int_milk[["land"]],
+          Water_intensity_milk        = int_milk[["water"]],
 
           # Product Intensities: Meat (per kg carcass weight)
-          GHG_intensity_meat          = ghg_meat_s1,
-          GHG_cradle_to_farm_meat     = ghg_meat_c2f,
-          Land_intensity_meat         = land_meat,
-          Water_intensity_meat        = water_meat,
+          GHG_intensity_meat          = int_meat[["ghg_s1"]],
+          GHG_cradle_to_farm_meat     = int_meat[["ghg_c2f"]],
+          Land_intensity_meat         = int_meat[["land"]],
+          Water_intensity_meat        = int_meat[["water"]],
 
           # Product Intensities: Eggs (per kg fresh eggs)
-          GHG_intensity_egg           = ghg_egg_s1,
-          GHG_cradle_to_farm_egg      = ghg_egg_c2f,
-          Land_intensity_egg          = land_egg,
-          Water_intensity_egg         = water_egg,
+          GHG_intensity_egg           = int_egg[["ghg_s1"]],
+          GHG_cradle_to_farm_egg      = int_egg[["ghg_c2f"]],
+          Land_intensity_egg          = int_egg[["land"]],
+          Water_intensity_egg         = int_egg[["water"]],
 
           # Product Intensities: Wool (per kg greasy wool)
-          GHG_intensity_wool          = ghg_wool_s1,
-          GHG_cradle_to_farm_wool     = ghg_wool_c2f,
-          Land_intensity_wool         = land_wool,
-          Water_intensity_wool        = water_wool,
+          GHG_intensity_wool          = int_wool[["ghg_s1"]],
+          GHG_cradle_to_farm_wool     = int_wool[["ghg_c2f"]],
+          Land_intensity_wool         = int_wool[["land"]],
+          Water_intensity_wool        = int_wool[["water"]],
 
           # Nutritional Intensities: Edible Protein (per kg edible protein)
-          GHG_intensity_protein       = ghg_prot_s1,
-          GHG_cradle_to_farm_protein  = ghg_prot_c2f,
-          Land_intensity_protein      = land_prot,
-          Water_intensity_protein     = water_prot,
+          GHG_intensity_protein       = int_prot[["ghg_s1"]],
+          GHG_cradle_to_farm_protein  = int_prot[["ghg_c2f"]],
+          Land_intensity_protein      = int_prot[["land"]],
+          Water_intensity_protein     = int_prot[["water"]],
 
           # Protein Feed Conversion Ratio (Mottet et al. 2017)
           Protein_FCR_total           = fcr_tot,
