@@ -167,6 +167,27 @@ Complete documentation, theoretical background, workflow guides, and examples ar
 
 Energy requirement equations for swine and poultry follow the **FEDNA** methodology published by the Spanish Ministry of Agriculture.
 
+### Co-Product Biophysical Allocation (Table 2)
+
+Co-product footprint intensities (greenhouse gases, agroecological land use, and freshwater deprivation) are partitioned across enterprise products following the biophysical energy allocation framework of the **International Dairy Federation (IDF Bulletin 520 / 2022)**, the **2019 IPCC Refinement**, and **FAO LEAP**:
+
+$$AF_k = \frac{\text{Energy}_k}{\sum_j \text{Energy}_j}$$
+
+Where net biophysical energy requirements per unit of production are:
+- **Cattle & Buffalo Milk**: $3.1\text{ MJ/kg FPCM}$ (IDF Bulletin 520 / 2022; Nemecek & Thoma).
+- **Sheep Milk**: $4.6\text{ MJ/kg fresh milk}$ at 7% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1993, 1995).
+- **Goat Milk**: $3.0\text{ MJ/kg fresh milk}$ at 3.8% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1998).
+- **Mature Cull Meat**: $15.0\text{ MJ/kg live weight}$ (IDF Bulletin 520 / 2022).
+- **Slaughter & Fattening Meat**: $11.0\text{ MJ/kg live weight}$ (IDF Bulletin 520 / 2022).
+- **Greasy Wool**: $24.0\text{ MJ/kg}$ (IPCC 2019 Refinement, Vol 4, Ch 10, Eq. 10.20; AFRC 1995).
+- **Fresh Eggs**: $6.0\text{ MJ/kg}$ (FAO LEAP Poultry Guidelines / GLEAM v3.0).
+
+For **Edible Animal Protein**, non-edible fiber (wool) is excluded:
+
+$$AF_{\text{protein}} = 1 - AF_{\text{wool}} = \frac{\text{Energy}_{\text{milk}} + \text{Energy}_{\text{meat}} + \text{Energy}_{\text{eggs}}}{\sum \text{Energy}}$$
+
+The allocated footprint is divided by the enterprise total edible protein, ensuring consistent nutritional footprints across cohorts without double-counting. Physical meat intensities are expressed per kilogram of carcass weight ($\text{kg carcass}$).
+
 ------------------------------------------------------------------------
 
 # 🤝 Contributing
