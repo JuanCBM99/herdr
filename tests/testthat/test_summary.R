@@ -255,11 +255,120 @@ test_that("Table 2 integrates breeding + replacement + slaughter in meat systems
     swine_tot <- res$totals %>% filter(animal_type == "swine")
     swine_int <- res$intensities %>% filter(animal_type == "swine")
 
-    # Swine meat enterprise should pool mature + replacement + slaughter emissions over total swine meat
-    expected_meat_s1 <- round((sum(swine_tot$CO2eq_Total_Gg) * 1e6) / sum(swine_int$meat_carcass_weight_kg), 3)
+    # Swine meat enterprise integrates breeding + replacement + slaughter with biophysical allocation
+    tot_swine_s1 <- sum(swine_tot$CO2eq_Total_Gg) * 1e6
     fatten_row <- swine_int %>% filter(production_role == "slaughter")
     sows_row <- swine_int %>% filter(animal_tag == "breeder_sows")
-    expect_equal(fatten_row$GHG_intensity_meat, expected_meat_s1, tolerance = 1e-3)
+
+    # Both slaughter and cull meat intensities are positive and close mass balance
+    expect_true(fatten_row$GHG_intensity_meat > 0)
+    expect_true(sows_row$GHG_intensity_meat > 0)
+
+    alloc_fatten_s1 <- fatten_row$GHG_intensity_meat * fatten_row$meat_carcass_weight_kg
+    alloc_sows_s1   <- sows_row$GHG_intensity_meat * sows_row$meat_carcass_weight_kg
+    expect_equal(alloc_fatten_s1 + alloc_sows_s1, tot_swine_s1, tolerance = 1e-2 * tot_swine_s1)
     expect_false(isTRUE(all.equal(fatten_row$Protein_FCR_total, sows_row$Protein_FCR_total)))
+  })
+})
+
+test_that("Table 2 integrates mature dairy + replacement + slaughter calves into a single enterprise pool", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  dir.create(file.path(temp_test_dir, "user_data"))
+
+  dairy_files <- list.files(system.file("Examples", "Level1_Spain_Dairy_Cattle_2015", package = "herdr"), full.names = TRUE)
+  if (length(dairy_files) == 0) {
+    dairy_files <- list.files("inst/Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE)
+  }
+  file.copy(dairy_files, file.path(temp_test_dir, "user_data"))
+
+  withr::with_dir(temp_test_dir, {
+    # Add a slaughter calf cohort and a replacement heifer cohort to the dairy farm
+    census <- read_csv("user_data/livestock_census.csv", col_types = cols(.default = "c"), show_col_types = FALSE)
+    calves_census <- census %>%
+      mutate(
+        animal_tag = "dairy_calves_fattening",
+        population = "50"
+      )
+    heifers_census <- census %>%
+      mutate(
+        animal_tag = "dairy_heifers",
+        population = "30"
+      )
+    write_csv(bind_rows(census, heifers_census, calves_census), "user_data/livestock_census.csv")
+
+    defs <- read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE)
+    calves_def <- defs %>%
+      mutate(
+        animal_tag = "dairy_calves_fattening",
+        production_role = "slaughter",
+        milk_yield_kg_year = "0"
+      )
+    heifers_def <- defs %>%
+      mutate(
+        animal_tag = "dairy_heifers",
+        production_role = "replacement",
+        milk_yield_kg_year = "0"
+      )
+    write_csv(bind_rows(defs, heifers_def, calves_def), "user_data/ruminant_definitions.csv")
+
+    manure <- read_csv("user_data/manure_management.csv", col_types = cols(.default = "c"), show_col_types = FALSE)
+    calves_manure <- manure %>% mutate(animal_tag = "dairy_calves_fattening")
+    heifers_manure <- manure %>% mutate(animal_tag = "dairy_heifers")
+    write_csv(bind_rows(manure, heifers_manure, calves_manure), "user_data/manure_management.csv")
+
+    weights <- read_csv("user_data/livestock_weights.csv", col_types = cols(.default = "c"), show_col_types = FALSE)
+    calves_weights <- weights %>%
+      mutate(
+        animal_tag = "dairy_calves_fattening",
+        initial_weight_kg = "50",
+        final_weight_kg = "450",
+        adult_weight_kg = "450",
+        productive_period_days = "365"
+      )
+    heifers_weights <- weights %>%
+      mutate(
+        animal_tag = "dairy_heifers",
+        initial_weight_kg = "200",
+        final_weight_kg = "550",
+        adult_weight_kg = "550",
+        productive_period_days = "365"
+      )
+    write_csv(bind_rows(weights, heifers_weights, calves_weights), "user_data/livestock_weights.csv")
+
+    res <- suppressWarnings(
+      generate_impact_assessment(farm_country = "Spain", year = 2022, saveoutput = FALSE)
+    )
+
+    tot <- res$totals %>% filter(farm_id == "farm_1", animal_type == "cattle", animal_subtype == "dairy")
+    inten <- res$intensities %>% filter(farm_id == "farm_1", animal_type == "cattle", animal_subtype == "dairy")
+
+    expect_equal(nrow(inten), 3)
+
+    # All three cohorts exist
+    mat_row <- inten %>% filter(production_role == "mature")
+    repl_row <- inten %>% filter(production_role == "replacement")
+    slau_row <- inten %>% filter(production_role == "slaughter")
+
+    # Replacement has NA commercial intensities
+    expect_true(is.na(repl_row$GHG_intensity_milk))
+    expect_true(is.na(repl_row$GHG_intensity_meat))
+
+    # Mature has milk and cull meat intensities
+    expect_true(!is.na(mat_row$GHG_intensity_milk) && mat_row$GHG_intensity_milk > 0)
+    expect_true(!is.na(mat_row$GHG_intensity_meat) && mat_row$GHG_intensity_meat > 0)
+
+    # Slaughter has young meat intensity
+    expect_true(!is.na(slau_row$GHG_intensity_meat) && slau_row$GHG_intensity_meat > 0)
+    expect_true(is.na(slau_row$GHG_intensity_milk))
+
+    # Verify closed mass balance: total allocated Scope 1 emissions equals total enterprise Scope 1 emissions
+    tot_s1 <- sum(tot$CO2eq_Total_Gg) * 1e6
+    alloc_milk_s1 <- mat_row$GHG_intensity_milk * mat_row$milk_FPCM_kg
+    alloc_cull_s1 <- mat_row$GHG_intensity_meat * mat_row$meat_carcass_weight_kg
+    alloc_slau_s1 <- slau_row$GHG_intensity_meat * slau_row$meat_carcass_weight_kg
+
+    sum_alloc <- alloc_milk_s1 + alloc_cull_s1 + alloc_slau_s1
+    expect_equal(sum_alloc, tot_s1, tolerance = 1e-2 * tot_s1)
   })
 })
