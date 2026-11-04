@@ -687,79 +687,83 @@ produces two tables:
   nutritional intensities grouped by
   `(farm_id, region, subregion, animal_type, animal_subtype)`.
 
-### 1. Enterprise Footprint Attribution Across `mature`, `replacement`, and `slaughter`
+### 1. Enterprise Biophysical Co-Product Allocation (IDF 2022 / IPCC 2019 / FAO LEAP)
 
 Within each enterprise
-`(farm_id, region, subregion, animal_type, animal_subtype)`,
-non-commercial rearing and breeding overheads are integrated into the
-commercial outputs according to three system archetypes:
+`(farm_id, region, subregion, animal_type, animal_subtype)`, all direct
+emissions, feed life cycle impacts, land use, and water deprivation
+across all cohorts (`mature`, `replacement`, and `slaughter`) are
+integrated into a single enterprise pool
+($`\text{Pool}_{\text{enterprise}}`$).
 
-#### A. Dairy Systems (`animal_subtype == "dairy"`)
+Co-product footprints are partitioned across commercial product streams
+using the **universal Net Energy biophysical allocation engine** (IDF
+Bulletin 520 / 2022, Section 10.5; IPCC 2019 Refinement; FAO LEAP):
 
-- **Breeding & Milking Pool (`mature` + `replacement`):** Replacement
-  heifers, ewe lambs, and doeling kids (`replacement`) produce zero
-  commercial output on their own; they exist to sustain the milking
-  herd. Their footprint is pooled with `mature` dairy cohorts and
-  allocated between **milk** (`milk_FPCM_kg`) and **culled adult meat**
-  (`meat_carcass_weight_kg`) via **IDF (2022) Net Energy physical
-  allocation**:
-  ``` math
-  \text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} & (\text{Cattle}) \\ 4.6 \times \text{Milk}_{\text{fresh}} & (\text{Sheep}) \\ 3.0 \times \text{Milk}_{\text{fresh}} & (\text{Goat}) \end{cases}, \qquad \text{E}_{\text{cull}} = 15.0 \times \text{Meat}_{\text{LW, cull}}
-  ```
-  ``` math
-  \text{AF}_{\text{milk}} = \frac{\text{E}_{\text{milk}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}, \qquad \text{AF}_{\text{cull}} = \frac{\text{E}_{\text{cull}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}
-  ```
-- **Multiple Milking Cohorts:** If a farm declares more than one
-  `mature` milking cohort within the same enterprise (e.g., stabled
-  vs. grazing dairy cows), each milking cohort retains its own direct
-  footprint plus a population-proportional share
-  ($`AAP_i / \sum AAP_{\text{milking}}`$) of non-milking
-  `replacement`/`mature` cohorts.
-- **Dairy Surplus Fattening Stock (`slaughter`):** Surplus dairy calves,
-  lambs, or kids finished for meat (`production_role == "slaughter"`,
-  `animal_subtype == "dairy"`) are evaluated on their own direct
-  fattening footprint ($`\text{AF}_{\text{meat}} = 1.0`$).
+``` math
+\text{E}_{\text{total}} = \text{E}_{\text{milk}} + \text{E}_{\text{cull}} + \text{E}_{\text{young}} + \text{E}_{\text{wool}} + \text{E}_{\text{egg}}
+```
 
-#### B. Egg Layer Systems (`animal_type == "poultry"`, `animal_subtype == "layer"`)
+Where net energy requirements per unit of production are: \* **Milk
+($`\text{E}_{\text{milk}}`$):**
+``` math
+\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} & (\text{Cattle \& other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} & (\text{Sheep, 7\% fat; IPCC 2019 / AFRC 1993, 1995}) \\ 3.0 \times \text{Milk}_{\text{fresh}} & (\text{Goat, 3.8\% fat; IPCC 2019 / AFRC 1998}) \end{cases}
+```
+\* **Culled Mature Meat ($`\text{E}_{\text{cull}}`$):**
+$`15.0\text{ MJ/kg live weight}`$ for adult breeding stock (IDF 2022).
+\* **Young Slaughter Meat ($`\text{E}_{\text{young}}`$):**
+$`11.0\text{ MJ/kg live weight}`$ for fattened calves, lambs, pigs, and
+broilers (IDF 2022). \* **Greasy Wool ($`\text{E}_{\text{wool}}`$):**
+$`24.0\text{ MJ/kg}`$ for wool weighed after drying before scouring
+(IPCC 2019, Eq. 10.20; AFRC 1995). \* **Fresh Eggs
+($`\text{E}_{\text{egg}}`$):** $`6.0\text{ MJ/kg}`$ (FAO LEAP / GLEAM
+v3.0).
 
-- Each `mature` laying cohort (`laying_hens`, `free_range_laying_hens`)
-  retains its own direct footprint plus a population-proportional share
-  ($`AAP_i / \sum AAP_{\text{mature}}`$) of `replacement` layer pullets
-  (`replacement_layer_pullets`), divided by its fresh egg output
-  (`egg_fresh_kg`).
+#### Allocation Factors ($`AF_k`$)
 
-#### C. Meat Systems (`animal_subtype == "meat"`)
+The fraction of the enterprise footprint attributed to each product
+stream is:
+``` math
+\text{AF}_k = \frac{\text{E}_k}{\text{E}_{\text{total}}}
+```
 
-- **Integrated Breeding + Finishing Enterprise:** When a meat enterprise
-  includes a breeding herd (`mature` and/or `replacement` cohorts
-  alongside `slaughter` cohorts—e.g., `breeder_sows` + `boars` +
-  `replacement_sows` + `fattening_pigs`, or `mature_beef_cattle` +
-  replacements + `beef_calves`), the breeding herd overhead
-  (`mature + replacement`) is distributed across `slaughter` cohorts in
-  proportion to their carcass weight output
-  ($`CW_i / \sum CW_{\text{slaughter}}`$). Both `slaughter` and `mature`
-  rows display the integrated meat intensity (including culled breeder
-  meat in the denominator).
-- **Pure Finishing / Feedlot Operation:** When no breeding herd is
-  present on the farm (only `slaughter` cohorts), each `slaughter`
-  cohort is evaluated on its own direct fattening footprint.
-- **Meat & Wool Co-Allocation in Sheep:** For meat sheep producing
-  greasy wool ($`\text{Wool}_{\text{kg}} > 0`$ and
-  $`\text{Meat}_{\text{LW}} > 0`$), physical net energy allocation
-  splits the footprint between wool ($`24.0\text{ MJ/kg wool}`$) and
-  meat ($`11.0\text{ MJ/kg live weight}`$):
-  ``` math
-  \text{AF}_{\text{wool}} = \frac{24.0 \times \text{Wool}_{\text{kg}}}{24.0 \times \text{Wool}_{\text{kg}} + 11.0 \times \text{Meat}_{\text{LW}}}, \qquad \text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{wool}}
-  ```
+- **Milk:**
+  $`\text{AF}_{\text{milk}} = \text{E}_{\text{milk}} / \text{E}_{\text{total}}`$
+- **Cull Meat:**
+  $`\text{AF}_{\text{cull}} = \text{E}_{\text{cull}} / \text{E}_{\text{total}}`$
+- **Young Meat:**
+  $`\text{AF}_{\text{young}} = \text{E}_{\text{young}} / \text{E}_{\text{total}}`$
+- **Wool:**
+  $`\text{AF}_{\text{wool}} = \text{E}_{\text{wool}} / \text{E}_{\text{total}}`$
+- **Eggs:**
+  $`\text{AF}_{\text{egg}} = \text{E}_{\text{egg}} / \text{E}_{\text{total}}`$
 
-#### D. Replacement Cohorts (`production_role == "replacement"`)
+For **Human Edible Protein**, non-edible fiber (wool) is excluded:
+``` math
+\text{AF}_{\text{protein}} = 1 - \text{AF}_{\text{wool}} = \frac{\text{E}_{\text{milk}} + \text{E}_{\text{cull}} + \text{E}_{\text{young}} + \text{E}_{\text{egg}}}{\text{E}_{\text{total}}}
+```
 
-- In Table 1 (`totals`), `replacement` cohorts show their full direct
-  emissions, land use, water deprivation, and per-head footprints.
-- In Table 2 (`intensities`), `replacement` cohorts show `NA` for
-  commercial product intensities because their footprint is already
-  absorbed into the `mature` or `slaughter` cohorts of their enterprise,
-  preventing double counting.
+#### Attribution by Cohort Role in Table 2 (`intensities`)
+
+- **`mature` Cohorts (Breeding / Milking / Laying stock):**
+  - $`\text{Intensity}_{\text{milk}} = (\text{Pool} \times \text{AF}_{\text{milk}}) / \text{Milk}_{\text{FPCM, total}}`$
+  - $`\text{Intensity}_{\text{cull meat}} = (\text{Pool} \times \text{AF}_{\text{cull}}) / \text{Meat}_{\text{CW, cull}}`$*(expressed
+    per kg carcass weight)*
+  - $`\text{Intensity}_{\text{egg}} = (\text{Pool} \times \text{AF}_{\text{egg}}) / \text{Egg}_{\text{fresh, total}}`$
+  - $`\text{Intensity}_{\text{wool}} = (\text{Pool} \times \text{AF}_{\text{wool}}) / \text{Wool}_{\text{total}}`$
+  - $`\text{Intensity}_{\text{protein}} = (\text{Pool} \times \text{AF}_{\text{protein}}) / \text{Protein}_{\text{total}}`$
+- **`slaughter` Cohorts (Fattening / Finishing stock):**
+  - $`\text{Intensity}_{\text{young meat}} = (\text{Pool} \times \text{AF}_{\text{young}}) / \text{Meat}_{\text{CW, young}}`$*(expressed
+    per kg carcass weight)*
+  - $`\text{Intensity}_{\text{wool}} = (\text{Pool} \times \text{AF}_{\text{wool}}) / \text{Wool}_{\text{total}}`$
+  - $`\text{Intensity}_{\text{protein}} = (\text{Pool} \times \text{AF}_{\text{protein}}) / \text{Protein}_{\text{total}}`$
+- **`replacement` Cohorts (Rearing stock):**
+  - In Table 1 (`totals`), replacement cohorts show their full direct
+    inventory.
+  - In Table 2 (`intensities`), replacement cohorts show `NA` for
+    commercial product intensities because their feed, emissions, and
+    land overhead are already absorbed into the enterprise pool and
+    allocated across commercial outputs, preventing double counting.
 
 ------------------------------------------------------------------------
 

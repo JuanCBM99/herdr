@@ -1304,110 +1304,114 @@ Enterprise-integrated commercial and nutritional intensities grouped by
 <code>(farm_id, region, subregion, animal_type, animal_subtype)</code>.</li>
 </ul>
 <div class="section level3">
-<h3 id="enterprise-footprint-attribution-across-mature-replacement-and-slaughter">1. Enterprise Footprint Attribution Across <code>mature</code>,
-<code>replacement</code>, and <code>slaughter</code><a class="anchor" aria-label="anchor" href="#enterprise-footprint-attribution-across-mature-replacement-and-slaughter"></a>
+<h3 id="enterprise-biophysical-co-product-allocation-idf-2022-ipcc-2019-fao-leap">1. Enterprise Biophysical Co-Product Allocation (IDF 2022 / IPCC
+2019 / FAO LEAP)<a class="anchor" aria-label="anchor" href="#enterprise-biophysical-co-product-allocation-idf-2022-ipcc-2019-fao-leap"></a>
 </h3>
 <p>Within each enterprise
 <code>(farm_id, region, subregion, animal_type, animal_subtype)</code>,
-non-commercial rearing and breeding overheads are integrated into the
-commercial outputs according to three system archetypes:</p>
+all direct emissions, feed life cycle impacts, land use, and water
+deprivation across all cohorts (<code>mature</code>,
+<code>replacement</code>, and <code>slaughter</code>) are integrated
+into a single enterprise pool
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Pool</mtext><mtext mathvariant="normal">enterprise</mtext></msub><annotation encoding="application/x-tex">\text{Pool}_{\text{enterprise}}</annotation></semantics></math>).</p>
+<p>Co-product footprints are partitioned across commercial product
+streams using the <strong>universal Net Energy biophysical allocation
+engine</strong> (IDF Bulletin 520 / 2022, Section 10.5; IPCC 2019
+Refinement; FAO LEAP):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">young</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">egg</mtext></msub></mrow><annotation encoding="application/x-tex">\text{E}_{\text{total}} = \text{E}_{\text{milk}} + \text{E}_{\text{cull}} + \text{E}_{\text{young}} + \text{E}_{\text{wool}} + \text{E}_{\text{egg}}</annotation></semantics></math></p>
+<p>Where net energy requirements per unit of production are: *
+<strong>Milk
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{milk}}</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Cattle &amp;other bovines; IDF 2022</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>4.6</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Sheep, 7%fat; IPCC 2019 / AFRC 1993, 1995</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>3.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Goat, 3.8%fat; IPCC 2019 / AFRC 1998</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} &amp; (\text{Cattle \&amp; other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} &amp; (\text{Sheep, 7\% fat; IPCC 2019 / AFRC 1993, 1995}) \\ 3.0 \times \text{Milk}_{\text{fresh}} &amp; (\text{Goat, 3.8\% fat; IPCC 2019 / AFRC 1998}) \end{cases}</annotation></semantics></math>
+* <strong>Culled Mature Meat
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{cull}}</annotation></semantics></math>):</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg live weight</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0\text{ MJ/kg live weight}</annotation></semantics></math>
+for adult breeding stock (IDF 2022). * <strong>Young Slaughter Meat
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">young</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{young}}</annotation></semantics></math>):</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg live weight</mtext></mrow></mrow><annotation encoding="application/x-tex">11.0\text{ MJ/kg live weight}</annotation></semantics></math>
+for fattened calves, lambs, pigs, and broilers (IDF 2022). *
+<strong>Greasy Wool
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">wool</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{wool}}</annotation></semantics></math>):</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>24.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">24.0\text{ MJ/kg}</annotation></semantics></math>
+for wool weighed after drying before scouring (IPCC 2019, Eq. 10.20;
+AFRC 1995). * <strong>Fresh Eggs
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">egg</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{egg}}</annotation></semantics></math>):</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">6.0\text{ MJ/kg}</annotation></semantics></math>
+(FAO LEAP / GLEAM v3.0).</p>
 <div class="section level4">
-<h4 id="a--dairy-systems-animal_subtype-dairy">A. Dairy Systems (<code>animal_subtype == "dairy"</code>)<a class="anchor" aria-label="anchor" href="#a--dairy-systems-animal_subtype-dairy"></a>
+<h4 id="allocation-factors-af_k">Allocation Factors
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>F</mi><mi>k</mi></msub></mrow><annotation encoding="application/x-tex">AF_k</annotation></semantics></math>)<a class="anchor" aria-label="anchor" href="#allocation-factors-af_k"></a>
 </h4>
+<p>The fraction of the enterprise footprint attributed to each product
+stream is:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mi>k</mi></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">E</mtext><mi>k</mi></msub><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_k = \frac{\text{E}_k}{\text{E}_{\text{total}}}</annotation></semantics></math></p>
 <ul>
 <li>
-<strong>Breeding &amp; Milking Pool (<code>mature</code> +
-<code>replacement</code>):</strong> Replacement heifers, ewe lambs, and
-doeling kids (<code>replacement</code>) produce zero commercial output
-on their own; they exist to sustain the milking herd. Their footprint is
-pooled with <code>mature</code> dairy cohorts and allocated between
-<strong>milk</strong> (<code>milk_FPCM_kg</code>) and <strong>culled
-adult meat</strong> (<code>meat_carcass_weight_kg</code>) via
-<strong>IDF (2022) Net Energy physical allocation</strong>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Cattle</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>4.6</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Sheep</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>3.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Goat</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable></mrow><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>=</mo><mn>15.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW, cull</mtext></msub></mrow><annotation encoding="application/x-tex">\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} &amp; (\text{Cattle}) \\ 4.6 \times \text{Milk}_{\text{fresh}} &amp; (\text{Sheep}) \\ 3.0 \times \text{Milk}_{\text{fresh}} &amp; (\text{Goat}) \end{cases}, \qquad \text{E}_{\text{cull}} = 15.0 \times \text{Meat}_{\text{LW, cull}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \frac{\text{E}_{\text{milk}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}, \qquad \text{AF}_{\text{cull}} = \frac{\text{E}_{\text{cull}}}{\text{E}_{\text{milk}} + \text{E}_{\text{cull}}}</annotation></semantics></math>
+<strong>Milk:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mi>/</mi><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{milk}} = \text{E}_{\text{milk}} / \text{E}_{\text{total}}</annotation></semantics></math>
 </li>
 <li>
-<strong>Multiple Milking Cohorts:</strong> If a farm declares more
-than one <code>mature</code> milking cohort within the same enterprise
-(e.g., stabled vs. grazing dairy cows), each milking cohort retains its
-own direct footprint plus a population-proportional share
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><msub><mi>P</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>A</mi><mi>A</mi><msub><mi>P</mi><mtext mathvariant="normal">milking</mtext></msub></mrow><annotation encoding="application/x-tex">AAP_i / \sum AAP_{\text{milking}}</annotation></semantics></math>)
-of non-milking <code>replacement</code>/<code>mature</code>
-cohorts.</li>
+<strong>Cull Meat:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mi>/</mi><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{cull}} = \text{E}_{\text{cull}} / \text{E}_{\text{total}}</annotation></semantics></math>
+</li>
 <li>
-<strong>Dairy Surplus Fattening Stock
-(<code>slaughter</code>):</strong> Surplus dairy calves, lambs, or kids
-finished for meat (<code>production_role == "slaughter"</code>,
-<code>animal_subtype == "dairy"</code>) are evaluated on their own
-direct fattening footprint
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{meat}} = 1.0</annotation></semantics></math>).</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="b--egg-layer-systems-animal_type-poultry-animal_subtype-layer">B. Egg Layer Systems (<code>animal_type == "poultry"</code>,
-<code>animal_subtype == "layer"</code>)<a class="anchor" aria-label="anchor" href="#b--egg-layer-systems-animal_type-poultry-animal_subtype-layer"></a>
-</h4>
-<ul>
-<li>Each <code>mature</code> laying cohort (<code>laying_hens</code>,
-<code>free_range_laying_hens</code>) retains its own direct footprint
-plus a population-proportional share
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>A</mi><msub><mi>P</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>A</mi><mi>A</mi><msub><mi>P</mi><mtext mathvariant="normal">mature</mtext></msub></mrow><annotation encoding="application/x-tex">AAP_i / \sum AAP_{\text{mature}}</annotation></semantics></math>)
-of <code>replacement</code> layer pullets
-(<code>replacement_layer_pullets</code>), divided by its fresh egg
-output (<code>egg_fresh_kg</code>).</li>
-</ul>
-</div>
-<div class="section level4">
-<h4 id="c--meat-systems-animal_subtype-meat">C. Meat Systems (<code>animal_subtype == "meat"</code>)<a class="anchor" aria-label="anchor" href="#c--meat-systems-animal_subtype-meat"></a>
-</h4>
-<ul>
+<strong>Young Meat:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">young</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">young</mtext></msub><mi>/</mi><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{young}} = \text{E}_{\text{young}} / \text{E}_{\text{total}}</annotation></semantics></math>
+</li>
 <li>
-<strong>Integrated Breeding + Finishing Enterprise:</strong> When a
-meat enterprise includes a breeding herd (<code>mature</code> and/or
-<code>replacement</code> cohorts alongside <code>slaughter</code>
-cohorts—e.g., <code>breeder_sows</code> + <code>boars</code> +
-<code>replacement_sows</code> + <code>fattening_pigs</code>, or
-<code>mature_beef_cattle</code> + replacements +
-<code>beef_calves</code>), the breeding herd overhead
-(<code>mature + replacement</code>) is distributed across
-<code>slaughter</code> cohorts in proportion to their carcass weight
-output
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><msub><mi>W</mi><mi>i</mi></msub><mi>/</mi><mo>∑</mo><mi>C</mi><msub><mi>W</mi><mtext mathvariant="normal">slaughter</mtext></msub></mrow><annotation encoding="application/x-tex">CW_i / \sum CW_{\text{slaughter}}</annotation></semantics></math>).
-Both <code>slaughter</code> and <code>mature</code> rows display the
-integrated meat intensity (including culled breeder meat in the
-denominator).</li>
+<strong>Wool:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">wool</mtext></msub><mi>/</mi><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{wool}} = \text{E}_{\text{wool}} / \text{E}_{\text{total}}</annotation></semantics></math>
+</li>
 <li>
-<strong>Pure Finishing / Feedlot Operation:</strong> When no
-breeding herd is present on the farm (only <code>slaughter</code>
-cohorts), each <code>slaughter</code> cohort is evaluated on its own
-direct fattening footprint.</li>
-<li>
-<strong>Meat &amp; Wool Co-Allocation in Sheep:</strong> For meat
-sheep producing greasy wool
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{Wool}_{\text{kg}} &gt; 0</annotation></semantics></math>
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub><mo>&gt;</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">\text{Meat}_{\text{LW}} &gt; 0</annotation></semantics></math>),
-physical net energy allocation splits the footprint between wool
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>24.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg wool</mtext></mrow></mrow><annotation encoding="application/x-tex">24.0\text{ MJ/kg wool}</annotation></semantics></math>)
-and meat
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg live weight</mtext></mrow></mrow><annotation encoding="application/x-tex">11.0\text{ MJ/kg live weight}</annotation></semantics></math>):
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><mfrac><mrow><mn>24.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub></mrow><mrow><mn>24.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">kg</mtext></msub><mo>+</mo><mn>11.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">LW</mtext></msub></mrow></mfrac><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{wool}} = \frac{24.0 \times \text{Wool}_{\text{kg}}}{24.0 \times \text{Wool}_{\text{kg}} + 11.0 \times \text{Meat}_{\text{LW}}}, \qquad \text{AF}_{\text{meat}} = 1 - \text{AF}_{\text{wool}}</annotation></semantics></math>
+<strong>Eggs:</strong>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">egg</mtext></msub><mi>/</mi><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{egg}} = \text{E}_{\text{egg}} / \text{E}_{\text{total}}</annotation></semantics></math>
 </li>
 </ul>
+<p>For <strong>Human Edible Protein</strong>, non-edible fiber (wool) is
+excluded:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">young</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">egg</mtext></msub></mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">\text{AF}_{\text{protein}} = 1 - \text{AF}_{\text{wool}} = \frac{\text{E}_{\text{milk}} + \text{E}_{\text{cull}} + \text{E}_{\text{young}} + \text{E}_{\text{egg}}}{\text{E}_{\text{total}}}</annotation></semantics></math></p>
 </div>
 <div class="section level4">
-<h4 id="d--replacement-cohorts-production_role-replacement">D. Replacement Cohorts
-(<code>production_role == "replacement"</code>)<a class="anchor" aria-label="anchor" href="#d--replacement-cohorts-production_role-replacement"></a>
+<h4 id="attribution-by-cohort-role-in-table-2-intensities">Attribution by Cohort Role in Table 2
+(<code>intensities</code>)<a class="anchor" aria-label="anchor" href="#attribution-by-cohort-role-in-table-2-intensities"></a>
 </h4>
 <ul>
-<li>In Table 1 (<code>totals</code>), <code>replacement</code> cohorts
-show their full direct emissions, land use, water deprivation, and
-per-head footprints.</li>
-<li>In Table 2 (<code>intensities</code>), <code>replacement</code>
-cohorts show <code>NA</code> for commercial product intensities because
-their footprint is already absorbed into the <code>mature</code> or
-<code>slaughter</code> cohorts of their enterprise, preventing double
+<li>
+<strong><code>mature</code> Cohorts (Breeding / Milking / Laying
+stock):</strong>
+<ul>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">milk</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM, total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{milk}} = (\text{Pool} \times \text{AF}_{\text{milk}}) / \text{Milk}_{\text{FPCM, total}}</annotation></semantics></math></li>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">cull meat</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">cull</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">CW, cull</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{cull meat}} = (\text{Pool} \times \text{AF}_{\text{cull}}) / \text{Meat}_{\text{CW, cull}}</annotation></semantics></math><em>(expressed per kg carcass weight)</em>
+</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">egg</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">egg</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Egg</mtext><mtext mathvariant="normal">fresh, total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{egg}} = (\text{Pool} \times \text{AF}_{\text{egg}}) / \text{Egg}_{\text{fresh, total}}</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{wool}} = (\text{Pool} \times \text{AF}_{\text{wool}}) / \text{Wool}_{\text{total}}</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">protein</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{protein}} = (\text{Pool} \times \text{AF}_{\text{protein}}) / \text{Protein}_{\text{total}}</annotation></semantics></math></li>
+</ul>
+</li>
+<li>
+<strong><code>slaughter</code> Cohorts (Fattening / Finishing
+stock):</strong>
+<ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">young meat</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">young</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Meat</mtext><mtext mathvariant="normal">CW, young</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{young meat}} = (\text{Pool} \times \text{AF}_{\text{young}}) / \text{Meat}_{\text{CW, young}}</annotation></semantics></math><em>(expressed per kg carcass weight)</em>
+</li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">wool</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">wool</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{wool}} = (\text{Pool} \times \text{AF}_{\text{wool}}) / \text{Wool}_{\text{total}}</annotation></semantics></math></li>
+<li><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Intensity</mtext><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Pool</mtext><mo>×</mo><msub><mtext mathvariant="normal">AF</mtext><mtext mathvariant="normal">protein</mtext></msub><mo stretchy="false" form="postfix">)</mo><mi>/</mi><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Intensity}_{\text{protein}} = (\text{Pool} \times \text{AF}_{\text{protein}}) / \text{Protein}_{\text{total}}</annotation></semantics></math></li>
+</ul>
+</li>
+<li>
+<strong><code>replacement</code> Cohorts (Rearing stock):</strong>
+<ul>
+<li>In Table 1 (<code>totals</code>), replacement cohorts show their
+full direct inventory.</li>
+<li>In Table 2 (<code>intensities</code>), replacement cohorts show
+<code>NA</code> for commercial product intensities because their feed,
+emissions, and land overhead are already absorbed into the enterprise
+pool and allocated across commercial outputs, preventing double
 counting.</li>
+</ul>
+</li>
 </ul>
 <hr>
 </div>

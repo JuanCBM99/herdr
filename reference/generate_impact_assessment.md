@@ -5,6 +5,11 @@ footprints, and GLEAM production outputs. Generates two distinct
 reports: an absolute environmental inventory (totals) and farm-level
 product, nutritional, and per-head environmental intensities.
 
+Product intensities (Table 2) are obtained by allocating the whole
+enterprise footprint (GHG, land, water) among its co-products using a
+biophysical (energy-based) allocation factor:
+`AF_k = Energy_k / Energy_total`.
+
 ## Usage
 
 ``` r
@@ -103,9 +108,24 @@ A named list containing two dataframes:
 
 - totals:
 
-  Absolute environmental inventory of emissions, feed, and land use.
+  Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg
+  CO2eq), feed (kg/year), land (m2) and water (m3).
 
 - intensities:
 
-  Farm-level product, nutritional, and per-head environmental
-  intensities.
+  Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or
+  edible protein), nutritional (kg feed protein / kg product protein),
+  and per-head environmental intensities.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+res <- generate_impact_assessment(
+  farm_country = "Spain", year = 2022,
+  saveoutput = FALSE, ar = "AR6"
+)
+res$totals
+res$intensities
+} # }
+```
