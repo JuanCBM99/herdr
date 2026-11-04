@@ -32,34 +32,16 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
           tot_shares <- tot_df %>%
             dplyr::group_by(dplyr::across(dplyr::all_of(ent_keys))) %>%
             dplyr::mutate(
-              .is_dairy = tolower(trimws(as.character(animal_subtype))) == "dairy",
-              .is_layer = tolower(trimws(as.character(animal_subtype))) == "layer",
-              .is_meat  = !.is_dairy & !.is_layer,
-              .breed    = production_role %in% c("mature", "replacement"),
-              .repl     = production_role == "replacement",
-              .mat      = production_role == "mature",
-              .slau     = production_role == "slaughter",
-              .has_brd  = any(.breed & population > 0, na.rm = TRUE),
-              .mat_pop  = sum(population[.mat], na.rm = TRUE),
-              .slau_pop = sum(population[.slau], na.rm = TRUE),
-              .r_sh     = dplyr::if_else(.mat & .mat_pop > 0, population / .mat_pop, 0),
-              .b_sh     = dplyr::if_else(.slau & .slau_pop > 0, population / .slau_pop, 1),
-              .pool_mode = dplyr::case_when(
-                production_role == "mature" & (.is_dairy | .is_layer) ~ "mat_repl",
-                .is_meat & .has_brd & production_role == "slaughter" ~ "slau_breed",
-                .is_meat & .has_brd & production_role == "mature" ~ "sys",
-                TRUE ~ "row"
-              ),
-              .p_ent  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_enteric + .r_sh * sum(CO2eq_enteric[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_enteric + .b_sh * sum(CO2eq_enteric[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_enteric, na.rm = TRUE), TRUE ~ CO2eq_enteric),
-              .p_man  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_manure + .r_sh * sum(CO2eq_manure[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_manure + .b_sh * sum(CO2eq_manure[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_manure, na.rm = TRUE), TRUE ~ CO2eq_manure),
-              .p_ndir = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_N2O_direct + .r_sh * sum(CO2eq_N2O_direct[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_N2O_direct + .b_sh * sum(CO2eq_N2O_direct[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_N2O_direct, na.rm = TRUE), TRUE ~ CO2eq_N2O_direct),
-              .p_nind = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_N2O_indirect + .r_sh * sum(CO2eq_N2O_indirect[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_N2O_indirect + .b_sh * sum(CO2eq_N2O_indirect[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_N2O_indirect, na.rm = TRUE), TRUE ~ CO2eq_N2O_indirect),
-              .p_fos  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_feed_fossil_Gg + .r_sh * sum(CO2eq_feed_fossil_Gg[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_feed_fossil_Gg + .b_sh * sum(CO2eq_feed_fossil_Gg[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_feed_fossil_Gg, na.rm = TRUE), TRUE ~ CO2eq_feed_fossil_Gg),
-              .p_luc  = dplyr::case_when(.pool_mode == "mat_repl" ~ CO2eq_feed_luc_Gg + .r_sh * sum(CO2eq_feed_luc_Gg[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ CO2eq_feed_luc_Gg + .b_sh * sum(CO2eq_feed_luc_Gg[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(CO2eq_feed_luc_Gg, na.rm = TRUE), TRUE ~ CO2eq_feed_luc_Gg),
-              .p_crop = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_cropland_m2 + .r_sh * sum(Land_cropland_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_cropland_m2 + .b_sh * sum(Land_cropland_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_cropland_m2, na.rm = TRUE), TRUE ~ Land_cropland_m2),
-              .p_gcon = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_grassland_convertible_m2 + .r_sh * sum(Land_grassland_convertible_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_grassland_convertible_m2 + .b_sh * sum(Land_grassland_convertible_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_grassland_convertible_m2, na.rm = TRUE), TRUE ~ Land_grassland_convertible_m2),
-              .p_gunc = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_grassland_unconvertible_m2 + .r_sh * sum(Land_grassland_unconvertible_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_grassland_unconvertible_m2 + .b_sh * sum(Land_grassland_unconvertible_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_grassland_unconvertible_m2, na.rm = TRUE), TRUE ~ Land_grassland_unconvertible_m2),
-              .p_loth = dplyr::case_when(.pool_mode == "mat_repl" ~ Land_other_m2 + .r_sh * sum(Land_other_m2[.repl], na.rm = TRUE), .pool_mode == "slau_breed" ~ Land_other_m2 + .b_sh * sum(Land_other_m2[.breed], na.rm = TRUE), .pool_mode == "sys" ~ sum(Land_other_m2, na.rm = TRUE), TRUE ~ Land_other_m2),
+              .p_ent  = sum(CO2eq_enteric, na.rm = TRUE),
+              .p_man  = sum(CO2eq_manure, na.rm = TRUE),
+              .p_ndir = sum(CO2eq_N2O_direct, na.rm = TRUE),
+              .p_nind = sum(CO2eq_N2O_indirect, na.rm = TRUE),
+              .p_fos  = sum(CO2eq_feed_fossil_Gg, na.rm = TRUE),
+              .p_luc  = sum(CO2eq_feed_luc_Gg, na.rm = TRUE),
+              .p_crop = sum(Land_cropland_m2, na.rm = TRUE),
+              .p_gcon = sum(Land_grassland_convertible_m2, na.rm = TRUE),
+              .p_gunc = sum(Land_grassland_unconvertible_m2, na.rm = TRUE),
+              .p_loth = sum(Land_other_m2, na.rm = TRUE),
               .s1_sum = .p_ent + .p_man + .p_ndir + .p_nind,
               .fd_sum = .p_fos + .p_luc,
               .ld_sum = .p_crop + .p_gcon + .p_gunc + .p_loth,
@@ -546,7 +528,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
       emiss_unit  <- paste0("kg CO2e / kg ", prod_label)
       land_unit   <- paste0("m2 / kg ", prod_label)
       water_unit  <- paste0("m\u00b3 depriv. / kg ", prod_label)
-      scale_desc  <- if (fu == "protein") "per kg of edible animal protein" else paste0("per kg of ", prod_label, " (biophysical allocation)")
+      scale_desc  <- if (fu == "protein") "per kg of edible animal protein (biophysical allocation)" else paste0("per kg of ", prod_label, " (biophysical allocation)")
     } else if (fu == "protein" && ("total_protein_kg" %in% names(df_agg) || "Water_intensity_protein" %in% names(df_agg))) {
       prot <- if ("total_protein_kg" %in% names(df_agg)) df_agg$total_protein_kg else rep(0, nrow(df_agg))
       is_dairy <- if ("animal_subtype" %in% names(df_agg)) df_agg$animal_subtype %in% "dairy" else if ("animal_tag" %in% names(df_agg)) df_agg$animal_tag %in% dairy_tags else FALSE
@@ -554,19 +536,39 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE) &
         (if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg == 0 else TRUE)
       valid <- prot > 0 & !is_dairy_dry
-      emiss_scale <- ifelse(valid, 1e6 / prot, 0)
-      land_scale  <- ifelse(valid, 1 / prot, 0)
+
+      # Enterprise biophysical allocation to edible protein: excludes wool energy (af_protein = 1 - af_wool)
+      m_kg <- if ("milk_FPCM_kg" %in% names(df_agg)) tidyr::replace_na(df_agg$milk_FPCM_kg, 0) else rep(0, nrow(df_agg))
+      c_kg <- if ("meat_carcass_weight_kg" %in% names(df_agg)) tidyr::replace_na(df_agg$meat_carcass_weight_kg, 0) else rep(0, nrow(df_agg))
+      e_kg <- if ("egg_fresh_kg" %in% names(df_agg)) tidyr::replace_na(df_agg$egg_fresh_kg, 0) else rep(0, nrow(df_agg))
+      w_kg <- if ("wool_kg" %in% names(df_agg)) tidyr::replace_na(df_agg$wool_kg, 0) else rep(0, nrow(df_agg))
+      lw_kg <- if ("meat_live_weight_kg" %in% names(df_agg)) tidyr::replace_na(df_agg$meat_live_weight_kg, 0) else c_kg / 0.54
+
+      e_m_c <- dplyr::case_when(
+        if ("animal_type" %in% names(df_agg)) df_agg$animal_type == "sheep" else FALSE ~ herdr_energy_coef$milk_sheep,
+        if ("animal_type" %in% names(df_agg)) df_agg$animal_type == "goat" else FALSE ~ herdr_energy_coef$milk_goat,
+        TRUE ~ herdr_energy_coef$milk_other
+      )
+      e_mt_c <- dplyr::case_when(
+        if ("production_role" %in% names(df_agg)) df_agg$production_role == "mature" else TRUE ~ herdr_energy_coef$meat_cull,
+        TRUE ~ herdr_energy_coef$meat_young
+      )
+      e_row_tot <- (e_m_c * m_kg) + (e_mt_c * lw_kg) + (herdr_energy_coef$egg * e_kg) + (herdr_energy_coef$wool * w_kg)
+      af_prot_calc <- dplyr::if_else(e_row_tot > 0, ((e_m_c * m_kg) + (e_mt_c * lw_kg) + (herdr_energy_coef$egg * e_kg)) / e_row_tot, 1)
+
+      emiss_scale <- ifelse(valid, (1e6 * af_prot_calc) / prot, 0)
+      land_scale  <- ifelse(valid, af_prot_calc / prot, 0)
       if ("Water_intensity_protein" %in% names(df_agg) && !any(valid)) {
         water_total_m3 <- tidyr::replace_na(df_agg$Water_intensity_protein, 0)
         water_scale <- rep(1, nrow(df_agg))
         has_water <- any(water_total_m3 > 0, na.rm = TRUE)
       } else {
-        water_scale <- ifelse(valid, 1 / prot, 0)
+        water_scale <- ifelse(valid, af_prot_calc / prot, 0)
       }
       emiss_unit  <- "kg CO2e / kg protein"
       land_unit   <- "m2 / kg protein"
       water_unit  <- "m\u00b3 depriv. / kg protein"
-      scale_desc  <- "per kg of edible animal protein"
+      scale_desc  <- "per kg of edible animal protein (biophysical allocation)"
     } else if (fu == "head" && "population" %in% names(df_agg)) {
       pop <- df_agg$population
       valid <- pop > 0
@@ -587,14 +589,25 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
       is_dairy <- if ("animal_subtype" %in% names(df_agg)) df_agg$animal_subtype %in% "dairy" else if ("animal_tag" %in% names(df_agg)) df_agg$animal_tag %in% dairy_tags else FALSE
       is_non_milking_dairy <- is_dairy & (milk_kg == 0) & (meat_kg == 0)
 
-      nel_total_mj <- 3.1 * milk_kg
-      neg_total_mj <- ifelse(egg_kg > 0 | is_non_milking_dairy, 0, 15.0 * meat_live_kg)
-      e_wool_mj <- if ("animal_subtype" %in% names(df_agg)) ifelse(df_agg$animal_subtype == "meat", 24.0 * wool_kg, 0) else 0
-      e_tot_mj <- nel_total_mj + neg_total_mj + e_wool_mj
+      e_milk_coef <- dplyr::case_when(
+        if ("animal_type" %in% names(df_agg)) df_agg$animal_type == "sheep" else FALSE ~ herdr_energy_coef$milk_sheep,
+        if ("animal_type" %in% names(df_agg)) df_agg$animal_type == "goat" else FALSE ~ herdr_energy_coef$milk_goat,
+        TRUE ~ herdr_energy_coef$milk_other
+      )
+      nel_total_mj <- e_milk_coef * milk_kg
+
+      e_meat_coef <- dplyr::case_when(
+        if ("production_role" %in% names(df_agg)) df_agg$production_role == "mature" else TRUE ~ herdr_energy_coef$meat_cull,
+        TRUE ~ herdr_energy_coef$meat_young
+      )
+      neg_total_mj <- ifelse(egg_kg > 0 | is_non_milking_dairy, 0, e_meat_coef * meat_live_kg)
+      e_wool_mj <- herdr_energy_coef$wool * wool_kg
+      e_egg_mj  <- herdr_energy_coef$egg * egg_kg
+      e_tot_mj  <- nel_total_mj + neg_total_mj + e_wool_mj + e_egg_mj
 
       af_milk_calc <- if ("AF_milk" %in% names(df_agg)) df_agg$AF_milk else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, nel_total_mj / e_tot_mj, ifelse(milk_kg > 0, 1, 0))
       af_meat_calc <- if ("AF_meat" %in% names(df_agg)) df_agg$AF_meat else ifelse(egg_kg > 0 | is_non_milking_dairy, 0, ifelse(e_tot_mj > 0, neg_total_mj / e_tot_mj, ifelse(meat_kg > 0, 1, 0)))
-      af_wool_calc <- if ("AF_wool" %in% names(df_agg)) df_agg$AF_wool else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, e_wool_mj / e_tot_mj, 0)
+      af_wool_calc <- if ("AF_wool" %in% names(df_agg)) df_agg$AF_wool else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, e_wool_mj / e_tot_mj, ifelse(wool_kg > 0, 1, 0))
       af_egg_calc  <- if ("AF_egg" %in% names(df_agg)) df_agg$AF_egg else ifelse(egg_kg > 0, 1, 0)
 
       if (fu == "milk") {
