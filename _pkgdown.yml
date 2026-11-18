@@ -93,7 +93,7 @@ toc:
   depth: 3
 
 logo:
-  image: man_logo.png
+  image: man/figures/logo.png
 favicon: favicon.ico
 
 meta:

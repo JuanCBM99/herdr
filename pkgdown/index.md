@@ -35,7 +35,7 @@ library(herdr)
 herdr_init()
 
 # Load example data
-file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
+file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data", overwrite = TRUE)
 
 # Run model
 results <- generate_impact_assessment(automatic_cycle = FALSE, farm_country = "Spain", year = 2015)
@@ -66,29 +66,33 @@ This runs a complete example of a cattle production system and returns greenhous
 
 Below are the main guides and examples for using the package:
 
-### 1. Introduction
+### 1. Introduction & Shiny App
 
-Learn what herdr does, which animals are supported, and how to
-install the package.  
+Learn what herdr does, which animals are supported, how to install the package, or launch the local web interface.
 
 - [Go to Introduction &rarr; ](articles/Introduction.html)
+- [Go to Interactive Shiny App Guide &rarr; ](articles/app.html)
 
-### 2. Technical reference
+### 2. Technical & Theoretical Reference
 
-Explore the included files and some explanation about them.
+Explore the included files, schemas, and full IPCC Tier 2 / GLEAM mathematical formulations.
 
 - [Go to Technical Reference: Files & Parameters &rarr; ](articles/Technical_reference.html)
+- [Go to Theoretical Basis (IPCC Tier 2 & GLEAM) &rarr; ](articles/Theoretical_basis.html)
 
-### 3. Manure & Land use Guide
+### 3. Methodology Guides
 
-Explore the included manure management systems based on IPCC 2019 tables.
+Explore herd demography, manure management systems, land competition, and feed carbon/water footprints.
 
+- [Go to Herd Demography & Life Cycles &rarr; ](articles/Herd_Demography.html)
 - [Go to Manure System Guide &rarr; ](articles/Manure.html)
 - [Go to Land use &rarr; ](articles/land_use.html)
+- [Go to Feed Water & Carbon Footprint (AWARE) &rarr; ](articles/Water_and_Feed_Footprint.html)
+- [Go to Adding a Custom Feed Ingredient &rarr; ](articles/Adding_Ingredient.html)
 
 ### 4. Workflow
 
-Step-by-step guide on how to perform a general use of the package. 
+Step-by-step guide on how to perform a general use of the package.
 
 - [Go to Workflow Guide: Step-by-Step &rarr; ](articles/Workflow.html)
 

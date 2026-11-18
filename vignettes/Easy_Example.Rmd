@@ -57,7 +57,7 @@ Repeat the same `diet_tag` once per ingredient.
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature` | `concentrate` | `corn` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature` | `concentrate` | `corn` | 44.85 | `Spain` | `NA` |
 | `diet_dairy_mature` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
 | `diet_dairy_mature` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
@@ -104,8 +104,8 @@ Open `livestock_weights.csv`. Make sure the identifying keys match the census ex
 
 | farm_id | animal_tag | region | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
 |:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `farm_1` | `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy_cattle_high_productivity` | 0.3 |
-| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.7 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy cattle_high_productivity` | 0.3 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy cattle_high_productivity` | 0.7 |
 
 ---
 
