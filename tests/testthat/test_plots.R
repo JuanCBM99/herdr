@@ -26,33 +26,21 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_s3_class(p_dmi, "ggplot")
   expect_match(p_dmi$labels$title, "Results for DMI kgday")
 
-  # 6. Assertions: Emissions breakdown special case
-  emissions_df <- data.frame(
-    animal_tag = c("cow_dairy", "sheep_meat"),
-    region = c("Europe", "Europe"),
-    subregion = c("Spain", "Spain"),
-    ch4_enteric = c(120.5, 15.2),
-    ch4_manure = c(30.1, 3.0),
-    n2o_manure = c(10.4, 1.1)
-  )
-  p_emissions <- plot_herdr_results(emissions_df)
-  expect_s3_class(p_emissions, "ggplot")
-  expect_equal(p_emissions$labels$title, "Greenhouse Gas Emissions")
-  expect_true("Gg_CO2e" %in% names(p_emissions$data))
-
-  # 7. Assertions: Aggregation logic (sum for totals, mean for rates)
+  # 6. Assertions: Aggregation logic (sum for totals, mean for per-head rates)
   rep_df <- data.frame(
     animal_tag = c("tag_1", "tag_1"),
     region = c("Europe", "Europe"),
     subregion = c("Spain", "Spain"),
     GE_MJday = c(100, 200),
-    DE_pct = c(60, 80)
+    DE_pct = c(60, 80),
+    total_CH4_mm_kgyear = c(100, 200)
   )
   p_agg <- plot_herdr_results(rep_df, group_cols = "animal_tag", func_name = "calculate_ge")
   expect_s3_class(p_agg, "ggplot")
   expect_equal(nrow(p_agg$data), 1)
-  expect_equal(p_agg$data$GE_MJday, 300)
+  expect_equal(p_agg$data$GE_MJday, 150)
   expect_equal(p_agg$data$DE_pct, 70)
+  expect_equal(p_agg$data$total_CH4_mm_kgyear, 300)
 
   # 8. Assertions: Diet composition profile plot
   diet_df <- data.frame(

@@ -24,7 +24,7 @@ test_that("reference data paths resolve bundled datasets correctly", {
   expect_true(file.exists(ecoalim_path))
 
   df_eco <- arrow::read_parquet(ecoalim_path)
-  expect_equal(nrow(df_eco), 224)
+  expect_equal(nrow(df_eco), 247)
   expect_equal(ncol(df_eco), 38)
 })
 

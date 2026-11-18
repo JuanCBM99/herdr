@@ -205,3 +205,40 @@ test_that("calculate_land_use works with normalized diets without region/subregi
 })
 
 
+
+test_that("calculate_land_use scales co-product land use by economic_allocation / (kg_coproduct_per_1ton_maincrop / 1000)", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  dir.create("user_data", showWarnings = FALSE)
+
+  dummy_crops <- data.frame(Area = "Spain", Item = "Wheat", Element = "Yield", Y2022 = 5000)
+  arrow::write_parquet(dummy_crops, "user_data/fao_crops.parquet")
+
+  dummy_forages <- data.frame(Area = "Spain", Item = "Alfalfa", Yield = 5000)
+  arrow::write_parquet(dummy_forages, "user_data/forages.parquet")
+
+  path_diet <- "user_data/diet_ingredients.csv"
+  df <- read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+    mutate(country_of_origin = "Spain", custom_yield_kg_ha = "5000")
+  write_csv(df, path_diet)
+
+  map_path <- "user_data/mapping.csv"
+  map_df <- read_csv(map_path, show_col_types = FALSE)
+  map_df$kg_coproduct_per_1ton_maincrop <- 1000
+  write_csv(map_df, map_path)
+
+  res_1000 <- suppressWarnings(calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE))
+
+  target_ing <- res_1000$ingredient[res_1000$land_use_per_animal_m2 > 0][1]
+  map_df$kg_coproduct_per_1ton_maincrop[map_df$ingredient == target_ing] <- 500
+  write_csv(map_df, map_path)
+
+  res_500 <- suppressWarnings(calculate_land_use(farm_country = "Spain", year = 2022, saveoutput = FALSE))
+
+  val_1000 <- sum(res_1000$land_use_per_animal_m2[res_1000$ingredient == target_ing])
+  val_500  <- sum(res_500$land_use_per_animal_m2[res_500$ingredient == target_ing])
+  expect_equal(val_500, val_1000 * 2, tolerance = 1e-6)
+})
