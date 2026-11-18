@@ -152,13 +152,13 @@ modal_tooltips <- list(
   frac_gas                 = "Fraction of nitrogen excreted that is volatilized",
   frac_leach               = "Fraction of nitrogen lost through leaching/runoff.",
   economic_allocation      = "Used to allocate environmental impacts between a main product and its co-products based on economic value.",
+  ea_reference             = "Reference multi-output SimaPro / Agribalyse process from which the economic allocation and physical co-product yield are derived.",
+  kg_coproduct_per_1ton_maincrop = "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop.",
   yield_name               = "FAOSTAT name of the ingredient used to link its database with herdr",
   agribalyse_name          = "Agribalyse name of the ingredient used to link its database with herdr",
   pregnancy_rate           = "Pregnancy rate expressed as a proportion (numeric value bounded between 0 and 1).",
   pr_sheep_goat            = "Prolificacy rate for sheep and goats, representing the number of lambs/kids born divided by pregnant ewes.",
   c_pregnancy_cattle       = "Pregnancy coefficient specific to cattle. Populate this parameter only for breeding groups.",
-  parameter                = "Name of the reproduction or herd parameter (e.g., replacement_rate, pregnancy_rate, pr_sheep_goat).",
-  value                    = "Numerical value for the parameter.",
   coefficient              = "IPCC standard coefficient code.",
   description              = "Descriptive category or condition for the coefficient."
 )

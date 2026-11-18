@@ -9,7 +9,15 @@ run_herdr_app()
 
 run_app()
 }
+\value{
+Invisibly returns the Shiny application output when the session closes.
+}
 \description{
 Opens the local herdr graphical user interface (GUI) in your default web browser.
 This allows you to run impact assessments offline keeping your data private.
+}
+\examples{
+\dontrun{
+run_herdr_app()
+}
 }

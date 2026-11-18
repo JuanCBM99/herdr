@@ -8,6 +8,11 @@
 #' @param functional_unit Character string specifying the functional unit for impact assessment plots: `"total"` (Gg CO2e, ha, m3), `"protein"` (per kg edible protein), `"product"` (per kg commercial product), `"fcr"` (Mottet et al. 2017 Protein Feed Conversion Ratio and human food competition), `"milk"`, `"meat"`, `"wool"`, `"egg"`, or `"head"` (per animal head). Default is `"total"`.
 #' @param impact_category Character string specifying the environmental impact category to visualize: `"ghg"` (carbon footprint), `"land"` (land use footprint), `"water"` (feed water deprivation footprint), `"overview"` (multi-criteria comparison of all footprints), or `"fcr"` (protein feed efficiency). Default is `NULL` (auto-selected).
 #' @return A ggplot2 object.
+#' @examples
+#' \dontrun{
+#' res <- generate_impact_assessment(saveoutput = FALSE, data_dir = "user_data")
+#' plot_herdr_results(res, impact_category = "ghg")
+#' }
 #' @export
 #' @import ggplot2
 #' @importFrom tidyr pivot_longer
@@ -192,7 +197,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
               rep(1, length(x))
             }
             wmean_safe(x, w_sh)
-          } else if (grepl("pct|ef|factor|intensity|cradle_to_farm|rate|dmi|_head", col_name, ignore.case = TRUE)) {
+          } else if (grepl("pct|ef|factor|intensity|cradle_to_farm|rate|dmi|_head|_mjday|_kcal|_kgday|^rem$|^reg$|^adg_gday$|^cfi_maintenance$", col_name, ignore.case = TRUE)) {
             w_pop <- if ("population" %in% names(cur_grp)) cur_grp$population else rep(1, length(x))
             wmean_safe(x, w_pop)
           } else {
@@ -298,19 +303,10 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
 
     # 2. GWP factors
     effective_gwp <- if (!is.null(ar)) ar else gwp_report
-    gwp_presets <- list(
-      AR6 = c(CH4 = 27, N2O = 273),
-      AR5 = c(CH4 = 28, N2O = 265),
-      AR4 = c(CH4 = 25, N2O = 298),
-      SAR = c(CH4 = 21, N2O = 310)
+    default_factors <- tryCatch(
+      resolve_gwp(effective_gwp)$values,
+      error = function(e) resolve_gwp("AR5")$values
     )
-    if (is.character(effective_gwp) && toupper(effective_gwp[1]) %in% names(gwp_presets)) {
-      default_factors <- gwp_presets[[toupper(effective_gwp[1])]]
-    } else if (is.numeric(effective_gwp) && all(c("CH4", "N2O") %in% names(effective_gwp))) {
-      default_factors <- effective_gwp
-    } else {
-      default_factors <- gwp_presets[["AR5"]]
-    }
 
     # 3. Raw GHG sources (Gg CO2e)
     co2e_ch4_ent <- if ("CO2eq_enteric" %in% names(df_agg)) {
@@ -605,10 +601,10 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
       e_egg_mj  <- herdr_energy_coef$egg * egg_kg
       e_tot_mj  <- nel_total_mj + neg_total_mj + e_wool_mj + e_egg_mj
 
-      af_milk_calc <- if ("AF_milk" %in% names(df_agg)) df_agg$AF_milk else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, nel_total_mj / e_tot_mj, ifelse(milk_kg > 0, 1, 0))
-      af_meat_calc <- if ("AF_meat" %in% names(df_agg)) df_agg$AF_meat else ifelse(egg_kg > 0 | is_non_milking_dairy, 0, ifelse(e_tot_mj > 0, neg_total_mj / e_tot_mj, ifelse(meat_kg > 0, 1, 0)))
-      af_wool_calc <- if ("AF_wool" %in% names(df_agg)) df_agg$AF_wool else ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, e_wool_mj / e_tot_mj, ifelse(wool_kg > 0, 1, 0))
-      af_egg_calc  <- if ("AF_egg" %in% names(df_agg)) df_agg$AF_egg else ifelse(egg_kg > 0, 1, 0)
+      af_milk_calc <- ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, nel_total_mj / e_tot_mj, ifelse(milk_kg > 0, 1, 0))
+      af_meat_calc <- ifelse(egg_kg > 0 | is_non_milking_dairy, 0, ifelse(e_tot_mj > 0, neg_total_mj / e_tot_mj, ifelse(meat_kg > 0, 1, 0)))
+      af_wool_calc <- ifelse(e_tot_mj > 0 & egg_kg == 0 & !is_non_milking_dairy, e_wool_mj / e_tot_mj, ifelse(wool_kg > 0, 1, 0))
+      af_egg_calc  <- ifelse(egg_kg > 0, 1, 0)
 
       if (fu == "milk") {
         prod_yield <- ifelse(is_non_milking_dairy, 0, milk_kg)
@@ -854,8 +850,6 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
       df_agg$co2e_n2o_ind     <- co2e_n2o_ind * emiss_scale
       df_agg$co2e_feed_fossil <- co2e_feed_fossil * emiss_scale
       df_agg$co2e_feed_luc    <- co2e_feed_luc * emiss_scale
-      df_agg$total_co2e       <- df_agg$co2e_ch4_ent + df_agg$co2e_ch4_man + df_agg$co2e_n2o_dir +
-                                 df_agg$co2e_n2o_ind + df_agg$co2e_feed_fossil + df_agg$co2e_feed_luc
 
       emiss_cols   <- c("co2e_ch4_ent", "co2e_ch4_man", "co2e_n2o_dir", "co2e_n2o_ind", "co2e_feed_fossil", "co2e_feed_luc")
       emiss_labels <- c("CH4 Enteric", "CH4 Manure", "N2O Direct", "N2O Indirect", "Feed Fossil GHG", "Feed LUC Deforestation")
@@ -1124,34 +1118,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
     return(p)
   }
 
-  # A) EMISSIONS BREAKDOWN (stacked bars)
-  if (all(c("ch4_enteric", "ch4_manure", "n2o_manure") %in% names(df_agg))) {
-    df_agg$Total_Gg <- df_agg$ch4_enteric + df_agg$ch4_manure + df_agg$n2o_manure
-
-    df_long <- tidyr::pivot_longer(
-      df_agg,
-      cols = c("ch4_enteric", "ch4_manure", "n2o_manure"),
-      names_to = "Emission_Source", values_to = "Gg_CO2e"
-    )
-
-    return(
-      ggplot(df_long, aes(x = Gg_CO2e, y = plot_label, fill = Emission_Source)) +
-        geom_col(width = 0.62) +
-        theme_herdr_plot() +
-        scale_x_continuous(expand = expansion(mult = c(0, 0.06)), labels = scales::comma) +
-        scale_fill_manual(
-          values = c("ch4_enteric" = "#2F6B4F", "ch4_manure" = "#D9A441", "n2o_manure" = "#B4483C"),
-          labels = c("CH4 Enteric", "CH4 Manure", "N2O Manure")
-        ) +
-        labs(
-          title = "Greenhouse Gas Emissions",
-          subtitle = "Total emissions breakdown by source (Gg CO2e)",
-          x = "Total Emissions (Gg CO2e)"
-        )
-    )
-  }
-
-  # B) DIET / NUTRIENT PROFILES (grouped bars)
+  # A) DIET / NUTRIENT PROFILES (grouped bars)
   if (all(c("DE_pct", "CP_pct") %in% names(df_agg))) {
     cols_to_pivot <- intersect(c("DE_pct", "CP_pct", "NDF_pct", "ASH_pct"), names(df_agg))
 
@@ -1245,8 +1212,6 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
 
   # D) EDIBLE PROTEIN PRODUCTION (stacked bars by commodity)
   if (all(c("milk_protein_kg", "meat_protein_kg", "egg_protein_kg") %in% names(df_agg))) {
-    df_agg$Total_Protein <- df_agg$milk_protein_kg + df_agg$meat_protein_kg + df_agg$egg_protein_kg
-
     df_long <- tidyr::pivot_longer(
       df_agg,
       cols = c("milk_protein_kg", "meat_protein_kg", "egg_protein_kg"),

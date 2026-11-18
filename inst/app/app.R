@@ -65,30 +65,13 @@ if (dir.exists(www_dir)) {
 
 if (!dir.exists("user_data")) herdr::herdr_init()
 
-# --- 2. Table Tab UI Builders ---
-build_standard_tab <- function(id) {
+# --- 2. Table Tab UI Builder ---
+build_table_tab <- function(id, is_standard = TRUE) {
   info <- tables_info[[id]]
-  bslib::nav_panel(
-    title = tagList(icon(info$icon), info$label, uiOutput(paste0("dirty_badge_", id), inline = TRUE)),
-    value = id,
-    div(
-      class = "p-3",
-      div(
-        class = "d-flex justify-content-between align-items-center mb-2",
-        h5(info$label, class = "m-0 text-muted"),
-        actionButton(paste0("open_modal_", id), "Add Record", icon = icon("plus"), class = "btn btn-sm btn-outline-success")
-      ),
-      uiOutput(paste0("tab_health_banner_", id)),
-      div(
-        style = "background: var(--herdr-card); border-radius: 8px; border: 1px solid var(--herdr-border); margin-bottom: 1rem;",
-        rhandsontable::rHandsontableOutput(paste0("table_", id), height = "calc(100vh - 360px)")
-      )
-    )
+  box_style <- paste0(
+    "background: var(--herdr-card); border-radius: 8px; border: 1px solid var(--herdr-border);",
+    if (is_standard) " margin-bottom: 1rem;" else ""
   )
-}
-
-build_advanced_tab <- function(id) {
-  info <- tables_info[[id]]
   bslib::nav_panel(
     title = tagList(icon(info$icon), info$label, uiOutput(paste0("dirty_badge_", id), inline = TRUE)),
     value = id,
@@ -101,7 +84,7 @@ build_advanced_tab <- function(id) {
       ),
       uiOutput(paste0("tab_health_banner_", id)),
       div(
-        style = "background: var(--herdr-card); border-radius: 8px; border: 1px solid var(--herdr-border);",
+        style = box_style,
         rhandsontable::rHandsontableOutput(paste0("table_", id), height = "calc(100vh - 360px)")
       )
     )
@@ -115,26 +98,7 @@ ui <- bslib::page_sidebar(
   window_title = "herdr \u2014 Livestock Emissions",
   tags$head(
     tags$link(rel = "stylesheet", type = "text/css", href = "herdr_assets/herdr.css?v=20260921b"),
-    tags$script(src = "herdr_assets/herdr.js?v=20260921b"),
-    tags$style(HTML("
-      /* Disarm Handsontable red cell invalidation */
-      html body .handsontable td.htInvalid,
-      html body .handsontable th.htInvalid,
-      html body .handsontable .htInvalid,
-      html body .handsontable td.htInvalid:hover,
-      html body .handsontable th.htInvalid:hover,
-      html body table.htCore td.htInvalid,
-      html body table.htCore th.htInvalid,
-      html body table.htCore .htInvalid,
-      .handsontable td.htInvalid,
-      .handsontable th.htInvalid,
-      .handsontable .htInvalid {
-        background: transparent !important;
-        background-color: transparent !important;
-        color: inherit !important;
-        box-shadow: none !important;
-      }
-    "))
+    tags$script(src = "herdr_assets/herdr.js?v=20260921b")
   ),
   title = tagList(
     div(
@@ -162,11 +126,11 @@ ui <- bslib::page_sidebar(
     selected = "census",
     full_screen = TRUE,
     build_dictionary_panel(),
-    !!!lapply(standard_ids, build_standard_tab),
+    !!!lapply(standard_ids, build_table_tab, is_standard = TRUE),
     bslib::nav_panel(
       title = tagList(icon("sliders"), "Advanced (IPCC)"),
       value = "advanced_tab",
-      div(class = "p-3", bslib::navset_card_tab(id = "advanced_inner_tabs", !!!lapply(advanced_ids, build_advanced_tab)))
+      div(class = "p-3", bslib::navset_card_tab(id = "advanced_inner_tabs", !!!lapply(advanced_ids, build_table_tab, is_standard = FALSE)))
     ),
     build_results_panel()
   )

@@ -39,3 +39,5 @@ fao_trade_matrix\.parquet$
 ^AGENTS\.md$
 ^\.Rhistory$
 ^Rplots\.pdf$
+^.*\.pptx$
+fao_crops\.parquet$

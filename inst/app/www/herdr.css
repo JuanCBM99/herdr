@@ -244,27 +244,6 @@ body {
   vertical-align: middle;
 }
 
-/* --- Alerts --- */
-.herdr-alert {
-  display: flex;
-  gap: 10px;
-  align-items: center;
-  padding: 0.75rem 1rem;
-  border-radius: 10px;
-  margin-bottom: 0.8rem;
-  font-size: 0.88rem;
-}
-.herdr-alert-danger {
-  background: var(--herdr-barn-light);
-  color: var(--herdr-barn-dark);
-  border: 1px solid var(--herdr-barn);
-}
-.herdr-alert-warning {
-  background: var(--herdr-wheat-light);
-  color: var(--herdr-wheat-dark);
-  border: 1px solid var(--herdr-wheat);
-}
-
 /* --- Handsontable Enhancements --- */
 .rhandsontable {
   min-height: 380px !important;
@@ -319,75 +298,6 @@ html body table.htCore .htInvalid {
   background-color: transparent !important;
   color: inherit !important;
   box-shadow: none !important;
-}
-
-/* --- KPI Metric Cards in Results --- */
-.kpi-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-  gap: 1rem;
-  margin-bottom: 1.25rem;
-}
-.kpi-card {
-  background: var(--herdr-card);
-  border-radius: 12px;
-  padding: 1rem 1.25rem;
-  border: 1px solid var(--herdr-border);
-  box-shadow: var(--herdr-shadow-sm);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: relative;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-.kpi-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--herdr-shadow-md);
-}
-.kpi-icon-wrap {
-  width: 44px;
-  height: 44px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  flex-shrink: 0;
-}
-.kpi-card.pasture .kpi-icon-wrap {
-  background: var(--herdr-pasture-light);
-  color: var(--herdr-pasture);
-}
-.kpi-card.wheat .kpi-icon-wrap {
-  background: var(--herdr-wheat-light);
-  color: var(--herdr-wheat-dark);
-}
-.kpi-card.barn .kpi-icon-wrap {
-  background: var(--herdr-barn-light);
-  color: var(--herdr-barn);
-}
-.kpi-data {
-  display: flex;
-  flex-direction: column;
-}
-.kpi-value {
-  font-family: 'Fraunces', serif;
-  font-weight: 800;
-  font-size: 1.45rem;
-  line-height: 1.2;
-  color: var(--herdr-ink);
-}
-.kpi-label {
-  font-size: 0.78rem;
-  letter-spacing: 0.01em;
-  color: var(--herdr-muted);
-  font-weight: 600;
-  line-height: 1.25;
-}
-.kpi-label sub {
-  font-size: 0.75em;
-  bottom: -0.15em;
 }
 
 /* --- Results Section --- */

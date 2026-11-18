@@ -389,9 +389,13 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("yield_name")),
                 tags$dd(class = "col-sm-9", "Corresponding FAOSTAT commodity name used for national crop yield lookups."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("agribalyse_name")),
-                tags$dd(class = "col-sm-9", "ECOALIM V9 / AGRIBALYSE v3.1 LCA database process name for upstream feed carbon and water footprint."),
+                tags$dd(class = "col-sm-9", "ECOALIM V9 / AGRIBALYSE v3.1/v3.2 LCA database process name for upstream feed carbon and water footprint."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("ea_reference")),
+                tags$dd(class = "col-sm-9", "Reference multi-output SimaPro / Agribalyse transformation process used to document economic and physical co-product allocation."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("economic_allocation")),
-                tags$dd(class = "col-sm-9", "Economic allocation fraction applied to co-products (between 0 and 1).")
+                tags$dd(class = "col-sm-9", "Economic allocation fraction applied to co-products (between 0 and 1)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("kg_coproduct_per_1ton_maincrop")),
+                tags$dd(class = "col-sm-9", "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop (1000 for primary crops).")
               )
             )
 

@@ -89,7 +89,7 @@ build_results_panel <- function() {
             )
           ),
           conditionalPanel(
-            condition = "input.function_choice == 'calculate_feed_emissions' && input.plot_feed_metric != 'overview'",
+            condition = "input.function_choice == 'calculate_feed_emissions'",
             class = "col-md-3",
             selectInput(
               "plot_feed_scale",

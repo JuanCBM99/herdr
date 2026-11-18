@@ -76,7 +76,7 @@ herdr_server <- function(input, output, session) {
       if (id == "diet_ingr" && !"custom_yield_kg_ha" %in% names(loaded)) {
         loaded$custom_yield_kg_ha <- NA_character_
       }
-      rv[[id]] <- if (reset) loaded[0, ] else loaded
+      rv[[id]] <- if (reset && id %in% standard_ids) loaded[0, ] else loaded
       dirty[[id]] <- FALSE
       table_render_triggers[[id]] <- if (is.null(table_render_triggers[[id]])) 1 else table_render_triggers[[id]] + 1
     }
@@ -92,6 +92,13 @@ herdr_server <- function(input, output, session) {
     try({
       if (input$data_source != "current") {
         file.copy(list.files(file.path(example_paths, input$data_source), full.names = TRUE), user_data_tmp, overwrite = TRUE)
+      } else if (dir.exists("user_data")) {
+        file.copy(list.files("user_data", full.names = TRUE), user_data_tmp, overwrite = TRUE)
+      } else if (example_paths != "") {
+        blank_dir <- file.path(example_paths, "Blank_IPCC_2019")
+        if (dir.exists(blank_dir)) {
+          file.copy(list.files(blank_dir, full.names = TRUE), user_data_tmp, overwrite = TRUE)
+        }
       }
       load_all_data(reset = FALSE)
       showNotification(paste("Loaded:", input$data_source), type = "message")
@@ -738,8 +745,6 @@ herdr_server <- function(input, output, session) {
       model_data()
     }
   })
-
-  output$table_results <- renderTable({ req(active_table_data()); active_table_data() }, digits = 6)
 
   output$table_results_hot <- renderRHandsontable({
     df <- active_table_data()

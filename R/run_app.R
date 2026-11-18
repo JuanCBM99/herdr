@@ -4,6 +4,11 @@
 #' Opens the local herdr graphical user interface (GUI) in your default web browser.
 #' This allows you to run impact assessments offline keeping your data private.
 #'
+#' @return Invisibly returns the Shiny application output when the session closes.
+#' @examples
+#' \dontrun{
+#' run_herdr_app()
+#' }
 #' @export
 # nocov start
 run_herdr_app <- function() {

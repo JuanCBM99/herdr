@@ -35,3 +35,9 @@ A ggplot2 object.
 \description{
 Plot herdr results dynamically with custom grouping and premium aesthetics
 }
+\examples{
+\dontrun{
+res <- generate_impact_assessment(saveoutput = FALSE, data_dir = "user_data")
+plot_herdr_results(res, impact_category = "ghg")
+}
+}

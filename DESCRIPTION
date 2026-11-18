@@ -49,7 +49,9 @@ Imports:
     arrow,
     ggplot2,
     scales,
-    zip
+    zip,
+    jsonlite,
+    htmlwidgets
 Suggests: 
     rmarkdown,
     testthat (>= 3.0.0),

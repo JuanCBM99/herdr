@@ -51,7 +51,7 @@ save_clean <- function(df, path) {
   } else if (fname == "diet_ingredients.csv") {
     df <- enforce_column_order(df, "diet_ingr")
   }
-  key_column <- intersect(c("animal_tag", "diet_tag"), names(df))[1]
+  key_column <- intersect(c("animal_tag", "diet_tag", "ingredient", "description", "system_base"), names(df))[1]
   if (!is.na(key_column)) {
     df <- df %>% dplyr::filter(!is.na(.data[[key_column]]) & .data[[key_column]] != "")
   }
@@ -838,14 +838,17 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       w_keys <- build_keys(clean_weights)
       act_weights <- clean_weights[w_keys %in% census_keys, , drop = FALSE]
 
-      if (nrow(act_weights) > 0 && "live_weight_kg" %in% names(act_weights)) {
-        bad_lw <- act_weights[is.na(act_weights$live_weight_kg) | as.numeric(act_weights$live_weight_kg) <= 0, , drop = FALSE]
+      weight_cols <- intersect(c("adult_weight_kg", "final_weight_kg"), names(act_weights))
+      if (nrow(act_weights) > 0 && length(weight_cols) > 0) {
+        w_vals <- lapply(act_weights[weight_cols], function(x) tidyr::replace_na(suppressWarnings(as.numeric(x)), 0))
+        has_pos_weight <- Reduce(`|`, lapply(w_vals, function(v) v > 0))
+        bad_lw <- act_weights[!has_pos_weight, , drop = FALSE]
         if (nrow(bad_lw) > 0) {
           fmt_lw <- vapply(build_keys(bad_lw), format_cohort_label, character(1), USE.NAMES = FALSE)
           fmt_lw <- fmt_lw[fmt_lw != ""]
           if (length(fmt_lw) > 0) {
             add_issue("error", "weights", "Weights", "Missing Live Weight",
-                      paste0("live_weight_kg must be > 0 for: ", paste(unique(fmt_lw), collapse = ", "), "."))
+                      paste0("adult_weight_kg or final_weight_kg must be > 0 for: ", paste(unique(fmt_lw), collapse = ", "), "."))
           }
         }
       }
@@ -1025,6 +1028,70 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
                       paste0("Invalid manure combination detected in Manure: '", invalid_combos[1], "'. Does not exist in IPCC Manure library."))
           }
         }
+
+        # 4. Validate b_0 tags against ipcc_coefficients
+        if ("b_0" %in% names(m_has_base) && !is.null(rv$ipcc_coef) && nrow(rv$ipcc_coef) > 0 &&
+            all(c("coefficient", "description") %in% names(rv$ipcc_coef))) {
+          b0_valid <- unique(na.omit(trimws(as.character(
+            rv$ipcc_coef$description[tolower(trimws(as.character(rv$ipcc_coef$coefficient))) == "b_0"]
+          ))))
+          b0_used <- trimws(as.character(m_has_base$b_0))
+          b0_used <- unique(b0_used[!is.na(b0_used) & b0_used != "" & b0_used != "NA"])
+          bad_b0 <- setdiff(b0_used, b0_valid)
+          if (length(bad_b0) > 0) {
+            add_issue("error", "manure", "Manure", "Unknown B0 Tag",
+                      paste0("Unknown methane producing capacity (b_0) tag(s) in Manure: '",
+                             paste(bad_b0, collapse = "', '"), "'. Must match ipcc_coefficients.csv."))
+          }
+        }
+
+        # 5. Validate species-specific support in ipcc_mm
+        if (all(c("animal_type", "animal_subtype") %in% names(rv$ipcc_mm))) {
+          meta_parts <- list()
+          for (tbl_m in list(rv$def, rv$mono)) {
+            if (!is.null(tbl_m) && nrow(tbl_m) > 0 && all(c("animal_tag", "animal_type", "animal_subtype") %in% names(tbl_m))) {
+              meta_parts[[length(meta_parts) + 1]] <- data.frame(
+                key = build_keys(tbl_m),
+                animal_type = tolower(trimws(as.character(tbl_m$animal_type))),
+                animal_subtype = tolower(trimws(as.character(tbl_m$animal_subtype))),
+                stringsAsFactors = FALSE
+              )
+            }
+          }
+          if (length(meta_parts) > 0) {
+            meta_df <- unique(do.call(rbind, meta_parts))
+            meta_df <- meta_df[meta_df$key != "" & !is.na(meta_df$animal_type) & !is.na(meta_df$animal_subtype) &
+                               meta_df$animal_type != "" & meta_df$animal_subtype != "", , drop = FALSE]
+            if (nrow(meta_df) > 0) {
+              m_keys <- build_keys(m_has_base)
+              idx_match <- match(m_keys, meta_df$key)
+              has_meta <- !is.na(idx_match)
+              if (any(has_meta)) {
+                m_sub <- m_has_base[has_meta, , drop = FALSE]
+                u_spec <- paste(
+                  build_manure_combo_key(m_sub),
+                  meta_df$animal_type[idx_match[has_meta]],
+                  meta_df$animal_subtype[idx_match[has_meta]],
+                  sep = " | "
+                )
+                master_spec <- paste(
+                  build_manure_combo_key(rv$ipcc_mm),
+                  tolower(trimws(as.character(rv$ipcc_mm$animal_type))),
+                  tolower(trimws(as.character(rv$ipcc_mm$animal_subtype))),
+                  sep = " | "
+                )
+                bad_spec <- unique(setdiff(u_spec, master_spec))
+                if (length(bad_spec) > 0) {
+                  reported_titles <- sapply(issues, function(x) x$title)
+                  if (!any(c("Invalid System Base", "Invalid System Variant", "Invalid Climate/System Combination", "Whitespace in Manure System") %in% reported_titles)) {
+                    add_issue("error", "manure", "Manure", "Unsupported Manure System for Species",
+                              paste0("Manure management system is not supported for the animal category in ipcc_mm.csv: '", bad_spec[1], "'."))
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -1067,7 +1134,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
           d_tag <- dp_clean$diet_tag[r]
           row_shares <- as.numeric(dp_clean[r, share_cols])
           total_share <- sum(row_shares, na.rm = TRUE)
-          if (abs(total_share - 100) > 1.0) {
+          if (abs(total_share - 100) > 0.1) {
             add_issue("error", "diet_prof", "Diet Profiles", "Diet Shares != 100%",
                       paste0("Diet '", d_tag, "' macro shares sum to ", round(total_share, 1), "% (must sum to 100%)."))
           }
@@ -1099,7 +1166,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       if (nrow(di_target) > 0) {
         di_target$ing_share_num <- suppressWarnings(as.numeric(di_target$ingredient_share))
         sums_df <- stats::aggregate(ing_share_num ~ diet_tag + ingredient_type, data = di_target, FUN = sum, na.rm = TRUE)
-        bad_sums <- sums_df[abs(sums_df$ing_share_num - 100) > 0.5, ]
+        bad_sums <- sums_df[abs(sums_df$ing_share_num - 100) > 0.1, ]
         if (nrow(bad_sums) > 0) {
           for (b in seq_len(nrow(bad_sums))) {
             add_issue("error", "diet_ingr", "Ingredients", "Ingredient Shares != 100%",
@@ -1110,12 +1177,40 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       }
     }
 
-    # Missing ingredients for active diets
-    ingr_diets <- unique(na.omit(trimws(as.character(di_clean$diet_tag))))
-    missing_ingr_diets <- setdiff(assigned_diets, ingr_diets)
-    if (length(missing_ingr_diets) > 0) {
-      add_issue("warning", "diet_ingr", "Ingredients", "Diet Without Ingredients",
-                paste0("Active diet profiles with no ingredients configured: ", paste(missing_ingr_diets, collapse = ", "), "."))
+    # Missing ingredients for active diet categories (> 0.1%)
+    if (!is.null(rv$diet_prof) && nrow(rv$diet_prof) > 0) {
+      active_target_diets <- if (length(assigned_diets) > 0) assigned_diets else defined_diets
+      dp_active <- rv$diet_prof[!is.na(rv$diet_prof$diet_tag) & rv$diet_prof$diet_tag %in% active_target_diets, , drop = FALSE]
+      type_map <- c(
+        forage = "forage_share",
+        concentrate = "concentrate_share",
+        milk = "milk_share",
+        milk_replacer = "milk_replacer_share"
+      )
+      missing_cats <- character()
+      for (t_name in names(type_map)) {
+        scol <- type_map[[t_name]]
+        if (scol %in% names(dp_active)) {
+          svals <- suppressWarnings(as.numeric(dp_active[[scol]]))
+          act_r <- which(!is.na(svals) & svals > 0.1)
+          for (r in act_r) {
+            d_tag <- trimws(as.character(dp_active$diet_tag[r]))
+            has_cat_ing <- any(
+              trimws(as.character(di_clean$diet_tag)) == d_tag &
+              trimws(as.character(di_clean$ingredient_type)) == t_name &
+              !is.na(di_clean$ingredient_share) &
+              suppressWarnings(as.numeric(di_clean$ingredient_share)) > 0
+            )
+            if (!has_cat_ing) {
+              missing_cats <- c(missing_cats, paste0(d_tag, " [", t_name, " = ", svals[r], "%]"))
+            }
+          }
+        }
+      }
+      if (length(missing_cats) > 0) {
+        add_issue("error", "diet_ingr", "Ingredients", "Active Category Missing Ingredients",
+                  paste0("Active diet categories missing ingredients: ", paste(unique(missing_cats), collapse = ", "), "."))
+      }
     }
   }
 
