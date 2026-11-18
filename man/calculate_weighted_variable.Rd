@@ -18,3 +18,8 @@ Tibble with weighted nutritional variables for all animal cohorts.
 Computes weighted averages of nutritional variables (DE, CP, Cropland CP, NDF, ASH, GE, and monogastric DE/ME)
 by mapping ingredients to diets and diets to animals, combining ruminant and monogastric (swine and poultry) definitions.
 }
+\examples{
+\dontrun{
+calculate_weighted_variable(saveoutput = FALSE, data_dir = "user_data")
+}
+}

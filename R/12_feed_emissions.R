@@ -11,6 +11,10 @@
 #' @param population_df Optional precalculated population dataframe.
 #' @return Tibble containing feed environmental footprints by animal category,
 #'   including total GHG (kg CO2e), fossil GHG, LUC GHG, and water consumption (m3).
+#' @examples
+#' \dontrun{
+#' calculate_feed_emissions(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_feed_emissions <- function(automatic_cycle = FALSE,
                                      saveoutput = TRUE,
@@ -47,7 +51,19 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     dplyr::distinct(ingredient, .keep_all = TRUE)
 
   mapping_clean <- name_mapping %>%
-    dplyr::select(ingredient, agribalyse_name) %>%
+    dplyr::mutate(
+      economic_allocation = if ("economic_allocation" %in% names(.)) {
+        suppressWarnings(as.numeric(economic_allocation))
+      } else {
+        1
+      },
+      kg_coproduct_per_1ton_maincrop = if ("kg_coproduct_per_1ton_maincrop" %in% names(.)) {
+        suppressWarnings(as.numeric(kg_coproduct_per_1ton_maincrop))
+      } else {
+        1000
+      }
+    ) %>%
+    dplyr::select(ingredient, agribalyse_name, economic_allocation, kg_coproduct_per_1ton_maincrop) %>%
     dplyr::distinct(ingredient, .keep_all = TRUE)
 
   ecoalim_clean <- ecoalim %>%
@@ -70,7 +86,7 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     return(dplyr::tibble())
   }
   DMI_df <- DMI_df %>%
-    dplyr::distinct(region, diet_tag, subregion, animal_tag, .keep_all = TRUE)
+    dplyr::distinct(dplyr::across(dplyr::any_of(c("farm_id", "region", "diet_tag", "subregion", "animal_tag"))), .keep_all = TRUE)
 
   if (is.null(population_df)) {
     population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
@@ -79,21 +95,10 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
   diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
   diet_ingredients_raw <- readr::read_csv(file.path(data_dir, "diet_ingredients.csv"), show_col_types = FALSE)
 
-  legacy_diet_mode <- any(c("region", "subregion") %in% names(diet_profiles)) &&
-                      any(duplicated(diet_profiles$diet_tag))
-
-  if (!legacy_diet_mode) {
-    diet_profiles <- diet_profiles %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
-      dplyr::distinct(diet_tag, .keep_all = TRUE)
-    diet_ingredients_raw <- diet_ingredients_raw %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion")))
-    diet_join_keys <- "diet_tag"
-  } else {
-    diet_profiles <- diet_profiles %>%
-      dplyr::distinct(diet_tag, region, subregion, .keep_all = TRUE)
-    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diet_profiles))
-  }
+  norm_diets <- herdr_normalize_diets(diet_profiles, diet_ingredients_raw)
+  diet_profiles <- norm_diets$diets
+  diet_ingredients_raw <- norm_diets$ingredients
+  diet_join_keys <- norm_diets$diet_join_keys
 
   # --- 3.1 Validate Diet Categories and Ingredient Shares ---
   herdr_validate_diet_shares(diet_profiles, diet_ingredients_raw, diet_join_keys = diet_join_keys)
@@ -104,11 +109,28 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     dplyr::inner_join(diet_ingredients_raw, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(feed_chars, by = "ingredient") %>%
     dplyr::left_join(mapping_clean, by = "ingredient") %>%
-    dplyr::left_join(ecoalim_clean, by = "agribalyse_name")
+    dplyr::left_join(ecoalim_clean, by = "agribalyse_name") %>%
+    dplyr::mutate(
+      share_factor = dplyr::case_when(
+        ingredient_type == "forage"        ~ forage_share / 100,
+        ingredient_type == "concentrate"   ~ concentrate_share / 100,
+        ingredient_type == "milk"          ~ milk_share / 100,
+        ingredient_type == "milk_replacer" ~ milk_replacer_share / 100,
+        TRUE ~ 0
+      )
+    )
 
   # Detect consumed ingredients without matching emission factor
+  # (excluding zero-allocation residues, maternal milk, and natural pastures)
   missing_factors <- joined %>%
-    dplyr::filter(as.numeric(ingredient_share) > 0, is.na(ef_climate_total)) %>%
+    dplyr::filter(
+      share_factor > 0,
+      as.numeric(ingredient_share) > 0,
+      is.na(ef_climate_total),
+      dplyr::coalesce(economic_allocation, 1) > 0,
+      !ingredient_type %in% c("milk"),
+      !grepl("_breast_milk$|_pasture_fresh$", ingredient)
+    ) %>%
     dplyr::select(ingredient) %>%
     dplyr::distinct()
 
@@ -125,16 +147,27 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
   calc <- joined %>%
     dplyr::mutate(
       DM_pct = dplyr::case_when(
+        ingredient_type == "forage" ~ 100,
         is.na(DM_pct) | DM_pct <= 0 ~ 100,
         TRUE ~ DM_pct
       ),
-      share_factor = dplyr::case_when(
-        ingredient_type == "forage"        ~ forage_share / 100,
-        ingredient_type == "concentrate"   ~ concentrate_share / 100,
-        ingredient_type == "milk"          ~ milk_share / 100,
-        ingredient_type == "milk_replacer" ~ milk_replacer_share / 100,
-        TRUE ~ 0
+      coproduct_mass_fraction = dplyr::if_else(
+        !is.na(kg_coproduct_per_1ton_maincrop) & kg_coproduct_per_1ton_maincrop > 0,
+        kg_coproduct_per_1ton_maincrop / 1000,
+        1
       ),
+      # Apply economic & mass allocation when a co-product (EA < 1) is mapped to a raw parent crop LCI
+      # (avoiding double-allocation for LCIs that are already co-products in ECOALIM/Agribalyse)
+      lci_alloc_factor = dplyr::if_else(
+        !is.na(economic_allocation) & economic_allocation < 1 &
+          ecoalim_category %in% c("Cereal grains", "Legumes and oilseeds"),
+        economic_allocation / coproduct_mass_fraction,
+        1
+      ),
+      ef_climate_total = ef_climate_total * lci_alloc_factor,
+      ef_climate_fossil = ef_climate_fossil * lci_alloc_factor,
+      ef_climate_luc = ef_climate_luc * lci_alloc_factor,
+      ef_water = ef_water * lci_alloc_factor,
       annual_dmi_kg_head = (DMI_kgday * 365) * share_factor * (as.numeric(ingredient_share) / 100),
       annual_fresh_kg_head = annual_dmi_kg_head / (DM_pct / 100)
     )
@@ -157,9 +190,9 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
       by = pop_join_keys
     ) %>%
     dplyr::mutate(
+      population = tidyr::replace_na(suppressWarnings(as.numeric(population)), 0),
       annual_dmi_kg_herd = annual_dmi_kg_head * population,
       annual_fresh_kg_herd = annual_fresh_kg_head * population,
-      feed_CO2e_head_kg = annual_fresh_kg_head * dplyr::coalesce(ef_climate_total, 0),
       feed_CO2e_herd_kg = annual_fresh_kg_herd * dplyr::coalesce(ef_climate_total, 0),
       feed_CO2e_fossil_herd_kg = annual_fresh_kg_herd * dplyr::coalesce(ef_climate_fossil, 0),
       feed_CO2e_luc_herd_kg = annual_fresh_kg_herd * dplyr::coalesce(ef_climate_luc, 0),

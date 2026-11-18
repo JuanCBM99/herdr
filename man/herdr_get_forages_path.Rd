@@ -19,3 +19,8 @@ Checks in order:
   \item Package bundled extdata (\code{system.file("extdata", "forages.parquet", package = "herdr")})
 }
 }
+\examples{
+\dontrun{
+herdr_get_forages_path("user_data")
+}
+}

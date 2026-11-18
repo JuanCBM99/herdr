@@ -12,6 +12,13 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param DMI_df Optional precalculated DMI dataframe.
 #' @param population_df Optional precalculated population dataframe.
+#' @return A tibble with total feed-related land use (\code{Total_Land_m2}, m2/year) broken down
+#'   by land category (\code{Forages_m2}, \code{Grains_m2}, \code{Maize_Soy_m2}, \code{Grazing_m2},
+#'   \code{Cropland_m2}) per animal cohort.
+#' @examples
+#' \dontrun{
+#' calculate_land_use(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_land_use <- function(automatic_cycle = FALSE,
                                saveoutput = TRUE,
@@ -36,6 +43,9 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     stop("Could not locate fao_crops.parquet in '", data_dir, "' or user cache. Please verify your internet connection or supply the file.")
   }
   fao_ds <- arrow::open_dataset(fao_crops_path)
+  if (!year_col %in% names(fao_ds)) {
+    stop("Year '", year, "' (column '", year_col, "') is not available in fao_crops.parquet.", call. = FALSE)
+  }
   fao_filtered <- dplyr::filter(fao_ds, Element == "Yield")
   if ("Area Code" %in% names(fao_ds)) {
     fao_filtered <- dplyr::filter(fao_filtered, `Area Code` < country_area_code_max)
@@ -43,16 +53,17 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   fao_raw <- fao_filtered %>%
     dplyr::select(Area, Item, dplyr::all_of(year_col)) %>%
     dplyr::collect() %>%
-    dplyr::rename(Value = dplyr::all_of(year_col)) %>%
-    dplyr::mutate(Year = as.numeric(year))
+    dplyr::rename(Value = dplyr::all_of(year_col))
 
   # Curated forage yields (MAPA 2024 / BC3); supports forages.parquet with package fallback
   forage_path <- herdr_get_forages_path(data_dir)
   forage_raw <- arrow::read_parquet(forage_path) %>%
-    dplyr::rename(Value = Yield) %>%
-    dplyr::mutate(Year = as.numeric(year))
+    dplyr::rename(Value = Yield)
 
   name_mapping <- readr::read_csv(file.path(data_dir, "mapping.csv"), show_col_types = FALSE)
+  if (!"kg_coproduct_per_1ton_maincrop" %in% names(name_mapping)) {
+    name_mapping$kg_coproduct_per_1ton_maincrop <- 1000
+  }
 
   feed_chars_raw <- readr::read_csv(file.path(data_dir, "feed_characteristics.csv"), show_col_types = FALSE)
 
@@ -86,9 +97,9 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::transmute(
       ingredient,
       country_of_origin = Area,
-      dm_yield = Value,
-      ha_per_kg = dplyr::if_else(dm_yield > 0, 1 / dm_yield, 0),
-      economic_allocation = as.numeric(economic_allocation)
+      fao_yield = Value,
+      economic_allocation = as.numeric(economic_allocation),
+      kg_coproduct_per_1ton_maincrop = suppressWarnings(as.numeric(kg_coproduct_per_1ton_maincrop))
     )
 
   # Spain national forage yields lookup as fallback proxy for other countries
@@ -122,21 +133,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     show_col_types = FALSE
   )
 
-  legacy_diet_mode <- any(c("region", "subregion") %in% names(diet_profiles)) &&
-                      any(duplicated(diet_profiles$diet_tag))
-
-  if (!legacy_diet_mode) {
-    diet_profiles <- diet_profiles %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
-      dplyr::distinct(diet_tag, .keep_all = TRUE)
-    diet_ingredients_raw <- diet_ingredients_raw %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion")))
-    diet_join_keys <- "diet_tag"
-  } else {
-    diet_profiles <- diet_profiles %>%
-      dplyr::distinct(diet_tag, region, subregion, .keep_all = TRUE)
-    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diet_profiles))
-  }
+  norm_diets <- herdr_normalize_diets(diet_profiles, diet_ingredients_raw)
+  diet_profiles <- norm_diets$diets
+  diet_ingredients_raw <- norm_diets$ingredients
+  diet_join_keys <- norm_diets$diet_join_keys
 
   diet_ingredients_raw <- diet_ingredients_raw %>%
     dplyr::mutate(
@@ -172,7 +172,11 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::group_by(Area, Item) %>%
       dplyr::summarise(Production = sum(Production, na.rm = TRUE), .groups = "drop")
 
-    global_trade <- arrow::open_dataset(path_parquet_trade) %>%
+    trade_ds <- arrow::open_dataset(path_parquet_trade)
+    if (!year_col %in% names(trade_ds)) {
+      stop("Year '", year, "' (column '", year_col, "') is not available in fao_trade_matrix.parquet.", call. = FALSE)
+    }
+    global_trade <- trade_ds %>%
       dplyr::select(`Reporter Countries`, `Partner Countries`, Item, Element, dplyr::all_of(year_col)) %>%
       dplyr::filter(Item %in% fao_items) %>%
       dplyr::collect() %>%
@@ -235,7 +239,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       NA_character_
     }
 
-    resolved_origin <- purrr::map_chr(fao_items, ~ trace_origin(.x, farm_country, chain_table))
+    resolved_origin <- purrr::map_chr(fao_items, function(it) trace_origin(it, farm_country, chain_table))
     names(resolved_origin) <- fao_items
 
     # --- 3c. Fallback for unresolved items ---
@@ -307,7 +311,16 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::inner_join(diet_ingredients, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(fao_yields, by = c("ingredient", "country_of_origin")) %>%
     dplyr::left_join(spain_forage_yields, by = "ingredient") %>%
-    dplyr::left_join(name_mapping %>% dplyr::select(ingredient, alloc_ref = economic_allocation) %>% dplyr::distinct(), by = "ingredient") %>%
+    dplyr::left_join(
+      name_mapping %>%
+        dplyr::select(
+          ingredient,
+          alloc_ref = economic_allocation,
+          coproduct_ref = kg_coproduct_per_1ton_maincrop
+        ) %>%
+        dplyr::distinct(ingredient, .keep_all = TRUE),
+      by = "ingredient"
+    ) %>%
     dplyr::left_join(feed_chars, by = "ingredient")
 
   # Detect forages where country_of_origin != "Spain" (or missing yield for country) and Spain's yield is used as fallback proxy
@@ -315,7 +328,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     dplyr::filter(
       ingredient_type == "forage",
       is.na(custom_yield_kg_ha),
-      is.na(dm_yield),
+      is.na(fao_yield),
       !is.na(spain_forage_yield),
       as.numeric(ingredient_share) > 0
     ) %>%
@@ -336,14 +349,14 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       raw_yield = dplyr::case_when(
         land_type %in% c("none", "no_land")                         ~ 0,
         !is.na(custom_yield_kg_ha)                                   ~ custom_yield_kg_ha,
-        !is.na(dm_yield)                                             ~ dm_yield,
-        ingredient_type == "forage" & !is.na(spain_forage_yield)     ~ spain_forage_yield,
+        !is.na(fao_yield)                                            ~ fao_yield,
+        !is.na(spain_forage_yield)                                   ~ spain_forage_yield,
         !is.na(fallback_yield)                                       ~ fallback_yield,
         TRUE                                                         ~ NA_real_
       ),
       dm_yield = dplyr::case_when(
         !is.na(custom_yield_kg_ha)                                   ~ raw_yield,
-        ingredient_type == "forage"                                  ~ raw_yield,
+        !is.na(spain_forage_yield) | ingredient_type == "forage"     ~ raw_yield,
         !is.na(raw_yield) & raw_yield > 0                           ~ raw_yield * (suppressWarnings(as.numeric(DM_pct)) / 100),
         TRUE                                                         ~ raw_yield
       ),
@@ -351,8 +364,22 @@ calculate_land_use <- function(automatic_cycle = FALSE,
     )
 
   # --- Validate that all consumed ingredients requiring land have yields ---
+  results <- results %>%
+    dplyr::mutate(
+      economic_allocation = dplyr::coalesce(economic_allocation, suppressWarnings(as.numeric(alloc_ref)), 1),
+      kg_coproduct_per_1ton_maincrop = dplyr::coalesce(
+        kg_coproduct_per_1ton_maincrop,
+        suppressWarnings(as.numeric(coproduct_ref)),
+        1000
+      ),
+      coproduct_mass_fraction = dplyr::if_else(
+        !is.na(kg_coproduct_per_1ton_maincrop) & kg_coproduct_per_1ton_maincrop > 0,
+        kg_coproduct_per_1ton_maincrop / 1000,
+        1
+      )
+    )
+
   missing_yields <- results %>%
-    dplyr::mutate(economic_allocation = dplyr::coalesce(economic_allocation, as.numeric(alloc_ref), 1)) %>%
     dplyr::filter(
       is.na(dm_yield) | dm_yield <= 0,
       !land_type %in% c("none", "no_land"),
@@ -387,7 +414,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       ha_kg_allocated = dplyr::if_else(
         land_type %in% c("none", "no_land"),
         0,
-        dplyr::coalesce(ha_per_kg, 0) * dplyr::coalesce(economic_allocation, 1)
+        dplyr::coalesce(ha_per_kg, 0) * (dplyr::coalesce(economic_allocation, 1) / coproduct_mass_fraction)
       ),
       share_factor = dplyr::case_when(
         ingredient_type == "forage"        ~ forage_share / 100,
@@ -400,6 +427,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       land_use_m2 = (ha_kg_allocated * annual_cons_kg) * 10000
     ) %>%
     dplyr::left_join(population_df, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
+    dplyr::mutate(population = tidyr::replace_na(suppressWarnings(as.numeric(population)), 0)) %>%
     tidyr::drop_na(animal_tag) %>%
     dplyr::group_by(
       farm_id, region, subregion, animal_tag,

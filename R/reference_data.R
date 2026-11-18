@@ -13,6 +13,8 @@ NULL
 #' using \code{tools::R_user_dir("herdr", which = "data")}.
 #'
 #' @return Character path to the user cache directory.
+#' @examples
+#' herdr_cache_dir()
 #' @export
 herdr_cache_dir <- function() {
   cache_dir <- tools::R_user_dir("herdr", which = "data")
@@ -36,6 +38,10 @@ herdr_cache_dir <- function() {
 #' @param data_dir Character. Path to the user data directory. Default is \code{"user_data"}.
 #' @param download_if_missing Logical. Whether to attempt downloading if not found locally or in cache.
 #' @return Absolute path to \code{fao_crops.parquet}, or NULL if not found.
+#' @examples
+#' \dontrun{
+#' herdr_get_fao_crops_path("user_data", download_if_missing = FALSE)
+#' }
 #' @export
 herdr_get_fao_crops_path <- function(data_dir = "user_data", download_if_missing = TRUE) {
   # 1. Local data directory (custom user data or test mocks)
@@ -99,6 +105,10 @@ herdr_get_fao_crops_path <- function(data_dir = "user_data", download_if_missing
 #' @param data_dir Character. Path to the user data directory. Default is \code{"user_data"}.
 #' @param download_if_missing Logical. Whether to attempt downloading if not found locally or in cache.
 #' @return Absolute path to \code{fao_trade_matrix.parquet}, or NULL if not found.
+#' @examples
+#' \dontrun{
+#' herdr_get_fao_trade_matrix_path("user_data", download_if_missing = FALSE)
+#' }
 #' @export
 herdr_get_fao_trade_matrix_path <- function(data_dir = "user_data", download_if_missing = TRUE) {
   # 1. Local data directory
@@ -157,6 +167,10 @@ herdr_get_fao_trade_matrix_path <- function(data_dir = "user_data", download_if_
 #'
 #' @param data_dir Character. Path to the user data directory. Default is \code{"user_data"}.
 #' @return Absolute path to forages parquet file.
+#' @examples
+#' \dontrun{
+#' herdr_get_forages_path("user_data")
+#' }
 #' @export
 herdr_get_forages_path <- function(data_dir = "user_data") {
   # 1. Local data directory
@@ -183,6 +197,10 @@ herdr_get_forages_path <- function(data_dir = "user_data") {
 #'   URL: \url{https://ecoalim.hub.inrae.fr/}
 #' @param data_dir Character. Path to the user data directory. Default is \code{"user_data"}.
 #' @return Absolute path to ECOALIM parquet file.
+#' @examples
+#' \dontrun{
+#' herdr_get_ecoalim_path("user_data")
+#' }
 #' @export
 herdr_get_ecoalim_path <- function(data_dir = "user_data") {
   # 1. Local data directory

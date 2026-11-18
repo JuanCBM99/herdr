@@ -24,3 +24,8 @@ Checks in order:
   \item Package bundled extdata (\code{system.file("extdata", "ecoalim.parquet", package = "herdr")})
 }
 }
+\examples{
+\dontrun{
+herdr_get_ecoalim_path("user_data")
+}
+}

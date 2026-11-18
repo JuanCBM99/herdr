@@ -13,3 +13,6 @@ Character path to the user cache directory.
 Returns the platform-appropriate user cache directory for herdr data
 using \code{tools::R_user_dir("herdr", which = "data")}.
 }
+\examples{
+herdr_cache_dir()
+}

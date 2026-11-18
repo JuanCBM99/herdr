@@ -24,3 +24,8 @@ Checks in order:
   \item Automatic download from GitHub Release to central user cache if missing.
 }
 }
+\examples{
+\dontrun{
+herdr_get_fao_crops_path("user_data", download_if_missing = FALSE)
+}
+}

@@ -6,6 +6,10 @@
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @return Tibble with weighted nutritional variables for all animal cohorts.
+#' @examples
+#' \dontrun{
+#' calculate_weighted_variable(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data") {
   message("Calculating Weighted Nutritional Variables...")
@@ -17,20 +21,25 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   definitions <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
   monogastric <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
 
-  # Check if diets table is normalized (diet_tag unique) or legacy composite
-  legacy_diet_mode <- any(c("region", "subregion") %in% names(diets)) &&
-    any(duplicated(diets$diet_tag))
-
-  if (!legacy_diet_mode) {
-    diets <- diets %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
-      dplyr::distinct(diet_tag, .keep_all = TRUE)
-    ingredients <- ingredients %>%
-      dplyr::select(-dplyr::any_of(c("region", "subregion")))
-    diet_join_keys <- "diet_tag"
+  mapping_path <- file.path(data_dir, "mapping.csv")
+  if (file.exists(mapping_path)) {
+    mapping_ea <- readr::read_csv(mapping_path, show_col_types = FALSE) %>%
+      dplyr::transmute(
+        ingredient,
+        economic_allocation = suppressWarnings(as.numeric(economic_allocation))
+      ) %>%
+      dplyr::distinct(ingredient, .keep_all = TRUE)
   } else {
-    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diets))
+    mapping_ea <- dplyr::tibble(ingredient = character(), economic_allocation = numeric())
   }
+
+  norm_diets <- herdr_normalize_diets(diets, ingredients)
+  diets <- norm_diets$diets
+  ingredients <- norm_diets$ingredients
+  diet_join_keys <- norm_diets$diet_join_keys
+
+  characteristics <- characteristics %>%
+    dplyr::distinct(ingredient, ingredient_type, .keep_all = TRUE)
 
   # --- 2. Consistency Validations (Shares must sum to 100%) ---
   herdr_validate_diet_shares(diets, ingredients, diet_join_keys = diet_join_keys)
@@ -39,6 +48,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   diet_profiles <- diets %>%
     dplyr::left_join(ingredients, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
+    dplyr::left_join(mapping_ea, by = "ingredient") %>%
     dplyr::mutate(
       dplyr::across(
         c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
@@ -62,7 +72,17 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
         c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
         ~ sum(. * weight_factor, na.rm = TRUE)
       ),
-      CP_cropland_pct = sum(dplyr::if_else(!is.na(land_type) & land_type == "cropland", CP_pct, 0) * weight_factor, na.rm = TRUE),
+      # Human-edible cropland CP (Wilkinson 2011; Mottet et al. 2017; CAST 1999: forages have he=0)
+      CP_cropland_pct = sum(
+        dplyr::if_else(
+          !is.na(land_type) & land_type == "cropland" &
+            ingredient_type != "forage" &
+            dplyr::coalesce(economic_allocation, 1) > 0.33,
+          CP_pct,
+          0
+        ) * weight_factor,
+        na.rm = TRUE
+      ),
       .groups = "drop"
     )
 
