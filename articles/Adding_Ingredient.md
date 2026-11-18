@@ -78,9 +78,13 @@ A few notes on where these numbers come from and how herdr uses them:
     herdr issues a warning and defaults to `NA`.)*
 - **`DM_pct` (Dry Matter %)**: Beyond nutritional calculations,
   [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md)
-  directly uses `DM_pct` to convert raw FAOSTAT yields to dry matter
-  yield ($`dm\_yield = raw\_yield \times \frac{DM\_pct}{100}`$). If
-  `DM_pct` is missing, herdr issues a warning and assumes 100%.
+  and
+  [`calculate_feed_emissions()`](https://juancbm99.github.io/herdr/reference/calculate_feed_emissions.md)
+  use `DM_pct` for concentrates/arable crops (to convert raw FAOSTAT
+  yields to dry matter yield and DMI to as-fed weight, respectively),
+  whereas forages (`ingredient_type == "forage"`) are already on a 100%
+  DM basis and skip `DM_pct` conversion. If `DM_pct` is missing, herdr
+  defaults to 100%.
 - `ASH_pct`, `CP_pct`, `EE_pct`, and `NDF_pct` should come from a lab
   analysis or a recognized feed table (FEDNA is herdr’s default source
   for most of its bundled ingredients; Feedipedia is a good alternative
@@ -109,37 +113,45 @@ vignette for the full column definitions.
 ### Step 2 — Add it to `mapping.csv`
 
 `feed_characteristics.csv` tells herdr *what’s in* the ingredient.
-`mapping.csv` tells herdr *what land it comes from*, which is what
-powers the land-use calculation. Add a row here too:
+`mapping.csv` tells herdr *what land and LCA process it comes from*,
+which powers the land-use and upstream footprint calculations. Add a row
+here too:
 
-| ingredient | yield_name | agribalyse_name | economic_allocation |
-|:---|:---|:---|---:|
-| `brewers_grains_wet` | `barley` | `Barley, feed grade, national average, at farm gate` | 0.15 |
+| ingredient | yield_name | agribalyse_name | ea_reference | economic_allocation | kg_coproduct_per_1ton_maincrop |
+|:---|:---|:---|:---|---:|---:|
+| `brewers_grains_wet` | `Barley` | `Brewer's grains, fresh, at brewery {FR} U` | `Brewer's grains, fresh, at brewery {FR} U` | 0.056 | 210 |
 
-Two of these columns need a bit more care:
+Three of these columns need a bit more care:
 
-#### `economic_allocation`
+#### `economic_allocation` and `kg_coproduct_per_1ton_maincrop`
 
-Wet brewers grains is a **co-product** of barley malting for brewing —
-the barley crop’s environmental burden has to be split between the beer
-(the main product) and the spent grains (the by-product) somehow.
-`economic_allocation` is that split, expressed as the share (0–1) of the
-crop’s total economic value attributed to *this* ingredient. Brewing
-by-products are typically low-value relative to the main product, so
-`0.15` here means 15% of the barley’s land-use footprint is attributed
-to the grains, and the rest to the beer itself. For a primary crop with
-no co-products (e.g. plain `barley_grain` used directly as feed), this
-would simply be `1.0`.
+Wet brewers grains is a **co-product** of barley malting and brewing —
+the barley crop’s environmental burden has to be split between the main
+product and the spent grains. In multi-output LCA processes (documented
+in `ea_reference`), `economic_allocation` is the share (0–1) of total
+process revenue attributed to the co-product batch, and
+`kg_coproduct_per_1ton_maincrop` is the physical yield of that
+co-product (in kg) obtained per $`1,000\text{ kg}`$ (1 ton) of parent
+crop processed. For a primary crop with no co-products (e.g. plain
+`barley` grain used directly as feed), `economic_allocation` is `1.0`
+and `kg_coproduct_per_1ton_maincrop` is `1000`.
 
 In
 [`calculate_land_use()`](https://juancbm99.github.io/herdr/reference/calculate_land_use.md),
-this factor directly scales the land requirement:
+these two parameters jointly scale the parent crop’s land requirement to
+1 kg of co-product:
 
 ``` math
-\text{ha\_kg\_allocated} = \text{ha\_per\_kg} \times \text{economic\_allocation}
+\text{ha\_kg\_allocated} = \text{ha\_per\_kg} \times \frac{\text{economic\_allocation}}{\text{kg\_coproduct\_per\_1ton\_maincrop} / 1000}
 ```
 
-If left blank or `NA`, herdr defaults `economic_allocation` to `1.0`.
+If left blank or `NA`, herdr defaults `economic_allocation` to `1.0` and
+`kg_coproduct_per_1ton_maincrop` to `1000`. In addition, co-products
+with `economic_allocation <= 0.33` are treated as low-value residues and
+excluded from direct human-edible `cropland` competition in
+[`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
+(and downstream
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)).
 
 #### `yield_name`
 
@@ -158,8 +170,9 @@ directly instead:
 ``` r
 
 library(arrow)
+library(herdr)
 
-crops <- read_parquet("user_data/fao_crops.parquet")
+crops <- read_parquet(herdr_get_fao_crops_path())
 unique(crops$Item)[grepl("barley", unique(crops$Item), ignore.case = TRUE)]
 ```
 
@@ -179,7 +192,7 @@ any bundled one. Add it to a diet as usual:
 
 | diet_tag | ingredient | ingredient_share | ingredient_type | country_of_origin | custom_yield_kg_ha |
 |:---|:---|---:|:---|:---|---:|
-| `diet_dairy_mature` | `brewers_grains_wet` | 15 | `concentrate` | `spain` | `NA` |
+| `diet_dairy_mature` | `brewers_grains_wet` | 15 | `concentrate` | `Spain` | `NA` |
 
 Keep these practical rules in mind when entering ingredients:
 
@@ -199,7 +212,7 @@ Keep these practical rules in mind when entering ingredients:
 
 - **Country of Origin & Yield Resolution**:
 
-  - **Explicit country** (e.g. `"spain"`): herdr resolves yields for
+  - **Explicit country** (e.g. `"Spain"`): herdr resolves yields for
     that specific country from `fao_crops.parquet` / `forages.parquet`.
   - **Bypassing FAO lookups (`custom_yield_kg_ha`)**: If you already
     know the specific crop yield (e.g. from local farm records), enter

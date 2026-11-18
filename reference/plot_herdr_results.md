@@ -62,3 +62,12 @@ plot_herdr_results(
 ## Value
 
 A ggplot2 object.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+res <- generate_impact_assessment(saveoutput = FALSE, data_dir = "user_data")
+plot_herdr_results(res, impact_category = "ghg")
+} # }
+```

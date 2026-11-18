@@ -9,3 +9,16 @@ the package.
 ``` r
 herdr_init()
 ```
+
+## Value
+
+Invisibly returns `NULL` after creating `user_data/` and `Examples/` in
+the working directory.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+herdr_init()
+} # }
+```

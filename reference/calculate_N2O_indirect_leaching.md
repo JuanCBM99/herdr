@@ -38,3 +38,16 @@ calculate_N2O_indirect_leaching(
 - pop_df:
 
   Optional precalculated population dataframe.
+
+## Value
+
+A tibble with leached nitrogen (`N_leaching_kg_year`, kg N/year) and
+indirect N2O emissions from leaching (`N2O_leach_kgyear`, kg N2O/year).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_N2O_indirect_leaching(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

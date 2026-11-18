@@ -38,3 +38,17 @@ calculate_N2O_indirect_volatilization(
 - pop_df:
 
   Optional precalculated population dataframe.
+
+## Value
+
+A tibble with volatilized nitrogen (`N_volatilization_kg_year`, kg
+N/year) and indirect N2O emissions from volatilization
+(`N2O_vol_kgyear`, kg N2O/year).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_N2O_indirect_volatilization(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

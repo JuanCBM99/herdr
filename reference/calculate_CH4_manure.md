@@ -38,3 +38,18 @@ calculate_CH4_manure(
 - pop_df:
 
   Optional precalculated population dataframe.
+
+## Value
+
+A tibble with manure management methane emission factors
+(`EF_CH4_mm_kgheadyear`, kg CH4/head/year) and total emissions
+(`total_CH4_mm_kgyear`, kg CH4/year) by animal cohort and management
+system.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_CH4_manure(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

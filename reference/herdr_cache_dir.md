@@ -12,3 +12,10 @@ herdr_cache_dir()
 ## Value
 
 Character path to the user cache directory.
+
+## Examples
+
+``` r
+herdr_cache_dir()
+#> [1] "/Users/runner/Library/Application Support/org.R-project.R/R/herdr"
+```

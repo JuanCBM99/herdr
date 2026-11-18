@@ -228,12 +228,13 @@ herdr issues a warning and defaults to <code>NA</code>.)</em>
 </li>
 <li>
 <strong><code>DM_pct</code> (Dry Matter %)</strong>: Beyond
-nutritional calculations, <code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code> directly
-uses <code>DM_pct</code> to convert raw FAOSTAT yields to dry matter
-yield
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>d</mi><mi>m</mi><mi>_</mi><mi>y</mi><mi>i</mi><mi>e</mi><mi>l</mi><mi>d</mi><mo>=</mo><mi>r</mi><mi>a</mi><mi>w</mi><mi>_</mi><mi>y</mi><mi>i</mi><mi>e</mi><mi>l</mi><mi>d</mi><mo>×</mo><mfrac><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><mi>t</mi></mrow><mn>100</mn></mfrac></mrow><annotation encoding="application/x-tex">dm\_yield = raw\_yield \times \frac{DM\_pct}{100}</annotation></semantics></math>).
-If <code>DM_pct</code> is missing, herdr issues a warning and assumes
-100%.</li>
+nutritional calculations, <code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code> and
+<code><a href="../reference/calculate_feed_emissions.html">calculate_feed_emissions()</a></code> use <code>DM_pct</code> for
+concentrates/arable crops (to convert raw FAOSTAT yields to dry matter
+yield and DMI to as-fed weight, respectively), whereas forages
+(<code>ingredient_type == "forage"</code>) are already on a 100% DM
+basis and skip <code>DM_pct</code> conversion. If <code>DM_pct</code> is
+missing, herdr defaults to 100%.</li>
 <li>
 <code>ASH_pct</code>, <code>CP_pct</code>, <code>EE_pct</code>, and
 <code>NDF_pct</code> should come from a lab analysis or a recognized
@@ -273,50 +274,65 @@ Reference</a> vignette for the full column definitions.</p>
 <h3 id="step-2-add-it-to-mapping-csv">Step 2 — Add it to <code>mapping.csv</code><a class="anchor" aria-label="anchor" href="#step-2-add-it-to-mapping-csv"></a>
 </h3>
 <p><code>feed_characteristics.csv</code> tells herdr <em>what’s in</em>
-the ingredient. <code>mapping.csv</code> tells herdr <em>what land it
-comes from</em>, which is what powers the land-use calculation. Add a
-row here too:</p>
-<table class="table">
+the ingredient. <code>mapping.csv</code> tells herdr <em>what land and
+LCA process it comes from</em>, which powers the land-use and upstream
+footprint calculations. Add a row here too:</p>
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="25%">
-<col width="25%">
-<col width="25%">
-<col width="25%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
+<col width="16%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">ingredient</th>
 <th align="left">yield_name</th>
 <th align="left">agribalyse_name</th>
+<th align="left">ea_reference</th>
 <th align="right">economic_allocation</th>
+<th align="right">kg_coproduct_per_1ton_maincrop</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>brewers_grains_wet</code></td>
-<td align="left"><code>barley</code></td>
-<td align="left"><code>Barley, feed grade, national average, at farm gate</code></td>
-<td align="right">0.15</td>
+<td align="left"><code>Barley</code></td>
+<td align="left"><code>Brewer's grains, fresh, at brewery {FR} U</code></td>
+<td align="left"><code>Brewer's grains, fresh, at brewery {FR} U</code></td>
+<td align="right">0.056</td>
+<td align="right">210</td>
 </tr></tbody>
 </table>
-<p>Two of these columns need a bit more care:</p>
+<p>Three of these columns need a bit more care:</p>
 <div class="section level4">
-<h4 id="economic_allocation">
-<code>economic_allocation</code><a class="anchor" aria-label="anchor" href="#economic_allocation"></a>
+<h4 id="economic_allocation-and-kg_coproduct_per_1ton_maincrop">
+<code>economic_allocation</code> and
+<code>kg_coproduct_per_1ton_maincrop</code><a class="anchor" aria-label="anchor" href="#economic_allocation-and-kg_coproduct_per_1ton_maincrop"></a>
 </h4>
 <p>Wet brewers grains is a <strong>co-product</strong> of barley malting
-for brewing — the barley crop’s environmental burden has to be split
-between the beer (the main product) and the spent grains (the
-by-product) somehow. <code>economic_allocation</code> is that split,
-expressed as the share (0–1) of the crop’s total economic value
-attributed to <em>this</em> ingredient. Brewing by-products are
-typically low-value relative to the main product, so <code>0.15</code>
-here means 15% of the barley’s land-use footprint is attributed to the
-grains, and the rest to the beer itself. For a primary crop with no
-co-products (e.g. plain <code>barley_grain</code> used directly as
-feed), this would simply be <code>1.0</code>.</p>
-<p>In <code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code>, this factor directly scales the
-land requirement:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">ha_kg_allocated</mtext><mo>=</mo><mtext mathvariant="normal">ha_per_kg</mtext><mo>×</mo><mtext mathvariant="normal">economic_allocation</mtext></mrow><annotation encoding="application/x-tex">\text{ha\_kg\_allocated} = \text{ha\_per\_kg} \times \text{economic\_allocation}</annotation></semantics></math></p>
+and brewing — the barley crop’s environmental burden has to be split
+between the main product and the spent grains. In multi-output LCA
+processes (documented in <code>ea_reference</code>),
+<code>economic_allocation</code> is the share (0–1) of total process
+revenue attributed to the co-product batch, and
+<code>kg_coproduct_per_1ton_maincrop</code> is the physical yield of
+that co-product (in kg) obtained per
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1,000\text{ kg}</annotation></semantics></math>
+(1 ton) of parent crop processed. For a primary crop with no co-products
+(e.g. plain <code>barley</code> grain used directly as feed),
+<code>economic_allocation</code> is <code>1.0</code> and
+<code>kg_coproduct_per_1ton_maincrop</code> is <code>1000</code>.</p>
+<p>In <code><a href="../reference/calculate_land_use.html">calculate_land_use()</a></code>, these two parameters jointly
+scale the parent crop’s land requirement to 1 kg of co-product:</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">ha_kg_allocated</mtext><mo>=</mo><mtext mathvariant="normal">ha_per_kg</mtext><mo>×</mo><mfrac><mtext mathvariant="normal">economic_allocation</mtext><mrow><mtext mathvariant="normal">kg_coproduct_per_1ton_maincrop</mtext><mi>/</mi><mn>1000</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{ha\_kg\_allocated} = \text{ha\_per\_kg} \times \frac{\text{economic\_allocation}}{\text{kg\_coproduct\_per\_1ton\_maincrop} / 1000}</annotation></semantics></math></p>
 <p>If left blank or <code>NA</code>, herdr defaults
-<code>economic_allocation</code> to <code>1.0</code>.</p>
+<code>economic_allocation</code> to <code>1.0</code> and
+<code>kg_coproduct_per_1ton_maincrop</code> to <code>1000</code>. In
+addition, co-products with <code>economic_allocation &lt;= 0.33</code>
+are treated as low-value residues and excluded from direct human-edible
+<code>cropland</code> competition in
+<code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code> (and downstream
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>).</p>
 </div>
 <div class="section level4">
 <h4 id="yield_name">
@@ -335,8 +351,9 @@ naming doesn’t always match FAOSTAT’s current item names exactly. Check
 them directly instead:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/apache/arrow/" class="external-link">arrow</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">crops</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="st">"user_data/fao_crops.parquet"</span><span class="op">)</span></span>
+<span><span class="va">crops</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://arrow.apache.org/docs/r/reference/read_parquet.html" class="external-link">read_parquet</a></span><span class="op">(</span><span class="fu"><a href="../reference/herdr_get_fao_crops_path.html">herdr_get_fao_crops_path</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">crops</span><span class="op">$</span><span class="va">Item</span><span class="op">)</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/grep.html" class="external-link">grepl</a></span><span class="op">(</span><span class="st">"barley"</span>, <span class="fu"><a href="https://rdrr.io/r/base/unique.html" class="external-link">unique</a></span><span class="op">(</span><span class="va">crops</span><span class="op">$</span><span class="va">Item</span><span class="op">)</span>, ignore.case <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">]</span></span></code></pre></div>
 <p>If the crop your ingredient derives from genuinely isn’t in either
 file, you have two options: add a row for it to the appropriate
@@ -373,7 +390,7 @@ like any bundled one. Add it to a diet as usual:</p>
 <td align="left"><code>brewers_grains_wet</code></td>
 <td align="right">15</td>
 <td align="left"><code>concentrate</code></td>
-<td align="left"><code>spain</code></td>
+<td align="left"><code>Spain</code></td>
 <td align="right"><code>NA</code></td>
 </tr></tbody>
 </table>
@@ -399,7 +416,7 @@ informative error if shares do not total 100%:</p>
 <p><strong>Country of Origin &amp; Yield Resolution</strong>:</p>
 <ul>
 <li>
-<strong>Explicit country</strong> (e.g. <code>"spain"</code>): herdr
+<strong>Explicit country</strong> (e.g. <code>"Spain"</code>): herdr
 resolves yields for that specific country from
 <code>fao_crops.parquet</code> / <code>forages.parquet</code>.</li>
 <li>

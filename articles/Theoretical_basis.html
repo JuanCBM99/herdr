@@ -212,7 +212,7 @@ represents energy used for grazing, walking, or other activities.</p>
 <li><p><strong>Cattle and Buffalo:</strong> (Eq. 10.6)
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>=</mo><mn>22.02</mn><mo>⋅</mo><msup><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>B</mi><mi>W</mi></mrow><mrow><mi>C</mi><mo>⋅</mo><mi>M</mi><mi>W</mi></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mn>0.75</mn></msup><mo>⋅</mo><mi>W</mi><msup><mi>G</mi><mn>1.097</mn></msup></mrow><annotation encoding="application/x-tex">NE_{g} = 22.02 \cdot \left( \frac{BW}{C \cdot MW} \right)^{0.75} \cdot WG^{1.097}</annotation></semantics></math></p></li>
 <li><p><strong>Sheep and Goats:</strong> (Eq. 10.7)
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>=</mo><mfrac><mrow><mi>W</mi><msub><mi>G</mi><mrow><mi>l</mi><mi>a</mi><mi>m</mi><mi>b</mi><mi>/</mi><mi>k</mi><mi>i</mi><mi>d</mi></mrow></msub><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>+</mo><mn>0.5</mn><mi>b</mi><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mi>i</mi></msub><mo>+</mo><mi>B</mi><msub><mi>W</mi><mi>f</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><mn>365</mn></mfrac></mrow><annotation encoding="application/x-tex">NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{365}</annotation></semantics></math></p></li>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>g</mi></msub><mo>=</mo><mfrac><mrow><mi>W</mi><msub><mi>G</mi><mrow><mi>l</mi><mi>a</mi><mi>m</mi><mi>b</mi><mi>/</mi><mi>k</mi><mi>i</mi><mi>d</mi></mrow></msub><mo>⋅</mo><mo stretchy="false" form="prefix">(</mo><mi>a</mi><mo>+</mo><mn>0.5</mn><mi>b</mi><mo stretchy="false" form="prefix">(</mo><mi>B</mi><msub><mi>W</mi><mi>i</mi></msub><mo>+</mo><mi>B</mi><msub><mi>W</mi><mi>f</mi></msub><mo stretchy="false" form="postfix">)</mo><mo stretchy="false" form="postfix">)</mo></mrow><msub><mtext mathvariant="normal">Days</mtext><mrow><mi>p</mi><mi>r</mi><mi>o</mi><mi>d</mi></mrow></msub></mfrac></mrow><annotation encoding="application/x-tex">NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{\text{Days}_{prod}}</annotation></semantics></math></p></li>
 </ul>
 <table class="table">
 <colgroup>
@@ -324,7 +324,7 @@ content.</p>
 <li>
 <strong>Pregnancy
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub></mrow><annotation encoding="application/x-tex">NE_p</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub><mo>=</mo><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><mo>⋅</mo><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub></mrow><annotation encoding="application/x-tex">NE_p = C_{pregnancy} \cdot NE_m</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><msub><mi>E</mi><mi>p</mi></msub><mo>=</mo><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><mo>⋅</mo><mi>N</mi><msub><mi>E</mi><mi>m</mi></msub><mo>⋅</mo><mtext mathvariant="normal">pregnancy_rate</mtext></mrow><annotation encoding="application/x-tex">NE_p = C_{pregnancy} \cdot NE_m \cdot \text{pregnancy\_rate}</annotation></semantics></math>
 </li>
 </ul>
 <table class="table">
@@ -1127,15 +1127,33 @@ yields (<code>custom_yield_kg_ha</code>):</strong> Already reported on a
 </ul>
 </div>
 <div class="section level4">
-<h4 id="b--economic-allocation-adjustment">B. Economic Allocation Adjustment<a class="anchor" aria-label="anchor" href="#b--economic-allocation-adjustment"></a>
+<h4 id="b--economic-mass-allocation-adjustment-for-co-products">B. Economic &amp; Mass Allocation Adjustment for Co-products<a class="anchor" aria-label="anchor" href="#b--economic-mass-allocation-adjustment-for-co-products"></a>
 </h4>
 <p>Attributing the entire crop area to co-products (e.g. soybean meal
-vs. soybean oil) would overstate impacts. <code>herdr</code> applies the
-<code>economic_allocation</code> factor from <code>mapping.csv</code>
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">EA_i \in [0, 1]</annotation></semantics></math>):
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">ha / kg DM</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times EA_i \quad (\text{ha / kg DM})</annotation></semantics></math>
+vs. soybean oil, or wheat bran vs. wheat flour) would overstate or
+distort impacts. Because FAOSTAT yields
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">Yield_i</annotation></semantics></math>)
+correspond to the primary harvested crop (<code>yield_name</code>),
+<code>herdr</code> scales the inverse main-crop yield by the ratio of
+the co-product’s economic allocation
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mo>∈</mo><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">EA_i \in [0, 1]</annotation></semantics></math>,
+<code>economic_allocation</code> in <code>mapping.csv</code>) to its
+physical mass yield fraction
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><msub><mi>F</mi><mi>i</mi></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">kg_coproduct_per_1ton_maincrop</mtext><mi>i</mi></msub><mn>1000</mn></mfrac></mrow><annotation encoding="application/x-tex">MF_i = \frac{\text{kg\_coproduct\_per\_1ton\_maincrop}_i}{1000}</annotation></semantics></math>):
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mn>1</mn><mrow><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub></mrow><mrow><mi>M</mi><msub><mi>F</mi><mi>i</mi></msub></mrow></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">ha / kg DM</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times \left( \frac{EA_i}{MF_i} \right) \quad (\text{ha / kg DM})</annotation></semantics></math>
+For primary crops
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn><mo>,</mo><mi>M</mi><msub><mi>F</mi><mi>i</mi></msub><mo>=</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">EA_i = 1, MF_i = 1</annotation></semantics></math>),
+this reduces to
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mi>/</mi><mi>Y</mi><mi>i</mi><mi>e</mi><mi>l</mi><msub><mi>d</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">1 / Yield_i</annotation></semantics></math>.
 For non-land inputs (<code>none</code>),
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = 0</annotation></semantics></math>.</p>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>d</mi><mi>j</mi><mi>u</mi><mi>s</mi><mi>t</mi><mi>e</mi><mi>d</mi><mi>L</mi><mi>a</mi><mi>n</mi><mi>d</mi><mi>P</mi><mi>e</mi><mi>r</mi><mi>K</mi><msub><mi>g</mi><mi>i</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">AdjustedLandPerKg_i = 0</annotation></semantics></math>.
+The same allocation factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mi>/</mi><mi>M</mi><msub><mi>F</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">EA_i / MF_i</annotation></semantics></math>)
+is applied in <code><a href="../reference/calculate_feed_emissions.html">calculate_feed_emissions()</a></code> whenever a
+co-product
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>A</mi><mi>i</mi></msub><mo>&lt;</mo><mn>1</mn></mrow><annotation encoding="application/x-tex">EA_i &lt; 1</annotation></semantics></math>)
+is mapped to an unallocated parent crop LCI in
+<code>ecoalim.parquet</code>.</p>
 </div>
 <div class="section level4">
 <h4 id="c--annual-cohort-intake-footprint">C. Annual Cohort Intake &amp; Footprint<a class="anchor" aria-label="anchor" href="#c--annual-cohort-intake-footprint"></a>
@@ -1434,10 +1452,26 @@ indicators on producing cohorts (<code>mature</code> and
 <strong>Cropland Protein Feed Conversion Ratio
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}}</annotation></semantics></math>):</strong>
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg cropland feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
+<li>
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>
+includes only non-forage arable-land ingredients
+(<code>land_type == "cropland"</code> and
+<code>ingredient_type != "forage"</code>, since forages have
+human-edible fraction
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>e</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h_e = 0</annotation></semantics></math>
+per Wilkinson 2011; Mottet et al. 2017) that act as primary crops or
+main economic drivers of land use
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>&gt;</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} &gt; 0.33</annotation></semantics></math>,
+such as cereal grains, pulses, soybean meal, and protein
+concentrates/isolates), while excluding crop residues and secondary
+agro-industrial by-products
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} \le 0.33</annotation></semantics></math>,
+such as cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed
+cakes).</li>
 <li>When
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &lt; 1.0</annotation></semantics></math>,
 the cohort/system is a <strong>net producer</strong> of human-edible
-protein relative to arable cropland protein consumed.</li>
+protein relative to competing arable cropland protein consumed.</li>
 </ul>
 </li>
 </ol>

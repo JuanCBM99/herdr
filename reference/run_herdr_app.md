@@ -11,3 +11,15 @@ run_herdr_app()
 
 run_app()
 ```
+
+## Value
+
+Invisibly returns the Shiny application output when the session closes.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+run_herdr_app()
+} # }
+```

@@ -47,3 +47,11 @@ calculate_vs(
 ## Value
 
 Tibble with VS for all animal categories.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_vs(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

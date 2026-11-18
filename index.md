@@ -35,7 +35,7 @@ library(herdr)
 herdr_init()
 
 # Load example data
-file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data")
+file.copy(list.files("Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE), "user_data", overwrite = TRUE)
 
 # Run model
 results <- generate_impact_assessment(automatic_cycle = FALSE, farm_country = "Spain", year = 2015)
@@ -54,30 +54,41 @@ greenhouse gas emissions and land use results.
 
 Below are the main guides and examples for using the package:
 
-### 1. Introduction
+### 1. Introduction & Shiny App
 
-Learn what herdr does, which animals are supported, and how to install
-the package.
+Learn what herdr does, which animals are supported, how to install the
+package, or launch the local web interface.
 
 - [Go to Introduction
   →](https://juancbm99.github.io/herdr/articles/Introduction.md)
+- [Go to Interactive Shiny App Guide
+  →](https://juancbm99.github.io/herdr/articles/app.md)
 
-### 2. Technical reference
+### 2. Technical & Theoretical Reference
 
-Explore the included files and some explanation about them.
+Explore the included files, schemas, and full IPCC Tier 2 / GLEAM
+mathematical formulations.
 
 - [Go to Technical Reference: Files & Parameters
   →](https://juancbm99.github.io/herdr/articles/Technical_reference.md)
+- [Go to Theoretical Basis (IPCC Tier 2 & GLEAM)
+  →](https://juancbm99.github.io/herdr/articles/Theoretical_basis.md)
 
-### 3. Manure & Land use Guide
+### 3. Methodology Guides
 
-Explore the included manure management systems based on IPCC 2019
-tables.
+Explore herd demography, manure management systems, land competition,
+and feed carbon/water footprints.
 
+- [Go to Herd Demography & Life Cycles
+  →](https://juancbm99.github.io/herdr/articles/Herd_Demography.md)
 - [Go to Manure System Guide
   →](https://juancbm99.github.io/herdr/articles/Manure.md)
 - [Go to Land use
   →](https://juancbm99.github.io/herdr/articles/land_use.md)
+- [Go to Feed Water & Carbon Footprint (AWARE)
+  →](https://juancbm99.github.io/herdr/articles/Water_and_Feed_Footprint.md)
+- [Go to Adding a Custom Feed Ingredient
+  →](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)
 
 ### 4. Workflow
 

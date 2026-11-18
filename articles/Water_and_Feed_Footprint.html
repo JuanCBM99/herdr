@@ -176,20 +176,21 @@ AnnualDMI_i \; (\text{kg DM / head / yr}) =
 <h3 id="conversion-to-as-fed-fresh-weight">2.2 Conversion to As-Fed Fresh Weight<a class="anchor" aria-label="anchor" href="#conversion-to-as-fed-fresh-weight"></a>
 </h3>
 <p>Because Life Cycle Assessment (LCA) emission factors in
-<strong>ECOALIM v9 / AGRIBALYSE v3.1</strong> are expressed per kilogram
-of fresh feedstuff as fed (rather than 100% dry matter),
-<code>herdr</code> converts dry matter intake to as-fed fresh weight
-using the ingredient’s dry matter percentage
+<strong>ECOALIM v9 / AGRIBALYSE v3.1</strong> for concentrates are
+expressed per kilogram of fresh feedstuff as fed, <code>herdr</code>
+converts dry matter intake to as-fed fresh weight using the ingredient’s
+dry matter percentage
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">DM\_pct_i</annotation></semantics></math>)
 from <code>feed_characteristics.csv</code>:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>F</mi><mi>r</mi><mi>e</mi><mi>s</mi><msub><mi>h</mi><mi>i</mi></msub><mspace width="0.278em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg fresh / head / yr</mtext><mo stretchy="false" form="postfix">)</mo><mo>=</mo><mfrac><mrow><mi>A</mi><mi>n</mi><mi>n</mi><mi>u</mi><mi>a</mi><mi>l</mi><mi>D</mi><mi>M</mi><msub><mi>I</mi><mi>i</mi></msub></mrow><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><mn>100</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow></mfrac></mrow><annotation encoding="application/x-tex">
 AnnualFresh_i \; (\text{kg fresh / head / yr}) =
 \frac{AnnualDMI_i}{\left(\frac{DM\_pct_i}{100}\right)}
 </annotation></semantics></math></p>
-<p><em>(If
+<p><em>(For forages — <code>ingredient_type == "forage"</code> — or if
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>_</mi><mi>p</mi><mi>c</mi><msub><mi>t</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">DM\_pct_i</annotation></semantics></math>
-is missing or non-positive, <code>herdr</code> defaults to
-100%).</em></p>
+is missing or non-positive, <code>herdr</code> keeps <code>DM_pct</code>
+at 100% because forage factors in <code>ecoalim.parquet</code> are
+already reported on a dry matter basis.)</em></p>
 </div>
 <div class="section level3">
 <h3 id="individual-and-herd-footprints">2.3 Individual and Herd Footprints<a class="anchor" aria-label="anchor" href="#individual-and-herd-footprints"></a>
@@ -229,6 +230,35 @@ corresponds to the total (<code>Climate change - EF 3.1</code>), fossil
 (<code>Climate change - Fossil</code>), or land-use change /
 deforestation (<code>Climate change - Land use and LU change</code>)
 characterization factor.</p>
+<blockquote>
+<p><strong>Co-product fallback allocation:</strong> When an ingredient
+maps directly to a dedicated co-product LCI process in
+<code>ecoalim.parquet</code> (such as soybean meal, wheat bran, or
+brewer’s grains), its characterization factor
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>F</mi><mi>i</mi></msub></mrow><annotation encoding="application/x-tex">EF_i</annotation></semantics></math>
+already incorporates economic allocation at the LCA database level and
+is applied with a multiplier of
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mn>1.0</mn><annotation encoding="application/x-tex">1.0</annotation></semantics></math>.
+Conversely, when a co-product (<code>economic_allocation &lt; 1</code>
+in <code>mapping.csv</code>, such as cereal straw or hulls) is linked to
+an unallocated parent grain or oilseed process in
+<code>agribalyse_name</code>, <code>herdr</code> automatically scales
+the parent crop’s emission factor by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub></mrow><mrow><mi>k</mi><mi>g</mi><mi>_</mi><mi>c</mi><mi>o</mi><mi>p</mi><mi>r</mi><mi>o</mi><mi>d</mi><mi>u</mi><mi>c</mi><mi>t</mi><mi>_</mi><mi>p</mi><mi>e</mi><mi>r</mi><mi>_</mi><mn>1</mn><mi>t</mi><mi>o</mi><mi>n</mi><mi>_</mi><mi>m</mi><mi>a</mi><mi>i</mi><mi>n</mi><mi>c</mi><mi>r</mi><mi>o</mi><msub><mi>p</mi><mi>i</mi></msub><mi>/</mi><mn>1000</mn></mrow></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{EconomicAllocation_i}{kg\_coproduct\_per\_1ton\_maincrop_i / 1000}</annotation></semantics></math>.</p>
+<p><strong>Database note (<code>ecoalim.parquet</code>
+extensions):</strong> 1. <em>General food items:</em> Feeds unavailable
+in standard ECOALIM v9 feed tables were sourced from the general
+<strong>AGRIBALYSE v3.2</strong> food database including <strong>only
+the <code>Agriculture</code> and <code>Processing</code> stages</strong>
+(excluding packaging, distribution, retail, and consumer stages). 2.
+<em>Whole-crop silages:</em> Whole-plant cereal and oilseed silages were
+estimated on a 100% DM basis by combining ECOALIM grain and straw
+processes (converted to DM via ECOALIM Table 7 moisture contents) using
+dry-matter Harvest Index
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">HI</mtext><annotation encoding="application/x-tex">\text{HI}</annotation></semantics></math>)
+weights from Fan et al. (2017):
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">EF</mtext><mtext mathvariant="normal">silage</mtext></msub><mo>=</mo><mtext mathvariant="normal">HI</mtext><mo>×</mo><msub><mtext mathvariant="normal">EF</mtext><mtext mathvariant="normal">grain, DM</mtext></msub><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mtext mathvariant="normal">HI</mtext><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msub><mtext mathvariant="normal">EF</mtext><mtext mathvariant="normal">straw, DM</mtext></msub></mrow><annotation encoding="application/x-tex">\text{EF}_{\text{silage}} = \text{HI} \times \text{EF}_{\text{grain, DM}} + (1 - \text{HI}) \times \text{EF}_{\text{straw, DM}}</annotation></semantics></math>.</p>
+</blockquote>
 <hr>
 </div>
 </div>

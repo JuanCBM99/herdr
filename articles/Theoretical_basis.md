@@ -57,7 +57,7 @@ Energy required for tissue deposition (weight gain).
 
 - **Sheep and Goats:** (Eq. 10.7)
   ``` math
-  NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{365}
+  NE_g = \frac{WG_{lamb/kid} \cdot (a + 0.5b(BW_i + BW_f))}{\text{Days}_{prod}}
   ```
 
 | Variable | Description | Source in the Package |
@@ -98,7 +98,7 @@ Energy required for milk production based on volume and fat content.
   ```
 - **Pregnancy ($`NE_p`$):**
   ``` math
-  NE_p = C_{pregnancy} \cdot NE_m
+  NE_p = C_{pregnancy} \cdot NE_m \cdot \text{pregnancy\_rate}
   ```
 
 | Variable | Description | Source in the Package |
@@ -576,15 +576,26 @@ For each ingredient $`i`$ in diet category $`cat`$:
   (`custom_yield_kg_ha`):** Already reported on a 100% dry matter basis
   ($`Yield_i = RawYield_i`$).
 
-#### B. Economic Allocation Adjustment
+#### B. Economic & Mass Allocation Adjustment for Co-products
 
 Attributing the entire crop area to co-products (e.g. soybean meal
-vs. soybean oil) would overstate impacts. `herdr` applies the
-`economic_allocation` factor from `mapping.csv` ($`EA_i \in [0, 1]`$):
+vs. soybean oil, or wheat bran vs. wheat flour) would overstate or
+distort impacts. Because FAOSTAT yields ($`Yield_i`$) correspond to the
+primary harvested crop (`yield_name`), `herdr` scales the inverse
+main-crop yield by the ratio of the co-product’s economic allocation
+($`EA_i \in [0, 1]`$, `economic_allocation` in `mapping.csv`) to its
+physical mass yield fraction
+($`MF_i = \frac{\text{kg\_coproduct\_per\_1ton\_maincrop}_i}{1000}`$):
 ``` math
-AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times EA_i \quad (\text{ha / kg DM})
+AdjustedLandPerKg_i = \left( \frac{1}{Yield_i} \right) \times \left( \frac{EA_i}{MF_i} \right) \quad (\text{ha / kg DM})
 ```
-For non-land inputs (`none`), $`AdjustedLandPerKg_i = 0`$.
+For primary crops ($`EA_i = 1, MF_i = 1`$), this reduces to
+$`1 / Yield_i`$. For non-land inputs (`none`),
+$`AdjustedLandPerKg_i = 0`$. The same allocation factor
+($`EA_i / MF_i`$) is applied in
+[`calculate_feed_emissions()`](https://juancbm99.github.io/herdr/reference/calculate_feed_emissions.md)
+whenever a co-product ($`EA_i < 1`$) is mapped to an unallocated parent
+crop LCI in `ecoalim.parquet`.
 
 #### C. Annual Cohort Intake & Footprint
 
@@ -783,9 +794,19 @@ cohorts (`mature` and `slaughter`):
     ``` math
     \text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})
     ```
+    - $`\text{Feed}_{\text{CP, cropland}}`$ includes only non-forage
+      arable-land ingredients (`land_type == "cropland"` and
+      `ingredient_type != "forage"`, since forages have human-edible
+      fraction $`h_e = 0`$ per Wilkinson 2011; Mottet et al. 2017) that
+      act as primary crops or main economic drivers of land use
+      ($`\text{economic\_allocation} > 0.33`$, such as cereal grains,
+      pulses, soybean meal, and protein concentrates/isolates), while
+      excluding crop residues and secondary agro-industrial by-products
+      ($`\text{economic\_allocation} \le 0.33`$, such as cereal straw,
+      hulls, pulps, brans, DDGS, and secondary oilseed cakes).
     - When $`\text{Protein\_FCR}_{\text{cropland}} < 1.0`$, the
       cohort/system is a **net producer** of human-edible protein
-      relative to arable cropland protein consumed.
+      relative to competing arable cropland protein consumed.
 
 ------------------------------------------------------------------------
 

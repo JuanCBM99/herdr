@@ -28,3 +28,11 @@ Distributed under Licence Ouverte / Open Licence Etalab 2.0. URL:
 ## Value
 
 Absolute path to ECOALIM parquet file.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+herdr_get_ecoalim_path("user_data")
+} # }
+```

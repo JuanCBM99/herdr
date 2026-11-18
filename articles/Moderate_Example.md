@@ -63,7 +63,7 @@ is an excerpt of the concentrate portion for Spain South:
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
-| `diet_dairy_mature_south` | `concentrate` | `corn` | 44.85 | `spain` | `NA` |
+| `diet_dairy_mature_south` | `concentrate` | `corn` | 44.85 | `Spain` | `NA` |
 | `diet_dairy_mature_south` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
 | `diet_dairy_mature_south` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
 
@@ -117,10 +117,10 @@ agroclimatic conditions:
 
 | farm_id | animal_tag | region | subregion | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
 |:---|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.0537 |
-| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy_cattle_high_productivity` | 0.3432 |
-| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
-| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy_cattle_high_productivity` | 0.3551 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy cattle_high_productivity` | 0.0537 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy cattle_high_productivity` | 0.3432 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `default` | `dairy cattle_high_productivity` | 0.3551 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy cattle_high_productivity` | 0.3551 |
 
 > ⚠️ **Illustrative snippet:** Some rows were omitted above for brevity.
 > In

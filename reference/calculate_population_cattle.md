@@ -62,3 +62,18 @@ A tibble with the modeled cattle population structure.
 
 - **Yearlings**: Retained replacement calves mapped 1:1 into yearling
   cohorts.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "mature_dairy_cattle",
+  region = "spain",
+  subregion = "galicia",
+  population = 100
+)
+calculate_population_cattle(census)
+} # }
+```

@@ -62,3 +62,16 @@ calculate_ge(
 - NE_wool_df:
 
   Optional precalculated NE_wool dataframe.
+
+## Value
+
+A tibble with daily Net Energy components, REM, REG, DE_pct, and Gross
+Energy requirements (`GE_MJday`, MJ/day) by animal cohort.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_ge(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

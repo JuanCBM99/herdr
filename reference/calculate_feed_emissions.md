@@ -46,3 +46,11 @@ calculate_feed_emissions(
 Tibble containing feed environmental footprints by animal category,
 including total GHG (kg CO2e), fossil GHG, LUC GHG, and water
 consumption (m3).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_feed_emissions(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

@@ -46,3 +46,17 @@ calculate_emissions_enteric(
 - pop_df:
 
   Optional precalculated population dataframe.
+
+## Value
+
+A tibble with enteric fermentation emission factors (`EF`, kg
+CH4/head/year) and total enteric methane emissions
+(`CH4_enteric_kgyear`, kg CH4/year) by animal cohort.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_emissions_enteric(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

@@ -61,3 +61,18 @@ A tibble with the modeled poultry population structure.
   positive count for `broilers` in the census (e.g. an independent
   commercial grow-out farm), their manual figure is preserved intact
   without being overwritten.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "laying_hens",
+  region = "spain",
+  subregion = "castilla",
+  population = 10000
+)
+calculate_population_poultry(census)
+} # }
+```

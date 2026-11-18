@@ -33,3 +33,11 @@ herdr_get_fao_trade_matrix_path(
 ## Value
 
 Absolute path to `fao_trade_matrix.parquet`, or NULL if not found.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+herdr_get_fao_trade_matrix_path("user_data", download_if_missing = FALSE)
+} # }
+```

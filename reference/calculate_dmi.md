@@ -49,3 +49,11 @@ calculate_DMI(
 
 A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to
 body weight (% BW).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_DMI(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

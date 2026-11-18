@@ -132,10 +132,10 @@ management concepts**:
 #### Concept B: Replacement Logic — Who Gets Replaced and How?
 
 - **Ruminants (Cattle, Sheep, Goats):**  
-  Adult breeding males (bulls, rams, bucks) live on the farm alongside
-  breeding females. Consequently, **the farm retains both female and
-  male replacement offspring** to ensure the generational renewal of
-  both sexes (`replacement_rate`).
+  Adult breeding males live on the farm alongside breeding females.
+  Consequently, **the farm retains both female and male replacement
+  offspring** to ensure the generational renewal of both sexes
+  (`replacement_rate`).
 - **Swine:**  
   Internal herd replacement focuses exclusively on the **future breeding
   mothers** (replacement gilts and sows). Breeding boars are not raised

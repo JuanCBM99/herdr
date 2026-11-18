@@ -261,22 +261,41 @@ Cycle Assessment databases: \* `ingredient`: Name in
 `feed_characteristics.csv`. \* `yield_name`: Item name in FAOSTAT
 (`fao_crops.parquet`) or forage database (`forages.parquet`). \*
 `agribalyse_name`: Matching process in the INRAE / ADEME ECOALIM v9 and
-AGRIBALYSE v3.1 LCA databases. \* `economic_allocation`: Fraction (0.0
-to 1.0) of crop cultivation area allocated to this co-product (e.g. 0.80
-for cereal grain vs. 0.20 for straw).
+AGRIBALYSE v3.1 / v3.2 LCA databases. \* `ea_reference`: Reference
+multi-output SimaPro / Agribalyse process or literature source from
+which the economic and physical co-product allocation parameters are
+sourced. \* `economic_allocation`: Economic revenue share (0.0 to 1.0)
+of the multi-output process allocated to the co-product batch
+(e.g. `1.0` for primary crops; `<= 0.33` for low-value by-products
+excluded from direct cropland competition). \*
+`kg_coproduct_per_1ton_maincrop`: Physical mass of co-product (kg)
+obtained per $`1,000\text{ kg}`$ (1 ton) of parent crop processed
+(`1000` for primary crops).
 
 #### 3. `ecoalim.parquet` — Feed Life Cycle Inventory Database
 
 Bundled reference database containing environmental characterization
-factors from **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1** under
-the European Commission’s **Environmental Footprint (EF 3.1)** standard:
-\* `Climate change - Fossil (kg CO2 eq/kg)`: Fossil greenhouse gas
-emissions per kg of feed fresh weight. \*
+factors from **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1 / v3.2**
+under the European Commission’s **Environmental Footprint (EF 3.1)**
+standard (per kg fresh weight for concentrates via `DM_pct`, and per kg
+dry matter for `forage` items): \*
+`Climate change - Fossil (kg CO2 eq/kg)`: Fossil greenhouse gas
+emissions per kg of feed. \*
 `Climate change - Land use and LU change (kg CO2 eq/kg)`: Direct
-land-use change / deforestation greenhouse gas emissions per kg fresh
-weight. \* `Water use (m3 depriv.)`: Freshwater deprivation
-characterized with the international **AWARE** model
-($`m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}`$ fresh weight).
+land-use change / deforestation greenhouse gas emissions per kg of feed.
+\* `Water use (m3 depriv.)`: Freshwater deprivation characterized with
+the international **AWARE** model
+($`m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}`$).
+
+> *Note:* For ingredients absent from standard ECOALIM v9 animal feed
+> tables, `ecoalim.parquet` includes selected processes from the general
+> **AGRIBALYSE v3.2** food database retaining **only the `Agriculture`
+> and `Processing` stages** (excluding packaging, distribution, retail,
+> and consumer stages). Additionally, whole-crop cereal and oilseed
+> silages were built on a dry-matter basis from ECOALIM grain and straw
+> using dry-matter Harvest Index ($`\text{HI}`$) weights
+> ($`\text{HI} \times \text{Grain}_{\text{DM}} + (1 - \text{HI}) \times \text{Straw}_{\text{DM}}`$;
+> Fan et al., 2017).
 
 #### 4. `forages.parquet` — Curated National Forage Database
 

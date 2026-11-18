@@ -1043,10 +1043,19 @@ Cycle Assessment databases: * <code>ingredient</code>: Name in
 <code>feed_characteristics.csv</code>. * <code>yield_name</code>: Item
 name in FAOSTAT (<code>fao_crops.parquet</code>) or forage database
 (<code>forages.parquet</code>). * <code>agribalyse_name</code>: Matching
-process in the INRAE / ADEME ECOALIM v9 and AGRIBALYSE v3.1 LCA
-databases. * <code>economic_allocation</code>: Fraction (0.0 to 1.0) of
-crop cultivation area allocated to this co-product (e.g. 0.80 for cereal
-grain vs. 0.20 for straw).</p>
+process in the INRAE / ADEME ECOALIM v9 and AGRIBALYSE v3.1 / v3.2 LCA
+databases. * <code>ea_reference</code>: Reference multi-output SimaPro /
+Agribalyse process or literature source from which the economic and
+physical co-product allocation parameters are sourced. *
+<code>economic_allocation</code>: Economic revenue share (0.0 to 1.0) of
+the multi-output process allocated to the co-product batch
+(e.g. <code>1.0</code> for primary crops; <code>&lt;= 0.33</code> for
+low-value by-products excluded from direct cropland competition). *
+<code>kg_coproduct_per_1ton_maincrop</code>: Physical mass of co-product
+(kg) obtained per
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1,000\text{ kg}</annotation></semantics></math>
+(1 ton) of parent crop processed (<code>1000</code> for primary
+crops).</p>
 </div>
 <div class="section level4">
 <h4 id="ecoalim">3. <code>ecoalim.parquet</code> — Feed Life Cycle Inventory
@@ -1054,17 +1063,31 @@ Database<a class="anchor" aria-label="anchor" href="#ecoalim"></a>
 </h4>
 <p>Bundled reference database containing environmental characterization
 factors from <strong>INRAE / ADEME ECOALIM v9</strong> and
-<strong>AGRIBALYSE v3.1</strong> under the European Commission’s
-<strong>Environmental Footprint (EF 3.1)</strong> standard: *
+<strong>AGRIBALYSE v3.1 / v3.2</strong> under the European Commission’s
+<strong>Environmental Footprint (EF 3.1)</strong> standard (per kg fresh
+weight for concentrates via <code>DM_pct</code>, and per kg dry matter
+for <code>forage</code> items): *
 <code>Climate change - Fossil (kg CO2 eq/kg)</code>: Fossil greenhouse
-gas emissions per kg of feed fresh weight. *
+gas emissions per kg of feed. *
 <code>Climate change - Land use and LU change (kg CO2 eq/kg)</code>:
 Direct land-use change / deforestation greenhouse gas emissions per kg
-fresh weight. * <code>Water use (m3 depriv.)</code>: Freshwater
-deprivation characterized with the international <strong>AWARE</strong>
-model
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow><mo>=</mo><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> world-eq</mtext></mrow><mi>/</mi><mtext mathvariant="normal">kg</mtext></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}</annotation></semantics></math>
-fresh weight).</p>
+of feed. * <code>Water use (m3 depriv.)</code>: Freshwater deprivation
+characterized with the international <strong>AWARE</strong> model
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> depriv.</mtext></mrow><mo>=</mo><msup><mi>m</mi><mn>3</mn></msup><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> world-eq</mtext></mrow><mi>/</mi><mtext mathvariant="normal">kg</mtext></mrow><annotation encoding="application/x-tex">m^3\text{ depriv.} = m^3\text{ world-eq} / \text{kg}</annotation></semantics></math>).</p>
+<blockquote>
+<p><em>Note:</em> For ingredients absent from standard ECOALIM v9 animal
+feed tables, <code>ecoalim.parquet</code> includes selected processes
+from the general <strong>AGRIBALYSE v3.2</strong> food database
+retaining <strong>only the <code>Agriculture</code> and
+<code>Processing</code> stages</strong> (excluding packaging,
+distribution, retail, and consumer stages). Additionally, whole-crop
+cereal and oilseed silages were built on a dry-matter basis from ECOALIM
+grain and straw using dry-matter Harvest Index
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">HI</mtext><annotation encoding="application/x-tex">\text{HI}</annotation></semantics></math>)
+weights
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">HI</mtext><mo>×</mo><msub><mtext mathvariant="normal">Grain</mtext><mtext mathvariant="normal">DM</mtext></msub><mo>+</mo><mo stretchy="false" form="prefix">(</mo><mn>1</mn><mo>−</mo><mtext mathvariant="normal">HI</mtext><mo stretchy="false" form="postfix">)</mo><mo>×</mo><msub><mtext mathvariant="normal">Straw</mtext><mtext mathvariant="normal">DM</mtext></msub></mrow><annotation encoding="application/x-tex">\text{HI} \times \text{Grain}_{\text{DM}} + (1 - \text{HI}) \times \text{Straw}_{\text{DM}}</annotation></semantics></math>;
+Fan et al., 2017).</p>
+</blockquote>
 </div>
 <div class="section level4">
 <h4 id="forages-parquet-curated-national-forage-database">4. <code>forages.parquet</code> — Curated National Forage

@@ -64,18 +64,20 @@ AnnualDMI_i \; (\text{kg DM / head / yr}) =
 ### 2.2 Conversion to As-Fed Fresh Weight
 
 Because Life Cycle Assessment (LCA) emission factors in **ECOALIM v9 /
-AGRIBALYSE v3.1** are expressed per kilogram of fresh feedstuff as fed
-(rather than 100% dry matter), `herdr` converts dry matter intake to
-as-fed fresh weight using the ingredient’s dry matter percentage
-($`DM\_pct_i`$) from `feed_characteristics.csv`:
+AGRIBALYSE v3.1** for concentrates are expressed per kilogram of fresh
+feedstuff as fed, `herdr` converts dry matter intake to as-fed fresh
+weight using the ingredient’s dry matter percentage ($`DM\_pct_i`$) from
+`feed_characteristics.csv`:
 
 ``` math
 AnnualFresh_i \; (\text{kg fresh / head / yr}) =
 \frac{AnnualDMI_i}{\left(\frac{DM\_pct_i}{100}\right)}
 ```
 
-*(If $`DM\_pct_i`$ is missing or non-positive, `herdr` defaults to
-100%).*
+*(For forages — `ingredient_type == "forage"` — or if $`DM\_pct_i`$ is
+missing or non-positive, `herdr` keeps `DM_pct` at 100% because forage
+factors in `ecoalim.parquet` are already reported on a dry matter
+basis.)*
 
 ### 2.3 Individual and Herd Footprints
 
@@ -110,6 +112,29 @@ where $`EF_{climate, i}`$ corresponds to the total
 (`Climate change - EF 3.1`), fossil (`Climate change - Fossil`), or
 land-use change / deforestation
 (`Climate change - Land use and LU change`) characterization factor.
+
+> **Co-product fallback allocation:** When an ingredient maps directly
+> to a dedicated co-product LCI process in `ecoalim.parquet` (such as
+> soybean meal, wheat bran, or brewer’s grains), its characterization
+> factor $`EF_i`$ already incorporates economic allocation at the LCA
+> database level and is applied with a multiplier of $`1.0`$.
+> Conversely, when a co-product (`economic_allocation < 1` in
+> `mapping.csv`, such as cereal straw or hulls) is linked to an
+> unallocated parent grain or oilseed process in `agribalyse_name`,
+> `herdr` automatically scales the parent crop’s emission factor by
+> $`\dfrac{EconomicAllocation_i}{kg\_coproduct\_per\_1ton\_maincrop_i / 1000}`$.
+>
+> **Database note (`ecoalim.parquet` extensions):** 1. *General food
+> items:* Feeds unavailable in standard ECOALIM v9 feed tables were
+> sourced from the general **AGRIBALYSE v3.2** food database including
+> **only the `Agriculture` and `Processing` stages** (excluding
+> packaging, distribution, retail, and consumer stages). 2. *Whole-crop
+> silages:* Whole-plant cereal and oilseed silages were estimated on a
+> 100% DM basis by combining ECOALIM grain and straw processes
+> (converted to DM via ECOALIM Table 7 moisture contents) using
+> dry-matter Harvest Index ($`\text{HI}`$) weights from Fan et
+> al. (2017):
+> $`\text{EF}_{\text{silage}} = \text{HI} \times \text{EF}_{\text{grain, DM}} + (1 - \text{HI}) \times \text{EF}_{\text{straw, DM}}`$.
 
 ------------------------------------------------------------------------
 

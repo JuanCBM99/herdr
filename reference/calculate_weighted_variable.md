@@ -25,3 +25,11 @@ calculate_weighted_variable(saveoutput = TRUE, data_dir = "user_data")
 ## Value
 
 Tibble with weighted nutritional variables for all animal cohorts.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_weighted_variable(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

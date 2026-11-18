@@ -39,3 +39,11 @@ calculate_production(
 ## Value
 
 Tibble with animal production summary.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_production(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

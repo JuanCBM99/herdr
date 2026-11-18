@@ -63,3 +63,11 @@ and manure management.
   the farm. Different housing or management variants within the same
   geographical farm must be distinguished via `animal_tag` (e.g.,
   `laying_hens` vs. `free_range_laying_hens`), not via `subregion`.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_population(automatic_cycle = TRUE, saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

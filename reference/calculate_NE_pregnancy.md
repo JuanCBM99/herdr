@@ -8,7 +8,10 @@ Calculate Net Energy for Pregnancy (NE_pregnancy)
 calculate_NE_pregnancy(
   saveoutput = TRUE,
   data_dir = "user_data",
-  nem_df = NULL
+  nem_df = NULL,
+  categories = NULL,
+  coefficients = NULL,
+  validate = TRUE
 )
 ```
 
@@ -26,3 +29,28 @@ calculate_NE_pregnancy(
 - nem_df:
 
   Optional precalculated NEm dataframe to avoid recomputation.
+
+- categories:
+
+  Optional preloaded `ruminant_definitions` dataframe.
+
+- coefficients:
+
+  Optional preloaded `ipcc_coefficients` dataframe.
+
+- validate:
+
+  Logical. Whether to run coefficient validation. Default is TRUE.
+
+## Value
+
+A tibble with columns `farm_id`, `region`, `subregion`, `animal_tag`,
+`animal_type`, `animal_subtype`, and `NEpregnancy_MJday` (MJ/day).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_NE_pregnancy(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

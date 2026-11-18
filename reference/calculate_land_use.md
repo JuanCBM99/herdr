@@ -64,3 +64,17 @@ calculate_land_use(
 - population_df:
 
   Optional precalculated population dataframe.
+
+## Value
+
+A tibble with total feed-related land use (`Total_Land_m2`, m2/year)
+broken down by land category (`Forages_m2`, `Grains_m2`, `Maize_Soy_m2`,
+`Grazing_m2`, `Cropland_m2`) per animal cohort.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+calculate_land_use(saveoutput = FALSE, data_dir = "user_data")
+} # }
+```

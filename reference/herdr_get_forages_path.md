@@ -22,3 +22,11 @@ herdr_get_forages_path(data_dir = "user_data")
 ## Value
 
 Absolute path to forages parquet file.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+herdr_get_forages_path("user_data")
+} # }
+```

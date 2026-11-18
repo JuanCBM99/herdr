@@ -56,3 +56,18 @@ A tibble with the modeled swine population structure.
 - **Fattening Pigs**: Slaughter pigs (`Annual Piglets - Replacements`)
   scaled to Average Annual Population (AAP, IPCC Eq. 10.1) based on
   fattening days (`days / 365`).
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "breeder_sows",
+  region = "spain",
+  subregion = "catalonia",
+  population = 500
+)
+calculate_population_swine(census)
+} # }
+```

@@ -34,3 +34,11 @@ herdr_get_fao_crops_path(data_dir = "user_data", download_if_missing = TRUE)
 ## Value
 
 Absolute path to `fao_crops.parquet`, or NULL if not found.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+herdr_get_fao_crops_path("user_data", download_if_missing = FALSE)
+} # }
+```

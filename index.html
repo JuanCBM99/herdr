@@ -117,7 +117,7 @@
 <span><span class="fu"><a href="reference/herdr_init.html">herdr_init</a></span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Load example data</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"Examples/Level1_Spain_Dairy_Cattle_2015"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"user_data"</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/files.html" class="external-link">file.copy</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.files.html" class="external-link">list.files</a></span><span class="op">(</span><span class="st">"Examples/Level1_Spain_Dairy_Cattle_2015"</span>, full.names <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>, <span class="st">"user_data"</span>, overwrite <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Run model</span></span>
 <span><span class="va">results</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/generate_impact_assessment.html">generate_impact_assessment</a></span><span class="op">(</span>automatic_cycle <span class="op">=</span> <span class="cn">FALSE</span>, farm_country <span class="op">=</span> <span class="st">"Spain"</span>, year <span class="op">=</span> <span class="fl">2015</span><span class="op">)</span></span></code></pre></div>
@@ -137,28 +137,33 @@
 </h2>
 <p>Below are the main guides and examples for using the package:</p>
 <div class="section level3">
-<h3 id="id_1-introduction">1. Introduction<a class="anchor" aria-label="anchor" href="#id_1-introduction"></a>
+<h3 id="id_1-introduction--shiny-app">1. Introduction &amp; Shiny App<a class="anchor" aria-label="anchor" href="#id_1-introduction--shiny-app"></a>
 </h3>
-<p>Learn what herdr does, which animals are supported, and how to install the package.</p>
+<p>Learn what herdr does, which animals are supported, how to install the package, or launch the local web interface.</p>
 <ul>
 <li><a href="articles/Introduction.html">Go to Introduction →</a></li>
+<li><a href="articles/app.html">Go to Interactive Shiny App Guide →</a></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="id_2-technical-reference">2. Technical reference<a class="anchor" aria-label="anchor" href="#id_2-technical-reference"></a>
+<h3 id="id_2-technical--theoretical-reference">2. Technical &amp; Theoretical Reference<a class="anchor" aria-label="anchor" href="#id_2-technical--theoretical-reference"></a>
 </h3>
-<p>Explore the included files and some explanation about them.</p>
+<p>Explore the included files, schemas, and full IPCC Tier 2 / GLEAM mathematical formulations.</p>
 <ul>
 <li><a href="articles/Technical_reference.html">Go to Technical Reference: Files &amp; Parameters →</a></li>
+<li><a href="articles/Theoretical_basis.html">Go to Theoretical Basis (IPCC Tier 2 &amp; GLEAM) →</a></li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="id_3-manure--land-use-guide">3. Manure &amp; Land use Guide<a class="anchor" aria-label="anchor" href="#id_3-manure--land-use-guide"></a>
+<h3 id="id_3-methodology-guides">3. Methodology Guides<a class="anchor" aria-label="anchor" href="#id_3-methodology-guides"></a>
 </h3>
-<p>Explore the included manure management systems based on IPCC 2019 tables.</p>
+<p>Explore herd demography, manure management systems, land competition, and feed carbon/water footprints.</p>
 <ul>
+<li><a href="articles/Herd_Demography.html">Go to Herd Demography &amp; Life Cycles →</a></li>
 <li><a href="articles/Manure.html">Go to Manure System Guide →</a></li>
 <li><a href="articles/land_use.html">Go to Land use →</a></li>
+<li><a href="articles/Water_and_Feed_Footprint.html">Go to Feed Water &amp; Carbon Footprint (AWARE) →</a></li>
+<li><a href="articles/Adding_Ingredient.html">Go to Adding a Custom Feed Ingredient →</a></li>
 </ul>
 </div>
 <div class="section level3">

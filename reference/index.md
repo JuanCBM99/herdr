@@ -40,12 +40,10 @@
   : Calculate Total Animal Population
 - [`calculate_population_cattle()`](https://juancbm99.github.io/herdr/reference/calculate_population_cattle.md)
   : Calculate Cattle Population Structure
-- [`calculate_population_goat()`](https://juancbm99.github.io/herdr/reference/calculate_population_goat.md)
-  : Calculate Goat Population Structure
 - [`calculate_population_poultry()`](https://juancbm99.github.io/herdr/reference/calculate_population_poultry.md)
   : Calculate Poultry Population Structure
-- [`calculate_population_sheep()`](https://juancbm99.github.io/herdr/reference/calculate_population_sheep.md)
-  : Calculate Sheep Population Structure
+- [`calculate_population_small_ruminants()`](https://juancbm99.github.io/herdr/reference/calculate_population_small_ruminants.md)
+  : Calculate Small Ruminant Population Structure (Sheep and Goats)
 - [`calculate_population_swine()`](https://juancbm99.github.io/herdr/reference/calculate_population_swine.md)
   : Calculate Swine Population Structure
 - [`calculate_production()`](https://juancbm99.github.io/herdr/reference/calculate_production.md)
