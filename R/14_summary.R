@@ -86,26 +86,29 @@ generate_impact_assessment <- function(automatic_cycle = FALSE,
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(CH4_manure_Gg = sum(total_CH4_mm_kgyear / 1e6, na.rm = TRUE), .groups = "drop")
 
-  neg_data <- suppressMessages(calculate_NEg(saveoutput = FALSE, data_dir = data_dir))
   N2O_dir_raw <- calculate_N2O_direct_manure(
     automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
-    ge_df = ge_data, cp_df = cp_data, pop_df = pop_data, neg_df = neg_data, dmi_df = dmi_data
+    ge_df = ge_data, cp_df = cp_data, pop_df = pop_data, neg_df = ge_data, dmi_df = dmi_data
   )
 
   N2O_dir <- N2O_dir_raw %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_direct_Gg = sum(direct_N2O_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_vol <- calculate_N2O_indirect_volatilization(
+  ipcc_mm_data <- herdr_read_manure_table(file.path(data_dir, "ipcc_mm.csv"))
+
+  N2O_vol <- herdr_calculate_N2O_indirect(
+    mode = "volatilization",
     automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
-    direct_N2O_df = N2O_dir_raw, pop_df = pop_data
+    direct_N2O_df = N2O_dir_raw, pop_df = pop_data, ipcc_master = ipcc_mm_data
   ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_vol_Gg = sum(N2O_vol_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")
 
-  N2O_lea <- calculate_N2O_indirect_leaching(
+  N2O_lea <- herdr_calculate_N2O_indirect(
+    mode = "leaching",
     automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir,
-    direct_N2O_df = N2O_dir_raw, pop_df = pop_data
+    direct_N2O_df = N2O_dir_raw, pop_df = pop_data, ipcc_master = ipcc_mm_data
   ) %>%
     dplyr::group_by(across(all_of(join_keys))) %>%
     dplyr::summarise(N2O_lea_Gg = sum(N2O_leach_kgyear, na.rm = TRUE) / 1e6, .groups = "drop")

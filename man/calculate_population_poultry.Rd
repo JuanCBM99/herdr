@@ -47,3 +47,15 @@ based on biological laying cycles, incubation fertility, and rearing durations.
 }
 }
 
+\examples{
+\dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "laying_hens",
+  region = "spain",
+  subregion = "castilla",
+  population = 10000
+)
+calculate_population_poultry(census)
+}
+}

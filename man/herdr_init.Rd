@@ -6,7 +6,15 @@
 \usage{
 herdr_init()
 }
+\value{
+Invisibly returns \code{NULL} after creating \code{user_data/} and \code{Examples/} in the working directory.
+}
 \description{
 This function creates the 'user_data' and 'Examples' folders in your
 current working directory and populates them with the default files from the package.
+}
+\examples{
+\dontrun{
+herdr_init()
+}
 }

@@ -42,3 +42,15 @@ farrowing rates, litter sizes, sow replacement rates, and fattening durations.
 }
 }
 
+\examples{
+\dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "breeder_sows",
+  region = "spain",
+  subregion = "catalonia",
+  population = 500
+)
+calculate_population_swine(census)
+}
+}

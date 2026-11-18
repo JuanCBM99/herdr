@@ -49,3 +49,8 @@ parent cohorts, ensuring seamless downstream integration with diets, weights, an
 }
 }
 
+\examples{
+\dontrun{
+calculate_population(automatic_cycle = TRUE, saveoutput = FALSE, data_dir = "user_data")
+}
+}

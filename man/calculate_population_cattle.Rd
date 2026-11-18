@@ -42,3 +42,15 @@ biological reproduction rates, replacement dynamics, and feeding period duration
 }
 }
 
+\examples{
+\dontrun{
+census <- tibble::tibble(
+  farm_id = "farm_1",
+  animal_tag = "mature_dairy_cattle",
+  region = "spain",
+  subregion = "galicia",
+  population = 100
+)
+calculate_population_cattle(census)
+}
+}

@@ -29,3 +29,8 @@ Computes total production of milk, meat, eggs, and fibre in physical units
 (kg of edible protein and fibre) based on FAO/GLEAM (Equations 9.1 to 9.5)
 and IDF standards.
 }
+\examples{
+\dontrun{
+calculate_production(saveoutput = FALSE, data_dir = "user_data")
+}
+}

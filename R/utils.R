@@ -3,6 +3,11 @@
 #' This function creates the 'user_data' and 'Examples' folders in your
 #' current working directory and populates them with the default files from the package.
 #'
+#' @return Invisibly returns \code{NULL} after creating \code{user_data/} and \code{Examples/} in the working directory.
+#' @examples
+#' \dontrun{
+#' herdr_init()
+#' }
 #' @export
 herdr_init <- function() {
 
@@ -58,7 +63,7 @@ herdr_validate_manure_allocation <- function(user_manure, tolerance = 1e-3) {
 
   allocation_sums <- user_manure %>%
     dplyr::filter(!is.na(allocation)) %>%
-    dplyr::group_by(farm_id, region, subregion, animal_tag) %>%
+    dplyr::group_by(dplyr::across(dplyr::any_of(c("farm_id", "region", "subregion", "animal_tag")))) %>%
     dplyr::summarise(total_alloc = sum(as.numeric(allocation), na.rm = TRUE), .groups = "drop")
 
   if (nrow(allocation_sums) == 0) {
@@ -134,8 +139,10 @@ herdr_validate_diet_shares <- function(diets, ingredients, diet_join_keys = "die
 
   # 1. Check that diet profiles categories sum to 100%
   if (length(present_cats) > 0) {
-    cat_matrix <- as.matrix(diets[present_cats])
-    cat_matrix[is.na(cat_matrix)] <- 0
+    cat_list <- lapply(diets[present_cats], function(x) {
+      tidyr::replace_na(suppressWarnings(as.numeric(as.character(x))), 0)
+    })
+    cat_matrix <- do.call(cbind, cat_list)
     diet_totals <- rowSums(cat_matrix)
     invalid_diets <- which(abs(diet_totals - 100) > tolerance)
 
@@ -175,10 +182,22 @@ herdr_validate_diet_shares <- function(diets, ingredients, diet_join_keys = "die
       active_rows <- which(!is.na(diets[[share_col]]) & as.numeric(diets[[share_col]]) > tolerance)
       for (r in active_rows) {
         d_tag <- diets$diet_tag[r]
-        has_ings <- any(ingredients$diet_tag == d_tag &
+        match_idx <- rep(TRUE, nrow(ingredients))
+        for (k in intersect(diet_join_keys, names(ingredients))) {
+          if (k %in% names(diets)) {
+            kv_d <- as.character(diets[[k]][r])
+            kv_i <- as.character(ingredients[[k]])
+            if (is.na(kv_d)) {
+              match_idx <- match_idx & is.na(kv_i)
+            } else {
+              match_idx <- match_idx & !is.na(kv_i) & kv_i == kv_d
+            }
+          }
+        }
+        has_ings <- any(match_idx &
                         ingredients$ingredient_type == type_name &
                         !is.na(ingredients$ingredient_share) &
-                        as.numeric(ingredients$ingredient_share) > 0)
+                        suppressWarnings(as.numeric(as.character(ingredients$ingredient_share))) > 0)
         if (!has_ings) {
           missing_ingredients <- c(missing_ingredients, paste0(d_tag, " [", type_name, " = ", diets[[share_col]][r], "%]"))
         }
@@ -366,6 +385,8 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
 
         c_type <- coeff_map[[col_name]]
         allowed_spec <- coefficients$description[
+          !is.na(coefficients$coefficient) &
+          !is.na(coefficients$animal_type) &
           tolower(coefficients$coefficient) == tolower(c_type) &
           tolower(coefficients$animal_type) == s_type
         ]
@@ -389,6 +410,23 @@ herdr_validate_ruminant_coefficients <- function(definitions, coefficients) {
   }
 
   invisible(TRUE)
+}
+
+#' Filter Lookup Rows by a Stratum Column Without Cross-Stratum Leakage
+#' @noRd
+herdr_filter_stratum <- function(m, col, val) {
+  if (!col %in% names(m) || nrow(m) == 0) return(m)
+  col_vals <- trimws(as.character(m[[col]]))
+  is_empty <- is.na(col_vals) | col_vals == "" | col_vals == "NA"
+
+  if (!is.na(val) && nzchar(trimws(as.character(val)))) {
+    v <- trimws(as.character(val))
+    m_exact <- m[!is_empty & col_vals == v, , drop = FALSE]
+    if (nrow(m_exact) > 0) return(m_exact)
+    return(m[is_empty, , drop = FALSE])
+  }
+
+  m[is_empty, , drop = FALSE]
 }
 
 #' Resolve Demographic Parameters by Stratum
@@ -435,20 +473,10 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
 
     # 1. Try matching in definitions
     if (!is.null(sub_defs)) {
-      m <- sub_defs
-      # Level 1: full stratum match (farm_id + region + subregion)
-      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
-        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
-        if (nrow(m_f) > 0) m <- m_f
-      }
-      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
-        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
-        if (nrow(m_r) > 0) m <- m_r
-      }
-      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
-        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
-        if (nrow(m_s) > 0) m <- m_s
-      }
+      m <- sub_defs %>%
+        herdr_filter_stratum("farm_id", f) %>%
+        herdr_filter_stratum("region", r) %>%
+        herdr_filter_stratum("subregion", s)
 
       # Extract candidate
       for (row_idx in seq_len(nrow(m))) {
@@ -462,19 +490,10 @@ herdr_resolve_demographic_param <- function(base_df, tag, param_col, param_name 
 
     # 2. Try matching in rate_parameters if not found in definitions
     if (is.na(val_found) && !is.null(sub_rates)) {
-      m <- sub_rates
-      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
-        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
-        if (nrow(m_f) > 0) m <- m_f
-      }
-      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
-        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
-        if (nrow(m_r) > 0) m <- m_r
-      }
-      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
-        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
-        if (nrow(m_s) > 0) m <- m_s
-      }
+      m <- sub_rates %>%
+        herdr_filter_stratum("farm_id", f) %>%
+        herdr_filter_stratum("region", r) %>%
+        herdr_filter_stratum("subregion", s)
       for (row_idx in seq_len(nrow(m))) {
         cand <- suppressWarnings(as.numeric(m$value[row_idx]))
         if (!is.na(cand) && cand >= 0) {
@@ -529,19 +548,10 @@ herdr_resolve_period_days <- function(base_df, tag, weights = NULL, default_days
     val_found <- NA_real_
 
     if (!is.null(sub_w)) {
-      m <- sub_w
-      if ("farm_id" %in% names(m) && !is.na(f) && nzchar(f)) {
-        m_f <- m[!is.na(m$farm_id) & m$farm_id == f, , drop = FALSE]
-        if (nrow(m_f) > 0) m <- m_f
-      }
-      if ("region" %in% names(m) && !is.na(r) && nzchar(r)) {
-        m_r <- m[!is.na(m$region) & m$region == r, , drop = FALSE]
-        if (nrow(m_r) > 0) m <- m_r
-      }
-      if ("subregion" %in% names(m) && !is.na(s) && nzchar(s)) {
-        m_s <- m[!is.na(m$subregion) & m$subregion == s, , drop = FALSE]
-        if (nrow(m_s) > 0) m <- m_s
-      }
+      m <- sub_w %>%
+        herdr_filter_stratum("farm_id", f) %>%
+        herdr_filter_stratum("region", r) %>%
+        herdr_filter_stratum("subregion", s)
 
       for (row_idx in seq_len(nrow(m))) {
         cand <- suppressWarnings(as.numeric(m$productive_period_days[row_idx]))
@@ -556,4 +566,80 @@ herdr_resolve_period_days <- function(base_df, tag, weights = NULL, default_days
   }
 
   return(out)
+}
+
+#' Compute Daily Egg Mass (g/day) From Monogastric Definitions
+#' @noRd
+herdr_calc_egg_mass_g_day <- function(df) {
+  if (is.null(df) || nrow(df) == 0) return(numeric(0))
+  egg_wt <- if ("egg_weight_g" %in% names(df)) suppressWarnings(as.numeric(df$egg_weight_g)) else rep(60, nrow(df))
+  egg_wt <- dplyr::coalesce(egg_wt, 60)
+  eggs_yr <- if ("eggs_per_year" %in% names(df)) suppressWarnings(as.numeric(df$eggs_per_year)) else rep(0, nrow(df))
+  eggs_yr <- dplyr::coalesce(eggs_yr, 0)
+  (eggs_yr / 365) * egg_wt
+}
+
+#' Normalize Diet Profiles and Ingredients Join Keys
+#' @noRd
+herdr_normalize_diets <- function(diets, ingredients) {
+  legacy_diet_mode <- any(c("region", "subregion") %in% names(diets)) &&
+    any(duplicated(diets$diet_tag))
+
+  if (!legacy_diet_mode) {
+    diets <- diets %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion"))) %>%
+      dplyr::distinct(diet_tag, .keep_all = TRUE)
+    ingredients <- ingredients %>%
+      dplyr::select(-dplyr::any_of(c("region", "subregion")))
+    diet_join_keys <- "diet_tag"
+  } else {
+    diet_join_keys <- intersect(c("region", "subregion", "diet_tag"), names(diets))
+    diets <- diets %>%
+      dplyr::distinct(dplyr::across(dplyr::all_of(diet_join_keys)), .keep_all = TRUE)
+  }
+
+  list(diets = diets, ingredients = ingredients, diet_join_keys = diet_join_keys)
+}
+
+#' Read Manure Management or IPCC Master CSV With Safe Character Keys
+#' @noRd
+herdr_read_manure_table <- function(path) {
+  char_cols <- c(
+    "farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype",
+    "system_base", "management_months", "system_climate", "system_subclimate",
+    "climate_zone", "system_variant", "climate_moisture", "b_0"
+  )
+  df <- readr::read_csv(
+    path,
+    col_types = readr::cols(management_months = readr::col_character()),
+    show_col_types = FALSE
+  )
+  df %>%
+    dplyr::mutate(dplyr::across(dplyr::any_of(char_cols), as.character))
+}
+
+#' Normalize Positional rate_parameters / definitions Arguments
+#' @noRd
+herdr_normalize_rate_params <- function(rate_parameters, definitions) {
+  if (!is.null(rate_parameters)) {
+    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
+      if (is.null(definitions)) {
+        definitions <- rate_parameters
+      }
+      rate_parameters <- NULL
+    }
+  }
+  list(rate_parameters = rate_parameters, definitions = definitions)
+}
+
+#' Load livestock_weights.csv Conditionally
+#' @noRd
+herdr_load_weights_df <- function(weights, data_dir) {
+  if (!is.null(weights)) return(weights)
+  weights_path <- file.path(data_dir, "livestock_weights.csv")
+  if (file.exists(weights_path)) {
+    suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+  } else {
+    NULL
+  }
 }

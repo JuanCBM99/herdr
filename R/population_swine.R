@@ -20,20 +20,26 @@
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #'
 #' @return A tibble with the modeled swine population structure.
+#' @examples
+#' \dontrun{
+#' census <- tibble::tibble(
+#'   farm_id = "farm_1",
+#'   animal_tag = "breeder_sows",
+#'   region = "spain",
+#'   subregion = "catalonia",
+#'   population = 500
+#' )
+#' calculate_population_swine(census)
+#' }
 #' @export
 calculate_population_swine <- function(census_swine, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("Calculating populations for SWINE...")
 
   # Handle flexible parameter positioning
-  if (!is.null(rate_parameters)) {
-    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
-      if (is.null(definitions)) {
-        definitions <- rate_parameters
-      }
-      rate_parameters <- NULL
-    }
-  }
+  norm_params <- herdr_normalize_rate_params(rate_parameters, definitions)
+  rate_parameters <- norm_params$rate_parameters
+  definitions <- norm_params$definitions
 
   # =========================================================================
   # Step 1: Identify Base Mature Cohorts & Valid Tags
@@ -71,23 +77,10 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
     if (!tag %in% names(base_pops_wide)) base_pops_wide[[tag]] <- 0
   }
 
-  if (all(c(base_pops_wide$breeder_sows, base_pops_wide$boars) == 0)) {
-    return(census_swine %>% dplyr::filter(animal_tag %in% valid_swine_tags))
-  }
-
   # =========================================================================
   # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
   # =========================================================================
-  weights_df <- if (!is.null(weights)) {
-    weights
-  } else {
-    weights_path <- file.path(data_dir, "livestock_weights.csv")
-    if (file.exists(weights_path)) {
-      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
-    } else {
-      NULL
-    }
-  }
+  weights_df <- herdr_load_weights_df(weights, data_dir)
 
   # 3a. Durations of reproductive cycle and fattening period
   sow_cycle_days <- herdr_resolve_period_days(base_pops_wide, "breeder_sows",   weights = weights_df, default_days = 148.9)

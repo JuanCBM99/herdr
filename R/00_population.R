@@ -31,6 +31,10 @@
 #' @return A tibble containing the complete animal population structure with columns:
 #'   \code{farm_id}, \code{region}, \code{subregion}, \code{animal_tag},
 #'   \code{animal_type}, \code{animal_subtype}, and \code{population}.
+#' @examples
+#' \dontrun{
+#' calculate_population(automatic_cycle = TRUE, saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data") {
 
@@ -132,35 +136,30 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     # 3a. Cattle demographic modeling
     df_cattle <- census_base %>% dplyr::filter(tolower(animal_type) == "cattle")
     if (nrow(df_cattle) > 0) {
-      message("Calculating populations for CATTLE...")
       results_list$cattle <- calculate_population_cattle(df_cattle, definitions_ruminant, weights = weights_df, data_dir = data_dir)
     }
 
     # 3b. Sheep demographic modeling
     df_sheep <- census_base %>% dplyr::filter(tolower(animal_type) == "sheep")
     if (nrow(df_sheep) > 0) {
-      message("Calculating populations for SHEEP...")
-      results_list$sheep <- calculate_population_sheep(df_sheep, definitions_ruminant, weights = weights_df, data_dir = data_dir)
+      results_list$sheep <- calculate_population_small_ruminants(df_sheep, definitions_ruminant, weights = weights_df, data_dir = data_dir, species = "sheep")
     }
 
     # 3c. Goat demographic modeling
     df_goat <- census_base %>% dplyr::filter(tolower(animal_type) == "goat")
     if (nrow(df_goat) > 0) {
-      message("Calculating populations for GOAT...")
-      results_list$goat <- calculate_population_goat(df_goat, definitions_ruminant, weights = weights_df, data_dir = data_dir)
+      results_list$goat <- calculate_population_small_ruminants(df_goat, definitions_ruminant, weights = weights_df, data_dir = data_dir, species = "goat")
     }
 
     # 3d. Swine demographic modeling
     df_swine <- census_base %>% dplyr::filter(tolower(animal_type) == "swine")
     if (nrow(df_swine) > 0) {
-      message("Calculating populations for SWINE...")
       results_list$swine <- calculate_population_swine(df_swine, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
     # 3e. Poultry demographic modeling
     df_poultry <- census_base %>% dplyr::filter(tolower(animal_type) == "poultry")
     if (nrow(df_poultry) > 0) {
-      message("Calculating populations for POULTRY...")
       results_list$poultry <- calculate_population_poultry(df_poultry, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 

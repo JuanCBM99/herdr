@@ -7,14 +7,21 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param vs_df Optional precalculated Volatile Solids dataframe.
 #' @param pop_df Optional precalculated population dataframe.
+#' @return A tibble with manure management methane emission factors (\code{EF_CH4_mm_kgheadyear},
+#'   kg CH4/head/year) and total emissions (\code{total_CH4_mm_kgyear}, kg CH4/year) by animal
+#'   cohort and management system.
+#' @examples
+#' \dontrun{
+#' calculate_CH4_manure(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_CH4_manure <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                  vs_df = NULL, pop_df = NULL) {
   message("Calculating CH4 emissions from manure management...")
 
   # --- 1. Data Loading ---
-  user_manure <- readr::read_csv(file.path(data_dir, "manure_management.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
-  ipcc_master <- readr::read_csv(file.path(data_dir, "ipcc_mm.csv"), col_types = readr::cols(management_months = readr::col_character()), show_col_types = FALSE)
+  user_manure <- herdr_read_manure_table(file.path(data_dir, "manure_management.csv"))
+  ipcc_master <- herdr_read_manure_table(file.path(data_dir, "ipcc_mm.csv"))
   coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
   join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")

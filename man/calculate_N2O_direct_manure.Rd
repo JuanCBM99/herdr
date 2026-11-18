@@ -32,7 +32,16 @@ calculate_N2O_direct_manure(
 
 \item{dmi_df}{Optional precalculated DMI dataframe.}
 }
+\value{
+A tibble with annual nitrogen excretion (\code{N_excreted_kgheadyear}, kg N/head/year)
+  and direct manure N2O emissions (\code{N2O_direct_kgyear}, kg N2O/year) by cohort and management system.
+}
 \description{
 Computes direct N2O emissions based on nitrogen excretion logic,
 emission factors, management system, and climate (IPCC Eq 10.25).
+}
+\examples{
+\dontrun{
+calculate_N2O_direct_manure(saveoutput = FALSE, data_dir = "user_data")
+}
 }

@@ -10,6 +10,10 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param pop_df Optional precalculated population dataframe.
 #' @return Tibble with animal production summary.
+#' @examples
+#' \dontrun{
+#' calculate_production(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                  pop_df = NULL) {
@@ -127,11 +131,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     }
 
     # Calculate daily egg mass internally for egg yield: (eggs_per_year / 365) * egg_weight_g
-    egg_wt <- if ("egg_weight_g" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$egg_weight_g)) else 60
-    egg_wt <- dplyr::coalesce(egg_wt, 60)
-    eggs_yr <- if ("eggs_per_year" %in% names(monogastrics)) suppressWarnings(as.numeric(monogastrics$eggs_per_year)) else 0
-    eggs_yr <- dplyr::coalesce(eggs_yr, 0)
-    monogastrics$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
+    monogastrics$egg_mass_g_day <- herdr_calc_egg_mass_g_day(monogastrics)
 
     if (!"replacement_rate" %in% names(monogastrics)) {
       monogastrics$replacement_rate <- NA_real_
@@ -199,14 +199,32 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         TRUE ~ 0
       ),
 
+      # Effective replacement rate: user CSV takes precedence; fallback to demographic defaults when automatic_cycle = TRUE
+      effective_repl_rate = dplyr::case_when(
+        has_replacement_rate ~ replacement_rate,
+        automatic_cycle & animal_tag == "mature_dairy_cattle" ~ 0.27,
+        automatic_cycle & animal_tag == "mature_beef_cattle" ~ 0.15,
+        automatic_cycle & animal_tag == "mature_beef_bull" ~ 0.125,
+        automatic_cycle & animal_tag %in% c("mature_sheep_male_dairy", "mature_goat_male_dairy") ~ 0.23,
+        automatic_cycle & animal_tag %in% c("mature_sheep_male_meat", "mature_goat_male_meat") ~ 0.25,
+        automatic_cycle & animal_tag %in% c(
+          "mature_sheep_female_dairy", "mature_sheep_female_meat",
+          "mature_goat_female_dairy", "mature_goat_female_meat"
+        ) ~ 0.30,
+        automatic_cycle & animal_tag == "breeder_sows" ~ 0.25,
+        automatic_cycle & animal_tag == "boars" ~ 0.30,
+        TRUE ~ 0
+      ),
+
       # Annual number of animals exiting for slaughter (N_exit)
       N_exit = dplyr::case_when(
         # 1. Replacement/rearing stock: do not exit to commercial slaughter
         production_role == "replacement" ~ 0,
 
-        # 2. Mature breeding stock with replacement rate defined in CSV (cattle, sheep, goats, sows, layers)
-        #    If replacement_rate == 0, yields 0 (breeding stock are not culled)
-        production_role == "mature" & has_replacement_rate ~ population * replacement_rate,
+        # 2. Mature breeding stock with replacement rate defined in CSV (or automatic_cycle default)
+        #    If replacement_rate == 0 in CSV, yields 0 (breeding stock are not culled)
+        production_role == "mature" & (has_replacement_rate | (automatic_cycle & effective_repl_rate > 0)) ~
+          population * effective_repl_rate,
 
         # 3. Mature animals without replacement rate in CSV (poultry culling by laying cycle: e.g. 511 d)
         production_role == "mature" & !has_replacement_rate & animal_type == "poultry" & productive_period_days > 0 ~
@@ -227,9 +245,9 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         TRUE ~ MILK_prot_def
       ),
       milk_protein_kg = milk_fresh_kg * milk_prot_pct,
-      # FPCM (Fat and Protein Corrected Milk - IDF)
+      # FPCM (Fat and Protein Corrected Milk - IDF for large ruminants; fresh milk for small ruminants)
       milk_FPCM_kg = dplyr::if_else(
-        milk_fresh_kg > 0 & fat_content_pct > 0,
+        !tolower(animal_type) %in% c("sheep", "goat") & milk_fresh_kg > 0 & fat_content_pct > 0,
         milk_fresh_kg * (0.1226 * fat_content_pct + 0.0776 * (milk_prot_pct * 100) + 0.2534),
         milk_fresh_kg
       ),

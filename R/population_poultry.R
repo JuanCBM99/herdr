@@ -25,20 +25,26 @@
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #'
 #' @return A tibble with the modeled poultry population structure.
+#' @examples
+#' \dontrun{
+#' census <- tibble::tibble(
+#'   farm_id = "farm_1",
+#'   animal_tag = "laying_hens",
+#'   region = "spain",
+#'   subregion = "castilla",
+#'   population = 10000
+#' )
+#' calculate_population_poultry(census)
+#' }
 #' @export
 calculate_population_poultry <- function(census_poultry, rate_parameters = NULL, definitions = NULL, weights = NULL, data_dir = "user_data") {
 
   message("Calculating populations for POULTRY...")
 
   # Handle flexible parameter positioning
-  if (!is.null(rate_parameters)) {
-    if (!("parameter" %in% names(rate_parameters) && "value" %in% names(rate_parameters))) {
-      if (is.null(definitions)) {
-        definitions <- rate_parameters
-      }
-      rate_parameters <- NULL
-    }
-  }
+  norm_params <- herdr_normalize_rate_params(rate_parameters, definitions)
+  rate_parameters <- norm_params$rate_parameters
+  definitions <- norm_params$definitions
 
   # =========================================================================
   # Step 1: Identify Base Mature Cohorts & Valid Tags
@@ -89,24 +95,10 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     if (!tag %in% names(base_wide)) base_wide[[tag]] <- 0
   }
 
-  if (nrow(base_wide) == 0 ||
-      all(c(base_wide$breeder_meat_hens, base_wide$laying_hens, base_wide$free_range_laying_hens) == 0)) {
-    return(census_poultry %>% dplyr::filter(animal_tag %in% valid_poultry_tags))
-  }
-
   # =========================================================================
   # Step 3: Retrieve Biological & Zootechnical Parameters (Stratum-Aware)
   # =========================================================================
-  weights_df <- if (!is.null(weights)) {
-    weights
-  } else {
-    weights_path <- file.path(data_dir, "livestock_weights.csv")
-    if (file.exists(weights_path)) {
-      suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
-    } else {
-      NULL
-    }
-  }
+  weights_df <- herdr_load_weights_df(weights, data_dir)
 
   # 3a. Durations of productive laying cycles and rearing periods
   pullet_meat_days       <- herdr_resolve_period_days(base_wide, "replacement_meat_pullets",  weights = weights_df, default_days = 140)
@@ -197,11 +189,11 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     dplyr::filter(animal_tag %in% valid_poultry_tags, round(population, 5) > 0)
 
   # Informative console summary messages
-  tot_layers        <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag %in% c("laying_hens", "free_range_laying_hens")], na.rm = TRUE)
-  tot_breeders      <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "breeder_meat_hens"], na.rm = TRUE)
-  tot_layer_pullets <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "replacement_layer_pullets"], na.rm = TRUE)
-  tot_meat_pullets  <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "replacement_meat_pullets"], na.rm = TRUE)
-  tot_broilers      <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "broilers"], na.rm = TRUE)
+  tot_cage_layers       <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "laying_hens"], na.rm = TRUE)
+  tot_free_range_layers <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "free_range_laying_hens"], na.rm = TRUE)
+  tot_breeders          <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "breeder_meat_hens"], na.rm = TRUE)
+  tot_meat_pullets      <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "replacement_meat_pullets"], na.rm = TRUE)
+  tot_broilers          <- sum(final_poultry_pop$population[final_poultry_pop$animal_tag == "broilers"], na.rm = TRUE)
 
   if (tot_broilers > 0) {
     annual_broiler_harvest <- tot_broilers * (365 / broiler_days[1])
@@ -220,12 +212,23 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     }
   }
 
-  if (tot_layers > 0) {
+  if (tot_cage_layers > 0) {
+    cage_pullets <- sum(calculated$laying_hens * laying_repl_rate * (pullet_layer_days / 365), na.rm = TRUE)
     message(sprintf("   \u2022 Layer hens: %s head (cycle %.0f days, repl %.1f%%) -> %s standing replacement pullets (%.0f days rearing)",
-                    format(round(tot_layers), big.mark = ","),
+                    format(round(tot_cage_layers), big.mark = ","),
                     laying_days[1],
                     laying_repl_rate[1] * 100,
-                    format(round(tot_layer_pullets, 1), big.mark = ","),
+                    format(round(cage_pullets, 1), big.mark = ","),
+                    pullet_layer_days[1]))
+  }
+
+  if (tot_free_range_layers > 0) {
+    fr_pullets <- sum(calculated$free_range_laying_hens * free_range_repl_rate * (pullet_layer_days / 365), na.rm = TRUE)
+    message(sprintf("   \u2022 Free-range layer hens: %s head (cycle %.0f days, repl %.1f%%) -> %s standing replacement pullets (%.0f days rearing)",
+                    format(round(tot_free_range_layers), big.mark = ","),
+                    free_range_laying_days[1],
+                    free_range_repl_rate[1] * 100,
+                    format(round(fr_pullets, 1), big.mark = ","),
                     pullet_layer_days[1]))
   }
 
