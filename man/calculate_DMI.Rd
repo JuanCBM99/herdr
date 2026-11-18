@@ -33,3 +33,8 @@ A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body we
 Computes daily Dry Matter Intake (kg DM/day) based on metabolic demand (GE/ED)
 for ruminants and metabolizable energy requirements (FEDNA / NRC) for monogastrics (swine and poultry).
 }
+\examples{
+\dontrun{
+calculate_DMI(saveoutput = FALSE, data_dir = "user_data")
+}
+}

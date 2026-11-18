@@ -4,13 +4,37 @@
 \alias{calculate_NEg}
 \title{Calculate Net Energy for Growth (NEg)}
 \usage{
-calculate_NEg(saveoutput = TRUE, data_dir = "user_data")
+calculate_NEg(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  weights = NULL,
+  categories = NULL,
+  coefficients = NULL,
+  validate = TRUE
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{weights}{Optional preloaded \code{livestock_weights} dataframe.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+
+\item{coefficients}{Optional preloaded \code{ipcc_coefficients} dataframe.}
+
+\item{validate}{Logical. Whether to run coefficient validation. Default is TRUE.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEg_MJday} (MJ/day).
 }
 \description{
 Calculate Net Energy for Growth (NEg)
+}
+\examples{
+\dontrun{
+calculate_NEg(saveoutput = FALSE, data_dir = "user_data")
+}
 }

@@ -11,6 +11,12 @@
 #' @param diet_vars Optional precalculated weighted nutritional variables dataframe.
 #' @param ge_df Optional precalculated Gross Energy dataframe.
 #' @param pop_df Optional precalculated population dataframe.
+#' @return A tibble with enteric fermentation emission factors (\code{EF}, kg CH4/head/year)
+#'   and total enteric methane emissions (\code{CH4_enteric_kgyear}, kg CH4/year) by animal cohort.
+#' @examples
+#' \dontrun{
+#' calculate_emissions_enteric(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TRUE, data_dir = "user_data",
                                         diet_vars = NULL, ge_df = NULL, pop_df = NULL) {
@@ -66,9 +72,9 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
         animal_type == "cattle" & animal_subtype == "dairy" & milk_yield_kg_year > 0 ~ dplyr::case_when(
           DE_pct >= 70 & NDF_pct < 35 ~ 5.7,
           DE_pct >= 70 & NDF_pct >= 35 ~ 6.0,
-          DE_pct >= 63 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
-          DE_pct <= 62 & NDF_pct > 38 ~ 6.5,
-          # Conservative IPCC baseline fallback for rations outside Table 10.12 experimental ranges
+          DE_pct > 62 & DE_pct < 70 & NDF_pct <= 37 ~ 6.0,
+          DE_pct > 62 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
+          DE_pct <= 62 ~ 6.5,
           TRUE ~ 6.5
         ),
         animal_type == "cattle" ~ dplyr::case_when(

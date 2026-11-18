@@ -4,13 +4,31 @@
 \alias{calculate_NE_wool}
 \title{Calculate Net Energy for Wool (NE_wool)}
 \usage{
-calculate_NE_wool(saveoutput = TRUE, data_dir = "user_data")
+calculate_NE_wool(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  categories = NULL,
+  weights = NULL
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+
+\item{weights}{Optional preloaded \code{livestock_weights} dataframe.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEwool_MJday} (MJ/day).
 }
 \description{
 Calculate Net Energy for Wool (NE_wool)
+}
+\examples{
+\dontrun{
+calculate_NE_wool(saveoutput = FALSE, data_dir = "user_data")
+}
 }

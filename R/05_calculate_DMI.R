@@ -10,6 +10,10 @@
 #' @param mono Optional precalculated monogastric energy dataframe.
 #' @param weights Optional preloaded livestock weights dataframe.
 #' @return A tibble with daily Dry Matter Intake (kg DM/day) and intake relative to body weight (\% BW).
+#' @examples
+#' \dontrun{
+#' calculate_DMI(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @name calculate_DMI
 #' @rdname calculate_DMI
 #' @export

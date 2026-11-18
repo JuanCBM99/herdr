@@ -5,6 +5,12 @@
 #'
 #' @param saveoutput If TRUE (default), saves the results to `output/monogastric_metabolizable_energy.csv`.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @return A tibble with daily metabolizable energy requirements (\code{ME_total_kcal_day},
+#'   kcal/day) and phase components for swine and poultry cohorts.
+#' @examples
+#' \dontrun{
+#' calculate_monogastric_energy(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_data") {
   message("Calculating Monogastric Metabolizable Energy (kcal/day)...")
@@ -17,11 +23,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
   join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
 
   # Calculate daily egg mass internally for bioenergetics: (eggs_per_year / 365) * egg_weight_g
-  egg_wt <- if ("egg_weight_g" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$egg_weight_g)) else 60
-  egg_wt <- dplyr::coalesce(egg_wt, 60)
-  eggs_yr <- if ("eggs_per_year" %in% names(mono_csv)) suppressWarnings(as.numeric(mono_csv$eggs_per_year)) else 0
-  eggs_yr <- dplyr::coalesce(eggs_yr, 0)
-  mono_csv$egg_mass_g_day <- (eggs_yr / 365) * egg_wt
+  mono_csv$egg_mass_g_day <- herdr_calc_egg_mass_g_day(mono_csv)
 
   # 2. Join definition and weight files
   master <- mono_csv %>%
@@ -52,7 +54,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       W_mean = (initial_weight_kg + final_weight_kg) / 2,
       W_metabolic = dplyr::case_when(
         animal_type == "poultry" ~ W_mean^0.75,
-        animal_type == "swine" ~ W_mean^alpha,
+        animal_type == "swine" & alpha > 0 ~ W_mean^alpha,
         TRUE ~ W_mean^0.75
       ),
       ME_maint_kcal_day = cfi_maintenance * W_metabolic,
@@ -74,7 +76,7 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
         (sow_reserve_gain_kg * 4800) / sows_gestation_days,
         0
       ),
-      ME_gestation_phase_daily = ME_growth_gestation_daily + ME_conceptus_daily + ME_maternal_reserves_daily,
+      ME_gestation_phase_daily = ME_conceptus_daily + ME_maternal_reserves_daily,
 
       # --- Lactation phase requirements ---
       piglet_adg_gday = dplyr::if_else(
@@ -104,15 +106,28 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       ),
       ME_eggs_day = 2 * egg_mass_g_day,
 
-      # --- Total daily energy integration ---
-      ME_total_kcal_day = pmax(0, ME_maint_kcal_day + ME_standard_growth_day + ME_eggs_day + ME_gestation_phase_daily + ME_lactation_phase_daily),
+      # --- Weight gestation & lactation phases by their fraction of the reproductive cycle ---
+      cycle_days = pmax(productive_period_days, sows_gestation_days + sows_lactation_days),
+      gest_weight = dplyr::if_else(
+        sows_gestation_days > 0 & sows_lactation_days > 0,
+        sows_gestation_days / cycle_days,
+        1
+      ),
+      lact_weight = dplyr::if_else(
+        sows_gestation_days > 0 & sows_lactation_days > 0,
+        sows_lactation_days / cycle_days,
+        1
+      ),
 
       # Map outputs directly to report columns
       ME_mant_kcal = ME_maint_kcal_day,
-      ME_crec_kcal = dplyr::if_else(sows_gestation_days > 0, ME_growth_gestation_daily, ME_standard_growth_day),
+      ME_crec_kcal = dplyr::if_else(sows_gestation_days > 0, ME_growth_gestation_daily * gest_weight, ME_standard_growth_day),
       ME_eggs_kcal = ME_eggs_day,
-      ME_gestation_kcal = ME_gestation_phase_daily,
-      ME_lactation_kcal = ME_lactation_phase_daily
+      ME_gestation_kcal = ME_gestation_phase_daily * gest_weight,
+      ME_lactation_kcal = ME_lactation_phase_daily * lact_weight,
+
+      # --- Total daily energy integration ---
+      ME_total_kcal_day = pmax(0, ME_mant_kcal + ME_crec_kcal + ME_eggs_kcal + ME_gestation_kcal + ME_lactation_kcal)
     ) %>%
     # Select final tidy report schema
     dplyr::select(

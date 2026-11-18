@@ -4,13 +4,37 @@
 \alias{calculate_NEm}
 \title{Calculate Net Energy for Maintenance (NEm)}
 \usage{
-calculate_NEm(saveoutput = TRUE, data_dir = "user_data")
+calculate_NEm(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  weights = NULL,
+  categories = NULL,
+  coefficients = NULL,
+  validate = TRUE
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
+
+\item{weights}{Optional preloaded \code{livestock_weights} dataframe.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+
+\item{coefficients}{Optional preloaded \code{ipcc_coefficients} dataframe.}
+
+\item{validate}{Logical. Whether to run coefficient validation. Default is TRUE.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEm_MJday} (MJ/day).
 }
 \description{
 Computes net energy for maintenance based on animal weight and CFI coefficient.
+}
+\examples{
+\dontrun{
+calculate_NEm(saveoutput = FALSE, data_dir = "user_data")
+}
 }

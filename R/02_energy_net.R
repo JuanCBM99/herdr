@@ -4,16 +4,27 @@
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param weights Optional preloaded \code{livestock_weights} dataframe.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param coefficients Optional preloaded \code{ipcc_coefficients} dataframe.
+#' @param validate Logical. Whether to run coefficient validation. Default is TRUE.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEm_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NEm(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data") {
+calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data",
+                          weights = NULL, categories = NULL, coefficients = NULL, validate = TRUE) {
   message("Calculating Net Energy for Maintenance (NEm)...")
 
   # --- 1. Data Loading from user_data ---
-  weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
-  herdr_validate_ruminant_coefficients(categories, coefficients)
+  if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
 
   # --- 2. Calculation Pipeline ---
   results <- weights %>%
@@ -45,15 +56,30 @@ calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @param nem_df Optional precalculated NEm dataframe to avoid recomputation.
+#' @param weights Optional preloaded \code{livestock_weights} dataframe.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param coefficients Optional preloaded \code{ipcc_coefficients} dataframe.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEa_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NEa(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
+calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL,
+                          weights = NULL, categories = NULL, coefficients = NULL) {
   message("Calculating Net Energy for Activity (NEa)...")
 
   # --- 1. Data Loading ---
-  weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
-  if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
+  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+  if (is.null(nem_df)) {
+    nem_df <- calculate_NEm(
+      saveoutput = FALSE, data_dir = data_dir,
+      weights = weights, categories = categories, coefficients = coefficients
+    )
+  }
 
   ca_table <- coefficients %>%
     dplyr::filter(tolower(coefficient) == "ca") %>%
@@ -93,29 +119,53 @@ calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NU
 #' Calculate Net Energy for Growth (NEg)
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param weights Optional preloaded \code{livestock_weights} dataframe.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param coefficients Optional preloaded \code{ipcc_coefficients} dataframe.
+#' @param validate Logical. Whether to run coefficient validation. Default is TRUE.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEg_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NEg(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
+calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data",
+                          weights = NULL, categories = NULL, coefficients = NULL, validate = TRUE) {
   message("Calculating Net Energy for Growth (NEg)...")
 
   # --- 1. Data Loading (Robust reading) ---
-  weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"),
-    col_types = readr::cols(farm_id = "c", subregion = "c"),
-    show_col_types = FALSE
-  )
+  if (is.null(weights)) {
+    weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"),
+      col_types = readr::cols(farm_id = "c", subregion = "c"),
+      show_col_types = FALSE
+    )
+  } else {
+    weights <- dplyr::mutate(weights, dplyr::across(dplyr::any_of(c("farm_id", "subregion")), as.character))
+  }
 
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"),
-    col_types = readr::cols(farm_id = "c", subregion = "c", c = "c", a = "c", b = "c"),
-    show_col_types = FALSE
-  )
+  if (is.null(categories)) {
+    categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"),
+      col_types = readr::cols(farm_id = "c", subregion = "c", c = "c", a = "c", b = "c"),
+      show_col_types = FALSE
+    )
+  } else {
+    categories <- dplyr::mutate(categories, dplyr::across(dplyr::any_of(c("farm_id", "subregion", "c", "a", "b")), as.character))
+  }
 
-  coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"),
-    col_types = readr::cols(description = "c"),
-    show_col_types = FALSE
-  )
+  if (is.null(coefficients)) {
+    coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"),
+      col_types = readr::cols(description = "c"),
+      show_col_types = FALSE
+    )
+  } else {
+    coefficients <- dplyr::mutate(coefficients, dplyr::across(dplyr::any_of("description"), as.character))
+  }
 
-  herdr_validate_ruminant_coefficients(categories, coefficients)
+  if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
 
   coeff_lookup <- coefficients %>%
+    dplyr::filter(tolower(coefficient) %in% c("c", "a", "b")) %>%
     dplyr::select(description, value) %>%
     dplyr::distinct()
 
@@ -160,19 +210,28 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' Calculate Net Energy for Lactation (NEl)
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param weights Optional preloaded \code{livestock_weights} dataframe.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEl_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NEl(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data") {
+calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data", categories = NULL, weights = NULL) {
   message("Calculating Net Energy for Lactation (NEl)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE) %>%
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  weights_keys <- weights %>%
     dplyr::select(farm_id, region, subregion, animal_tag) %>%
     dplyr::distinct()
 
   # --- 2. Calculation Pipeline ---
   results <- categories %>%
-    dplyr::inner_join(weights, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
+    dplyr::inner_join(weights_keys, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
     dplyr::mutate(
       across(c(milk_yield_kg_year, fat_content_pct), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       Milk_yield_kg_day = milk_yield_kg_year / 365,
@@ -199,12 +258,19 @@ calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @param nem_df Optional precalculated NEm dataframe to avoid recomputation.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEwork_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NE_work(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
+calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL, categories = NULL) {
   message("Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
 
   if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
 
@@ -222,7 +288,7 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
     # --- 3. Final Selection and Cleanup ---
     dplyr::select(
       farm_id, region, subregion, animal_tag,
-      animal_type, animal_subtype, work_hours, NEm_MJday, NEwork_MJday
+      animal_type, animal_subtype, NEwork_MJday
     )
 
   # --- 4. Save Output ---
@@ -238,19 +304,28 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
 #' Calculate Net Energy for Wool (NE_wool)
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param weights Optional preloaded \code{livestock_weights} dataframe.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEwool_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NE_wool(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data") {
+calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data", categories = NULL, weights = NULL) {
   message("Calculating Net Energy for Wool (NE_wool)...")
 
   # --- 1. Data Loading from user_data ---
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE) %>%
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  weights_keys <- weights %>%
     dplyr::select(farm_id, region, subregion, animal_tag) %>%
     dplyr::distinct()
 
   # --- 2. Calculation Pipeline ---
   results <- categories %>%
-    dplyr::inner_join(weights, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
+    dplyr::inner_join(weights_keys, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
     dplyr::mutate(
       wool_yield_kg_year = tidyr::replace_na(suppressWarnings(as.numeric(wool_yield_kg_year)), 0),
       NEwool_MJday = (wool_yield_kg_year * 24) / 365
@@ -269,15 +344,25 @@ calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data") {
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
 #' @param nem_df Optional precalculated NEm dataframe to avoid recomputation.
+#' @param categories Optional preloaded \code{ruminant_definitions} dataframe.
+#' @param coefficients Optional preloaded \code{ipcc_coefficients} dataframe.
+#' @param validate Logical. Whether to run coefficient validation. Default is TRUE.
+#' @return A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+#'   \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEpregnancy_MJday} (MJ/day).
+#' @examples
+#' \dontrun{
+#' calculate_NE_pregnancy(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
-calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL) {
+calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL,
+                                   categories = NULL, coefficients = NULL, validate = TRUE) {
   message("Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
   # --- 1. Data Loading ---
-  categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
-  herdr_validate_ruminant_coefficients(categories, coefficients)
+  if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
 
   if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
 
@@ -310,17 +395,25 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", ne
     ) %>%
     dplyr::left_join(coeff_lookup, by = "c_pregnancy_tag") %>%
     dplyr::mutate(
-      pregnancy_rate = tidyr::replace_na(suppressWarnings(as.numeric(pregnancy_rate)), 0),
+      raw_preg_rate = suppressWarnings(as.numeric(pregnancy_rate)),
       pr_sheep_goat = tidyr::replace_na(suppressWarnings(as.numeric(pr_sheep_goat)), 0),
+      pregnancy_rate = dplyr::case_when(
+        !is.na(raw_preg_rate) ~ raw_preg_rate,
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat > 0 ~ 1.0,
+        TRUE ~ 0
+      ),
       c_value = tidyr::replace_na(suppressWarnings(as.numeric(c_value)), 0),
       NEm_MJday = tidyr::replace_na(suppressWarnings(as.numeric(NEm_MJday)), 0),
+      # IPCC 2019, Vol 4, Ch 10, Table 10.7 (cattle = c_value; sheep/goat: 1 -> 0.077, 2 -> 0.126, >=3 -> 0.150)
       C_preg_factor = dplyr::case_when(
         tolower(animal_type) %in% c("cattle", "buffalo") ~ c_value,
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 0 ~ 0,
         tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 1.0 ~ 0.077,
-        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat > 1.0 & pr_sheep_goat < 2.0 ~ {
-          (0.126 * (pr_sheep_goat - 1)) + (0.077 * (1 - (pr_sheep_goat - 1)))
-        },
-        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat >= 2.0 ~ 0.150,
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 2.0 ~
+          0.077 + (pr_sheep_goat - 1.0) * (0.126 - 0.077),
+        tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat < 3.0 ~
+          0.126 + (pr_sheep_goat - 2.0) * (0.150 - 0.126),
+        tolower(animal_type) %in% c("sheep", "goat", "goats") ~ 0.150,
         TRUE ~ 0
       ),
       NEpregnancy_MJday = C_preg_factor * NEm_MJday * pregnancy_rate

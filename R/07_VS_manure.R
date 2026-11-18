@@ -10,6 +10,10 @@
 #' @param dmi_data Optional precalculated DMI dataframe.
 #' @param diet_char Optional precalculated weighted nutritional variables dataframe.
 #' @return Tibble with VS for all animal categories.
+#' @examples
+#' \dontrun{
+#' calculate_vs(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "user_data",
                          ge_data = NULL, dmi_data = NULL, diet_char = NULL) {
@@ -26,7 +30,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
   results <- ge_data %>%
     dplyr::select(dplyr::all_of(join_keys), GE_MJday, DE_pct) %>%
     dplyr::left_join(
-      diet_char %>% dplyr::select(dplyr::all_of(join_keys), ASH_pct, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_DE_kcal_kg),
+      diet_char %>% dplyr::select(dplyr::all_of(join_keys), ASH_pct, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_DE_kcal_kg, dplyr::any_of("swine_ME_kcal_kg")),
       by = join_keys
     ) %>%
     dplyr::left_join(
@@ -34,9 +38,16 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
       by = join_keys
     ) %>%
     dplyr::mutate(
+      swine_ME_kcal_kg = if ("swine_ME_kcal_kg" %in% names(.)) swine_ME_kcal_kg else 0,
       dplyr::across(
-        c(GE_MJday, DE_pct, ASH_pct, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_DE_kcal_kg, DMI_kgday),
+        c(GE_MJday, DE_pct, ASH_pct, GE_feed_kcal_kg, poultry_ME_kcal_kg, swine_DE_kcal_kg, swine_ME_kcal_kg, DMI_kgday),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
+      ),
+      # If swine_DE_kcal_kg is missing, estimate DE from ME (ME ≈ 0.96 * DE)
+      swine_DE_eff = dplyr::case_when(
+        swine_DE_kcal_kg > 0 ~ swine_DE_kcal_kg,
+        swine_ME_kcal_kg > 0 ~ swine_ME_kcal_kg / 0.96,
+        TRUE ~ 0
       ),
 
       # --- 3. Compute Volatile Solids (VS) via Category-Specific Methods ---
@@ -48,7 +59,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
 
         # Swine: VS derived via DMI, accounting for Digestible Energy and a 2% urinary loss adjustment
         animal_type == "swine" & GE_feed_kcal_kg > 0 ~
-          (DMI_kgday * (1 - (swine_DE_kcal_kg / GE_feed_kcal_kg) + 0.02) * (1 - (ASH_pct / 100))),
+          (DMI_kgday * (1 - (swine_DE_eff / GE_feed_kcal_kg) + 0.02) * (1 - (ASH_pct / 100))),
         animal_type == "swine" & GE_feed_kcal_kg <= 0 ~ 0,
 
         # Ruminants (Default): IPCC Tier 2 Formula
@@ -56,7 +67,13 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
         TRUE ~ ((GE_MJday * (1 - DE_pct / 100)) + (urinary_energy * GE_MJday)) * ((1 - ASH_pct / 100) / 18.45)
       ),
       VS_kgday = pmax(0, VS_kgday)
-    ) %>%
+    )
+
+  if (any(results$animal_type == "swine" & results$GE_feed_kcal_kg > 0 & results$swine_DE_eff <= 0, na.rm = TRUE)) {
+    warning("[herdr] Missing both swine_DE_kcal_kg and swine_ME_kcal_kg for swine diet(s); VS calculation may overestimate fecal energy.", call. = FALSE)
+  }
+
+  results <- results %>%
     # --- 4. Select, Format and Round Outputs ---
     dplyr::select(
       dplyr::all_of(join_keys),

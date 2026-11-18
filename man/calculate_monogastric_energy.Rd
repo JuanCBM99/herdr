@@ -11,7 +11,16 @@ calculate_monogastric_energy(saveoutput = TRUE, data_dir = "user_data")
 
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 }
+\value{
+A tibble with daily metabolizable energy requirements (\code{ME_total_kcal_day},
+  kcal/day) and phase components for swine and poultry cohorts.
+}
 \description{
 Calculates daily metabolizable energy requirements (kcal/day) for poultry and swine
 using direct mathematical switches.
+}
+\examples{
+\dontrun{
+calculate_monogastric_energy(saveoutput = FALSE, data_dir = "user_data")
+}
 }

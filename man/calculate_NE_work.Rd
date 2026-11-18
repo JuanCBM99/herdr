@@ -4,7 +4,12 @@
 \alias{calculate_NE_work}
 \title{Calculate Net Energy for Work (NE_work)}
 \usage{
-calculate_NE_work(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
+calculate_NE_work(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  nem_df = NULL,
+  categories = NULL
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
@@ -12,7 +17,18 @@ calculate_NE_work(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 
 \item{nem_df}{Optional precalculated NEm dataframe to avoid recomputation.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEwork_MJday} (MJ/day).
 }
 \description{
 Computes NE_work based on NEm and hours of activity.
+}
+\examples{
+\dontrun{
+calculate_NE_work(saveoutput = FALSE, data_dir = "user_data")
+}
 }

@@ -26,9 +26,18 @@ calculate_emissions_enteric(
 
 \item{pop_df}{Optional precalculated population dataframe.}
 }
+\value{
+A tibble with enteric fermentation emission factors (\code{EF}, kg CH4/head/year)
+  and total enteric methane emissions (\code{CH4_enteric_kgyear}, kg CH4/year) by animal cohort.
+}
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),
 Digestible Energy (DE), NDF, and Ym factor using IPCC Tier 2 logic for ruminants,
 and the IPCC Tier 1 fixed emission factor for swine (1.5 kg CH4/head/year, high
 productivity systems; IPCC 2019 Refinement, Vol 4, Ch 10, Table 10.10 and Eq. 10.19).
+}
+\examples{
+\dontrun{
+calculate_emissions_enteric(saveoutput = FALSE, data_dir = "user_data")
+}
 }

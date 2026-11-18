@@ -11,6 +11,12 @@
 #' @param NE_work_df Optional precalculated NE_work dataframe.
 #' @param NE_pregnancy_df Optional precalculated NE_pregnancy dataframe.
 #' @param NE_wool_df Optional precalculated NE_wool dataframe.
+#' @return A tibble with daily Net Energy components, REM, REG, DE_pct, and Gross Energy
+#'   requirements (\code{GE_MJday}, MJ/day) by animal cohort.
+#' @examples
+#' \dontrun{
+#' calculate_ge(saveoutput = FALSE, data_dir = "user_data")
+#' }
 #' @export
 calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
                          de_df = NULL,
@@ -28,8 +34,33 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
   de_df <- de_df %>%
     dplyr::select(dplyr::all_of(join_keys_univ), DE_pct)
 
-  # --- 2. NE Components Collection ---
+  # --- 2. NE Components Collection (Load shared tables & validate ONCE) ---
   message("  -> Fetching NE components...")
+
+  need_ne <- any(vapply(
+    list(NEm_df, NEa_df, NEg_df, NEl_df, NE_work_df, NE_pregnancy_df, NE_wool_df),
+    is.null,
+    logical(1)
+  ))
+
+  if (need_ne) {
+    weights_shared <- readr::read_csv(
+      file.path(data_dir, "livestock_weights.csv"),
+      col_types = readr::cols(farm_id = "c", subregion = "c"),
+      show_col_types = FALSE
+    )
+    categories_shared <- readr::read_csv(
+      file.path(data_dir, "ruminant_definitions.csv"),
+      col_types = readr::cols(farm_id = "c", subregion = "c", c = "c", a = "c", b = "c"),
+      show_col_types = FALSE
+    )
+    coefficients_shared <- readr::read_csv(
+      file.path(data_dir, "ipcc_coefficients.csv"),
+      col_types = readr::cols(description = "c"),
+      show_col_types = FALSE
+    )
+    herdr_validate_ruminant_coefficients(categories_shared, coefficients_shared)
+  }
 
   get_ne <- function(df, func, col_name, ...) {
     if (!is.null(df)) {
@@ -40,13 +71,34 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
     }
   }
 
-  NEm_df <- get_ne(NEm_df, calculate_NEm, "NEm_MJday")
-  NEa_df <- get_ne(NEa_df, calculate_NEa, "NEa_MJday", nem_df = NEm_df)
-  NEg_df <- get_ne(NEg_df, calculate_NEg, "NEg_MJday")
-  NEl_df <- get_ne(NEl_df, calculate_NEl, "NEl_MJday")
-  NE_work_df <- get_ne(NE_work_df, calculate_NE_work, "NEwork_MJday", nem_df = NEm_df)
-  NE_pregnancy_df <- get_ne(NE_pregnancy_df, calculate_NE_pregnancy, "NEpregnancy_MJday", nem_df = NEm_df)
-  NE_wool_df <- get_ne(NE_wool_df, calculate_NE_wool, "NEwool_MJday")
+  NEm_df <- get_ne(
+    NEm_df, calculate_NEm, "NEm_MJday",
+    weights = weights_shared, categories = categories_shared, coefficients = coefficients_shared, validate = FALSE
+  )
+  NEa_df <- get_ne(
+    NEa_df, calculate_NEa, "NEa_MJday",
+    nem_df = NEm_df, weights = weights_shared, categories = categories_shared, coefficients = coefficients_shared
+  )
+  NEg_df <- get_ne(
+    NEg_df, calculate_NEg, "NEg_MJday",
+    weights = weights_shared, categories = categories_shared, coefficients = coefficients_shared, validate = FALSE
+  )
+  NEl_df <- get_ne(
+    NEl_df, calculate_NEl, "NEl_MJday",
+    categories = categories_shared, weights = weights_shared
+  )
+  NE_work_df <- get_ne(
+    NE_work_df, calculate_NE_work, "NEwork_MJday",
+    nem_df = NEm_df, categories = categories_shared
+  )
+  NE_pregnancy_df <- get_ne(
+    NE_pregnancy_df, calculate_NE_pregnancy, "NEpregnancy_MJday",
+    nem_df = NEm_df, categories = categories_shared, coefficients = coefficients_shared, validate = FALSE
+  )
+  NE_wool_df <- get_ne(
+    NE_wool_df, calculate_NE_wool, "NEwool_MJday",
+    categories = categories_shared, weights = weights_shared
+  )
 
   # --- 3. Aggregation and GE Calculation (IPCC) ---
   results <- de_df %>%

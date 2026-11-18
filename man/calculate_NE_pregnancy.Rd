@@ -7,7 +7,10 @@
 calculate_NE_pregnancy(
   saveoutput = TRUE,
   data_dir = "user_data",
-  nem_df = NULL
+  nem_df = NULL,
+  categories = NULL,
+  coefficients = NULL,
+  validate = TRUE
 )
 }
 \arguments{
@@ -16,7 +19,22 @@ calculate_NE_pregnancy(
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 
 \item{nem_df}{Optional precalculated NEm dataframe to avoid recomputation.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+
+\item{coefficients}{Optional preloaded \code{ipcc_coefficients} dataframe.}
+
+\item{validate}{Logical. Whether to run coefficient validation. Default is TRUE.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEpregnancy_MJday} (MJ/day).
 }
 \description{
 Calculate Net Energy for Pregnancy (NE_pregnancy)
+}
+\examples{
+\dontrun{
+calculate_NE_pregnancy(saveoutput = FALSE, data_dir = "user_data")
+}
 }

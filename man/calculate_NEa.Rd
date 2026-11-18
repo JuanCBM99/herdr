@@ -4,7 +4,14 @@
 \alias{calculate_NEa}
 \title{Calculate Net Energy for Activity (NEa)}
 \usage{
-calculate_NEa(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
+calculate_NEa(
+  saveoutput = TRUE,
+  data_dir = "user_data",
+  nem_df = NULL,
+  weights = NULL,
+  categories = NULL,
+  coefficients = NULL
+)
 }
 \arguments{
 \item{saveoutput}{If TRUE (default) the results are saved in the output folder.}
@@ -12,7 +19,22 @@ calculate_NEa(saveoutput = TRUE, data_dir = "user_data", nem_df = NULL)
 \item{data_dir}{Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.}
 
 \item{nem_df}{Optional precalculated NEm dataframe to avoid recomputation.}
+
+\item{weights}{Optional preloaded \code{livestock_weights} dataframe.}
+
+\item{categories}{Optional preloaded \code{ruminant_definitions} dataframe.}
+
+\item{coefficients}{Optional preloaded \code{ipcc_coefficients} dataframe.}
+}
+\value{
+A tibble with columns \code{farm_id}, \code{region}, \code{subregion},
+  \code{animal_tag}, \code{animal_type}, \code{animal_subtype}, and \code{NEa_MJday} (MJ/day).
 }
 \description{
 Calculate Net Energy for Activity (NEa)
+}
+\examples{
+\dontrun{
+calculate_NEa(saveoutput = FALSE, data_dir = "user_data")
+}
 }

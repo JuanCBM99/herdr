@@ -38,6 +38,15 @@ calculate_ge(
 
 \item{NE_wool_df}{Optional precalculated NE_wool dataframe.}
 }
+\value{
+A tibble with daily Net Energy components, REM, REG, DE_pct, and Gross Energy
+  requirements (\code{GE_MJday}, MJ/day) by animal cohort.
+}
 \description{
 Computes gross energy requirements by aggregating Net Energy (NE) components.
+}
+\examples{
+\dontrun{
+calculate_ge(saveoutput = FALSE, data_dir = "user_data")
+}
 }
