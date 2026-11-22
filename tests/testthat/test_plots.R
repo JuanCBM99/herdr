@@ -273,5 +273,61 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   expect_true("GHG Intensity (kg CO2e / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
   expect_true("Land Footprint (m2 / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
   expect_true("Water Intensity (m³ depriv. / kg protein)" %in% levels(p_t2_prot_ov$data$panel))
+
+  # 18. Enterprise-level Table 2 views collapse animal_tag into animal_type + animal_subtype
+  multi_cohort_int <- tibble::tibble(
+    farm_id = rep("farm_1", 4),
+    region = rep("spain_2015", 4),
+    subregion = c("north", "north", "south", "south"),
+    animal_tag = c("mature_dairy_cattle", "feedlot_calves_male", "mature_dairy_cattle", "feedlot_calves_male"),
+    animal_type = rep("cattle", 4),
+    animal_subtype = rep("dairy", 4),
+    production_role = c("mature", "slaughter", "mature", "slaughter"),
+    population = c(100, 30, 200, 80),
+    milk_FPCM_kg = c(800000, 0, 1600000, 0),
+    meat_carcass_weight_kg = c(10000, 6000, 20000, 16000),
+    egg_fresh_kg = rep(0, 4),
+    wool_kg = rep(0, 4),
+    total_protein_kg = c(30000, 1000, 60000, 3000),
+    GHG_intensity_milk = c(0.60, NA_real_, 0.50, NA_real_),
+    GHG_cradle_to_farm_milk = c(1.00, NA_real_, 0.90, NA_real_),
+    GHG_intensity_meat = c(4.50, 3.30, 4.00, 2.90),
+    GHG_cradle_to_farm_meat = c(6.50, 5.00, 6.00, 4.50),
+    GHG_intensity_egg = rep(NA_real_, 4),
+    GHG_cradle_to_farm_egg = rep(NA_real_, 4),
+    GHG_intensity_wool = rep(NA_real_, 4),
+    GHG_cradle_to_farm_wool = rep(NA_real_, 4),
+    GHG_intensity_protein = c(20.0, 20.0, 15.0, 15.0),
+    GHG_cradle_to_farm_protein = c(30.0, 30.0, 25.0, 25.0),
+    Land_intensity_protein = c(40.0, 40.0, 35.0, 35.0),
+    Water_intensity_protein = c(5.0, 5.0, 4.0, 4.0),
+    Protein_FCR_total = c(5.0, 5.0, 4.0, 4.0),
+    Protein_FCR_cropland = c(2.0, 2.0, 1.5, 1.5)
+  )
+
+  p_fcr_ent <- plot_herdr_results(
+    multi_cohort_int,
+    group_cols = c("farm_id", "animal_tag", "region"),
+    func_name = "generate_impact_assessment",
+    functional_unit = "fcr",
+    impact_category = "fcr"
+  )
+  expect_s3_class(p_fcr_ent, "ggplot")
+  expect_equal(length(unique(p_fcr_ent$data$plot_label)), 1)
+  expect_equal(as.character(unique(p_fcr_ent$data$plot_label)), "farm_1 - cattle - dairy - spain_2015")
+  # Exact enterprise protein-weighted FCR across north (31k kg, FCR=5) and south (63k kg, FCR=4)
+  exp_fcr <- (5.0 * 31000 + 4.0 * 63000) / (31000 + 63000)
+  fcr_tot_val <- p_fcr_ent$data$value[p_fcr_ent$data$metric_raw == "fcr_total"]
+  expect_equal(fcr_tot_val, exp_fcr, tolerance = 1e-6)
+
+  p_meat_ent <- plot_herdr_results(
+    multi_cohort_int,
+    group_cols = c("farm_id", "animal_tag", "region"),
+    func_name = "generate_impact_assessment",
+    functional_unit = "meat",
+    impact_category = "ghg"
+  )
+  expect_s3_class(p_meat_ent, "ggplot")
+  expect_equal(length(unique(p_meat_ent$data$plot_label)), 1)
 })
 

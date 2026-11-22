@@ -116,6 +116,16 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
       fu_check %in% c("product", "water_product") ~ "product",
       TRUE ~ ""
     )
+    # Enterprise-level Table 2 intensities (FCR, protein, commercial products) are defined
+    # at the enterprise level (farm_id, region, subregion, animal_type, animal_subtype), not per
+    # animal_tag cohort. Replace animal_tag with animal_type + animal_subtype to avoid duplicate bars.
+    if (target_fu %in% c("fcr", "protein", "milk", "meat", "egg", "wool", "product") &&
+        "animal_tag" %in% valid_groups &&
+        all(c("animal_type", "animal_subtype") %in% names(df))) {
+      idx_tag <- match("animal_tag", valid_groups)
+      valid_groups <- unique(append(valid_groups[-idx_tag], c("animal_type", "animal_subtype"), after = idx_tag - 1))
+    }
+
     if (target_fu == "fcr" && "Protein_FCR_total" %in% names(df)) {
       keep_rows <- !is.na(df$Protein_FCR_total) & df$Protein_FCR_total > 0
       if (any(keep_rows)) df <- df[keep_rows, , drop = FALSE]
@@ -395,12 +405,12 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
 
       valid_prot <- (df_agg$total_protein_kg > 0) & !is_non_milking_dairy
 
-      if (has_raw_cp) {
-        df_agg$fcr_total <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_total_kg / df_agg$total_protein_kg, 0)
-        df_agg$fcr_cropland <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_cropland_kg / df_agg$total_protein_kg, 0)
-      } else if (has_direct_fcr) {
+      if (has_direct_fcr) {
         df_agg$fcr_total <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_total, 0), 0)
         df_agg$fcr_cropland <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_cropland, 0), 0)
+      } else if (has_raw_cp) {
+        df_agg$fcr_total <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_total_kg / df_agg$total_protein_kg, 0)
+        df_agg$fcr_cropland <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_cropland_kg / df_agg$total_protein_kg, 0)
       } else {
         df_agg$fcr_total <- 0
         df_agg$fcr_cropland <- 0
@@ -451,7 +461,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         ) +
         labs(
           title = "Protein Feed Efficiency & Human Food Competition",
-          subtitle = "kg Crude Protein Intake per kg Animal Edible Protein Output (Mottet et al. 2017)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer",
+          subtitle = "Enterprise-level kg Crude Protein Intake per kg Animal Edible Protein Output (arable concentrates with EA > 0.33; crude protein basis)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer",
           x = "Protein Feed Conversion Ratio (kg CP feed / kg edible protein)",
           y = NULL
         )

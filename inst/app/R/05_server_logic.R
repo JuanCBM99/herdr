@@ -633,14 +633,36 @@ herdr_server <- function(input, output, session) {
     }
   })
 
-  # Sync table selector automatically when chart functional unit / impact category changes
-  observeEvent(list(input$plot_impact_category, input$plot_functional_unit), {
-    if (!identical(input$function_choice, "generate_impact_assessment")) return()
+  # Sync table selector and chart grouping options when functional unit / impact category changes.
+  # Table 2 intensities (FCR, protein, commercial products) are enterprise-level, so hide animal_tag.
+  observeEvent(list(input$function_choice, input$plot_impact_category, input$plot_functional_unit), {
+    is_summary <- identical(input$function_choice, "generate_impact_assessment")
     ic <- if (!is.null(input$plot_impact_category)) input$plot_impact_category else "ghg"
     fu <- if (!is.null(input$plot_functional_unit)) input$plot_functional_unit else "total"
-    target_tbl <- if (ic == "fcr" || fu %in% c("product", "protein")) "intensities" else "totals"
-    if (!identical(input$results_table_choice, target_tbl)) {
-      updateRadioButtons(session, "results_table_choice", selected = target_tbl)
+    is_enterprise_view <- is_summary && (ic == "fcr" || fu %in% c("product", "protein"))
+
+    if (is_summary) {
+      target_tbl <- if (is_enterprise_view) "intensities" else "totals"
+      if (!identical(input$results_table_choice, target_tbl)) {
+        updateRadioButtons(session, "results_table_choice", selected = target_tbl)
+      }
+    }
+
+    current_groups <- input$plot_groups
+    if (is_enterprise_view) {
+      ent_choices <- c("farm_id", "animal_type", "animal_subtype", "region", "subregion")
+      if (!is.null(current_groups) && "animal_tag" %in% current_groups) {
+        idx_tag <- match("animal_tag", current_groups)
+        new_sel <- unique(append(current_groups[-idx_tag], c("animal_type", "animal_subtype"), after = idx_tag - 1))
+      } else {
+        new_sel <- intersect(current_groups, ent_choices)
+        if (length(new_sel) == 0) new_sel <- c("farm_id", "animal_type", "animal_subtype", "region")
+      }
+      updateSelectizeInput(session, "plot_groups", choices = ent_choices, selected = new_sel)
+    } else {
+      all_choices <- c("farm_id", "animal_tag", "animal_type", "animal_subtype", "region", "subregion")
+      new_sel <- if (!is.null(current_groups) && length(current_groups) > 0) current_groups else c("farm_id", "animal_tag", "region", "subregion")
+      updateSelectizeInput(session, "plot_groups", choices = all_choices, selected = new_sel)
     }
   }, ignoreInit = TRUE)
 
