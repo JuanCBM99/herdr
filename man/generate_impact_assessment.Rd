@@ -50,16 +50,19 @@ generate_impact_assessment(
 \value{
 A named list containing two dataframes:
   \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).}
-  \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein), nutritional (kg feed protein / kg product protein), and per-head environmental intensities.}
+  \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_cropland} across arable non-forage concentrates with economic allocation > 0.33, crude protein basis without DIAAS/partial HEP).}
 }
 \description{
 Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
 and GLEAM production outputs. Generates two distinct reports: an absolute environmental inventory (totals)
 and farm-level product, nutritional, and per-head environmental intensities.
 
-Product intensities (Table 2) are obtained by allocating the whole enterprise footprint
-(GHG, land, water) among its co-products using a biophysical (energy-based) allocation
-factor: \code{AF_k = Energy_k / Energy_total}.
+Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
+(GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
+factor: \code{AF_k = Energy_k / Energy_total}. Specifically, \code{Protein_FCR_total} divides whole-herd
+total feed crude protein by edible animal protein (allocated by \code{af_protein}), whereas
+\code{Protein_FCR_cropland} restricts feed crude protein to arable non-forage concentrates with
+economic allocation > 0.33 (crude protein basis, without DIAAS or partial HEP adjustments).
 }
 \examples{
 \dontrun{

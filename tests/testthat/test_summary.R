@@ -267,7 +267,14 @@ test_that("Table 2 integrates breeding + replacement + slaughter in meat systems
     alloc_fatten_s1 <- fatten_row$GHG_intensity_meat * fatten_row$meat_carcass_weight_kg
     alloc_sows_s1   <- sows_row$GHG_intensity_meat * sows_row$meat_carcass_weight_kg
     expect_equal(alloc_fatten_s1 + alloc_sows_s1, tot_swine_s1, tolerance = 1e-2 * tot_swine_s1)
-    expect_false(isTRUE(all.equal(fatten_row$Protein_FCR_total, sows_row$Protein_FCR_total)))
+
+    # Enterprise-level Protein FCR: all protein-producing cohorts share whole-herd FCR (including replacement)
+    expect_equal(fatten_row$Protein_FCR_total, sows_row$Protein_FCR_total)
+    expect_equal(fatten_row$Protein_FCR_cropland, sows_row$Protein_FCR_cropland)
+    exp_swine_fcr_tot <- round(sum(swine_tot$feed_CP_total_kg) / sum(swine_int$total_protein_kg), 2)
+    exp_swine_fcr_crop <- round(sum(swine_tot$feed_CP_cropland_kg) / sum(swine_int$total_protein_kg), 2)
+    expect_equal(fatten_row$Protein_FCR_total, exp_swine_fcr_tot)
+    expect_equal(fatten_row$Protein_FCR_cropland, exp_swine_fcr_crop)
   })
 })
 
@@ -370,5 +377,14 @@ test_that("Table 2 integrates mature dairy + replacement + slaughter calves into
 
     sum_alloc <- alloc_milk_s1 + alloc_cull_s1 + alloc_slau_s1
     expect_equal(sum_alloc, tot_s1, tolerance = 1e-2 * tot_s1)
+
+    # Verify unified enterprise-level Protein FCR includes mature + replacement + slaughter
+    expect_true(is.na(repl_row$Protein_FCR_total))
+    expect_equal(mat_row$Protein_FCR_total, slau_row$Protein_FCR_total)
+    expect_equal(mat_row$Protein_FCR_cropland, slau_row$Protein_FCR_cropland)
+    exp_dairy_fcr_tot <- round(sum(tot$feed_CP_total_kg) / sum(inten$total_protein_kg), 2)
+    exp_dairy_fcr_crop <- round(sum(tot$feed_CP_cropland_kg) / sum(inten$total_protein_kg), 2)
+    expect_equal(mat_row$Protein_FCR_total, exp_dairy_fcr_tot)
+    expect_equal(mat_row$Protein_FCR_cropland, exp_dairy_fcr_crop)
   })
 })
