@@ -174,7 +174,7 @@ Co-product footprint intensities (greenhouse gases, agroecological land use, and
 $$AF_k = \frac{\text{Energy}_k}{\sum_j \text{Energy}_j}$$
 
 Where net biophysical energy requirements per unit of production are:
-- **Cattle & Buffalo Milk**: $3.1\text{ MJ/kg FPCM}$ (IDF Bulletin 520 / 2022; Nemecek & Thoma).
+- **Cattle Milk**: $3.1\text{ MJ/kg FPCM}$ (IDF Bulletin 520 / 2022; Nemecek & Thoma).
 - **Sheep Milk**: $4.6\text{ MJ/kg fresh milk}$ at 7% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1993, 1995).
 - **Goat Milk**: $3.0\text{ MJ/kg fresh milk}$ at 3.8% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1998).
 - **Mature Cull Meat**: $15.0\text{ MJ/kg live weight}$ (IDF Bulletin 520 / 2022).

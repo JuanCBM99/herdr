@@ -101,7 +101,7 @@ calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NU
       dplyr::across(c(initial_weight_kg, final_weight_kg, ca_value, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       avg_weight = (initial_weight_kg + final_weight_kg) / 2,
       NEa_MJday = dplyr::case_when(
-        tolower(animal_type) %in% c("cattle", "buffalo") ~ ca_value * NEm_MJday,
+        tolower(animal_type) == "cattle" ~ ca_value * NEm_MJday,
         tolower(animal_type) %in% c("sheep", "goat") ~ ca_value * avg_weight,
         TRUE ~ 0
       )
@@ -406,7 +406,7 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", ne
       NEm_MJday = tidyr::replace_na(suppressWarnings(as.numeric(NEm_MJday)), 0),
       # IPCC 2019, Vol 4, Ch 10, Table 10.7 (cattle = c_value; sheep/goat: 1 -> 0.077, 2 -> 0.126, >=3 -> 0.150)
       C_preg_factor = dplyr::case_when(
-        tolower(animal_type) %in% c("cattle", "buffalo") ~ c_value,
+        tolower(animal_type) == "cattle" ~ c_value,
         tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 0 ~ 0,
         tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 1.0 ~ 0.077,
         tolower(animal_type) %in% c("sheep", "goat", "goats") & pr_sheep_goat <= 2.0 ~

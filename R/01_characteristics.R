@@ -110,7 +110,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   # --- 5. Biological & Nutritional Threshold Checks (Mature Ruminants Only) ---
   mature_check <- full_data %>%
     dplyr::filter(
-      tolower(animal_type) %in% c("cattle", "sheep", "goat", "buffalo"),
+      tolower(animal_type) %in% c("cattle", "sheep", "goat"),
       tolower(trimws(as.character(production_role))) == "mature"
     )
 
