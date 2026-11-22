@@ -196,3 +196,62 @@ test_that("calculate_production correctly uses protein_content_pct when provided
   expected_fallback_prot <- round(dairy_fallback$milk_fresh_kg[1] * ipcc_prot_pct, 2)
   expect_equal(dairy_fallback$milk_protein_kg[1], expected_fallback_prot)
 })
+
+test_that("calculate_production excludes suckled milk and hatching eggs in meat systems", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  dir.create(file.path(temp_test_dir, "user_data"))
+
+  # 1. Check poultry meat breeders vs layers using Monogastric_Example
+  mono_files <- list.files(system.file("Examples", "Monogastric_Example", package = "herdr"), full.names = TRUE)
+  if (length(mono_files) == 0) {
+    mono_files <- list.files("inst/Examples/Monogastric_Example", full.names = TRUE)
+  }
+  file.copy(mono_files, file.path(temp_test_dir, "user_data"))
+
+  res_mono <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = file.path(temp_test_dir, "user_data")
+  ))
+
+  breeder_meat <- res_mono %>% dplyr::filter(animal_tag == "breeder_meat_hens")
+  layers <- res_mono %>% dplyr::filter(animal_subtype == "layer", production_role == "mature")
+  expect_equal(breeder_meat$egg_fresh_kg[1], 0)
+  expect_equal(breeder_meat$egg_protein_kg[1], 0)
+  expect_true(all(layers$egg_fresh_kg > 0))
+
+  # 2. Check suckled milk in meat ruminants is excluded from commercial milk
+  temp_rum_dir <- tempfile()
+  dir.create(temp_rum_dir)
+  source_data <- test_path("test_data/user_data")
+  file.copy(from = source_data, to = temp_rum_dir, recursive = TRUE)
+  ud <- file.path(temp_rum_dir, "user_data")
+
+  rum_df <- readr::read_csv(file.path(ud, "ruminant_definitions.csv"), show_col_types = FALSE) %>%
+    dplyr::mutate(
+      region = dplyr::if_else(animal_tag == "mature_sheep_female_meat", "spain", region),
+      subregion = dplyr::if_else(animal_tag == "mature_sheep_female_meat", NA_character_, subregion)
+    )
+  readr::write_csv(rum_df, file.path(ud, "ruminant_definitions.csv"))
+
+  cen_df <- readr::read_csv(file.path(ud, "livestock_census.csv"), show_col_types = FALSE) %>%
+    dplyr::bind_rows(tibble::tibble(
+      farm_id = "farm_1", animal_tag = "mature_sheep_female_meat",
+      region = "spain", subregion = NA_character_, population = 100
+    ))
+  readr::write_csv(cen_df, file.path(ud, "livestock_census.csv"))
+
+  res_rum <- suppressMessages(calculate_production(
+    automatic_cycle = FALSE,
+    saveoutput = FALSE,
+    data_dir = ud
+  ))
+
+  meat_ewe <- res_rum %>% dplyr::filter(animal_tag == "mature_sheep_female_meat")
+  dairy_cow <- res_rum %>% dplyr::filter(animal_tag == "mature_dairy_cattle")
+  expect_equal(meat_ewe$milk_fresh_kg[1], 0)
+  expect_equal(meat_ewe$milk_FPCM_kg[1], 0)
+  expect_equal(meat_ewe$milk_protein_kg[1], 0)
+  expect_gt(dairy_cow$milk_fresh_kg[1], 0)
+})

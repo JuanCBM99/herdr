@@ -237,7 +237,8 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       ),
 
       # --- A) MILK PRODUCTION ---
-      milk_fresh_kg = population * milk_yield_kg_year,
+      # Only commercial milk from dairy systems (suckled milk in meat systems is an internal flow)
+      milk_fresh_kg = dplyr::if_else(animal_subtype %in% "dairy", population * milk_yield_kg_year, 0),
       # Real milk protein percentage: User input preferred; fallback to IPCC fat regression, then GLEAM default
       milk_prot_pct = dplyr::case_when(
         protein_content_pct > 0 ~ protein_content_pct / 100,
@@ -259,7 +260,12 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       meat_protein_kg = meat_boneless_kg * MEAT_prot,
 
       # --- C) EGG PRODUCTION ---
-      egg_fresh_kg = dplyr::if_else(egg_mass_g_day > 0, (egg_mass_g_day * 365 / 1000) * population, 0),
+      # Only commercial table eggs from layer systems (hatching eggs in meat breeders are an internal flow)
+      egg_fresh_kg = dplyr::if_else(
+        animal_subtype %in% "layer" & egg_mass_g_day > 0,
+        (egg_mass_g_day * 365 / 1000) * population,
+        0
+      ),
       egg_protein_kg = egg_fresh_kg * egg_prot_fraction,
 
       # --- D) FIBRE / WOOL ---
