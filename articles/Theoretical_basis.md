@@ -50,7 +50,7 @@ activities.
 
 Energy required for tissue deposition (weight gain).
 
-- **Cattle and Buffalo:** (Eq. 10.6)
+- **Cattle:** (Eq. 10.6)
   ``` math
   NE_{g} = 22.02 \cdot \left( \frac{BW}{C \cdot MW} \right)^{0.75} \cdot WG^{1.097}
   ```

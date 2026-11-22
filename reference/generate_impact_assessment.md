@@ -5,10 +5,15 @@ footprints, and GLEAM production outputs. Generates two distinct
 reports: an absolute environmental inventory (totals) and farm-level
 product, nutritional, and per-head environmental intensities.
 
-Product intensities (Table 2) are obtained by allocating the whole
-enterprise footprint (GHG, land, water) among its co-products using a
-biophysical (energy-based) allocation factor:
-`AF_k = Energy_k / Energy_total`.
+Product intensities and Protein FCR (Table 2) are obtained by allocating
+the whole enterprise pool (GHG, land, water, feed protein) among its
+co-products using a biophysical (energy-based) allocation factor:
+`AF_k = Energy_k / Energy_total`. Specifically, `Protein_FCR_total`
+divides whole-herd total feed crude protein by edible animal protein
+(allocated by `af_protein`), whereas `Protein_FCR_cropland` restricts
+feed crude protein to arable non-forage concentrates with economic
+allocation \> 0.33 (crude protein basis, without DIAAS or partial HEP
+adjustments).
 
 ## Usage
 
@@ -114,8 +119,10 @@ A named list containing two dataframes:
 - intensities:
 
   Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or
-  edible protein), nutritional (kg feed protein / kg product protein),
-  and per-head environmental intensities.
+  edible protein) and enterprise-level nutritional intensities
+  (`Protein_FCR_total` across all feed CP; `Protein_FCR_cropland` across
+  arable non-forage concentrates with economic allocation \> 0.33, crude
+  protein basis without DIAAS/partial HEP).
 
 ## Examples
 
