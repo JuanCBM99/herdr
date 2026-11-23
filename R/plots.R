@@ -461,7 +461,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         ) +
         labs(
           title = "Protein Feed Efficiency & Human Food Competition",
-          subtitle = "Enterprise-level kg Crude Protein Intake per kg Animal Edible Protein Output (arable concentrates with EA > 0.33; crude protein basis)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer",
+          subtitle = "Enterprise-level kg Crude Protein Intake per kg Animal Edible Protein Output (mapping.csv human_edible; crude protein basis)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer",
           x = "Protein Feed Conversion Ratio (kg CP feed / kg edible protein)",
           y = NULL
         )

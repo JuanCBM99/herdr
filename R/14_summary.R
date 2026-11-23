@@ -8,8 +8,10 @@
 #' (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 #' factor: \code{AF_k = Energy_k / Energy_total}. Specifically, \code{Protein_FCR_total} divides whole-herd
 #' total feed crude protein by edible animal protein (allocated by \code{af_protein}), whereas
-#' \code{Protein_FCR_cropland} restricts feed crude protein to arable non-forage concentrates with
-#' economic allocation > 0.33 (crude protein basis, without DIAAS or partial HEP adjustments).
+#' \code{Protein_FCR_cropland} weights feed crude protein by the explicit \code{human_edible} column in
+#' \code{mapping.csv} (default binary \code{0/1} classification anchored on arable non-forage concentrates
+#' with \code{economic_allocation > 0.33}, excluding inedible/waste items and including commercial food-grade
+#' dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).
 #'
 #' @param automatic_cycle Logical. TRUE for built-in demographic models, FALSE for manual livestock_census.csv.
 #' @param farm_id Character vector to filter by farm_id. Default is NULL.
@@ -26,7 +28,7 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @return A named list containing two dataframes:
 #'   \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).}
-#'   \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_cropland} across arable non-forage concentrates with economic allocation > 0.33, crude protein basis without DIAAS/partial HEP).}
+#'   \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_cropland} weighted by the \code{human_edible} column in \code{mapping.csv}, crude protein basis without DIAAS/partial HEP).}
 #' @examples
 #' \dontrun{
 #' res <- generate_impact_assessment(
