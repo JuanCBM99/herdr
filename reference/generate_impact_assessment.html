@@ -6,16 +6,20 @@ Product intensities and Protein FCR (Table 2) are obtained by allocating the who
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: AF_k = Energy_k / Energy_total. Specifically, Protein_FCR_total divides whole-herd
 total feed crude protein by edible animal protein (allocated by af_protein), whereas
-Protein_FCR_cropland restricts feed crude protein to arable non-forage concentrates with
-economic allocation &amp;gt; 0.33 (crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:description" content="Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
+Protein_FCR_cropland weights feed crude protein by the explicit human_edible column in
+mapping.csv (default binary 0/1 classification anchored on arable non-forage concentrates
+with economic_allocation &amp;gt; 0.33, excluding inedible/waste items and including commercial food-grade
+dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:description" content="Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
 and GLEAM production outputs. Generates two distinct reports: an absolute environmental inventory (totals)
 and farm-level product, nutritional, and per-head environmental intensities.
 Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: AF_k = Energy_k / Energy_total. Specifically, Protein_FCR_total divides whole-herd
 total feed crude protein by edible animal protein (allocated by af_protein), whereas
-Protein_FCR_cropland restricts feed crude protein to arable non-forage concentrates with
-economic allocation &amp;gt; 0.33 (crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:image" content="https://juancbm99.github.io/herdr/logo.png"></head><body>
+Protein_FCR_cropland weights feed crude protein by the explicit human_edible column in
+mapping.csv (default binary 0/1 classification anchored on arable non-forage concentrates
+with economic_allocation &amp;gt; 0.33, excluding inedible/waste items and including commercial food-grade
+dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:image" content="https://juancbm99.github.io/herdr/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -82,8 +86,10 @@ and farm-level product, nutritional, and per-head environmental intensities.</p>
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: <code>AF_k = Energy_k / Energy_total</code>. Specifically, <code>Protein_FCR_total</code> divides whole-herd
 total feed crude protein by edible animal protein (allocated by <code>af_protein</code>), whereas
-<code>Protein_FCR_cropland</code> restricts feed crude protein to arable non-forage concentrates with
-economic allocation &gt; 0.33 (crude protein basis, without DIAAS or partial HEP adjustments).</p>
+<code>Protein_FCR_cropland</code> weights feed crude protein by the explicit <code>human_edible</code> column in
+<code>mapping.csv</code> (default binary <code>0/1</code> classification anchored on arable non-forage concentrates
+with <code>economic_allocation &gt; 0.33</code>, excluding inedible/waste items and including commercial food-grade
+dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).</p>
     </div>
 
     <div class="section level2">
@@ -168,7 +174,7 @@ economic allocation &gt; 0.33 (crude protein basis, without DIAAS or partial HEP
 <dd><p>Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).</p></dd>
 
   <dt>intensities</dt>
-<dd><p>Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (<code>Protein_FCR_total</code> across all feed CP; <code>Protein_FCR_cropland</code> across arable non-forage concentrates with economic allocation &gt; 0.33, crude protein basis without DIAAS/partial HEP).</p></dd>
+<dd><p>Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (<code>Protein_FCR_total</code> across all feed CP; <code>Protein_FCR_cropland</code> weighted by the <code>human_edible</code> column in <code>mapping.csv</code>, crude protein basis without DIAAS/partial HEP).</p></dd>
 
 </dl></div>
 

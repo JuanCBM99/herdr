@@ -1439,39 +1439,53 @@ counting.</li>
 al., 2017)<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-and-human-food-competition-mottet-et-al--2017"></a>
 </h3>
 <p>Following Mottet et al. (2017, <em>Global Food Security</em>, 14,
-1–8), <code>herdr</code> evaluates protein conversion efficiency via two
-indicators on producing cohorts (<code>mature</code> and
-<code>slaughter</code>):</p>
+1–8), <code>herdr</code> evaluates enterprise-level protein conversion
+efficiency on producing cohorts (<code>mature</code> and
+<code>slaughter</code>), integrating whole-herd feed intake (including
+<code>replacement</code> cohorts) allocated to edible protein by
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">wool</mtext></msub></mrow><annotation encoding="application/x-tex">AF_{\text{protein}} = 1 - AF_{\text{wool}}</annotation></semantics></math>:</p>
 <ol style="list-style-type: decimal">
 <li>
 <strong>Total Protein Feed Conversion Ratio
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math>
 </li>
 <li>
-<strong>Cropland Protein Feed Conversion Ratio
+<strong>Human-Edible / Cropland Protein Feed Conversion Ratio
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg cropland feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg human-edible feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
 <li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, cropland</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, cropland}}</annotation></semantics></math>
-includes only non-forage arable-land ingredients
-(<code>land_type == "cropland"</code> and
-<code>ingredient_type != "forage"</code>, since forages have
-human-edible fraction
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, human-edible}}</annotation></semantics></math>
+weights each ingredient’s crude protein directly by the explicit
+<code>human_edible</code> column (<code>0</code> or <code>1</code>, also
+accepting fractions in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math>)
+in <code>mapping.csv</code>, cleanly separating food competition from
+land-use classification (<code>land_type</code>).</li>
+<li>
+<strong>Default <code>human_edible</code> classification criterion
+in <code>mapping.csv</code>:</strong> anchored on arable non-forage
+concentrates with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>&gt;</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} &gt; 0.33</annotation></semantics></math>
+(<code>1</code> for primary cereal grains, pulses, soybean/linseed
+meals, and protein concentrates/isolates, plus commercial food-grade
+dairy feeds <code>casein</code> and <code>skimmed_milk</code>), while
+assigning <code>0</code> to all forages (including dehydrated alfalfa
+and forage meals;
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>e</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h_e = 0</annotation></semantics></math>
-per Wilkinson 2011; Mottet et al. 2017) that act as primary crops or
-main economic drivers of land use
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>&gt;</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} &gt; 0.33</annotation></semantics></math>,
-such as cereal grains, pulses, soybean meal, and protein
-concentrates/isolates), while excluding crop residues and secondary
-agro-industrial by-products
+per Wilkinson 2011; Mottet et al. 2017), secondary agro-industrial
+by-products
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} \le 0.33</annotation></semantics></math>,
 such as cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed
-cakes).</li>
+cakes), biologically inedible or food-waste items (whole cottonseed,
+vetches, acorns, bakery/bread by-products), internal suckled milk, and
+non-agricultural additives (urea, minerals, synthetic amino acids).
+Calculations are reported on a crude protein basis without DIAAS or
+partial milling-extraction HEP adjustments.</li>
 <li>When
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &lt; 1.0</annotation></semantics></math>,
-the cohort/system is a <strong>net producer</strong> of human-edible
-protein relative to competing arable cropland protein consumed.</li>
+the enterprise is a <strong>net producer</strong> of human-edible
+protein relative to competing human-edible feed protein consumed.</li>
 </ul>
 </li>
 </ol>

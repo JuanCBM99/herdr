@@ -10,10 +10,12 @@ the whole enterprise pool (GHG, land, water, feed protein) among its
 co-products using a biophysical (energy-based) allocation factor:
 `AF_k = Energy_k / Energy_total`. Specifically, `Protein_FCR_total`
 divides whole-herd total feed crude protein by edible animal protein
-(allocated by `af_protein`), whereas `Protein_FCR_cropland` restricts
-feed crude protein to arable non-forage concentrates with economic
-allocation \> 0.33 (crude protein basis, without DIAAS or partial HEP
-adjustments).
+(allocated by `af_protein`), whereas `Protein_FCR_cropland` weights feed
+crude protein by the explicit `human_edible` column in `mapping.csv`
+(default binary `0/1` classification anchored on arable non-forage
+concentrates with `economic_allocation > 0.33`, excluding inedible/waste
+items and including commercial food-grade dairy feeds; crude protein
+basis, without DIAAS or partial HEP adjustments).
 
 ## Usage
 
@@ -120,9 +122,9 @@ A named list containing two dataframes:
 
   Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or
   edible protein) and enterprise-level nutritional intensities
-  (`Protein_FCR_total` across all feed CP; `Protein_FCR_cropland` across
-  arable non-forage concentrates with economic allocation \> 0.33, crude
-  protein basis without DIAAS/partial HEP).
+  (`Protein_FCR_total` across all feed CP; `Protein_FCR_cropland`
+  weighted by the `human_edible` column in `mapping.csv`, crude protein
+  basis without DIAAS/partial HEP).
 
 ## Examples
 

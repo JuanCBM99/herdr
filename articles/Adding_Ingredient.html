@@ -327,12 +327,35 @@ scale the parent crop’s land requirement to 1 kg of co-product:</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">ha_kg_allocated</mtext><mo>=</mo><mtext mathvariant="normal">ha_per_kg</mtext><mo>×</mo><mfrac><mtext mathvariant="normal">economic_allocation</mtext><mrow><mtext mathvariant="normal">kg_coproduct_per_1ton_maincrop</mtext><mi>/</mi><mn>1000</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">\text{ha\_kg\_allocated} = \text{ha\_per\_kg} \times \frac{\text{economic\_allocation}}{\text{kg\_coproduct\_per\_1ton\_maincrop} / 1000}</annotation></semantics></math></p>
 <p>If left blank or <code>NA</code>, herdr defaults
 <code>economic_allocation</code> to <code>1.0</code> and
-<code>kg_coproduct_per_1ton_maincrop</code> to <code>1000</code>. In
-addition, co-products with <code>economic_allocation &lt;= 0.33</code>
-are treated as low-value residues and excluded from direct human-edible
-<code>cropland</code> competition in
-<code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code> (and downstream
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>).</p>
+<code>kg_coproduct_per_1ton_maincrop</code> to <code>1000</code>. Note
+that <code>kg_coproduct_per_1ton_maincrop</code> must always be
+expressed as kg as-fed of the ingredient (at its <code>DM_pct</code> in
+<code>feed_characteristics.csv</code>) obtained per
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1,000\text{ kg}</annotation></semantics></math>
+fresh weight of the parent crop in FAOSTAT (for example, dehydrated
+tubers adjust for the water removed from the fresh crop).</p>
+</div>
+<div class="section level4">
+<h4 id="human_edible">
+<code>human_edible</code><a class="anchor" aria-label="anchor" href="#human_edible"></a>
+</h4>
+<p>Food-feed competition in <code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code>
+(and downstream <code>Protein_FCR_cropland</code> in
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) is controlled directly by the
+explicit <code>human_edible</code> column in <code>mapping.csv</code>
+(<code>0</code> or <code>1</code>; fractional values in
+<code>[0, 1]</code> are also supported), decoupling food competition
+cleanly from <code>land_type</code>. In <code>herdr</code>’s bundled
+<code>mapping.csv</code>, default values follow a binary classification
+anchored on arable non-forage concentrates with
+<code>economic_allocation &gt; 0.33</code> (<code>1</code> for primary
+grains, pulses, soybean/linseed meals, protein concentrates/isolates,
+and commercial food-grade dairy feeds like <code>casein</code> and
+<code>skimmed_milk</code>; <code>0</code> for forages including
+dehydrated alfalfa/forage meals, low-value residues with
+<code>economic_allocation &lt;= 0.33</code>, inedible/waste items such
+as whole cottonseed, vetches, acorns, and bakery/bread by-products,
+internal suckled milk, and non-agricultural additives).</p>
 </div>
 <div class="section level4">
 <h4 id="yield_name">

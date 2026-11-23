@@ -781,32 +781,45 @@ For **Human Edible Protein**, non-edible fiber (wool) is excluded:
 ### 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
 
 Following Mottet et al. (2017, *Global Food Security*, 14, 1–8), `herdr`
-evaluates protein conversion efficiency via two indicators on producing
-cohorts (`mature` and `slaughter`):
+evaluates enterprise-level protein conversion efficiency on producing
+cohorts (`mature` and `slaughter`), integrating whole-herd feed intake
+(including `replacement` cohorts) allocated to edible protein by
+$`AF_{\text{protein}} = 1 - AF_{\text{wool}}`$:
 
 1.  **Total Protein Feed Conversion Ratio
     ($`\text{Protein\_FCR}_{\text{total}}`$):**
     ``` math
-    \text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})
+    \text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})
     ```
-2.  **Cropland Protein Feed Conversion Ratio
+2.  **Human-Edible / Cropland Protein Feed Conversion Ratio
     ($`\text{Protein\_FCR}_{\text{cropland}}`$):**
     ``` math
-    \text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, cropland}}}{\text{Protein}_{\text{total}}} \quad (\text{kg cropland feed CP} / \text{kg edible protein})
+    \text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})
     ```
-    - $`\text{Feed}_{\text{CP, cropland}}`$ includes only non-forage
-      arable-land ingredients (`land_type == "cropland"` and
-      `ingredient_type != "forage"`, since forages have human-edible
-      fraction $`h_e = 0`$ per Wilkinson 2011; Mottet et al. 2017) that
-      act as primary crops or main economic drivers of land use
-      ($`\text{economic\_allocation} > 0.33`$, such as cereal grains,
-      pulses, soybean meal, and protein concentrates/isolates), while
-      excluding crop residues and secondary agro-industrial by-products
-      ($`\text{economic\_allocation} \le 0.33`$, such as cereal straw,
-      hulls, pulps, brans, DDGS, and secondary oilseed cakes).
+    - $`\text{Feed}_{\text{CP, human-edible}}`$ weights each
+      ingredient’s crude protein directly by the explicit `human_edible`
+      column (`0` or `1`, also accepting fractions in $`[0, 1]`$) in
+      `mapping.csv`, cleanly separating food competition from land-use
+      classification (`land_type`).
+    - **Default `human_edible` classification criterion in
+      `mapping.csv`:** anchored on arable non-forage concentrates with
+      $`\text{economic\_allocation} > 0.33`$ (`1` for primary cereal
+      grains, pulses, soybean/linseed meals, and protein
+      concentrates/isolates, plus commercial food-grade dairy feeds
+      `casein` and `skimmed_milk`), while assigning `0` to all forages
+      (including dehydrated alfalfa and forage meals; $`h_e = 0`$ per
+      Wilkinson 2011; Mottet et al. 2017), secondary agro-industrial
+      by-products ($`\text{economic\_allocation} \le 0.33`$, such as
+      cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed
+      cakes), biologically inedible or food-waste items (whole
+      cottonseed, vetches, acorns, bakery/bread by-products), internal
+      suckled milk, and non-agricultural additives (urea, minerals,
+      synthetic amino acids). Calculations are reported on a crude
+      protein basis without DIAAS or partial milling-extraction HEP
+      adjustments.
     - When $`\text{Protein\_FCR}_{\text{cropland}} < 1.0`$, the
-      cohort/system is a **net producer** of human-edible protein
-      relative to competing arable cropland protein consumed.
+      enterprise is a **net producer** of human-edible protein relative
+      to competing human-edible feed protein consumed.
 
 ------------------------------------------------------------------------
 

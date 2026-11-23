@@ -146,12 +146,31 @@ these two parameters jointly scale the parent crop’s land requirement to
 ```
 
 If left blank or `NA`, herdr defaults `economic_allocation` to `1.0` and
-`kg_coproduct_per_1ton_maincrop` to `1000`. In addition, co-products
-with `economic_allocation <= 0.33` are treated as low-value residues and
-excluded from direct human-edible `cropland` competition in
+`kg_coproduct_per_1ton_maincrop` to `1000`. Note that
+`kg_coproduct_per_1ton_maincrop` must always be expressed as kg as-fed
+of the ingredient (at its `DM_pct` in `feed_characteristics.csv`)
+obtained per $`1,000\text{ kg}`$ fresh weight of the parent crop in
+FAOSTAT (for example, dehydrated tubers adjust for the water removed
+from the fresh crop).
+
+#### `human_edible`
+
+Food-feed competition in
 [`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
-(and downstream
-[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md)).
+(and downstream `Protein_FCR_cropland` in
+[`generate_impact_assessment()`](https://juancbm99.github.io/herdr/reference/generate_impact_assessment.md))
+is controlled directly by the explicit `human_edible` column in
+`mapping.csv` (`0` or `1`; fractional values in `[0, 1]` are also
+supported), decoupling food competition cleanly from `land_type`. In
+`herdr`’s bundled `mapping.csv`, default values follow a binary
+classification anchored on arable non-forage concentrates with
+`economic_allocation > 0.33` (`1` for primary grains, pulses,
+soybean/linseed meals, protein concentrates/isolates, and commercial
+food-grade dairy feeds like `casein` and `skimmed_milk`; `0` for forages
+including dehydrated alfalfa/forage meals, low-value residues with
+`economic_allocation <= 0.33`, inedible/waste items such as whole
+cottonseed, vetches, acorns, and bakery/bread by-products, internal
+suckled milk, and non-agricultural additives).
 
 #### `yield_name`
 

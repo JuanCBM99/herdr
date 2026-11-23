@@ -245,15 +245,20 @@ if <code>kg_coproduct_per_1ton_maincrop</code> is omitted or
 <code>NA</code>, <code>herdr</code> defaults to
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1000\text{ kg}</annotation></semantics></math>
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><msub><mi>F</mi><mi>i</mi></msub><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">MF_i = 1.0</annotation></semantics></math>).
-Furthermore, in downstream food-feed competition accounting
-(<code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code> and
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>), low-value agro-industrial
-residues with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">EconomicAllocation_i \le 0.33</annotation></semantics></math>
-and forages
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>e</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h_e = 0</annotation></semantics></math>,
-per Wilkinson 2011; Mottet et al. 2017) are excluded from human-edible
-<code>cropland</code> competition.</p>
+Here <code>kg_coproduct_per_1ton_maincrop</code> is always expressed as
+kg as-fed of the ingredient (at its <code>DM_pct</code>) obtained per
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1,000\text{ kg}</annotation></semantics></math>
+fresh weight of the FAOSTAT parent crop. Separately, direct food-feed
+competition accounting (<code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code> and
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) is driven by the explicit
+<code>human_edible</code> column in <code>mapping.csv</code> (default
+binary <code>0/1</code>, anchored on arable non-forage concentrates with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>&gt;</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">EconomicAllocation_i &gt; 0.33</annotation></semantics></math>
+while excluding forages, residues with
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>c</mi><mi>o</mi><mi>n</mi><mi>o</mi><mi>m</mi><mi>i</mi><mi>c</mi><mi>A</mi><mi>l</mi><mi>l</mi><mi>o</mi><mi>c</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><msub><mi>n</mi><mi>i</mi></msub><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">EconomicAllocation_i \le 0.33</annotation></semantics></math>,
+and inedible/waste feeds; Wilkinson 2011; Mottet et al. 2017), keeping
+land-use accounting (<code>land_type</code>) cleanly separated from food
+competition (<code>human_edible</code>).</p>
 </div>
 <div class="section level3">
 <h3 id="annual-ingredient-intake">3. Annual ingredient intake<a class="anchor" aria-label="anchor" href="#annual-ingredient-intake"></a>

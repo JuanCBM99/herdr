@@ -1049,13 +1049,28 @@ Agribalyse process or literature source from which the economic and
 physical co-product allocation parameters are sourced. *
 <code>economic_allocation</code>: Economic revenue share (0.0 to 1.0) of
 the multi-output process allocated to the co-product batch
-(e.g. <code>1.0</code> for primary crops; <code>&lt;= 0.33</code> for
-low-value by-products excluded from direct cropland competition). *
+(e.g. <code>1.0</code> for primary crops; values
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\le 0.33</annotation></semantics></math>
+are also used as the baseline threshold to identify low-value
+agro-industrial by-products when assigning default
+<code>human_edible</code> flags). *
 <code>kg_coproduct_per_1ton_maincrop</code>: Physical mass of co-product
-(kg) obtained per
+as fed (kg, at the ingredient’s <code>DM_pct</code>) obtained per
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>1</mn><mo>,</mo><mn>000</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> kg</mtext></mrow></mrow><annotation encoding="application/x-tex">1,000\text{ kg}</annotation></semantics></math>
-(1 ton) of parent crop processed (<code>1000</code> for primary
-crops).</p>
+(1 ton) of fresh parent crop processed (<code>1000</code> for dry
+primary crops). * <code>human_edible</code>: Explicit food-competition
+flag (<code>0</code> or <code>1</code>, or fractional value in
+<code>[0, 1]</code>) used by <code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code>
+to compute <code>CP_cropland_pct</code> and
+<code>Protein_FCR_cropland</code>, decoupled from
+<code>land_type</code>. Default values are set to <code>1</code> for
+arable non-forage concentrates with
+<code>economic_allocation &gt; 0.33</code> (plus commercial food-grade
+dairy feeds <code>casein</code> and <code>skimmed_milk</code>) and
+<code>0</code> for forages (including dehydrated alfalfa/forage meals),
+residues (<code>economic_allocation &lt;= 0.33</code>), inedible/waste
+items (whole cottonseed, vetches, acorns, bakery/bread by-products),
+internal suckled milk, and non-agricultural additives.</p>
 </div>
 <div class="section level4">
 <h4 id="ecoalim">3. <code>ecoalim.parquet</code> — Feed Life Cycle Inventory

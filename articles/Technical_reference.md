@@ -266,11 +266,23 @@ multi-output SimaPro / Agribalyse process or literature source from
 which the economic and physical co-product allocation parameters are
 sourced. \* `economic_allocation`: Economic revenue share (0.0 to 1.0)
 of the multi-output process allocated to the co-product batch
-(e.g. `1.0` for primary crops; `<= 0.33` for low-value by-products
-excluded from direct cropland competition). \*
-`kg_coproduct_per_1ton_maincrop`: Physical mass of co-product (kg)
-obtained per $`1,000\text{ kg}`$ (1 ton) of parent crop processed
-(`1000` for primary crops).
+(e.g. `1.0` for primary crops; values $`\le 0.33`$ are also used as the
+baseline threshold to identify low-value agro-industrial by-products
+when assigning default `human_edible` flags). \*
+`kg_coproduct_per_1ton_maincrop`: Physical mass of co-product as fed
+(kg, at the ingredient’s `DM_pct`) obtained per $`1,000\text{ kg}`$ (1
+ton) of fresh parent crop processed (`1000` for dry primary crops). \*
+`human_edible`: Explicit food-competition flag (`0` or `1`, or
+fractional value in `[0, 1]`) used by
+[`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
+to compute `CP_cropland_pct` and `Protein_FCR_cropland`, decoupled from
+`land_type`. Default values are set to `1` for arable non-forage
+concentrates with `economic_allocation > 0.33` (plus commercial
+food-grade dairy feeds `casein` and `skimmed_milk`) and `0` for forages
+(including dehydrated alfalfa/forage meals), residues
+(`economic_allocation <= 0.33`), inedible/waste items (whole cottonseed,
+vetches, acorns, bakery/bread by-products), internal suckled milk, and
+non-agricultural additives.
 
 #### 3. `ecoalim.parquet` — Feed Life Cycle Inventory Database
 
