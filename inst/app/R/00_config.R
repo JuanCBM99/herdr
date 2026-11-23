@@ -152,6 +152,7 @@ modal_tooltips <- list(
   frac_gas                 = "Fraction of nitrogen excreted that is volatilized",
   frac_leach               = "Fraction of nitrogen lost through leaching/runoff.",
   economic_allocation      = "Used to allocate environmental impacts between a main product and its co-products based on economic value.",
+  human_edible             = "Binary (0 or 1, or fraction 0-1) indicating whether the ingredient competes directly as human-edible food for Protein FCR / EPCR accounting.",
   ea_reference             = "Reference multi-output SimaPro / Agribalyse process from which the economic allocation and physical co-product yield are derived.",
   kg_coproduct_per_1ton_maincrop = "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop.",
   yield_name               = "FAOSTAT name of the ingredient used to link its database with herdr",

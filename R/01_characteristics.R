@@ -23,14 +23,22 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
 
   mapping_path <- file.path(data_dir, "mapping.csv")
   if (file.exists(mapping_path)) {
-    mapping_ea <- readr::read_csv(mapping_path, show_col_types = FALSE) %>%
+    mapping_raw <- readr::read_csv(mapping_path, show_col_types = FALSE)
+    mapping_he <- mapping_raw %>%
       dplyr::transmute(
         ingredient,
-        economic_allocation = suppressWarnings(as.numeric(economic_allocation))
+        human_edible = if ("human_edible" %in% names(mapping_raw)) {
+          suppressWarnings(as.numeric(human_edible))
+        } else {
+          0
+        }
       ) %>%
       dplyr::distinct(ingredient, .keep_all = TRUE)
   } else {
-    mapping_ea <- dplyr::tibble(ingredient = character(), economic_allocation = numeric())
+    mapping_he <- dplyr::tibble(
+      ingredient = character(),
+      human_edible = numeric()
+    )
   }
 
   norm_diets <- herdr_normalize_diets(diets, ingredients)
@@ -48,7 +56,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   diet_profiles <- diets %>%
     dplyr::left_join(ingredients, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
-    dplyr::left_join(mapping_ea, by = "ingredient") %>%
+    dplyr::left_join(mapping_he, by = "ingredient") %>%
     dplyr::mutate(
       dplyr::across(
         c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
@@ -68,20 +76,16 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     dplyr::group_by(dplyr::across(dplyr::all_of(diet_join_keys))) %>%
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
+      # Human-edible feed CP (Mottet et al. 2017; Wilkinson 2011):
+      # Must be computed BEFORE dplyr::across() overwrites CP_pct with the scalar diet average.
+      # Uses `human_edible` (0/1 or fraction in [0, 1]) directly from mapping.csv.
+      CP_cropland_pct = sum(
+        CP_pct * pmin(pmax(dplyr::coalesce(human_edible, 0), 0), 1) * weight_factor,
+        na.rm = TRUE
+      ),
       dplyr::across(
         c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
         ~ sum(. * weight_factor, na.rm = TRUE)
-      ),
-      # Human-edible cropland CP (Wilkinson 2011; Mottet et al. 2017; CAST 1999: forages have he=0)
-      CP_cropland_pct = sum(
-        dplyr::if_else(
-          !is.na(land_type) & land_type == "cropland" &
-            ingredient_type != "forage" &
-            dplyr::coalesce(economic_allocation, 1) > 0.33,
-          CP_pct,
-          0
-        ) * weight_factor,
-        na.rm = TRUE
       ),
       .groups = "drop"
     )

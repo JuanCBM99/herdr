@@ -79,7 +79,7 @@ if(getRversion() >= "2.15.1") {
 
     # --- Land Use and FAO Data ---
     "Area", "Item", "Value", "yield_name", "agribalyse_name",
-    "fao_yield", "dm_yield", "ha_per_kg", "economic_allocation", "share_factor",
+    "fao_yield", "dm_yield", "ha_per_kg", "economic_allocation", "human_edible", "share_factor",
     "ha_kg_allocated", "annual_cons_kg", "land_use_m2", "total_land_use_m2",
     "Element", "Yield", "country_of_origin", "custom_yield_kg_ha",
     "land_type", "Reporter Countries", "Partner Countries", "Total_Import",

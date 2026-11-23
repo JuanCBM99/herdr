@@ -395,7 +395,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("economic_allocation")),
                 tags$dd(class = "col-sm-9", "Economic allocation fraction applied to co-products (between 0 and 1)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("kg_coproduct_per_1ton_maincrop")),
-                tags$dd(class = "col-sm-9", "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop (1000 for primary crops).")
+                tags$dd(class = "col-sm-9", "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop (1000 for primary crops)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("human_edible")),
+                tags$dd(class = "col-sm-9", "Human-edible food competition flag (0 = non-edible forage/by-product/additive, 1 = human-edible concentrate or dairy feed; also accepts fractional values in [0, 1]).")
               )
             )
 
