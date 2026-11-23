@@ -35,13 +35,13 @@ concentrate,corn_gluten_meal_60,cropland,89.6,1.9,66.96,3.01,6.81,99.1,5229.36,4
 concentrate,wheat_bran_15_starch,cropland,87.4,6.18,17.62,3.78,46.11,71.4,4344.06,2414.187643,2551,1876,Feedipedia
 concentrate,wheat_bran_20_starch,cropland,87.6,5.59,17.12,3.88,42.35,71.4,4368.12,2625.570776,2763,2100,Feedipedia
 concentrate,wheat_middlings_25_starch,cropland,87.9,5.12,16.27,3.98,38.57,77.1,4381.65,2798.634812,2935,2304,Feedipedia
-concentrate,wheat_flour_30_starch,cropland,88.2,4.42,16.67,3.97,33.11,88.2,4417.89,3004.535147,3152,2540,Feedipedia
+concentrate,wheat_middlings_30_starch,cropland,88.2,4.42,16.67,3.97,33.11,88.2,4417.89,3004.535147,3152,2540,Feedipedia
 concentrate,bakery_byproduct_2_5_ash,cropland,90.8,2.75,11.45,10.46,8.26,90,4776.51,4058.641724,4146,3998,Feedipedia
 concentrate,bakery_byproduct_6_ash,cropland,89.6,6.7,11.94,8.48,13.39,90,4499.18,3593.75,3683,3460,Feedipedia
 concentrate,bread_byproduct,cropland,92.1,2.82,14.12,2.93,8.58,90,4391.8,3827.361564,3931,3529,Feedipedia
 concentrate,malt_rootlets_barley_sprouts,cropland,90.5,7.18,21.1,1.66,44.42,65.7,4233.54,2541.436464,2707,,Feedipedia
-concentrate,whole_acorn,cropland,62.5,2.56,4.16,7.68,29.76,NA,4519.84,,,,Feedipedia
-concentrate,acorn_decorticated,cropland,57.2,2.1,5.59,9.27,13.11,NA,4650.57,3671.328671,3706,,Feedipedia
+concentrate,whole_acorn,grassland_unconvertible,62.5,2.56,4.16,7.68,29.76,NA,4519.84,,,,Feedipedia
+concentrate,acorn_decorticated,grassland_unconvertible,57.2,2.1,5.59,9.27,13.11,NA,4650.57,3671.328671,3706,,Feedipedia
 concentrate,tapioca_62_5,cropland,88.4,6.9,2.71,0.57,11.88,84.5,3908.97,3291.855204,3314,3117,Feedipedia
 concentrate,tapioca_65,cropland,88.2,6.24,2.72,0.57,9.64,84.5,3938.16,3384.353741,3396,3231,Feedipedia
 concentrate,tapioca_70,cropland,89,5.06,2.81,0.56,7.3,84.5,3990.87,3505.617978,3517,3421,Feedipedia
