@@ -397,7 +397,11 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("kg_coproduct_per_1ton_maincrop")),
                 tags$dd(class = "col-sm-9", "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop (1000 for primary crops)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("human_edible")),
-                tags$dd(class = "col-sm-9", "Human-edible food competition flag (0 = non-edible forage/by-product/additive, 1 = human-edible concentrate or dairy feed; also accepts fractional values in [0, 1]).")
+                tags$dd(class = "col-sm-9", "Human-edible food competition flag (0 = non-edible forage/by-product/additive, 1 = human-edible concentrate or dairy feed; also accepts fractional values in [0, 1])."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("diaas_pct")),
+                tags$dd(class = "col-sm-9", "Digestible Indispensable Amino Acid Score (%, FAO 2013 0.5–3 yr child reference pattern, untruncated)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("diaas_reference")),
+                tags$dd(class = "col-sm-9", "Primary scientific reference documenting the DIAAS value (Ertl et al., 2016b, Die Bodenkultur 67(2):91–103; Ertl et al., 2016a, Animal 10(11):1883–1889).")
               )
             )
 

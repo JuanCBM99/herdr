@@ -2,14 +2,20 @@
 #'
 #' Computes total production of milk, meat, eggs, and fibre in physical units
 #' (fresh milk, FPCM, live weight, carcass weight) and nutritional units
-#' (kg of edible protein and fibre) based on FAO/GLEAM (Equations 9.1 to 9.5)
-#' and IDF standards.
+#' (kg of edible protein, DIAAS-adjusted human-digestible protein, and fibre)
+#' based on FAO/GLEAM (Equations 9.1 to 9.5), IDF standards, and Ertl et al.
+#' (2016b, Table 5; FAO 2013 0.5-3 yr child scoring pattern, untruncated).
 #'
 #' @param automatic_cycle Logical. If TRUE, uses the built-in model for automatic farm cycle calculation. Default is FALSE.
 #' @param saveoutput Logical. If TRUE (default), results are saved to output folder.
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param pop_df Optional precalculated population dataframe.
-#' @return Tibble with animal production summary.
+#' @return Tibble with annual animal production per cohort, including physical outputs
+#'   (\code{milk_fresh_kg}, \code{milk_FPCM_kg}, \code{meat_live_weight_kg},
+#'   \code{meat_carcass_weight_kg}, \code{egg_fresh_kg}, \code{wool_kg}), edible protein
+#'   (\code{milk_protein_kg}, \code{meat_protein_kg}, \code{egg_protein_kg},
+#'   \code{total_protein_kg}, kg/year), and DIAAS-adjusted human-digestible animal protein
+#'   (\code{total_HDP_kg}, kg HDP/year).
 #' @examples
 #' \dontrun{
 #' calculate_production(saveoutput = FALSE, data_dir = "user_data")
@@ -159,17 +165,20 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       dplyr::distinct(farm_id, region, subregion, animal_tag, .keep_all = TRUE)
   }
 
-  # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) ---
+  # --- 2. FAO/GLEAM Technical Coefficients (Table 9.1) & Animal Product DIAAS ---
+  # Animal product DIAAS (%) from Ertl et al. (2016b), Die Bodenkultur 67(2):91-103, Table 5
+  # (FAO 2013 0.5-3 yr child scoring pattern, untruncated; cow milk from Ertl et al. 2016a, Table 1).
   production_constants <- tibble::tribble(
-    ~animal_type, ~BFM,  ~MEAT_prot, ~DP_pct, ~MILK_prot_def,
-    "cattle",     0.75,  0.2113,     54.0,    0.033,
-    "sheep",      0.70,  0.2013,     47.0,    0.058,
-    "goat",       0.70,  0.1920,     47.0,    0.034,
-    "swine",      0.65,  0.2020,     73.0,    0.000,
-    "poultry",    0.75,  0.1900,     70.0,    0.000
+    ~animal_type, ~BFM,  ~MEAT_prot, ~DP_pct, ~MILK_prot_def, ~MILK_diaas_pct, ~MEAT_diaas_pct,
+    "cattle",     0.75,  0.2113,     54.0,    0.033,          115.9,           109.3,
+    "sheep",      0.70,  0.2013,     47.0,    0.058,          109.1,           116.8,
+    "goat",       0.70,  0.1920,     47.0,    0.034,          123.5,           116.8,
+    "swine",      0.65,  0.2020,     73.0,    0.000,            0.0,           113.9,
+    "poultry",    0.75,  0.1900,     70.0,    0.000,            0.0,           108.2
   )
 
   egg_prot_fraction <- 0.1240
+  egg_diaas_pct <- 116.4 # Ertl et al. (2016b), Table 5: Whole chicken egg
 
   # --- 3. Pipeline Calculation ---
   results <- pop_df
@@ -187,7 +196,7 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
         c(
           population, milk_yield_kg_year, fat_content_pct, protein_content_pct, wool_yield_kg_year,
           egg_mass_g_day, replacement_rate, productive_period_days, adult_weight_kg,
-          final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def
+          final_weight_kg, BFM, MEAT_prot, DP_pct, MILK_prot_def, MILK_diaas_pct, MEAT_diaas_pct
         ),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),
@@ -271,15 +280,19 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       # --- D) FIBRE / WOOL ---
       wool_kg = population * wool_yield_kg_year,
 
-      # --- E) TOTAL EDIBLE PROTEIN ---
-      total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg
+      # --- E) TOTAL EDIBLE PROTEIN & DIAAS-ADJUSTED HUMAN-DIGESTIBLE PROTEIN (HDP) ---
+      total_protein_kg = milk_protein_kg + meat_protein_kg + egg_protein_kg,
+      milk_HDP_kg = milk_protein_kg * (MILK_diaas_pct / 100),
+      meat_HDP_kg = meat_protein_kg * (MEAT_diaas_pct / 100),
+      egg_HDP_kg = egg_protein_kg * (egg_diaas_pct / 100),
+      total_HDP_kg = milk_HDP_kg + meat_HDP_kg + egg_HDP_kg
     ) %>%
     dplyr::select(
       dplyr::all_of(join_keys), animal_type, animal_subtype, production_role, fat_content_pct, protein_content_pct, population, N_exit,
       # Commercial products
       milk_fresh_kg, milk_FPCM_kg, meat_live_weight_kg, meat_carcass_weight_kg, egg_fresh_kg, wool_kg,
-      # Edible protein (GLEAM)
-      milk_protein_kg, meat_protein_kg, egg_protein_kg, total_protein_kg
+      # Edible protein (GLEAM) & DIAAS-adjusted HDP (Ertl et al., 2016b, Table 5)
+      milk_protein_kg, meat_protein_kg, egg_protein_kg, total_protein_kg, total_HDP_kg
     )
 
   # --- 4. Save output file ---

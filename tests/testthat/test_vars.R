@@ -107,6 +107,113 @@ test_that("calculate_weighted_variable computes human-edible CP from mapping.csv
   # Only linseed_meal (he=1) and skimmed_milk (he=1, despite land_type=none) should count,
   # weighted by each ingredient's own CP_pct (not the scalar diet average)
   expected_he_cp <- 0.25 * cp_by_ing[["linseed_meal"]] + 0.25 * cp_by_ing[["skimmed_milk"]]
-  expect_equal(row_he$CP_cropland_pct, expected_he_cp, tolerance = 1e-6)
+  expect_equal(row_he$CP_human_edible_pct, expected_he_cp, tolerance = 1e-6)
   expect_equal(row_he$CP_pct, mean(unname(cp_by_ing[custom_ing$ingredient])), tolerance = 1e-6)
+  # Because linseed_meal (37.99% CP) has diaas_pct = NA (>50% of edible CP), coverage < 80% -> HDP_feed_pct is NA
+  expect_true(is.na(row_he$HDP_feed_pct))
+})
+
+test_that("calculate_weighted_variable computes HDP_feed_pct accurately from diaas_pct and handles partial coverage", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  diets <- read_csv("user_data/diet_profiles.csv", show_col_types = FALSE)
+  target_diet <- diets$diet_tag[1]
+  diets_one <- diets[1, ] %>%
+    mutate(forage_share = 0, concentrate_share = 100, milk_share = 0, milk_replacer_share = 0)
+  write_csv(diets_one, "user_data/diet_profiles.csv")
+
+  # 1. Full DIAAS coverage: 50% corn (diaas=42.4) + 50% soybean_meal_44_cp (diaas=97.0)
+  ing_full <- tibble::tibble(
+    diet_tag = target_diet,
+    ingredient_type = c("concentrate", "concentrate"),
+    ingredient = c("corn", "soybean_meal_44_cp"),
+    ingredient_share = c(50, 50),
+    country_of_origin = c("Spain", "Brazil"),
+    custom_yield_kg_ha = c(NA_real_, NA_real_)
+  )
+  write_csv(ing_full, "user_data/diet_ingredients.csv")
+
+  fc <- read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE) %>%
+    dplyr::filter(ingredient %in% c("corn", "soybean_meal_44_cp", "tapioca_65"))
+  cp_by_ing <- setNames(as.numeric(fc$CP_pct), fc$ingredient)
+
+  res_full <- suppressWarnings(calculate_weighted_variable(saveoutput = FALSE))
+  row_full <- res_full %>% dplyr::filter(diet_tag == target_diet) %>% dplyr::slice(1)
+
+  exp_hdp <- 0.50 * cp_by_ing[["corn"]] * 0.424 + 0.50 * cp_by_ing[["soybean_meal_44_cp"]] * 0.970
+  expect_equal(row_full$HDP_feed_pct, exp_hdp, tolerance = 1e-6)
+
+  # 2. High coverage (>=80% but <100%): 45% corn + 45% soybean_meal_44_cp + 10% tapioca_65 (2.72% CP, diaas=NA)
+  # tapioca_65 is ~1% of edible CP -> coverage ~99% -> scales weighted-average DIAAS cleanly (no NA, no >5% warning)
+  ing_part <- tibble::tibble(
+    diet_tag = target_diet,
+    ingredient_type = rep("concentrate", 3),
+    ingredient = c("corn", "soybean_meal_44_cp", "tapioca_65"),
+    ingredient_share = c(45, 45, 10),
+    country_of_origin = rep("Spain", 3),
+    custom_yield_kg_ha = rep(NA_real_, 3)
+  )
+  write_csv(ing_part, "user_data/diet_ingredients.csv")
+
+  res_part <- suppressWarnings(calculate_weighted_variable(saveoutput = FALSE))
+  row_part <- res_part %>% dplyr::filter(diet_tag == target_diet) %>% dplyr::slice(1)
+
+  cp_known <- 0.45 * cp_by_ing[["corn"]] + 0.45 * cp_by_ing[["soybean_meal_44_cp"]]
+  hdp_known <- 0.45 * cp_by_ing[["corn"]] * 0.424 + 0.45 * cp_by_ing[["soybean_meal_44_cp"]] * 0.970
+  cp_total_edible <- cp_known + 0.10 * cp_by_ing[["tapioca_65"]]
+  expect_equal(row_part$HDP_feed_pct, (hdp_known / cp_known) * cp_total_edible, tolerance = 1e-6)
+
+  # 3. Unused template diet with missing DIAAS must NOT trigger Warning (DIAAS),
+  #    whereas an active cohort diet with missing DIAAS (>5% edible CP) MUST warn.
+  unused_diet <- diets_one %>%
+    mutate(diet_tag = "unused_template_diet_no_diaas")
+  write_csv(dplyr::bind_rows(diets_one, unused_diet), "user_data/diet_profiles.csv")
+
+  ing_unused_missing <- tibble::tibble(
+    diet_tag = "unused_template_diet_no_diaas",
+    ingredient_type = "concentrate",
+    ingredient = "linseed_meal",
+    ingredient_share = 100,
+    country_of_origin = "Spain",
+    custom_yield_kg_ha = NA_real_
+  )
+  write_csv(dplyr::bind_rows(ing_full, ing_unused_missing), "user_data/diet_ingredients.csv")
+
+  caught_warnings <- character()
+  withCallingHandlers(
+    calculate_weighted_variable(saveoutput = FALSE),
+    warning = function(w) {
+      caught_warnings <<- c(caught_warnings, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  expect_false(any(grepl("Warning \\(DIAAS\\)", caught_warnings)))
+
+  # Now assign missing-DIAAS ingredient to the active diet -> Warning (DIAAS) must fire
+  ing_active_missing <- tibble::tibble(
+    diet_tag = target_diet,
+    ingredient_type = c("concentrate", "concentrate"),
+    ingredient = c("corn", "linseed_meal"),
+    ingredient_share = c(50, 50),
+    country_of_origin = c("Spain", "Spain"),
+    custom_yield_kg_ha = c(NA_real_, NA_real_)
+  )
+  write_csv(dplyr::bind_rows(ing_active_missing, ing_unused_missing), "user_data/diet_ingredients.csv")
+
+  caught_warnings_active <- character()
+  withCallingHandlers(
+    calculate_weighted_variable(saveoutput = FALSE),
+    warning = function(w) {
+      caught_warnings_active <<- c(caught_warnings_active, conditionMessage(w))
+      invokeRestart("muffleWarning")
+    }
+  )
+  diaas_warns <- grep("Warning \\(DIAAS\\)", caught_warnings_active, value = TRUE)
+  expect_length(diaas_warns, 1)
+  expect_true(grepl(target_diet, diaas_warns, fixed = TRUE))
+  expect_true(grepl("linseed_meal", diaas_warns, fixed = TRUE))
+  expect_false(grepl("unused_template_diet_no_diaas", diaas_warns, fixed = TRUE))
 })

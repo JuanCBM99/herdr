@@ -1,11 +1,14 @@
 #' Calculate Weighted Nutritional Variables
 #'
-#' Computes weighted averages of nutritional variables (DE, CP, Cropland CP, NDF, ASH, GE, and monogastric DE/ME)
-#' by mapping ingredients to diets and diets to animals, combining ruminant and monogastric (swine and poultry) definitions.
+#' Computes weighted averages of nutritional variables (DE, CP, human-edible CP, DIAAS-adjusted
+#' human-digestible protein, NDF, ASH, GE, and monogastric DE/ME) by mapping ingredients to diets
+#' and diets to animals, combining ruminant and monogastric (swine and poultry) definitions.
 #'
 #' @param saveoutput If TRUE (default) the results are saved in the output folder.
 #' @param data_dir Character. Path to the folder containing input CSV files. Default is \code{"user_data"}.
-#' @return Tibble with weighted nutritional variables for all animal cohorts.
+#' @return Tibble with weighted nutritional variables for all animal cohorts, including
+#'   \code{CP_human_edible_pct} (human-edible feed CP, \% DM) and \code{HDP_feed_pct}
+#'   (DIAAS-adjusted human-digestible feed protein, \% DM, FAO 2013 0.5-3 yr child pattern).
 #' @examples
 #' \dontrun{
 #' calculate_weighted_variable(saveoutput = FALSE, data_dir = "user_data")
@@ -31,13 +34,19 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
           suppressWarnings(as.numeric(human_edible))
         } else {
           0
+        },
+        diaas_pct = if ("diaas_pct" %in% names(mapping_raw)) {
+          suppressWarnings(as.numeric(diaas_pct))
+        } else {
+          NA_real_
         }
       ) %>%
       dplyr::distinct(ingredient, .keep_all = TRUE)
   } else {
     mapping_he <- dplyr::tibble(
       ingredient = character(),
-      human_edible = numeric()
+      human_edible = numeric(),
+      diaas_pct = numeric()
     )
   }
 
@@ -53,7 +62,7 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   herdr_validate_diet_shares(diets, ingredients, diet_join_keys = diet_join_keys)
 
   # --- 3. Compute Weighted Nutritional Profiles ---
-  diet_profiles <- diets %>%
+  diet_joined <- diets %>%
     dplyr::left_join(ingredients, by = diet_join_keys, relationship = "many-to-many") %>%
     dplyr::left_join(characteristics, by = c("ingredient", "ingredient_type")) %>%
     dplyr::left_join(mapping_he, by = "ingredient") %>%
@@ -71,17 +80,30 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
         ingredient_type == "milk" ~ milk_share,
         ingredient_type == "milk_replacer" ~ milk_replacer_share,
         TRUE ~ 0
-      )) / 10000
-    ) %>%
+      )) / 10000,
+      he_frac = pmin(pmax(dplyr::coalesce(human_edible, 0), 0), 1),
+      he_cp_term = dplyr::coalesce(CP_pct, 0) * he_frac * weight_factor
+    )
+
+  diet_profiles <- diet_joined %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(diet_join_keys))) %>%
     dplyr::summarise(
       forage_pct = dplyr::first(forage_share),
-      # Human-edible feed CP (Mottet et al. 2017; Wilkinson 2011):
+      # Human-edible feed CP and DIAAS-adjusted HDP (Ertl et al. 2016b; FAO 2013 0.5-3 yr pattern):
       # Must be computed BEFORE dplyr::across() overwrites CP_pct with the scalar diet average.
-      # Uses `human_edible` (0/1 or fraction in [0, 1]) directly from mapping.csv.
-      CP_cropland_pct = sum(
-        CP_pct * pmin(pmax(dplyr::coalesce(human_edible, 0), 0), 1) * weight_factor,
-        na.rm = TRUE
+      # Uses `human_edible` (0/1 or fraction in [0, 1]) and `diaas_pct` (%) directly from mapping.csv.
+      CP_human_edible_pct = sum(he_cp_term, na.rm = TRUE),
+      he_cp_with_diaas = sum(he_cp_term[!is.na(diaas_pct)], na.rm = TRUE),
+      he_hdp_known = sum(he_cp_term[!is.na(diaas_pct)] * (diaas_pct[!is.na(diaas_pct)] / 100), na.rm = TRUE),
+      diaas_coverage = dplyr::if_else(CP_human_edible_pct > 0, he_cp_with_diaas / CP_human_edible_pct, 1),
+      # Apply weighted-average DIAAS of known human-edible ingredients when coverage >= 80%
+      # (following Ertl et al. 2016b Section 2.6):
+      #   HDP_feed_pct = weighted_DIAAS_known * CP_human_edible_pct = (he_hdp_known / he_cp_with_diaas) * CP_human_edible_pct
+      # (simplifies identically to `he_hdp_known` when coverage == 100%; returns NA if coverage < 80%).
+      HDP_feed_pct = dplyr::case_when(
+        CP_human_edible_pct <= 0 ~ 0,
+        diaas_coverage >= 0.80 & he_cp_with_diaas > 0 ~ (he_hdp_known / he_cp_with_diaas) * CP_human_edible_pct,
+        TRUE ~ NA_real_
       ),
       dplyr::across(
         c(DE_pct, CP_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg),
@@ -109,6 +131,29 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
 
   if (!"production_role" %in% names(full_data)) {
     full_data$production_role <- NA_character_
+  }
+
+  # Warn transparently when > 5% of human-edible feed CP in any ACTIVE cohort diet lacks a DIAAS value
+  # (filtered to diets actually assigned in full_data so unused template diets do not trigger false warnings).
+  active_diets <- full_data %>%
+    dplyr::filter(!is.na(diet_tag)) %>%
+    dplyr::distinct(dplyr::across(dplyr::all_of(diet_join_keys)))
+
+  low_cov_diets <- diet_profiles %>%
+    dplyr::semi_join(active_diets, by = diet_join_keys) %>%
+    dplyr::filter(CP_human_edible_pct > 0, diaas_coverage < 0.95)
+  if (nrow(low_cov_diets) > 0) {
+    missing_diaas_ing <- diet_joined %>%
+      dplyr::semi_join(low_cov_diets, by = diet_join_keys) %>%
+      dplyr::filter(he_cp_term > 0, is.na(diaas_pct)) %>%
+      dplyr::pull(ingredient) %>%
+      unique()
+    warning(paste0(
+      "Warning (DIAAS): >5% of human-edible feed CP lacks `diaas_pct` in mapping.csv for diet(s): ",
+      paste(unique(low_cov_diets$diet_tag), collapse = ", "),
+      " (missing ingredients: ", paste(missing_diaas_ing, collapse = ", "), "). ",
+      "HDP_feed_pct is scaled from known ingredients when coverage >= 80%, or set to NA when < 80%."
+    ))
   }
 
   # --- 5. Biological & Nutritional Threshold Checks (Mature Ruminants Only) ---
@@ -164,7 +209,8 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   results <- full_data %>%
     dplyr::select(
       farm_id, region, subregion, animal_tag, animal_type, animal_subtype, diet_tag,
-      DE_pct, CP_pct, CP_cropland_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg, swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
+      DE_pct, CP_pct, CP_human_edible_pct, HDP_feed_pct, NDF_pct, ASH_pct, GE_feed_kcal_kg,
+      swine_ME_kcal_kg, swine_DE_kcal_kg, poultry_ME_kcal_kg
     )
 
   if (isTRUE(saveoutput)) {

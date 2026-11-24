@@ -153,6 +153,8 @@ modal_tooltips <- list(
   frac_leach               = "Fraction of nitrogen lost through leaching/runoff.",
   economic_allocation      = "Used to allocate environmental impacts between a main product and its co-products based on economic value.",
   human_edible             = "Binary (0 or 1, or fraction 0-1) indicating whether the ingredient competes directly as human-edible food for Protein FCR / EPCR accounting.",
+  diaas_pct                = "Digestible Indispensable Amino Acid Score (%, FAO 2013 0.5-3 yr child pattern, untruncated) for protein quality accounting.",
+  diaas_reference          = "Primary scientific source for the DIAAS value (default backbone: Ertl et al., 2016b, Die Bodenkultur 67(2):91-103).",
   ea_reference             = "Reference multi-output SimaPro / Agribalyse process from which the economic allocation and physical co-product yield are derived.",
   kg_coproduct_per_1ton_maincrop = "Physical yield of co-product (in kg) obtained per 1,000 kg (1 ton) of processed parent crop.",
   yield_name               = "FAOSTAT name of the ingredient used to link its database with herdr",

@@ -184,7 +184,9 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
             wmean_safe(x, cur_grp$egg_fresh_kg)
           } else if (grepl("_wool$", col_name, ignore.case = TRUE) && "wool_kg" %in% names(cur_grp)) {
             wmean_safe(x, cur_grp$wool_kg)
-          } else if (grepl("_protein$|fcr", col_name, ignore.case = TRUE) && "total_protein_kg" %in% names(cur_grp)) {
+          } else if (grepl("^epcr", col_name, ignore.case = TRUE) && "total_HDP_kg" %in% names(cur_grp)) {
+            wmean_safe(x, cur_grp$total_HDP_kg)
+          } else if (grepl("_protein$|fcr|^epcr|^pqr$", col_name, ignore.case = TRUE) && "total_protein_kg" %in% names(cur_grp)) {
             wmean_safe(x, cur_grp$total_protein_kg)
           } else if (grepl("_product$", col_name, ignore.case = TRUE) && "product_weight_kg" %in% names(cur_grp)) {
             wmean_safe(x, cur_grp$product_weight_kg)
@@ -400,55 +402,84 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         (if ("milk_FPCM_kg" %in% names(df_agg)) df_agg$milk_FPCM_kg == 0 else FALSE) &
         (if ("meat_carcass_weight_kg" %in% names(df_agg)) df_agg$meat_carcass_weight_kg == 0 else TRUE)
 
-      has_direct_fcr <- "Protein_FCR_total" %in% names(df_agg) && "Protein_FCR_cropland" %in% names(df_agg)
-      has_raw_cp <- all(c("feed_CP_total_kg", "feed_CP_cropland_kg", "total_protein_kg") %in% names(df_agg))
+      has_direct_fcr <- "Protein_FCR_total" %in% names(df_agg) && "Protein_FCR_human_edible" %in% names(df_agg)
+      has_raw_cp <- all(c("feed_CP_total_kg", "feed_CP_human_edible_kg", "total_protein_kg") %in% names(df_agg))
+      has_direct_epcr <- "EPCR_DIAAS" %in% names(df_agg) && any(!is.na(df_agg$EPCR_DIAAS))
+      has_raw_hdp <- all(c("feed_HDP_kg", "total_HDP_kg") %in% names(df_agg)) && any(!is.na(df_agg$feed_HDP_kg))
+      has_epcr <- has_direct_epcr || has_raw_hdp
 
       valid_prot <- (df_agg$total_protein_kg > 0) & !is_non_milking_dairy
 
       if (has_direct_fcr) {
         df_agg$fcr_total <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_total, 0), 0)
-        df_agg$fcr_cropland <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_cropland, 0), 0)
+        df_agg$fcr_human_edible <- ifelse(valid_prot, tidyr::replace_na(df_agg$Protein_FCR_human_edible, 0), 0)
       } else if (has_raw_cp) {
         df_agg$fcr_total <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_total_kg / df_agg$total_protein_kg, 0)
-        df_agg$fcr_cropland <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_cropland_kg / df_agg$total_protein_kg, 0)
+        df_agg$fcr_human_edible <- ifelse(valid_prot & df_agg$total_protein_kg > 0, df_agg$feed_CP_human_edible_kg / df_agg$total_protein_kg, 0)
       } else {
         df_agg$fcr_total <- 0
-        df_agg$fcr_cropland <- 0
+        df_agg$fcr_human_edible <- 0
+      }
+
+      if (has_epcr) {
+        if (has_direct_epcr) {
+          df_agg$epcr_diaas <- ifelse(valid_prot, df_agg$EPCR_DIAAS, NA_real_)
+        } else {
+          df_agg$epcr_diaas <- ifelse(valid_prot & df_agg$total_HDP_kg > 0, df_agg$feed_HDP_kg / df_agg$total_HDP_kg, NA_real_)
+        }
+        fcr_cols <- c("fcr_total", "fcr_human_edible", "epcr_diaas")
+        fcr_labels <- c(
+          "Total Protein FCR (Biological)",
+          "Human-Edible Protein FCR (Crude Protein)",
+          "EPCR DIAAS (Protein-Quality Adjusted)"
+        )
+        palette_fcr <- c(
+          "Total Protein FCR (Biological)"           = "#0284C7",
+          "Human-Edible Protein FCR (Crude Protein)" = "#D97706",
+          "EPCR DIAAS (Protein-Quality Adjusted)"    = "#15803D"
+        )
+        fcr_subtitle <- "Enterprise-level feed protein per kg animal protein: total CP, human-edible CP (mapping.csv), and DIAAS-adjusted HDP (FAO 2013 0.5-3 yr)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer"
+        fcr_xlab <- "Protein Conversion Ratio (kg feed CP or HDP / kg animal protein or HDP)"
+      } else {
+        fcr_cols <- c("fcr_total", "fcr_human_edible")
+        fcr_labels <- c("Total Protein FCR (Biological)", "Human-Edible Protein FCR (Crude Protein)")
+        palette_fcr <- c(
+          "Total Protein FCR (Biological)"           = "#0284C7",
+          "Human-Edible Protein FCR (Crude Protein)" = "#D97706"
+        )
+        fcr_subtitle <- "Enterprise-level kg Crude Protein Intake per kg Animal Edible Protein Output (mapping.csv human_edible; crude protein basis)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer"
+        fcr_xlab <- "Protein Feed Conversion Ratio (kg CP feed / kg edible protein)"
       }
 
       plot_long <- df_agg %>%
-        dplyr::select(dplyr::all_of(c("plot_label", "fcr_total", "fcr_cropland"))) %>%
+        dplyr::select(dplyr::all_of(c("plot_label", fcr_cols))) %>%
         tidyr::pivot_longer(
-          cols = c("fcr_total", "fcr_cropland"),
+          cols = dplyr::all_of(fcr_cols),
           names_to = "metric_raw",
           values_to = "value"
         ) %>%
         dplyr::mutate(
           metric = factor(
             metric_raw,
-            levels = c("fcr_total", "fcr_cropland"),
-            labels = c("Total Protein FCR (Biological)", "Cropland Protein FCR (Human Competition)")
+            levels = fcr_cols,
+            labels = fcr_labels
           ),
-          label_text = ifelse(value > 0, sprintf("%.2f", value), "")
+          label_text = ifelse(!is.na(value) & value > 0, sprintf("%.2f", value), "")
         )
 
-      palette_fcr <- c(
-        "Total Protein FCR (Biological)"           = "#0284C7",
-        "Cropland Protein FCR (Human Competition)" = "#D97706"
-      )
-
-      max_val <- if (nrow(plot_long) > 0 && max(plot_long$value, na.rm = TRUE) > 0) max(plot_long$value, na.rm = TRUE) else 2.0
+      max_val <- if (nrow(plot_long) > 0 && any(!is.na(plot_long$value)) && max(plot_long$value, na.rm = TRUE) > 0) max(plot_long$value, na.rm = TRUE) else 2.0
 
       p <- ggplot(plot_long, aes(x = value, y = plot_label, fill = metric)) +
-        geom_col(position = position_dodge(width = 0.75), width = 0.65) +
+        geom_col(position = position_dodge(width = 0.78), width = 0.68, na.rm = TRUE) +
         geom_vline(xintercept = 1.0, linetype = "dashed", color = "#DC2626", linewidth = 0.85) +
         geom_text(
           aes(label = label_text),
-          position = position_dodge(width = 0.75),
+          position = position_dodge(width = 0.78),
           hjust = -0.2,
           fontface = "bold",
-          size = 4.0,
-          color = "#1F2937"
+          size = 3.8,
+          color = "#1F2937",
+          na.rm = TRUE
         ) +
         scale_fill_manual(values = palette_fcr) +
         scale_x_continuous(expand = expansion(mult = c(0, 0.18)), limits = c(0, max(max_val, 1.2) * 1.15)) +
@@ -456,13 +487,13 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         theme(
           legend.position = "top",
           legend.title = element_blank(),
-          legend.text = element_text(size = 12, face = "bold"),
+          legend.text = element_text(size = 11.5, face = "bold"),
           axis.title.x = element_text(margin = margin(t = 10), face = "bold", color = "#1F2937", size = 12)
         ) +
         labs(
           title = "Protein Feed Efficiency & Human Food Competition",
-          subtitle = "Enterprise-level kg Crude Protein Intake per kg Animal Edible Protein Output (mapping.csv human_edible; crude protein basis)\nDashed red line at 1.0 indicates threshold: < 1.0 = Net Food Producer, > 1.0 = Net Consumer",
-          x = "Protein Feed Conversion Ratio (kg CP feed / kg edible protein)",
+          subtitle = fcr_subtitle,
+          x = fcr_xlab,
           y = NULL
         )
 

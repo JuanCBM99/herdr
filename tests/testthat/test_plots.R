@@ -144,13 +144,13 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   # 13. Assertions: Protein Feed Efficiency (Mottet FCR)
   impact_fcr_df <- impact_fu_df %>%
     dplyr::mutate(
-      feed_CP_total_kg    = c(910000, 320000),
-      feed_CP_cropland_kg = c(650000, 80000)
+      feed_CP_total_kg        = c(910000, 320000),
+      feed_CP_human_edible_kg = c(650000, 80000)
     )
   p_fu_fcr <- plot_herdr_results(impact_fcr_df, group_cols = "animal_tag", func_name = "generate_impact_assessment", functional_unit = "fcr")
   expect_s3_class(p_fu_fcr, "ggplot")
   expect_match(p_fu_fcr$labels$title, "Protein Feed Efficiency")
-  expect_true("Cropland Protein FCR (Human Competition)" %in% levels(p_fu_fcr$data$metric))
+  expect_true("Human-Edible Protein FCR (Crude Protein)" %in% levels(p_fu_fcr$data$metric))
 
   # 14. Assertions: Standalone Feed Environmental Footprint plot (calculate_feed_emissions)
   feed_res_df <- data.frame(
@@ -259,7 +259,7 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
       Land_intensity_protein = c(19.2, 18.7),
       Water_intensity_protein = c(0.32, 0.19),
       Protein_FCR_total = c(3.50, 4.00),
-      Protein_FCR_cropland = c(2.50, 1.00)
+      Protein_FCR_human_edible = c(2.50, 1.00)
     )
   )
 
@@ -302,7 +302,7 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
     Land_intensity_protein = c(40.0, 40.0, 35.0, 35.0),
     Water_intensity_protein = c(5.0, 5.0, 4.0, 4.0),
     Protein_FCR_total = c(5.0, 5.0, 4.0, 4.0),
-    Protein_FCR_cropland = c(2.0, 2.0, 1.5, 1.5)
+    Protein_FCR_human_edible = c(2.0, 2.0, 1.5, 1.5)
   )
 
   p_fcr_ent <- plot_herdr_results(
@@ -329,5 +329,25 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   )
   expect_s3_class(p_meat_ent, "ggplot")
   expect_equal(length(unique(p_meat_ent$data$plot_label)), 1)
+
+  # 19. 3-bar Protein FCR plot with EPCR_DIAAS weighted by total_HDP_kg across cohorts
+  multi_cohort_diaas <- multi_cohort_int %>%
+    dplyr::mutate(
+      total_HDP_kg = total_protein_kg * 1.15,
+      EPCR_DIAAS = c(1.10, 1.10, 0.80, 0.80),
+      PQR = c(1.82, 1.82, 1.88, 1.88)
+    )
+  p_fcr_diaas <- plot_herdr_results(
+    multi_cohort_diaas,
+    group_cols = c("farm_id", "animal_tag", "region"),
+    func_name = "generate_impact_assessment",
+    functional_unit = "fcr",
+    impact_category = "fcr"
+  )
+  expect_s3_class(p_fcr_diaas, "ggplot")
+  expect_setequal(unique(p_fcr_diaas$data$metric_raw), c("fcr_total", "fcr_human_edible", "epcr_diaas"))
+  exp_epcr <- (1.10 * (31000 * 1.15) + 0.80 * (63000 * 1.15)) / ((31000 + 63000) * 1.15)
+  epcr_val <- p_fcr_diaas$data$value[p_fcr_diaas$data$metric_raw == "epcr_diaas"]
+  expect_equal(epcr_val, exp_epcr, tolerance = 1e-6)
 })
 

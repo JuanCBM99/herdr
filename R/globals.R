@@ -79,7 +79,8 @@ if(getRversion() >= "2.15.1") {
 
     # --- Land Use and FAO Data ---
     "Area", "Item", "Value", "yield_name", "agribalyse_name",
-    "fao_yield", "dm_yield", "ha_per_kg", "economic_allocation", "human_edible", "share_factor",
+    "fao_yield", "dm_yield", "ha_per_kg", "economic_allocation", "human_edible", "diaas_pct", "share_factor",
+    "he_frac", "he_cp_term", "he_cp_with_diaas", "he_hdp_known", "diaas_coverage", "HDP_feed_pct",
     "ha_kg_allocated", "annual_cons_kg", "land_use_m2", "total_land_use_m2",
     "Element", "Yield", "country_of_origin", "custom_yield_kg_ha",
     "land_type", "Reporter Countries", "Partner Countries", "Total_Import",
@@ -91,10 +92,11 @@ if(getRversion() >= "2.15.1") {
 
     # --- Production and Edible Protein (GLEAM) ---
     "production_role", "replacement_rate", "has_replacement_rate", "effective_repl_rate", "BFM", "MEAT_prot", "DP_pct",
-    "MILK_prot_def", "milk_fresh_kg", "milk_prot_pct", "N_exit",
+    "MILK_prot_def", "MILK_diaas_pct", "MEAT_diaas_pct", "milk_fresh_kg", "milk_prot_pct", "N_exit",
     "slaughter_weight_kg", "meat_live_weight_kg", "meat_carcass_weight_kg",
     "meat_boneless_kg", "egg_fresh_kg", "milk_protein_kg", "meat_protein_kg",
     "egg_protein_kg", "milk_FPCM_kg", "wool_kg", "total_protein_kg",
+    "milk_HDP_kg", "meat_HDP_kg", "egg_HDP_kg", "total_HDP_kg",
 
     # --- Impacts and Summary (CO2eq) ---
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg",
@@ -112,7 +114,7 @@ if(getRversion() >= "2.15.1") {
 
     # --- Functional Units and Intensities ---
     "CO2eq_Total_head", "CO2eq_cradle_to_farm_head", "Land_head", "Water_head",
-    "feed_intake_kg", "CP_cropland_pct",
+    "feed_intake_kg", "CP_human_edible_pct", "feed_CP_total_kg", "feed_CP_human_edible_kg", "feed_HDP_kg", "EPCR_DIAAS", "PQR",
 
     # --- Enfoque A (IDF Bulletin 520 / 2022) Biophysical Allocation ---
     "GHG_intensity_milk", "Land_intensity_milk",

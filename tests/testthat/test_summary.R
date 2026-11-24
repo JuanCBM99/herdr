@@ -53,7 +53,7 @@ test_that("generate_impact_assessment creates two consistent final reports safel
   # Verify inventory columns in Table 1
   expected_cols_totals <- c(
     "farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype", "production_role",
-    "population", "DMI_kgday", "feed_intake_kg", "feed_CP_total_kg", "feed_CP_cropland_kg",
+    "population", "DMI_kgday", "feed_intake_kg", "feed_CP_total_kg", "feed_CP_human_edible_kg", "feed_HDP_kg",
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg", "N2O_lea_Gg", "N2O_indirect_Gg",
     "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O_direct", "CO2eq_N2O_indirect", "CO2eq_N2O",
     "CO2eq_feed_fossil_Gg", "CO2eq_feed_luc_Gg", "CO2eq_feed_Gg",
@@ -70,13 +70,13 @@ test_that("generate_impact_assessment creates two consistent final reports safel
   expected_cols_intensities <- c(
     "farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype", "production_role",
     "population",
-    "milk_FPCM_kg", "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg", "total_protein_kg",
+    "milk_FPCM_kg", "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg", "total_protein_kg", "total_HDP_kg",
     "GHG_intensity_milk", "GHG_cradle_to_farm_milk", "Land_intensity_milk", "Water_intensity_milk",
     "GHG_intensity_meat", "GHG_cradle_to_farm_meat", "Land_intensity_meat", "Water_intensity_meat",
     "GHG_intensity_egg", "GHG_cradle_to_farm_egg", "Land_intensity_egg", "Water_intensity_egg",
     "GHG_intensity_wool", "GHG_cradle_to_farm_wool", "Land_intensity_wool", "Water_intensity_wool",
     "GHG_intensity_protein", "GHG_cradle_to_farm_protein", "Land_intensity_protein", "Water_intensity_protein",
-    "Protein_FCR_total", "Protein_FCR_cropland"
+    "Protein_FCR_total", "Protein_FCR_human_edible", "EPCR_DIAAS", "PQR"
   )
   for (col in expected_cols_intensities) {
     expect_true(col %in% colnames(results$intensities), info = paste("Missing intensities col:", col))
@@ -114,8 +114,8 @@ test_that("generate_impact_assessment creates two consistent final reports safel
       if (!is.na(farm_sample$Protein_FCR_total)) {
         expect_true(farm_sample$Protein_FCR_total > 0)
       }
-      if (!is.na(farm_sample$Protein_FCR_cropland)) {
-        expect_true(farm_sample$Protein_FCR_cropland >= 0)
+      if (!is.na(farm_sample$Protein_FCR_human_edible)) {
+        expect_true(farm_sample$Protein_FCR_human_edible >= 0)
       }
       if (!is.na(farm_sample$GHG_intensity_milk)) {
         expect_true(farm_sample$GHG_intensity_milk > 0)
@@ -268,13 +268,25 @@ test_that("Table 2 integrates breeding + replacement + slaughter in meat systems
     alloc_sows_s1   <- sows_row$GHG_intensity_meat * sows_row$meat_carcass_weight_kg
     expect_equal(alloc_fatten_s1 + alloc_sows_s1, tot_swine_s1, tolerance = 1e-2 * tot_swine_s1)
 
-    # Enterprise-level Protein FCR: all protein-producing cohorts share whole-herd FCR (including replacement)
+    # Enterprise-level Protein FCR & DIAAS EPCR: all protein-producing cohorts share whole-herd values
     expect_equal(fatten_row$Protein_FCR_total, sows_row$Protein_FCR_total)
-    expect_equal(fatten_row$Protein_FCR_cropland, sows_row$Protein_FCR_cropland)
+    expect_equal(fatten_row$Protein_FCR_human_edible, sows_row$Protein_FCR_human_edible)
+    expect_equal(fatten_row$EPCR_DIAAS, sows_row$EPCR_DIAAS)
+    expect_equal(fatten_row$PQR, sows_row$PQR)
     exp_swine_fcr_tot <- round(sum(swine_tot$feed_CP_total_kg) / sum(swine_int$total_protein_kg), 2)
-    exp_swine_fcr_crop <- round(sum(swine_tot$feed_CP_cropland_kg) / sum(swine_int$total_protein_kg), 2)
+    exp_swine_fcr_he <- round(sum(swine_tot$feed_CP_human_edible_kg) / sum(swine_int$total_protein_kg), 2)
+    exp_swine_epcr <- round(sum(swine_tot$feed_HDP_kg) / sum(swine_int$total_HDP_kg), 2)
+    exp_swine_pqr <- round(
+      (sum(swine_int$total_HDP_kg) / sum(swine_int$total_protein_kg)) /
+        (sum(swine_tot$feed_HDP_kg) / sum(swine_tot$feed_CP_human_edible_kg)),
+      2
+    )
     expect_equal(fatten_row$Protein_FCR_total, exp_swine_fcr_tot)
-    expect_equal(fatten_row$Protein_FCR_cropland, exp_swine_fcr_crop)
+    expect_equal(fatten_row$Protein_FCR_human_edible, exp_swine_fcr_he)
+    expect_equal(fatten_row$EPCR_DIAAS, exp_swine_epcr)
+    expect_equal(fatten_row$PQR, exp_swine_pqr)
+    expect_true(fatten_row$PQR > 1.0)
+    expect_true(fatten_row$EPCR_DIAAS < fatten_row$Protein_FCR_human_edible)
   })
 })
 
@@ -381,10 +393,10 @@ test_that("Table 2 integrates mature dairy + replacement + slaughter calves into
     # Verify unified enterprise-level Protein FCR includes mature + replacement + slaughter
     expect_true(is.na(repl_row$Protein_FCR_total))
     expect_equal(mat_row$Protein_FCR_total, slau_row$Protein_FCR_total)
-    expect_equal(mat_row$Protein_FCR_cropland, slau_row$Protein_FCR_cropland)
+    expect_equal(mat_row$Protein_FCR_human_edible, slau_row$Protein_FCR_human_edible)
     exp_dairy_fcr_tot <- round(sum(tot$feed_CP_total_kg) / sum(inten$total_protein_kg), 2)
-    exp_dairy_fcr_crop <- round(sum(tot$feed_CP_cropland_kg) / sum(inten$total_protein_kg), 2)
+    exp_dairy_fcr_he <- round(sum(tot$feed_CP_human_edible_kg) / sum(inten$total_protein_kg), 2)
     expect_equal(mat_row$Protein_FCR_total, exp_dairy_fcr_tot)
-    expect_equal(mat_row$Protein_FCR_cropland, exp_dairy_fcr_crop)
+    expect_equal(mat_row$Protein_FCR_human_edible, exp_dairy_fcr_he)
   })
 })

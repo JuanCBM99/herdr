@@ -37,7 +37,7 @@ build_results_panel <- function() {
                 "Land Footprint (Land Use)"        = "land",
                 "Water Deprivation (AWARE / EF 3.1)" = "water",
                 "Multi-Impact Overview"            = "overview",
-                "Protein Feed Efficiency (Mottet)"  = "fcr"
+                "Protein Efficiency (FCR & EPCR DIAAS)" = "fcr"
               ),
               selected = "ghg"
             )

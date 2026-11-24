@@ -7,11 +7,14 @@
 #' Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 #' (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 #' factor: \code{AF_k = Energy_k / Energy_total}. Specifically, \code{Protein_FCR_total} divides whole-herd
-#' total feed crude protein by edible animal protein (allocated by \code{af_protein}), whereas
-#' \code{Protein_FCR_cropland} weights feed crude protein by the explicit \code{human_edible} column in
+#' total feed crude protein by edible animal protein (allocated by \code{af_protein}),
+#' \code{Protein_FCR_human_edible} weights feed crude protein by the explicit \code{human_edible} column in
 #' \code{mapping.csv} (default binary \code{0/1} classification anchored on arable non-forage concentrates
 #' with \code{economic_allocation > 0.33}, excluding inedible/waste items and including commercial food-grade
-#' dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).
+#' dairy feeds), and \code{EPCR_DIAAS} adjusts both human-edible feed protein (\code{diaas_pct} in
+#' \code{mapping.csv}) and animal product protein (Ertl et al., 2016b, Table 5) by their Digestible
+#' Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child pattern, untruncated), alongside the
+#' Protein Quality Ratio (\code{PQR = DIAAS_output / DIAAS_input}).
 #'
 #' @param automatic_cycle Logical. TRUE for built-in demographic models, FALSE for manual livestock_census.csv.
 #' @param farm_id Character vector to filter by farm_id. Default is NULL.
@@ -27,8 +30,8 @@
 #' @param ar Optional shorthand alias for `gwp_report` (e.g., `ar = "AR6"`).
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to `"user_data"`.
 #' @return A named list containing two dataframes:
-#'   \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).}
-#'   \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_cropland} weighted by the \code{human_edible} column in \code{mapping.csv}, crude protein basis without DIAAS/partial HEP).}
+#'   \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year, including \code{feed_CP_total_kg}, \code{feed_CP_human_edible_kg}, and \code{feed_HDP_kg}), land (m2) and water (m3).}
+#'   \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_human_edible} weighted by \code{human_edible} in \code{mapping.csv}; \code{EPCR_DIAAS} adjusting both feed and animal protein by DIAAS under FAO 2013 0.5-3 yr pattern; and \code{PQR = DIAAS_output / DIAAS_input}).}
 #' @examples
 #' \dontrun{
 #' res <- generate_impact_assessment(
@@ -201,7 +204,8 @@ assemble_cohort_inventory <- function(automatic_cycle, farm_country, year, data_
     dplyr::group_by(dplyr::across(dplyr::all_of(join_keys))) %>%
     dplyr::summarise(
       CP_pct = mean(CP_pct, na.rm = TRUE),
-      CP_cropland_pct = mean(CP_cropland_pct, na.rm = TRUE),
+      CP_human_edible_pct = mean(CP_human_edible_pct, na.rm = TRUE),
+      HDP_feed_pct = mean(HDP_feed_pct, na.rm = FALSE),
       .groups = "drop"
     )
 
@@ -223,6 +227,7 @@ assemble_cohort_inventory <- function(automatic_cycle, farm_country, year, data_
       egg_fresh_kg = sum(egg_fresh_kg, na.rm = TRUE),
       wool_kg = sum(wool_kg, na.rm = TRUE),
       total_protein_kg = sum(total_protein_kg, na.rm = TRUE),
+      total_HDP_kg = sum(total_HDP_kg, na.rm = TRUE),
       production_role = dplyr::first(production_role),
       .groups = "drop"
     ) %>%
@@ -231,18 +236,24 @@ assemble_cohort_inventory <- function(automatic_cycle, farm_country, year, data_
     dplyr::mutate(
       DMI_kgday = tidyr::replace_na(DMI_kgday, 0),
       CP_pct = tidyr::replace_na(CP_pct, 0),
-      CP_cropland_pct = tidyr::replace_na(CP_cropland_pct, 0),
+      CP_human_edible_pct = tidyr::replace_na(CP_human_edible_pct, 0),
       feed_intake_kg = population * DMI_kgday * 365,
       feed_CP_total_kg = feed_intake_kg * (CP_pct / 100),
-      feed_CP_cropland_kg = feed_intake_kg * (CP_cropland_pct / 100)
+      feed_CP_human_edible_kg = feed_intake_kg * (CP_human_edible_pct / 100),
+      feed_HDP_kg = dplyr::if_else(
+        feed_CP_human_edible_kg == 0,
+        0,
+        feed_intake_kg * (HDP_feed_pct / 100)
+      )
     ) %>%
-    dplyr::select(-DMI_kgday, -CP_pct, -CP_cropland_pct)
+    dplyr::select(-DMI_kgday, -CP_pct, -CP_human_edible_pct, -HDP_feed_pct)
 
   # --- E. Merge all components, attach authoritative roles & preserve census order ---
   cohort_df <- list(CH4_ent, CH4_man, N2O_dir, N2O_vol, N2O_lea, land_u, feed_emiss, prod_data) %>%
     purrr::reduce(dplyr::full_join, by = join_keys) %>%
     dplyr::mutate(
-      dplyr::across(dplyr::where(is.numeric), ~ tidyr::replace_na(., 0)),
+      dplyr::across(dplyr::where(is.numeric) & !dplyr::any_of("feed_HDP_kg"), ~ tidyr::replace_na(., 0)),
+      feed_HDP_kg = dplyr::if_else(feed_CP_human_edible_kg == 0 & is.na(feed_HDP_kg), 0, feed_HDP_kg),
       animal_subtype = trimws(as.character(animal_subtype))
     )
 
@@ -299,7 +310,7 @@ add_per_head_metrics <- function(df) {
 #' @noRd
 build_totals_table <- function(cohort_df, group_by_identification = TRUE) {
   additive_cols <- c(
-    "population", "feed_intake_kg", "feed_CP_total_kg", "feed_CP_cropland_kg",
+    "population", "feed_intake_kg", "feed_CP_total_kg", "feed_CP_human_edible_kg", "feed_HDP_kg",
     "CH4_enteric_Gg", "CH4_manure_Gg", "N2O_direct_Gg", "N2O_vol_Gg", "N2O_lea_Gg", "N2O_indirect_Gg",
     "CO2eq_enteric", "CO2eq_manure", "CO2eq_N2O_direct", "CO2eq_N2O_indirect", "CO2eq_N2O",
     "CO2eq_feed_fossil_Gg", "CO2eq_feed_luc_Gg", "CO2eq_feed_Gg",
@@ -324,13 +335,16 @@ build_totals_table <- function(cohort_df, group_by_identification = TRUE) {
     dplyr::group_by(farm_id, region, subregion, animal_type, animal_subtype) %>%
     dplyr::summarise(
       .orig_row_id = min(.orig_row_id, na.rm = TRUE),
-      dplyr::across(dplyr::all_of(additive_cols), ~ sum(.x, na.rm = TRUE)),
+      # Compute feed_HDP_kg BEFORE across() overwrites feed_CP_human_edible_kg with its scalar sum
+      feed_HDP_kg = if (any(feed_CP_human_edible_kg > 0 & is.na(feed_HDP_kg))) NA_real_ else sum(feed_HDP_kg, na.rm = TRUE),
+      dplyr::across(dplyr::all_of(setdiff(additive_cols, "feed_HDP_kg")), ~ sum(.x, na.rm = TRUE)),
       .groups = "drop"
     ) %>%
     dplyr::arrange(.orig_row_id) %>%
     dplyr::select(-.orig_row_id) %>%
     add_per_head_metrics() %>%
-    dplyr::relocate(DMI_kgday, .after = population)
+    dplyr::relocate(DMI_kgday, .after = population) %>%
+    dplyr::relocate(feed_HDP_kg, .after = feed_CP_human_edible_kg)
 }
 
 # ==============================================================================
@@ -358,7 +372,7 @@ herdr_energy_coef <- list(
 # Intensity vector returned when a product has no valid allocation or denominator.
 herdr_empty_intensity <- c(
   ghg_s1 = NA_real_, ghg_c2f = NA_real_, land = NA_real_, water = NA_real_,
-  fcr_tot = NA_real_, fcr_crop = NA_real_
+  fcr_tot = NA_real_, fcr_he = NA_real_
 )
 
 #' Build Table 2: Enterprise-allocated product intensities and Protein FCR per cohort.
@@ -379,8 +393,10 @@ build_intensities_table <- function(cohort_df) {
 #' Allocation rules by production_role:
 #' - mature: milk (af_milk), eggs (af_egg), wool (af_wool), cull meat (af_cull).
 #' - slaughter: young meat (af_young), wool (af_wool).
-#' - mature & slaughter: edible protein intensities (GHG, land, water) and Protein FCR
-#'   (Mottet et al. 2017) use the unified whole-enterprise pool * af_protein / enterprise$protein_kg.
+#' - mature & slaughter: edible protein intensities (GHG, land, water), Protein FCR
+#'   (\code{Protein_FCR_total}, \code{Protein_FCR_human_edible}; Mottet et al. 2017),
+#'   and DIAAS-adjusted protein metrics (\code{EPCR_DIAAS}, \code{PQR};
+#'   Ertl et al. 2016a, 2016b) use the unified whole-enterprise pool * af_protein.
 #' - replacement (or other non-producing roles): commercial outputs = 0, intensities = NA.
 #' @noRd
 build_enterprise_intensities <- function(df_enterprise, animal_type) {
@@ -394,13 +410,15 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
   active_prod <- active_mature | active_slaughter
 
   # 1. Whole-enterprise input pool (integrates mature + replacement + slaughter)
+  hdp_feed_missing <- any(df_enterprise$feed_CP_human_edible_kg > 0 & is.na(df_enterprise$feed_HDP_kg))
   pool_farm <- list(
-    s1      = sum(df_enterprise$CO2eq_Total_Gg, na.rm = TRUE) * 1e6,
-    c2f     = sum(df_enterprise$CO2eq_cradle_to_farm_Gg, na.rm = TRUE) * 1e6,
-    land    = sum(df_enterprise$Land_m2, na.rm = TRUE),
-    water   = sum(df_enterprise$Water_feed_m3, na.rm = TRUE),
-    cp_tot  = sum(df_enterprise$feed_CP_total_kg, na.rm = TRUE),
-    cp_crop = sum(df_enterprise$feed_CP_cropland_kg, na.rm = TRUE)
+    s1       = sum(df_enterprise$CO2eq_Total_Gg, na.rm = TRUE) * 1e6,
+    c2f      = sum(df_enterprise$CO2eq_cradle_to_farm_Gg, na.rm = TRUE) * 1e6,
+    land     = sum(df_enterprise$Land_m2, na.rm = TRUE),
+    water    = sum(df_enterprise$Water_feed_m3, na.rm = TRUE),
+    cp_tot   = sum(df_enterprise$feed_CP_total_kg, na.rm = TRUE),
+    cp_he    = sum(df_enterprise$feed_CP_human_edible_kg, na.rm = TRUE),
+    hdp_feed = if (hdp_feed_missing) NA_real_ else sum(df_enterprise$feed_HDP_kg, na.rm = TRUE)
   )
 
   # 2. Whole-enterprise product outputs
@@ -413,7 +431,8 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
     cull_lw    = sum(df_enterprise$meat_live_weight_kg[is_mature], na.rm = TRUE),
     young_cw   = sum(df_enterprise$meat_carcass_weight_kg[is_slaughter], na.rm = TRUE),
     young_lw   = sum(df_enterprise$meat_live_weight_kg[is_slaughter], na.rm = TRUE),
-    protein_kg = sum(df_enterprise$total_protein_kg[is_mature | is_slaughter], na.rm = TRUE)
+    protein_kg = sum(df_enterprise$total_protein_kg[is_mature | is_slaughter], na.rm = TRUE),
+    hdp_animal = sum(df_enterprise$total_HDP_kg[is_mature | is_slaughter], na.rm = TRUE)
   )
 
   # 3. Biophysical allocation factors & enterprise intensities (computed ONCE per product)
@@ -426,12 +445,37 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
   int_wool  <- calc_intensities(pool_farm, af$af_wool,    enterprise$wool_kg)
   int_prot  <- calc_intensities(pool_farm, af$af_protein, enterprise$protein_kg)
 
+  # DIAAS-adjusted Edible Protein Conversion Ratio (EPCR_DIAAS) and Protein Quality Ratio (PQR)
+  # Ertl et al. (2016a, 2016b): EPCR_DIAAS = (HDP_feed * af_protein) / HDP_animal; PQR = DIAAS_out / DIAAS_in
+  epcr_diaas_val <- if (
+    !is.na(pool_farm$hdp_feed) && !is.na(enterprise$hdp_animal) &&
+      enterprise$hdp_animal > 0 && !is.na(af$af_protein) && af$af_protein > 0
+  ) {
+    round((pool_farm$hdp_feed * af$af_protein) / enterprise$hdp_animal, 2)
+  } else {
+    NA_real_
+  }
+
+  pqr_val <- if (
+    !is.na(pool_farm$hdp_feed) && pool_farm$hdp_feed > 0 &&
+      !is.na(pool_farm$cp_he) && pool_farm$cp_he > 0 &&
+      !is.na(enterprise$hdp_animal) && enterprise$hdp_animal > 0 &&
+      !is.na(enterprise$protein_kg) && enterprise$protein_kg > 0
+  ) {
+    diaas_out <- enterprise$hdp_animal / enterprise$protein_kg
+    diaas_in  <- pool_farm$hdp_feed / pool_farm$cp_he
+    round(diaas_out / diaas_in, 2)
+  } else {
+    NA_real_
+  }
+
   # 4. Cohort commercial outputs (zero for non-producing roles such as replacement)
   milk_fpcm <- dplyr::if_else(active_mature, df_enterprise$milk_FPCM_kg, 0)
   meat_cw   <- dplyr::if_else(active_prod,   df_enterprise$meat_carcass_weight_kg, 0)
   egg_kg    <- dplyr::if_else(active_mature, df_enterprise$egg_fresh_kg, 0)
   wool_kg   <- dplyr::if_else(active_prod,   df_enterprise$wool_kg, 0)
   prot_kg   <- dplyr::if_else(active_prod,   df_enterprise$total_protein_kg, 0)
+  hdp_kg    <- dplyr::if_else(active_prod,   df_enterprise$total_HDP_kg, 0)
 
   # Helpers to assign enterprise intensities to active cohort rows
   assign_val <- function(cond, val) {
@@ -456,6 +500,7 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
     egg_fresh_kg                = egg_kg,
     wool_kg                     = wool_kg,
     total_protein_kg            = prot_kg,
+    total_HDP_kg                = hdp_kg,
 
     # Product Intensities: Milk (per kg FPCM / fresh for small ruminants)
     GHG_intensity_milk          = assign_val(milk_fpcm > 0, int_milk[["ghg_s1"]]),
@@ -487,7 +532,9 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
     Land_intensity_protein      = assign_val(prot_kg > 0, int_prot[["land"]]),
     Water_intensity_protein     = assign_val(prot_kg > 0, int_prot[["water"]]),
     Protein_FCR_total           = assign_val(prot_kg > 0, int_prot[["fcr_tot"]]),
-    Protein_FCR_cropland        = assign_val(prot_kg > 0, int_prot[["fcr_crop"]]),
+    Protein_FCR_human_edible    = assign_val(prot_kg > 0, int_prot[["fcr_he"]]),
+    EPCR_DIAAS                  = assign_val(prot_kg > 0, epcr_diaas_val),
+    PQR                         = assign_val(prot_kg > 0, pqr_val),
 
     .orig_row_id                = df_enterprise$.orig_row_id
   )
@@ -546,10 +593,10 @@ calc_biophysical_af <- function(cur_type, enterprise) {
 }
 
 #' Allocate the enterprise footprint and feed-protein pool to one product.
-#' @param pool List with s1, c2f (kg CO2eq), land (m2), water (m3), cp_tot and cp_crop (kg CP).
+#' @param pool List with s1, c2f (kg CO2eq), land (m2), water (m3), cp_tot and cp_he (kg CP).
 #' @param alloc_factor Allocation factor (0-1) of the product.
 #' @param denom Total enterprise production of the product (kg).
-#' @return Named numeric vector (ghg_s1, ghg_c2f, land, water, fcr_tot, fcr_crop) per kg of product.
+#' @return Named numeric vector (ghg_s1, ghg_c2f, land, water, fcr_tot, fcr_he) per kg of product.
 #' @noRd
 calc_intensities <- function(pool, alloc_factor, denom) {
   if (is.na(denom) || denom <= 0 || is.na(alloc_factor) || alloc_factor <= 0) {
@@ -561,7 +608,7 @@ calc_intensities <- function(pool, alloc_factor, denom) {
     land     = round((pool$land * alloc_factor) / denom, 3),
     water    = round((pool$water * alloc_factor) / denom, 3),
     fcr_tot  = round((pool$cp_tot * alloc_factor) / denom, 2),
-    fcr_crop = round((pool$cp_crop * alloc_factor) / denom, 2)
+    fcr_he   = round((pool$cp_he * alloc_factor) / denom, 2)
   )
 }
 

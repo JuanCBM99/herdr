@@ -32,7 +32,7 @@ test_that("calculate_production executes and returns expected schema and non-neg
     "milk_fresh_kg", "milk_FPCM_kg", "meat_live_weight_kg",
     "meat_carcass_weight_kg", "egg_fresh_kg", "wool_kg",
     "milk_protein_kg", "meat_protein_kg", "egg_protein_kg",
-    "total_protein_kg"
+    "total_protein_kg", "total_HDP_kg"
   )
 
   for (col in expected_cols) {
@@ -55,6 +55,15 @@ test_that("calculate_production executes and returns expected schema and non-neg
   # Total edible protein must match sum of individual protein pools within rounding tolerance
   protein_sum <- round(res$milk_protein_kg + res$meat_protein_kg + res$egg_protein_kg, 2)
   expect_equal(res$total_protein_kg, protein_sum, tolerance = 0.05)
+
+  # Total HDP must exceed total crude protein for producing cohorts (all Ertl 2016b Table 5 animal DIAAS > 100%)
+  prod_rows <- res[res$total_protein_kg > 0, ]
+  expect_true(all(prod_rows$total_HDP_kg > prod_rows$total_protein_kg))
+  cattle_rows <- prod_rows[prod_rows$animal_type == "cattle", ]
+  if (nrow(cattle_rows) > 0) {
+    exp_cattle_hdp <- cattle_rows$milk_protein_kg * 1.159 + cattle_rows$meat_protein_kg * 1.093
+    expect_equal(cattle_rows$total_HDP_kg, exp_cattle_hdp, tolerance = 1e-4)
+  }
 })
 
 test_that("calculate_production writes output to output/production.csv when saveoutput = TRUE", {
