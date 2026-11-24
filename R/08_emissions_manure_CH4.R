@@ -7,9 +7,10 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param vs_df Optional precalculated Volatile Solids dataframe.
 #' @param pop_df Optional precalculated population dataframe.
-#' @return A tibble with manure management methane emission factors (\code{EF_CH4_mm_kgheadyear},
-#'   kg CH4/head/year) and total emissions (\code{total_CH4_mm_kgyear}, kg CH4/year) by animal
-#'   cohort and management system.
+#' @return A tibble with manure management methane emission factors (\code{EF_kgyear},
+#'   kg CH4/head/year), volatile solids (\code{VS_kgday}), \code{B0_m3kg}, \code{MCF_pct},
+#'   and total emissions (\code{total_CH4_mm_kgyear}, kg CH4/year) by animal cohort and
+#'   management system.
 #' @examples
 #' \dontrun{
 #' calculate_CH4_manure(saveoutput = FALSE, data_dir = "user_data")

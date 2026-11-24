@@ -11,8 +11,9 @@
 #' @param diet_vars Optional precalculated weighted nutritional variables dataframe.
 #' @param ge_df Optional precalculated Gross Energy dataframe.
 #' @param pop_df Optional precalculated population dataframe.
-#' @return A tibble with enteric fermentation emission factors (\code{EF}, kg CH4/head/year)
-#'   and total enteric methane emissions (\code{CH4_enteric_kgyear}, kg CH4/year) by animal cohort.
+#' @return A tibble with enteric fermentation methane conversion factor (\code{Ym_pct}, %),
+#'   emission factor (\code{EF_kgheadyear}, kg CH4/head/year), and total enteric methane
+#'   emissions (\code{total_CH4_enteric_Ggyear}, Gg CH4/year) by animal cohort.
 #' @examples
 #' \dontrun{
 #' calculate_emissions_enteric(saveoutput = FALSE, data_dir = "user_data")

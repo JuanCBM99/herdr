@@ -12,9 +12,10 @@
 #' @param data_dir Path to the directory containing input CSV/data files. Defaults to "user_data".
 #' @param DMI_df Optional precalculated DMI dataframe.
 #' @param population_df Optional precalculated population dataframe.
-#' @return A tibble with total feed-related land use (\code{Total_Land_m2}, m2/year) broken down
-#'   by land category (\code{Forages_m2}, \code{Grains_m2}, \code{Maize_Soy_m2}, \code{Grazing_m2},
-#'   \code{Cropland_m2}) per animal cohort.
+#' @return A tibble with feed-related land use per animal (\code{land_use_per_animal_m2},
+#'   m2/head/year) and total cohort land use (\code{total_land_use_m2}, m2/year) grouped by
+#'   cohort, \code{ingredient}, \code{land_type} (\code{cropland}, \code{grassland_convertible},
+#'   \code{grassland_unconvertible}, \code{none}), and \code{country_of_origin}.
 #' @examples
 #' \dontrun{
 #' calculate_land_use(saveoutput = FALSE, data_dir = "user_data")

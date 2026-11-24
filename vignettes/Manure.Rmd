@@ -23,7 +23,7 @@ This guide provides the complete decision matrix of valid paths for your `manure
 # 1. The Two Fundamental Rules
 
 ### Rule 1: Allocation Must Equal Exactly 1.0 per Cohort
-For each unique animal cohort (defined by `animal_tag`, `region`, and `subregion`), the sum of the `allocation` column across all assigned manure systems must equal **1.0** (100%):
+For each unique animal cohort (defined by `farm_id`, `animal_tag`, `region`, and `subregion`), the sum of the `allocation` column across all assigned manure systems must equal **1.0** (100%):
 
 $$\sum \text{allocation} = 1.0$$
 
@@ -80,15 +80,15 @@ For standard solid, composting, digestion, and grazing systems, sub-climates, st
 
 | System Base (`system_base`) | Valid Variants (`system_variant`) | System Climate (`system_climate`) | Moisture (`climate_moisture`) |
 |:---|:---|:---|:---:|
-| **`solid_storage`** | `additives`, `bulking_agent_addition`, `covered_compacted`, or *(leave blank)* | `cool`, `temperate`, or `warm` | `default` |
-| **`composting`** | `intensive_windrow`, `passive_windrow`, `static_pile`, or `vessel` | `cool`, `temperate`, or `warm` | `default` |
-| **`anaerobic_digester`** | `low_leakage_open_storage`, `low_leak_high_gastight`, `low_leak_low_gastight`, `high_leakage_open_storage`, `high_leakage_high_gastight`, `high_leakage_low_gastight` | `cool`, `temperate`, or `warm` | `default` |
-| **`aerobic_treatment`** | `forced_aeration` or `natural_aeration` | `cool`, `temperate`, or `warm` | `default` |
-| **`pasture_range_paddock`**| *(leave blank)* | `cool`, `temperate`, or `warm` | `default` |
-| **`daily_spread`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default` |
-| **`dry_lot`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default` |
-| **`burned_for_fuel`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default` |
-| **`poultry_manure`** | `with_litter` or `without_litter` | `cool`, `temperate`, or `warm` | `default` |
+| **`solid_storage`** | `additives`, `bulking_agent_addition`, `covered_compacted`, or *(leave blank)* | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`composting`** | `intensive_windrow`, `passive_windrow`, `static_pile`, or `vessel` | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`anaerobic_digester`** | `low_leakage_open_storage`, `low_leak_high_gastight`, `low_leak_low_gastight`, `high_leakage_open_storage`, `high_leakage_high_gastight`, `high_leakage_low_gastight` | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`aerobic_treatment`** | `forced_aeration` or `natural_aeration` | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`pasture_range_paddock`**| *(leave blank)* | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`daily_spread`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`dry_lot`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`burned_for_fuel`** | *(leave blank)* | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
+| **`poultry_manure`** | `with_litter` or `without_litter` | `cool`, `temperate`, or `warm` | `default`, `dry`, or `wet` |
 
 ---
 
@@ -103,7 +103,7 @@ For standard solid, composting, digestion, and grazing systems, sub-climates, st
 * For **High-Detail Systems:** Align with `climate_zone`:
   * If `zone_wet`, `zone_moist`, or `zone_montane` $\rightarrow$ use **`wet`**.
   * If `zone_dry` $\rightarrow$ use **`dry`**.
-* For **Standard Systems:** Use **`default`**.
+* For **Standard Systems:** Use **`wet`** or **`dry`** when regional moisture is known (IPCC 2019 distinguishes `EF4` volatilization factors between wet `0.014` and dry `0.005` climates), or **`default`** (`0.010`) when climate moisture is disaggregated/unknown.
 
 ---
 

@@ -24,9 +24,10 @@ calculate_CH4_manure(
 \item{pop_df}{Optional precalculated population dataframe.}
 }
 \value{
-A tibble with manure management methane emission factors (\code{EF_CH4_mm_kgheadyear},
-  kg CH4/head/year) and total emissions (\code{total_CH4_mm_kgyear}, kg CH4/year) by animal
-  cohort and management system.
+A tibble with manure management methane emission factors (\code{EF_kgyear},
+  kg CH4/head/year), volatile solids (\code{VS_kgday}), \code{B0_m3kg}, \code{MCF_pct},
+  and total emissions (\code{total_CH4_mm_kgyear}, kg CH4/year) by animal cohort and
+  management system.
 }
 \description{
 Computes CH4 emissions from manure based on Volatile Solids (VS),

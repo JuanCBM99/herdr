@@ -65,7 +65,7 @@ Navigate left-to-right through the top tabs. Every cohort is uniquely identified
 *   **Run the model (`Step 3: Calculate`):** Select **Full Assessment (`generate_impact_assessment`)** or any individual physiological module and click **Run Selected**.
 *   **Explore the `Results` Tab:**
     *   **Group Chart By:** Aggregate bars dynamically by `farm_id`, `animal_tag`, `animal_type`, `animal_subtype`, `region`, or `subregion`.
-    *   **Impact Category Selector:** Switch between **Carbon Footprint (GHG)** (Scope 1 + Feed Fossil + Feed LUC), **Land Use Footprint** (Cropland vs. Convertible/Unconvertible Grassland), **Water Deprivation (AWARE)**, **Multi-Impact Overview** (3-panel comparison), and **Protein Feed Efficiency (Mottet FCR)**.
+    *   **Impact Category Selector:** Switch between **Carbon Footprint (GHG)** (Scope 1 + Feed Fossil + Feed LUC), **Land Use Footprint** (Cropland vs. Convertible/Unconvertible Grassland), **Water Deprivation (AWARE)**, **Multi-Impact Overview** (3-panel comparison), and **Protein Efficiency (FCR & EPCR DIAAS)**.
     *   **Functional Unit Selector:** Benchmark impacts as **Total Inventory** (`Gg CO2e`, `ha`, `Mm3 depriv.`), **Per Commercial Product** (`milk`, `meat`, `egg`, `wool`), **Per kg Edible Protein**, or **Per Animal Head**.
     *   **Dual Output Tables (`Table 1: Totals` vs. `Table 2: Product Intensities`):** Toggle between the **Absolute Bio-Environmental Inventory (`totals`)** and the **Enterprise-Integrated Product Intensities (`intensities`)** table below the chart (the table switches automatically when you select product, protein, or FCR views).
 

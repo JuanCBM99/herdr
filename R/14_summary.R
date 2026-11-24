@@ -417,7 +417,7 @@ build_intensities_table <- function(cohort_df) {
 #' - mature: milk (af_milk), eggs (af_egg), wool (af_wool), cull meat (af_cull).
 #' - slaughter: young meat (af_young), wool (af_wool).
 #' - mature & slaughter: edible protein intensities (GHG, land, water), Protein FCR
-#'   (\code{Protein_FCR_total}, \code{Protein_FCR_human_edible}; Mottet et al. 2017),
+#'   (\code{Protein_FCR_total}, \code{Protein_FCR_human_edible}; Wilkinson 2011),
 #'   and DIAAS-adjusted protein metrics (\code{EPCR_DIAAS}, \code{PQR};
 #'   Ertl et al. 2016a, 2016b) use the unified whole-enterprise pool * af_protein.
 #' - replacement (or other non-producing roles): commercial outputs = 0, intensities = NA.

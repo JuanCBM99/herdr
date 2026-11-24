@@ -38,9 +38,10 @@ above which a country is considered a genuine producer. Default is 0.70.}
 \item{population_df}{Optional precalculated population dataframe.}
 }
 \value{
-A tibble with total feed-related land use (\code{Total_Land_m2}, m2/year) broken down
-  by land category (\code{Forages_m2}, \code{Grains_m2}, \code{Maize_Soy_m2}, \code{Grazing_m2},
-  \code{Cropland_m2}) per animal cohort.
+A tibble with feed-related land use per animal (\code{land_use_per_animal_m2},
+  m2/head/year) and total cohort land use (\code{total_land_use_m2}, m2/year) grouped by
+  cohort, \code{ingredient}, \code{land_type} (\code{cropland}, \code{grassland_convertible},
+  \code{grassland_unconvertible}, \code{none}), and \code{country_of_origin}.
 }
 \description{
 Computes total land use (m2) per animal based on validated DMI and specific origin countries.

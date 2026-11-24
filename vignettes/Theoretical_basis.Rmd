@@ -80,7 +80,7 @@ Energy required for milk production based on volume and fat content.
 | $NE_l$    | Net energy for lactation (MJ/day) | Calculated |
 | $Milk$    | Average daily milk yield (kg/day) | `ruminant_definitions.csv` |
 | $Fat$     | Milk fat content percentage (%) | `ruminant_definitions.csv` |
-| $EV_{milk}$| Energy required to produce 1 kg of milk (MJ/kg) | `ipcc_coefficients.csv` |
+| $EV_{milk}$| Energy required to produce 1 kg of milk (MJ/kg) | Internal constant (`4.6` sheep; `3.0` goat; IPCC 2019 Eq. 10.9) |
 
 ---
 
@@ -95,7 +95,7 @@ Energy required for milk production based on volume and fat content.
 | $Hours$   | Number of hours worked per day (draft animals) | `ruminant_definitions.csv` |
 | $Pr_{wool}$| Annual wool production (kg/year) | `ruminant_definitions.csv` |
 | $EV_{wool}$| Energy per kg of wool (IPCC default 24 MJ/kg) | Constant |
-| $C_{pregnancy}$| Pregnancy energy coefficient | `ipcc_coefficients.csv` |
+| $C_{pregnancy}$| Pregnancy energy coefficient | `ipcc_coefficients.csv` (cattle); interpolated from `pr_sheep_goat` (sheep/goats; IPCC 2019 Table 10.7) |
 
 ---
 
@@ -127,6 +127,17 @@ $$GE = \frac{\left( \frac{NE_m + NE_a + NE_l + NE_{work} + NE_p}{REM} + \frac{NE
 | $NE_x$    | Various net energy requirements calculated above | Calculated Results |
 | $REM/REG$ | Efficiency ratios | Results of Eq. 10.14/10.15 |
 | $DE$      | Feed digestibility (%) | `feed_characteristics.csv` |
+
+## 8. Dry Matter Intake (`calculate_DMI`)
+
+Daily Dry Matter Intake ($DMI$, kg DM/head/day) is derived directly from physiological energy demand divided by the weighted energy density of the assigned diet:
+
+* **Ruminants (cattle, sheep, goats):**
+  $$DMI = \frac{GE_{\text{MJ/day}}}{GE_{\text{feed, kcal/kg}} \times 0.004184}$$
+* **Swine:**
+  $$DMI = \frac{ME_{\text{total, kcal/day}}}{ME_{\text{swine, kcal/kg}}}$$
+* **Poultry:**
+  $$DMI = \frac{ME_{\text{total, kcal/day}}}{ME_{\text{poultry, kcal/kg}}}$$
 
 ---
 
@@ -237,13 +248,13 @@ $$ME_{lactation} = ME_{milk} + ME_{mobilization}$$
 
 ## 6. Total Metabolizable Energy
 
-The total daily metabolizable energy requirement is:
+For growing/finishing cohorts and poultry, total daily metabolizable energy is the direct sum of active components. For breeding sows that undergo both gestation and lactation within a reproductive cycle ($\text{CycleDays} = \max(\text{productive\_period\_days},\, Days_{gest} + Days_{lact})$), gestation-phase and lactation-phase requirements are weighted by their fraction of the reproductive cycle ($w_{gest} = Days_{gest} / \text{CycleDays}$, $w_{lact} = Days_{lact} / \text{CycleDays}$):
 
-$$ME_{total} = ME_{maint} + ME_{growth} + ME_{eggs} + ME_{gestation} + ME_{lactation}$$
+$$ME_{total} = ME_{maint} + ME_{growth} + ME_{eggs} + w_{gest} \cdot ME_{gestation} + w_{lact} \cdot ME_{lactation}$$
 
 ---
 
-# III. Methane Module
+# III. Methane Module {#iii-methane-module}
 
 ## 1. Enteric Fermentation ($CH_4$)
 
@@ -254,7 +265,23 @@ $$EF = \frac{GE \cdot \left( \frac{Y_m}{100} \right) \cdot 365}{55.65}$$
 |:---|:---|:---|
 | $EF$  | Methane emission factor (kg $CH_4$/head/year) | Calculated |
 | $GE$  | Daily gross energy intake (MJ/day) | Result of Section I |
-| $Y_m$ | Methane conversion factor (%) | Calculated from diet NDF & DE |
+| $Y_m$ | Methane conversion factor (%) | IPCC 2019 Table 10.12 (see below) |
+
+### Methane Conversion Factor ($Y_m$, IPCC 2019 Table 10.12)
+
+| Livestock Category | Diet Condition | $Y_m$ (%) |
+|:---|:---|---:|
+| **Lactating dairy cattle** (`milk_yield_kg_year > 0`) | $DE \ge 70\%$ and $NDF \le 35\%$ | **5.7** |
+| **Lactating dairy cattle** (`milk_yield_kg_year > 0`) | $DE \ge 70\%$ and $NDF > 35\%$ | **6.0** |
+| **Lactating dairy cattle** (`milk_yield_kg_year > 0`) | $62\% < DE < 70\%$ and $NDF \le 37\%$ | **6.0** |
+| **Lactating dairy cattle** (`milk_yield_kg_year > 0`) | $62\% < DE < 70\%$ and $NDF > 37\%$ | **6.3** |
+| **Lactating dairy cattle** (`milk_yield_kg_year > 0`) | $DE \le 62\%$ | **6.5** |
+| **Non-dairy / non-lactating cattle** | $DE \ge 75\%$ | **3.0** |
+| **Non-dairy / non-lactating cattle** | $72\% \le DE < 75\%$ | **4.0** |
+| **Non-dairy / non-lactating cattle** | $62\% < DE < 72\%$ | **6.3** |
+| **Non-dairy / non-lactating cattle** | $DE \le 62\%$ | **7.0** |
+| **Sheep** | All diets | **6.7** |
+| **Goats** | All diets | **5.5** |
 
 ### Total Enteric Emissions ($E_T$) (Eq. 10.19)
 $$E_T = \sum_{(P)} EF_{(T,P)} \cdot \left( \frac{N_{(T,P)}}{10^6} \right)$$
@@ -480,7 +507,7 @@ Annual throughput of animals leaving the herd for slaughter ($N_{\text{exit}}$) 
 Total fresh milk is computed as:
 $$\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}$$
 
-To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2015)** standard:
+To standardize milk across breeds and diets, Fat and Protein Corrected Milk (FPCM) is calculated following the **IDF (2022)** standard:
 $$\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \cdot \text{Fat} (\%) + 0.0776 \cdot \text{Protein} (\%) + 0.2534 \right]$$
 
 ## 3. Meat Production & Carcass Metrics
@@ -498,10 +525,12 @@ $$\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \c
 | **Swine** | 73.0% | 0.65 | 0.2020 | — |
 | **Poultry** | 70.0% | 0.75 | 0.1900 | — |
 
-## 4. Egg Production & Total Edible Protein
+## 4. Egg Production, Greasy Wool, and Total Edible / Digestible Protein
 
 $$\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP, \qquad \text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240$$
+$$\text{Wool}_{\text{greasy}} = AAP \times \text{wool\_yield\_kg\_year}$$
 $$\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}$$
+$$\text{HDP}_{\text{total}} = \sum_{s \in \{\text{milk, meat, eggs}\}} \text{Protein}_s \times \frac{\text{DIAAS}_s}{100}$$
 
 ---
 
@@ -522,10 +551,10 @@ $$\text{E}_{\text{total}} = \text{E}_{\text{milk}} + \text{E}_{\text{cull}} + \t
 
 Where net energy requirements per unit of production are:
 * **Milk ($\text{E}_{\text{milk}}$):**
-  $$\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} & (\text{Cattle \& other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} & (\text{Sheep, 7\% fat; IPCC 2019 / AFRC 1993, 1995}) \\ 3.0 \times \text{Milk}_{\text{fresh}} & (\text{Goat, 3.8\% fat; IPCC 2019 / AFRC 1998}) \end{cases}$$
+  $$\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} & (\text{Cattle \& other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} & (\text{Sheep, 7\% fat; IPCC 2019}) \\ 3.0 \times \text{Milk}_{\text{fresh}} & (\text{Goat, 3.8\% fat; IPCC 2019}) \end{cases}$$
 * **Culled Mature Meat ($\text{E}_{\text{cull}}$):** $15.0\text{ MJ/kg live weight}$ for adult breeding stock (IDF 2022).
 * **Young Slaughter Meat ($\text{E}_{\text{young}}$):** $11.0\text{ MJ/kg live weight}$ for fattened calves, lambs, pigs, and broilers (IDF 2022).
-* **Greasy Wool ($\text{E}_{\text{wool}}$):** $24.0\text{ MJ/kg}$ for wool weighed after drying before scouring (IPCC 2019, Eq. 10.20; AFRC 1995).
+* **Greasy Wool ($\text{E}_{\text{wool}}$):** $24.0\text{ MJ/kg}$ for wool weighed after drying before scouring (IPCC 2019, Eq. 10.12).
 * **Fresh Eggs ($\text{E}_{\text{egg}}$):** $6.0\text{ MJ/kg}$ (FAO LEAP / GLEAM v3.0).
 
 ### Allocation Factors ($AF_k$)
@@ -560,37 +589,35 @@ $$\text{AF}_{\text{protein}} = 1 - \text{AF}_{\text{wool}} = \frac{\text{E}_{\te
 
 ---
 
-## 2. Protein Feed Conversion and Human Food Competition (Mottet et al., 2017)
+## 2. Protein Feed Conversion, Human Food Competition, and Protein Quality
 
-Following Mottet et al. (2017, *Global Food Security*, 14, 1–8), `herdr` evaluates enterprise-level protein conversion efficiency on producing cohorts (`mature` and `slaughter`), integrating whole-herd feed intake (including `replacement` cohorts) allocated to edible protein by $AF_{\text{protein}} = 1 - AF_{\text{wool}}$:
+`herdr` evaluates enterprise-level protein conversion efficiency on producing cohorts (`mature` and `slaughter`), integrating whole-herd feed intake (including `replacement` cohorts) allocated to edible protein by $AF_{\text{protein}} = 1 - AF_{\text{wool}}$.
 
-1. **Total Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{total}}$):**
-   $$\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})$$
-2. **Human-Edible Protein Feed Conversion Ratio ($\text{Protein\_FCR}_{\text{human\_edible}}$):**
-   $$\text{Protein\_FCR}_{\text{human\_edible}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})$$
-   * $\text{Feed}_{\text{CP, human-edible}}$ weights each ingredient's crude protein directly by the explicit `human_edible` column (`0` or `1`, also accepting fractions in $[0, 1]$) in `mapping.csv`, cleanly separating food competition from land-use classification (`land_type`).
-   * **Default `human_edible` classification criterion in `mapping.csv`:** anchored on arable non-forage concentrates with $\text{economic\_allocation} > 0.33$ (`1` for primary cereal grains, pulses, soybean/linseed meals, and protein concentrates/isolates, plus commercial food-grade dairy feeds `casein` and `skimmed_milk`), while assigning `0` to all forages (including dehydrated alfalfa and forage meals; $h_e = 0$ per Wilkinson 2011; Mottet et al. 2017), secondary agro-industrial by-products ($\text{economic\_allocation} \le 0.33$, such as cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed cakes), biologically inedible or food-waste items (whole cottonseed, vetches, acorns, bakery/bread by-products), internal suckled milk, and non-agricultural additives (urea, minerals, synthetic amino acids).
-   * When $\text{Protein\_FCR}_{\text{human\_edible}} < 1.0$, the enterprise is a **net producer** of crude human-edible protein relative to competing human-edible feed protein consumed.
-3. **DIAAS-Adjusted Edible Protein Conversion Ratio ($\text{EPCR}_{\text{DIAAS}}$) and Protein Quality Ratio ($\text{PQR}$):**
-   Following **FAO (2013)** and **Ertl et al. (2016a, 2016b)**, `herdr` also accounts for differences in indispensable amino acid profiles and true ileal digestibility between plant feeds and animal-source foods using the untruncated **Digestible Indispensable Amino Acid Score (DIAAS, `0.5–3 yr` child reference pattern)**:
-   $$\text{EPCR}_{\text{DIAAS}} = \frac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \frac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}, \qquad \text{PQR} = \frac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}$$
-   where $\text{Feed}_{\text{HDP}}$ weights each human-edible feed ingredient's crude protein by `diaas_pct / 100` from `mapping.csv` (backbone: Ertl et al., 2016b, Table 4, supplemented by Ertl et al., 2016a, Rutherfurd et al., 2015, Cervantes-Pahm et al., 2014 harmonized via `48/57`, Herreman et al., 2020, and Nosworthy et al., 2018), and $\text{Animal}_{\text{HDP}}$ weights commercial animal protein streams by species-specific DIAAS values from **Ertl et al. (2016b, Table 5)**: cow milk (`115.9%`), sheep milk (`109.1%`), goat milk (`123.5%`), beef (`109.3%`), sheep/goat meat (`116.8%`), pork (`113.9%`), chicken meat (`108.2%`), and whole egg (`116.4%`).
-   * **Transparency notes:** (i) Following Ertl et al. (2016b, Section 2.6), when $\ge 80\%$ (but $< 100\%$) of human-edible feed CP has a DIAAS entry, the weighted-average DIAAS of known ingredients is applied to total human-edible CP (emitting a warning whenever $> 5\%$ lacks DIAAS, and returning `NA` if $< 80\%$ is covered); (ii) `EPCR_DIAAS` uses weighted-average ingredient DIAAS at the farm gate (raw feedstuffs, without modeling cereal–legume amino acid complementarity in mixed human diets) and untruncated $> 100\%$ scores for animal products (reflecting their ability to complement lower-quality plant proteins in mixed diets); therefore, `EPCR_DIAAS` is always reported alongside unadjusted `Protein_FCR_human_edible` and `Protein_FCR_total`.
+| Metric | Formula | Interpretation | Framework |
+|:---|:---|:---|:---|
+| **`Protein_FCR_total`** | $\dfrac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}}$ | Total kg feed crude protein per kg edible animal protein (overall biological N efficiency). | Crude protein balance |
+| **`Protein_FCR_human_edible`** | $\dfrac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}}$ | Competing human-edible feed CP per kg edible animal protein (`< 1.0` = net crude-protein producer). | Wilkinson (2011); Ertl et al. (2016a) |
+| **`EPCR_DIAAS`** | $\dfrac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \dfrac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}$ | Quality-adjusted human-digestible feed protein per kg human-digestible animal protein (`< 1.0` = net digestible-protein producer). | FAO (2013); Ertl et al. (2016a, 2016b) |
+| **`PQR`** | $\dfrac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}$ | Protein Quality Ratio: amino-acid quality upgrade from human-edible plant feeds to animal food (`> 1.0` = net quality upgrade). | Ertl et al. (2016a, 2016b) |
+
+### Key Implementation Conventions
+* **Human-edible feed protein ($\text{Feed}_{\text{CP, human-edible}}$):** Each ingredient's crude protein is weighted by the explicit `human_edible` column (`0`, `1`, or any fraction in $[0, 1]$) in `mapping.csv`, decoupling food-feed competition cleanly from land classification (`land_type`). As an editable default convention in `herdr`, arable non-forage concentrates with `economic_allocation > 0.33` (primary grains, pulses, soybean/linseed meals, protein concentrates/isolates, plus commercial `casein` and `skimmed_milk`) default to `1`, whereas all forages (including dehydrated alfalfa/forage meals), secondary by-products (`economic_allocation <= 0.33`), inedible/waste items (whole cottonseed, vetches, acorns, bakery by-products), suckled milk, and mineral/synthetic additives default to `0`.
+* **DIAAS scores (`0.5–3 yr` child pattern, untruncated):** Feed human-digestible protein ($\text{Feed}_{\text{HDP}}$) weights each human-edible ingredient's CP by `diaas_pct / 100` from `mapping.csv` (backbone: Ertl et al., 2016b, Table 4, supplemented by Ertl et al., 2016a, Cervantes-Pahm et al., 2014, Rutherfurd et al., 2015, Nosworthy et al., 2018, and Herreman et al., 2020). Animal output ($\text{Animal}_{\text{HDP}}$) uses species-specific DIAAS values from Ertl et al. (2016b, Table 5): cow milk (`115.9%`), sheep milk (`109.1%`), goat milk (`123.5%`), beef (`109.3%`), sheep/goat meat (`116.8%`), pork (`113.9%`), chicken meat (`108.2%`), and whole egg (`116.4%`).
+* **Coverage & farm-gate transparency:** Following Ertl et al. (2016b, Section 2.6), if $\ge 80\%$ (but $< 100\%$) of human-edible feed CP has a DIAAS entry, the known weighted-average DIAAS is applied to total human-edible CP (emitting a warning whenever $> 5\%$ lacks DIAAS, and returning `NA` if coverage $< 80\%$). Because `EPCR_DIAAS` evaluates raw feedstuffs at the farm gate without modeling cereal–legume amino-acid complementarity in mixed human diets, it is always reported alongside unadjusted `Protein_FCR_human_edible` and `Protein_FCR_total`.
 
 ---
 
 ### 📚 References
-* Boulay, A.-M., et al. (2018). *The WULCA-consensus characterization model for water scarcity footprint: assessing impacts of water consumption based on available water remaining (AWARE)*. **The International Journal of Life Cycle Assessment**, 23(2), 368–378.
 * Cervantes-Pahm, S. K., Liu, Y., & Stein, H. H. (2014). *Digestible indispensable amino acid score and digestible amino acids in eight cereal grains*. **British Journal of Nutrition**, 111(9), 1663–1672.
 * Ertl, P., Knaus, W., & Zollitsch, W. (2016a). *An approach to including protein quality when assessing the net contribution of livestock to human food supply*. **Animal**, 10(11), 1883–1889.
 * Ertl, P., Steinwidder, A., Schönauer, M., Krimberger, K., Knaus, W., & Zollitsch, W. (2016b). *Net food production of different livestock: A national analysis for Austria including relative occupation of different land categories*. **Die Bodenkultur**, 67(2), 91–103.
-* European Commission (2021). *Commission Recommendation (EU) 2021/2279 on the use of Environmental Footprint methods*. **Official Journal of the European Union**, L 471, 1–396.
 * FAO (2013). *Dietary protein quality evaluation in human nutrition: Report of an FAO Expert Consultation*. FAO Food and Nutrition Paper 92, Rome.
 * FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM) v3.0: Model description*. Food and Agriculture Organization of the United Nations, Rome.
+* FEDNA (2019). *Tablas FEDNA de composición y valor nutritivo de alimentos para la fabricación de piensos compuestos* (4ª ed.). Fundación Española para el Desarrollo de la Nutrición Animal, Madrid.
 * Herreman, L., Nommensen, P., Pennings, B., & Laus, M. C. (2020). *Comprehensive overview of the quality of plant- and animal-sourced proteins based on the digestible indispensable amino acid score*. **Food Science & Nutrition**, 8(10), 5379–5391.
 * IDF (2022). *The C-footprint of dairy: Updated IDF standard for carbon footprinting of the dairy sector*. International Dairy Federation Bulletin 520/2022.
-* INRAE (2023). *ECOALIM dataset v9: Life Cycle Assessment datasets for animal feed ingredients*. Institut National de Recherche pour l'Agriculture, l'Alimentation et l'Environnement (INRAE).
 * IPCC (2019). *Refinement to the 2006 IPCC Guidelines for National Greenhouse Gas Inventories*. Volume 4: AFOLU, Chapter 10.
 * Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., & Gerber, P. (2017). *More fuel than food: Global food security and the role of livestock feed*. **Global Food Security**, 14, 1–8.
 * Nosworthy, M. G., et al. (2018). *Effect of processing on the in vitro and in vivo protein quality of red and green lentils*. **Food Science & Nutrition**, 6(5), 1196–1205.
 * Rutherfurd, S. M., Fanning, A. C., Miller, B. J., & Moughan, P. J. (2015). *Protein digestibility-corrected amino acid scores and digestible indispensable amino acid scores differentially describe protein quality in growing male rats*. **The Journal of Nutrition**, 145(2), 372–379.
+* Wilkinson, J. M. (2011). *Re-defining efficiency of feed use by livestock*. **Animal**, 5(7), 1014–1022.

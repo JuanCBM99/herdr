@@ -34,7 +34,7 @@ Most existing calculators evaluate emissions or feed land requirements in isolat
 │  1. IPCC TIER 2 GHGs     │  2. AGROECOLOGICAL LAND     │  3. FOOD PRODUCTIVITY & FCR   │
 │  • Enteric CH4           │  • Cropland vs Grassland    │  • GLEAM Milk, Meat, Eggs     │
 │  • Manure CH4            │  • Mottet (2017) Framework  │  • IDF (2022) Physical Alloc. │
-│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Mottet (2017) Protein FCRs │
+│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Protein FCR & DIAAS EPCR   │
 ├──────────────────────────┴─────────────────────────────┴───────────────────────────────┤
 │  4. UPSTREAM FEED LCA & WATER DEPRIVATION (EF 3.1)                                     │
 │  • ECOALIM v9 & AGRIBALYSE v3.1 (Fossil vs. LUC CO2e)                                  │
@@ -47,7 +47,7 @@ Most existing calculators evaluate emissions or feed land requirements in isolat
 2. **Agroecological Land Footprint & Competition:**
    Quantifies feed land requirements ($\text{m}^2$) and classifies land according to human food competition (Mottet et al., 2017) into **Cropland**, **Convertible Grassland**, **Unconvertible Rangeland**, and **None**. When ingredient origins are unspecified, `herdr` traces true producer countries using recursive FAO bilateral trade matrices and national self-sufficiency thresholds.
 3. **Animal Productivity & Edible Human Protein:**
-   Implements the **FAO** methodology to translate herd throughput across functional roles (`mature`, `replacement`, `slaughter`) into physical commodities (Fat and Protein Corrected Milk, cold dressed carcass weight, boneless meat, greasy wool, and fresh eggs) and total digestible human protein (kg protein/year).
+   Implements the **FAO** methodology to translate herd throughput across functional roles (`mature`, `replacement`, `slaughter`) into physical commodities (Fat and Protein Corrected Milk, cold dressed carcass weight, greasy wool, and fresh eggs) and edible human protein (crude `total_protein_kg` and DIAAS-adjusted `total_HDP_kg`).
 4. **Enterprise Attribution, Biophysical Co-Product Allocation & Protein Feed Efficiency:**
    Automatically integrates non-commercial rearing and breeding overheads (`replacement` and `mature` breeders) into commercial outputs, applies the **International Dairy Federation (IDF Bulletin 520/2022)** Net Energy physical allocation, and reports protein conversion, human food competition, and DIAAS protein-quality metrics (`Protein_FCR_total`, `Protein_FCR_human_edible`, `EPCR_DIAAS`, and `PQR`).
 5. **Upstream Feed LCA & Water Deprivation (EF 3.1 / AWARE):**

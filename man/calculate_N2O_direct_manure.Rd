@@ -33,8 +33,10 @@ calculate_N2O_direct_manure(
 \item{dmi_df}{Optional precalculated DMI dataframe.}
 }
 \value{
-A tibble with annual nitrogen excretion (\code{N_excreted_kgheadyear}, kg N/head/year)
-  and direct manure N2O emissions (\code{N2O_direct_kgyear}, kg N2O/year) by cohort and management system.
+A tibble with daily nitrogen intake (\code{N_intake_kgheadday}), daily nitrogen
+  retention (\code{N_retention_kg_day}), annual nitrogen excretion (\code{N_excreted_kgheadyear},
+  kg N/head/year), \code{EF3}, and direct manure N2O emissions (\code{direct_N2O_kgyear},
+  kg N2O/year) by cohort and management system.
 }
 \description{
 Computes direct N2O emissions based on nitrogen excretion logic,

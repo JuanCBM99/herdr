@@ -26,7 +26,7 @@ It provides estimates of:
 - Upstream feed carbon footprint — fossil vs. land-use change / deforestation ($\text{CO}_2\text{e}$, ECOALIM v9 / EF 3.1)
 - Feed freshwater deprivation ($\text{m}^3\text{ depriv.}$, AWARE model)
 - Feed-related land use & agroecological competition ($\text{m}^2$, Mottet et al. 2017)
-- Milk (FPCM), carcass meat, fresh eggs, greasy wool, edible human protein, and Protein FCRs
+- Milk (FPCM), carcass meat, fresh eggs, greasy wool, edible human protein, human-edible Protein FCRs, DIAAS-adjusted `EPCR_DIAAS`, and Protein Quality Ratio (`PQR`)
 
 ------------------------------------------------------------------------
 
@@ -141,7 +141,7 @@ Output files are automatically saved in the `output/` directory.
   - Curated national forage yield databases (`forages.parquet`)
   - Dynamic FAO bilateral trade allocation matrix
   - 70% domestic self-sufficiency allocation rule
-- 🥩 Milk (FPCM), meat (carcass & boneless), egg, wool, and edible human protein outputs, with **IDF (2022)** biophysical co-product allocation and **Mottet (2017)** Protein FCRs.
+- 🥩 Milk (FPCM), carcass meat, fresh eggs, greasy wool, and edible human protein outputs, with **IDF (2022)** biophysical co-product allocation, human-edible Protein FCRs (**Wilkinson, 2011**), and **DIAAS-adjusted `EPCR_DIAAS` / `PQR`** (**FAO, 2013**; **Ertl et al., 2016a, 2016b**).
 - 🧩 Modular workflow allowing both individual calculations and complete assessments.
 - 📄 Transparent CSV-based input files that can easily be modified by users.
 
@@ -179,7 +179,7 @@ Where net biophysical energy requirements per unit of production are:
 - **Goat Milk**: $3.0\text{ MJ/kg fresh milk}$ at 3.8% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1998).
 - **Mature Cull Meat**: $15.0\text{ MJ/kg live weight}$ (IDF Bulletin 520 / 2022).
 - **Slaughter & Fattening Meat**: $11.0\text{ MJ/kg live weight}$ (IDF Bulletin 520 / 2022).
-- **Greasy Wool**: $24.0\text{ MJ/kg}$ (IPCC 2019 Refinement, Vol 4, Ch 10, Eq. 10.20; AFRC 1995).
+- **Greasy Wool**: $24.0\text{ MJ/kg}$ (IPCC 2019 Refinement, Vol 4, Ch 10, Eq. 10.12; AFRC 1995).
 - **Fresh Eggs**: $6.0\text{ MJ/kg}$ (FAO LEAP Poultry Guidelines / GLEAM v3.0).
 
 For **Edible Animal Protein**, non-edible fiber (wool) is excluded:

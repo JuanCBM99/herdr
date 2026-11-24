@@ -27,8 +27,9 @@ calculate_emissions_enteric(
 \item{pop_df}{Optional precalculated population dataframe.}
 }
 \value{
-A tibble with enteric fermentation emission factors (\code{EF}, kg CH4/head/year)
-  and total enteric methane emissions (\code{CH4_enteric_kgyear}, kg CH4/year) by animal cohort.
+A tibble with enteric fermentation methane conversion factor (\code{Ym_pct}, %),
+  emission factor (\code{EF_kgheadyear}, kg CH4/head/year), and total enteric methane
+  emissions (\code{total_CH4_enteric_Ggyear}, Gg CH4/year) by animal cohort.
 }
 \description{
 Computes enteric methane emissions based on Gross Energy (GE),

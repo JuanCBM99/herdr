@@ -104,9 +104,9 @@ When you run `generate_impact_assessment()`, `herdr` produces two complementary 
 
 1. **Table 1 (`results$totals`):** Shows the **direct physical inventory** of each of the 10 cohorts (enteric $\text{CH}_4$, manure $\text{CH}_4$, direct/indirect $\text{N}_2\text{O}$, upstream feed fossil & LUC $\text{CO}_2\text{e}$, agroecological land, AWARE water, and per-head footprints).
 2. **Table 2 (`results$intensities`):** Computes **enterprise-integrated product and protein intensities** within each `(farm_id, region, subregion, animal_type, animal_subtype)` group:
-   * **Poultry Meat (`poultry`, `meat`):** The overhead footprint of `breeder_meat_hens` (`mature`) and `replacement_meat_pullets` (`replacement`) is integrated with `broilers` (`slaughter`) over the total meat produced (broilers + culled breeders). `replacement_meat_pullets` shows `NA` for product intensities because its emissions are already absorbed into the meat enterprise.
-   * **Poultry Layers (`poultry`, `layer`):** Each laying cohort (`laying_hens` and `free_range_laying_hens`) keeps its own direct footprint plus a population-proportional share (`90%` and `10%`, respectively) of the `replacement_layer_pullets` overhead, divided by its respective egg production (`egg_fresh_kg`).
-   * **Swine Meat (`swine`, `meat`):** The breeding herd overhead (`breeder_sows` + `boars` + `replacement_sows`) is integrated with `fattening_pigs` over total carcass pork output (finished pigs + culled sows/boars).
+   * **Poultry Meat (`poultry`, `meat`):** The overhead footprint of `breeder_meat_hens` (`mature`) and `replacement_meat_pullets` (`replacement`) is integrated with `broilers` (`slaughter`), with biophysical energy allocation partitioning meat between young slaughter broilers ($11.0\text{ MJ/kg LW}$) and culled breeders ($15.0\text{ MJ/kg LW}$). `replacement_meat_pullets` shows `NA` for commercial product intensities because its emissions are absorbed into the meat enterprise.
+   * **Poultry Layers (`poultry`, `layer`):** Because `laying_hens`, `free_range_laying_hens`, and `replacement_layer_pullets` share the same enterprise key `(farm_id = "farm_1", animal_type = "poultry", animal_subtype = "layer")`, they are pooled into a single egg-producing enterprise (assign distinct `farm_id` values — e.g. `farm_barn` vs. `farm_freerange` — if you want separate intensities per housing system).
+   * **Swine Meat (`swine`, `meat`):** The breeding herd overhead (`breeder_sows` + `boars` + `replacement_sows`) is integrated with `fattening_pigs`, partitioning carcass pork intensities biophysically between slaughter pigs ($11.0\text{ MJ/kg LW}$) and culled sows/boars ($15.0\text{ MJ/kg LW}$).
 
 ---
 
@@ -131,22 +131,22 @@ results <- generate_impact_assessment(
 results$totals
 results$intensities
 
-# 1. Compare Carbon Footprint per kg of Edible Protein across cohorts
+# 1. Compare Carbon Footprint per kg of Edible Protein across enterprises
 plot_herdr_results(
   df              = results,
-  group_cols      = "animal_tag",
+  group_cols      = c("animal_type", "animal_subtype"),
   func_name       = "generate_impact_assessment",
   impact_category = "ghg",
   functional_unit = "protein"
 )
 
-# 2. Compare Egg Carbon Intensity between caged/barn vs. free-range hens
+# 2. Compare Protein Feed Efficiency (Total CP, Human-Edible CP, and DIAAS EPCR)
 plot_herdr_results(
   df              = results,
-  group_cols      = "animal_tag",
+  group_cols      = c("animal_type", "animal_subtype"),
   func_name       = "generate_impact_assessment",
-  impact_category = "ghg",
-  functional_unit = "egg"
+  impact_category = "fcr",
+  functional_unit = "fcr"
 )
 ```
 

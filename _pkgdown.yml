@@ -53,14 +53,73 @@ navbar:
           href: reference/index.html
 
   right:
-    - icon: fa-file-code-o
+    - icon: fas fa-code
       href: reference/index.html
-    - icon: fa-download
+      aria-label: Function Reference
+    - icon: fas fa-download
       href: https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip
-    - icon: fa-github
+      aria-label: Download Repository
+    - icon: fab fa-github
       href: https://github.com/JuanCBM99/herdr
-    - icon: fa-youtube
+      aria-label: GitHub Repository
+    - icon: fab fa-youtube
       href: https://www.youtube.com/@JuanCBM9
+      aria-label: Video Tutorial
+
+reference:
+  - title: "Project Setup & Interactive App"
+    desc: "Initialize a standardized project directory and launch the Shiny GUI."
+    contents:
+      - herdr_init
+      - run_app
+      - run_herdr_app
+  - title: "Integrated Assessment & Visualization"
+    desc: "End-to-end cradle-to-farm-gate environmental impact assessment and publication-grade plots."
+    contents:
+      - generate_impact_assessment
+      - plot_herdr_results
+  - title: "Herd Demography & Production"
+    desc: "Average Annual Population (AAP), automatic life-cycle modeling, and edible animal outputs."
+    contents:
+      - calculate_population
+      - calculate_population_cattle
+      - calculate_population_small_ruminants
+      - calculate_population_swine
+      - calculate_population_poultry
+      - calculate_production
+  - title: "Nutrition, Energy Balance & Intake"
+    desc: "Weighted diet composition, IPCC Tier 2 Net/Gross Energy, FEDNA monogastric ME, and Dry Matter Intake."
+    contents:
+      - calculate_weighted_variable
+      - calculate_NEm
+      - calculate_NEa
+      - calculate_NEg
+      - calculate_NEl
+      - calculate_NE_work
+      - calculate_NE_wool
+      - calculate_NE_pregnancy
+      - calculate_ge
+      - calculate_monogastric_energy
+      - calculate_DMI
+  - title: "GHG Emissions, Land Use & Feed LCA"
+    desc: "Enteric CH4, manure CH4 and N2O, agroecological land footprint, and ECOALIM/AWARE feed footprint."
+    contents:
+      - calculate_emissions_enteric
+      - calculate_vs
+      - calculate_CH4_manure
+      - calculate_N2O_direct_manure
+      - calculate_N2O_indirect_volatilization
+      - calculate_N2O_indirect_leaching
+      - calculate_land_use
+      - calculate_feed_emissions
+  - title: "Reference Data & Cache Utilities"
+    desc: "Manage local caches and locate bundled or downloaded FAO/ECOALIM reference datasets."
+    contents:
+      - herdr_cache_dir
+      - herdr_get_fao_crops_path
+      - herdr_get_fao_trade_matrix_path
+      - herdr_get_forages_path
+      - herdr_get_ecoalim_path
 
 articles:
   - title: "Getting Started"
@@ -92,9 +151,5 @@ articles:
 toc:
   depth: 3
 
-logo:
-  image: man/figures/logo.png
-favicon: favicon.ico
-
-meta:
+home:
   description: "herdr: Integrated livestock GHG emissions, land competition, and nutritional protein modeling in R."
