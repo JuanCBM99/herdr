@@ -97,13 +97,13 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient_type")),
                 tags$dd(class = "col-sm-9", "Category of the ingredient: 'forage', 'concentrate', 'milk', or 'milk_replacer'. Filters available ingredients."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient")),
-                tags$dd(class = "col-sm-9", "Specific feed ingredient from the feed characteristics database (e.g., 'corn_national', 'soybean_meal_44_cp')."),
+                tags$dd(class = "col-sm-9", "Specific feed ingredient from the feed characteristics database (e.g., 'corn', 'soybean_meal_44_cp')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ingredient_share")),
                 tags$dd(class = "col-sm-9", "Percentage of this specific ingredient within its ingredient_type (shares for each type must sum to 100%)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("country_of_origin")),
                 tags$dd(class = "col-sm-9", "Optional: Country where this feed was produced. Use this if the origin is known or leave blank for automatic country allocation."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("custom_yield_kg_ha")),
-                tags$dd(class = "col-sm-9", "Optional: Specific known yield for this ingredient in kg dry matter, leave blank if you dont know.")
+                tags$dd(class = "col-sm-9", "Optional: Specific known yield for this ingredient in kg dry matter per hectare; leave blank if you don't know.")
               )
             ),
 
@@ -134,7 +134,7 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("diet_tag")),
                 tags$dd(class = "col-sm-9", "Assigned diet profile linking to Diet Profiles."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("cfi")),
-                tags$dd(class = "col-sm-9", "IPCC maintenance coefficient descriptor (e.g., 'cattle/buffalo [lactating cows]')."),
+                tags$dd(class = "col-sm-9", "IPCC maintenance coefficient descriptor (e.g., 'cattle_buffalo [lactating cows]')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("ca")),
                 tags$dd(class = "col-sm-9", "IPCC feeding activity coefficient descriptor ('stall', 'pasture', 'grazing large areas')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("c")),
@@ -193,9 +193,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("cfi_maintenance")),
                 tags$dd(class = "col-sm-9", "Maintenance energy coefficient in kcal/kg body weight^alpha per day."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("frac_fat_pct")),
-                tags$dd(class = "col-sm-9", "Fat fraction in daily body weight gain (percentage, 0–100%)."),
+                tags$dd(class = "col-sm-9", "Fat fraction in daily body weight gain as a decimal fraction (0–1, e.g., 0.266 for 26.6%; do not enter 0–100%)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("frac_protein_pct")),
-                tags$dd(class = "col-sm-9", "Protein fraction in daily body weight gain (percentage, 0–100%)."),
+                tags$dd(class = "col-sm-9", "Protein fraction in daily body weight gain as a decimal fraction (0–1, e.g., 0.159 for 15.9%; do not enter 0–100%)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("eggs_per_year")),
                 tags$dd(class = "col-sm-9", "Annual egg production per laying hen (eggs/hen/year, e.g. 310–325 for layers, 210–220 for meat breeders)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("egg_weight_g")),
@@ -267,9 +267,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("region, subregion")),
                 tags$dd(class = "col-sm-9", "Cohort identity matching Census."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("system_base")),
-                tags$dd(class = "col-sm-9", "Main manure management system (e.g., 'liquid_slurry', 'pit_storage', 'solid_storage', 'pasture', 'daily_spread')."),
+                tags$dd(class = "col-sm-9", "Main manure management system (e.g., 'liquid_slurry', 'pit_storage', 'solid_storage', 'pasture_range_paddock', 'daily_spread')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("system_variant")),
-                tags$dd(class = "col-sm-9", "Storage/treatment variation (e.g., 'with_natural_crust_cover', 'uncovered', 'aerobic_treatment')."),
+                tags$dd(class = "col-sm-9", "Storage/treatment variation (e.g., 'with_natural_crust_cover', 'uncovered', 'with_cover')."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("management_months")),
                 tags$dd(class = "col-sm-9", "Duration in months per year manure is retained or managed in this system."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("system_climate")),
@@ -322,7 +322,9 @@ build_dictionary_panel <- function() {
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("poultry_ME_kcal_kg")),
                 tags$dd(class = "col-sm-9", "Metabolizable Energy specific for poultry (kcal/kg DM)."),
                 tags$dt(class = "col-sm-3 text-monospace", tags$code("source_DE")),
-                tags$dd(class = "col-sm-9", "Scientific reference / nutritional database (Feedipedia, INRAE, NRC).")
+                tags$dd(class = "col-sm-9", "Scientific reference / nutritional database for Digestible Energy (Feedipedia, INRAE FeedTables, MAPA)."),
+                tags$dt(class = "col-sm-3 text-monospace", tags$code("source_GE")),
+                tags$dd(class = "col-sm-9", "Origin of Gross Energy density (Ewan 1989 equation, INRAE-CIRAD-AFZ FeedTables, NIST/FEDNA combustion enthalpy, or Non-energetic additive).")
               )
             ),
 

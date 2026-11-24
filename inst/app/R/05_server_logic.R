@@ -44,14 +44,19 @@ herdr_server <- function(input, output, session) {
     }
 
     try({
-      df_area <- arrow::read_parquet(parquet_path, col_select = c("Area"))
+      ds <- arrow::open_dataset(parquet_path)
+      cols <- names(ds)
+      if ("Area Code" %in% cols) {
+        df_area <- arrow::read_parquet(parquet_path, col_select = c("Area", "Area Code"))
+        df_area <- df_area[!is.na(df_area$`Area Code`) & df_area$`Area Code` < 5000, , drop = FALSE]
+      } else {
+        df_area <- arrow::read_parquet(parquet_path, col_select = c("Area"))
+      }
       countries <- sort(unique(na.omit(df_area$Area)))
       selected_country <- if ("Spain" %in% countries) "Spain" else countries[1]
 
       updateSelectInput(session, "farm_country", choices = countries, selected = selected_country)
 
-      ds <- arrow::open_dataset(parquet_path)
-      cols <- names(ds)
       year_cols <- grep("^Y[0-9]{4}$", cols, value = TRUE)
 
       if (length(year_cols) > 0) {
@@ -125,6 +130,9 @@ herdr_server <- function(input, output, session) {
   observeEvent(input$confirm_reset_data, {
     removeModal()
     load_all_data(reset = TRUE)
+    for (id in standard_ids) {
+      save_clean(rv[[id]], file.path(user_data_tmp, tables_info[[id]]$file))
+    }
     showNotification("All data tables have been reset to blank templates.", type = "message")
     nav_select("main_tabs", "census")
   })
@@ -240,11 +248,13 @@ herdr_server <- function(input, output, session) {
           ),
           div(class = "text-muted small mt-1", it$message)
         ),
-        actionButton(
-          paste0("health_jump_", it$table_id),
-          paste("Go to", it$tab_label),
+        tags$button(
+          id = paste0("health_jump_btn_", i),
+          type = "button",
           class = "btn btn-sm btn-outline-secondary text-nowrap align-self-center",
-          icon = icon("arrow-right")
+          onclick = sprintf("Shiny.setInputValue('health_jump_target', '%s', {priority: 'event'})", it$table_id),
+          icon("arrow-right"),
+          paste(" Go to", it$tab_label)
         )
       )
     })
@@ -270,10 +280,7 @@ herdr_server <- function(input, output, session) {
       intro_alert,
       div(style = "max-height: 55vh; overflow-y: auto;", issue_cards),
       footer = tagList(
-        modalButton("Close"),
-        if (!has_errors && is_preflight) {
-          actionButton("force_calculate", "Proceed to Calculate Anyway", class = "btn btn-success", icon = icon("play"))
-        }
+        modalButton("Close")
       ),
       size = "l",
       easyClose = TRUE
@@ -285,18 +292,18 @@ herdr_server <- function(input, output, session) {
     show_data_health_modal(issues, is_preflight = FALSE)
   })
 
-  # Health Modal Quick Jump Handlers
-  lapply(c(standard_ids, advanced_ids), function(tab_id) {
-    observeEvent(input[[paste0("health_jump_", tab_id)]], {
-      removeModal()
-      if (tab_id %in% standard_ids) {
-        nav_select("main_tabs", tab_id)
-      } else if (tab_id %in% advanced_ids) {
-        nav_select("main_tabs", "advanced_tab")
-        nav_select("advanced_inner_tabs", tab_id)
-      }
-    }, ignoreInit = TRUE)
-  })
+  # Health Modal Quick Jump Handler (single event avoids duplicate DOM IDs across multi-issue tables)
+  observeEvent(input$health_jump_target, {
+    tab_id <- input$health_jump_target
+    req(tab_id)
+    removeModal()
+    if (tab_id %in% standard_ids) {
+      nav_select("main_tabs", tab_id)
+    } else if (tab_id %in% advanced_ids) {
+      nav_select("main_tabs", "advanced_tab")
+      nav_select("advanced_inner_tabs", tab_id)
+    }
+  }, ignoreInit = TRUE)
 
   # --- 5. RHandsontable & Modal Form Handlers ---
   lapply(names(tables_info), function(id) {
@@ -432,8 +439,16 @@ herdr_server <- function(input, output, session) {
           tagList(col_name, tags$i(class = "fa-solid fa-circle-info ms-1 text-muted", title = info_text, style = "cursor:help;"))
         } else { col_name }
 
+        is_manure_cascade <- (id == "manure" && col_name %in% MANURE_CASCADE_COLUMNS)
         choices <- get_dropdown_choices(col_name)
-        if (!is.null(choices)) {
+        if (is_manure_cascade) {
+          selectInput(
+            paste0("modal_input_", id, "_", col_name),
+            label = label_html,
+            choices = if (!is.null(choices)) choices else c(""),
+            selected = ""
+          )
+        } else if (!is.null(choices)) {
           rule <- if (id %in% names(dynamic_dropdowns)) dynamic_dropdowns[[id]][[col_name]] else NULL
           is_strict <- if (!is.null(rule) && !is.null(rule$strict)) rule$strict else TRUE
           if (!is_strict) {
@@ -465,8 +480,8 @@ herdr_server <- function(input, output, session) {
     observeEvent(input[[paste0("save_modal_", id)]], {
       df <- rv[[id]]
       col_key <- names(df)[1]
-      df_clean <- if (nrow(df) > 0) df[!is.na(df[[col_key]]) & trimws(as.character(df[[col_key]])) != "", ] else df
-      template_row <- if (nrow(df_clean) > 0) df_clean[1, ] else df[1, ]
+      df_clean <- if (nrow(df) > 0) df[!is.na(df[[col_key]]) & trimws(as.character(df[[col_key]])) != "", , drop = FALSE] else df
+      template_row <- if (nrow(df_clean) > 0) df_clean[1, , drop = FALSE] else df[1, , drop = FALSE]
       new_row <- template_row
 
       for (col_name in names(df)) {
@@ -610,11 +625,6 @@ herdr_server <- function(input, output, session) {
       showNotification("Please resolve the highlighted items before calculating.", type = "warning")
       return()
     }
-    execute_calculation_pipeline()
-  })
-
-  observeEvent(input$force_calculate, {
-    removeModal()
     execute_calculation_pipeline()
   })
 

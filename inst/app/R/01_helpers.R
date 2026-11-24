@@ -5,7 +5,7 @@
 # --- Data I/O Sanitization ---
 
 enforce_column_order <- function(df, id) {
-  if (is.null(df) || nrow(df) == 0 || ncol(df) == 0) return(df)
+  if (is.null(df) || ncol(df) == 0) return(df)
 
   desired_lead <- switch(id,
     "census" = c("farm_id", "animal_tag", "region", "subregion", "population"),
@@ -27,7 +27,23 @@ enforce_column_order <- function(df, id) {
 
 read_clean <- function(path) {
   if (!file.exists(path)) return(data.frame())
-  df <- readr::read_csv(path, show_col_types = FALSE, lazy = FALSE, progress = FALSE) %>%
+  char_keys <- c(
+    "farm_id", "region", "subregion", "animal_tag", "diet_tag",
+    "animal_type", "animal_subtype", "production_role",
+    "c", "a", "b", "description"
+  )
+  hdr <- tryCatch(
+    names(readr::read_csv(path, n_max = 0, show_col_types = FALSE, progress = FALSE)),
+    error = function(e) character(0)
+  )
+  present_char <- intersect(char_keys, hdr)
+  col_spec <- if (length(present_char) > 0) {
+    do.call(readr::cols, stats::setNames(rep(list(readr::col_character()), length(present_char)), present_char))
+  } else {
+    readr::cols()
+  }
+
+  df <- readr::read_csv(path, col_types = col_spec, show_col_types = FALSE, lazy = FALSE, progress = FALSE) %>%
     dplyr::mutate(dplyr::across(where(is.logical), as.character))
 
   fname <- basename(path)
@@ -42,7 +58,7 @@ read_clean <- function(path) {
 }
 
 save_clean <- function(df, path) {
-  if (is.null(df) || nrow(df) == 0) return(invisible(NULL))
+  if (is.null(df) || ncol(df) == 0) return(invisible(NULL))
   fname <- basename(path)
   if (fname == "ruminant_definitions.csv") {
     df <- enforce_column_order(df, "def")
@@ -51,9 +67,12 @@ save_clean <- function(df, path) {
   } else if (fname == "diet_ingredients.csv") {
     df <- enforce_column_order(df, "diet_ingr")
   }
+  if (nrow(df) == 0) {
+    return(readr::write_csv(df, path, na = ""))
+  }
   key_column <- intersect(c("animal_tag", "diet_tag", "ingredient", "description", "system_base"), names(df))[1]
   if (!is.na(key_column)) {
-    df <- df %>% dplyr::filter(!is.na(.data[[key_column]]) & .data[[key_column]] != "")
+    df <- df %>% dplyr::filter(!is.na(.data[[key_column]]) & trimws(as.character(.data[[key_column]])) != "")
   }
   df %>%
     dplyr::mutate(dplyr::across(where(is.logical), ~ NA_character_)) %>%
@@ -513,21 +532,28 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
 
   all_census_keys <- build_keys(valid_census)
 
-  # Negative population check
+  # Non-numeric and negative population checks (NA-safe subsetting)
   if ("population" %in% names(valid_census)) {
-    neg_pop <- valid_census[!is.na(valid_census$population) & as.numeric(valid_census$population) < 0, ]
-    if (nrow(neg_pop) > 0) {
-      tags_bad <- unique(na.omit(neg_pop$animal_tag))
+    pop_raw <- trimws(as.character(valid_census$population))
+    pop_num <- suppressWarnings(as.numeric(pop_raw))
+
+    non_num_idx <- which(!is.na(pop_raw) & pop_raw != "" & pop_raw != "NA" & is.na(pop_num))
+    if (length(non_num_idx) > 0) {
+      tags_nan <- unique(na.omit(as.character(valid_census$animal_tag[non_num_idx])))
+      add_issue("error", "census", "Census", "Non-numeric Population Count",
+                paste0("Population must be a valid number for: ", paste(tags_nan, collapse = ", "), "."))
+    }
+
+    neg_idx <- which(!is.na(pop_num) & pop_num < 0)
+    if (length(neg_idx) > 0) {
+      tags_bad <- unique(na.omit(as.character(valid_census$animal_tag[neg_idx])))
       add_issue("error", "census", "Census", "Negative Population Count",
                 paste0("Population cannot be negative for: ", paste(tags_bad, collapse = ", "), "."))
     }
-  }
 
-  # Active cohorts in Census (population > 0) identified by 3-key: animal_tag, region, subregion
-  active_census <- if ("population" %in% names(valid_census)) {
-    valid_census[!is.na(valid_census$population) & as.numeric(valid_census$population) > 0, , drop = FALSE]
+    active_census <- valid_census[which(!is.na(pop_num) & pop_num > 0), , drop = FALSE]
   } else {
-    valid_census
+    active_census <- valid_census
   }
 
   if (nrow(active_census) == 0) {
@@ -695,9 +721,9 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
 
       # Dynamic lookup function to retrieve allowed coefficient descriptions directly from ipcc_coefficients.csv
       get_valid_from_csv <- function(c_name, s_name = NULL) {
-        sub <- coef_df[tolower(trimws(coef_df$coefficient)) == tolower(c_name), , drop = FALSE]
+        sub <- coef_df[which(tolower(trimws(as.character(coef_df$coefficient))) == tolower(c_name)), , drop = FALSE]
         if (!is.null(s_name) && has_species_col) {
-          sub <- sub[tolower(trimws(sub$animal_type)) == tolower(s_name), , drop = FALSE]
+          sub <- sub[which(tolower(trimws(as.character(sub$animal_type))) == tolower(s_name)), , drop = FALSE]
         }
         res <- unique(na.omit(trimws(as.character(sub$description))))
         res[res != "" & res != "NA"]
@@ -854,7 +880,8 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       }
 
       if (nrow(act_weights) > 0 && "productive_period_days" %in% names(act_weights)) {
-        bad_ppd <- act_weights[is.na(act_weights$productive_period_days) | as.numeric(act_weights$productive_period_days) <= 0, , drop = FALSE]
+        ppd_num <- suppressWarnings(as.numeric(act_weights$productive_period_days))
+        bad_ppd <- act_weights[which(is.na(ppd_num) | ppd_num <= 0), , drop = FALSE]
         if (nrow(bad_ppd) > 0) {
           fmt_ppd <- vapply(build_keys(bad_ppd), format_cohort_label, character(1), USE.NAMES = FALSE)
           fmt_ppd <- fmt_ppd[fmt_ppd != ""]
@@ -1132,7 +1159,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       if (nrow(dp_clean) > 0) {
         for (r in seq_len(nrow(dp_clean))) {
           d_tag <- dp_clean$diet_tag[r]
-          row_shares <- as.numeric(dp_clean[r, share_cols])
+          row_shares <- suppressWarnings(as.numeric(dp_clean[r, share_cols]))
           total_share <- sum(row_shares, na.rm = TRUE)
           if (abs(total_share - 100) > 0.1) {
             add_issue("error", "diet_prof", "Diet Profiles", "Diet Shares != 100%",
@@ -1145,7 +1172,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
 
   # --- 8. Diet Ingredients Validation (Shares 100% per Category & Unknown Ingredients) ---
   if (!is.null(rv$diet_ingr) && nrow(rv$diet_ingr) > 0) {
-    di_clean <- rv$diet_ingr[!is.na(rv$diet_ingr$diet_tag) & rv$diet_ingr$diet_tag != "", , drop = FALSE]
+    di_clean <- rv$diet_ingr[!is.na(rv$diet_ingr$diet_tag) & trimws(as.character(rv$diet_ingr$diet_tag)) != "", , drop = FALSE]
 
     # Check unknown ingredients against feed_characteristics
     if (!is.null(rv$feed_char) && "ingredient" %in% names(rv$feed_char) && "ingredient" %in% names(di_clean)) {
@@ -1159,14 +1186,40 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
       }
     }
 
-    # Check shares sum to 100% within each diet_tag + ingredient_type category
+    # Check shares sum to 100% within each diet_tag + ingredient_type category (NA-safe, never crashes aggregate)
     if (all(c("diet_tag", "ingredient_type", "ingredient_share") %in% names(di_clean))) {
       target_diets <- if (length(assigned_diets) > 0) intersect(assigned_diets, unique(di_clean$diet_tag)) else unique(di_clean$diet_tag)
-      di_target <- di_clean[di_clean$diet_tag %in% target_diets & !is.na(di_clean$ingredient_type) & di_clean$ingredient_type != "", , drop = FALSE]
+      di_target <- di_clean[
+        which(di_clean$diet_tag %in% target_diets &
+              !is.na(di_clean$ingredient_type) &
+              trimws(as.character(di_clean$ingredient_type)) != ""),
+        ,
+        drop = FALSE
+      ]
       if (nrow(di_target) > 0) {
-        di_target$ing_share_num <- suppressWarnings(as.numeric(di_target$ingredient_share))
-        sums_df <- stats::aggregate(ing_share_num ~ diet_tag + ingredient_type, data = di_target, FUN = sum, na.rm = TRUE)
-        bad_sums <- sums_df[abs(sums_df$ing_share_num - 100) > 0.1, ]
+        share_raw <- trimws(as.character(di_target$ingredient_share))
+        share_num <- suppressWarnings(as.numeric(share_raw))
+
+        non_num_ing <- which(!is.na(share_raw) & share_raw != "" & share_raw != "NA" & is.na(share_num))
+        if (length(non_num_ing) > 0) {
+          add_issue("error", "diet_ingr", "Ingredients", "Non-numeric Ingredient Share",
+                    paste0("Non-numeric ingredient_share detected in Ingredients row(s): ",
+                           paste(head(non_num_ing, 5), collapse = ", "),
+                           ". Use decimal points '.' instead of commas ','."))
+        }
+
+        neg_ing <- which(!is.na(share_num) & share_num < 0)
+        if (length(neg_ing) > 0) {
+          add_issue("error", "diet_ingr", "Ingredients", "Negative Ingredient Share",
+                    paste0("Negative ingredient_share detected in Ingredients row(s): ",
+                           paste(head(neg_ing, 5), collapse = ", "), "."))
+        }
+
+        di_target$ing_share_safe <- ifelse(is.na(share_num), 0, share_num)
+        sums_df <- di_target %>%
+          dplyr::group_by(diet_tag, ingredient_type) %>%
+          dplyr::summarise(ing_share_num = sum(ing_share_safe, na.rm = TRUE), .groups = "drop")
+        bad_sums <- sums_df[which(abs(sums_df$ing_share_num - 100) > 0.1), , drop = FALSE]
         if (nrow(bad_sums) > 0) {
           for (b in seq_len(nrow(bad_sums))) {
             add_issue("error", "diet_ingr", "Ingredients", "Ingredient Shares != 100%",
@@ -1187,6 +1240,7 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
         milk = "milk_share",
         milk_replacer = "milk_replacer_share"
       )
+      di_share_num <- suppressWarnings(as.numeric(di_clean$ingredient_share))
       missing_cats <- character()
       for (t_name in names(type_map)) {
         scol <- type_map[[t_name]]
@@ -1195,12 +1249,11 @@ validate_project_data <- function(rv, automatic_cycle = FALSE) {
           act_r <- which(!is.na(svals) & svals > 0.1)
           for (r in act_r) {
             d_tag <- trimws(as.character(dp_active$diet_tag[r]))
-            has_cat_ing <- any(
-              trimws(as.character(di_clean$diet_tag)) == d_tag &
-              trimws(as.character(di_clean$ingredient_type)) == t_name &
-              !is.na(di_clean$ingredient_share) &
-              suppressWarnings(as.numeric(di_clean$ingredient_share)) > 0
-            )
+            has_cat_ing <- isTRUE(any(
+              !is.na(di_clean$diet_tag) & trimws(as.character(di_clean$diet_tag)) == d_tag &
+              !is.na(di_clean$ingredient_type) & trimws(as.character(di_clean$ingredient_type)) == t_name &
+              !is.na(di_share_num) & di_share_num > 0
+            ))
             if (!has_cat_ing) {
               missing_cats <- c(missing_cats, paste0(d_tag, " [", t_name, " = ", svals[r], "%]"))
             }

@@ -113,7 +113,10 @@ ui <- bslib::page_sidebar(
       ),
       div(
         class = "herdr-header-actions",
-        tags$span(class = "herdr-version-pill", "v1.0.4"),
+        tags$span(
+          class = "herdr-version-pill",
+          paste0("v", tryCatch(as.character(utils::packageVersion("herdr")), error = function(e) "dev"))
+        ),
         tags$a(href = "https://juancbm99.github.io/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("book"), "Docs"),
         tags$a(href = "https://github.com/JuanCBM99/herdr", target = "_blank", class = "btn btn-outline-secondary", icon("github"), "GitHub"),
         bslib::input_dark_mode(id = "dark_mode", mode = "light")

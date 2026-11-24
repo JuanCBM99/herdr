@@ -198,3 +198,79 @@ test_that("Enhanced data health validation flags invalid animal types, invented 
   })
 })
 
+test_that("Shiny Block B regressions: dictionary units, 0-row save_clean, NA-safe validation, leading zeros, and cascades", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  file.copy(from = test_path("test_data/user_data"), to = temp_test_dir, recursive = TRUE)
+  withr::local_dir(temp_test_dir)
+
+  app_env <- new.env()
+  sys.source(app_file, envir = app_env)
+
+  # 1. Data dictionary accurately documents frac_fat_pct / frac_protein_pct as 0-1 fractions (not 0-100%)
+  dict_html <- as.character(app_env$build_dictionary_panel())
+  expect_match(dict_html, "frac_fat_pct")
+  expect_match(dict_html, "decimal fraction \\(0")
+  expect_false(grepl("body weight gain \\(percentage, 0", dict_html))
+  expect_match(dict_html, "cattle_buffalo \\[lactating cows\\]")
+  expect_match(dict_html, "pasture_range_paddock")
+  expect_false(grepl("corn_national", dict_html, fixed = TRUE))
+
+  # 2. save_clean() writes 0-row CSVs (overwriting stale data) and read_clean() preserves leading zeros
+  tmp_csv <- file.path(temp_test_dir, "zero_row_test.csv")
+  df_full <- data.frame(farm_id = "001", subregion = "08019", animal_tag = "cow_1", population = 10, stringsAsFactors = FALSE)
+  app_env$save_clean(df_full, tmp_csv)
+  read_back <- app_env$read_clean(tmp_csv)
+  expect_identical(read_back$farm_id, "001")
+  expect_identical(read_back$subregion, "08019")
+
+  app_env$save_clean(df_full[0, , drop = FALSE], tmp_csv)
+  read_zero <- app_env$read_clean(tmp_csv)
+  expect_equal(nrow(read_zero), 0)
+  expect_true(all(c("farm_id", "subregion", "animal_tag", "population") %in% names(read_zero)))
+
+  # 3. Server-level tests: reset wipes disk CSVs, blank/non-numeric shares never crash aggregate, NA-safe subsetting
+  app_server <- app_env$server
+  shiny::testServer(app_server, {
+    # 3a. All-NA / blank ingredient_share must NOT crash aggregate() and must report != 100%
+    orig_ingr <- rv$diet_ingr
+    rv$diet_ingr$ingredient_share <- NA_character_
+    issues_na_ingr <- project_validation_issues()
+    expect_true(any(sapply(issues_na_ingr, function(x) x$table_id == "diet_ingr" && grepl("100%", x$title))))
+
+    # 3b. Non-numeric ingredient_share flags explicit error without crashing
+    rv$diet_ingr$ingredient_share[1] <- "abc"
+    issues_nan_ingr <- project_validation_issues()
+    expect_true(any(sapply(issues_nan_ingr, function(x) x$table_id == "diet_ingr" && grepl("Non-numeric", x$title))))
+    rv$diet_ingr <- orig_ingr
+
+    # 3c. Non-numeric population must flag Non-numeric Population Count (NOT phantom NA rows / Negative Population)
+    orig_census <- rv$census
+    rv$census$population[1] <- "fifty"
+    issues_nan_pop <- project_validation_issues()
+    expect_true(any(sapply(issues_nan_pop, function(x) x$table_id == "census" && grepl("Non-numeric Population", x$title))))
+    expect_false(any(sapply(issues_nan_pop, function(x) x$table_id == "census" && grepl("Negative Population", x$title))))
+    rv$census <- orig_census
+
+    # 3d. Non-numeric productive_period_days must report Missing Productive Period cleanly without NA labels
+    orig_weights <- rv$weights
+    active_idx <- which(rv$weights$animal_tag == "mature_dairy_cattle")[1]
+    rv$weights$productive_period_days[active_idx] <- "invalid_days"
+    issues_bad_ppd <- project_validation_issues()
+    ppd_issues <- Filter(function(x) x$table_id == "weights" && grepl("Productive Period", x$title), issues_bad_ppd)
+    expect_true(length(ppd_issues) > 0)
+    expect_false(grepl("\\bNA\\b", ppd_issues[[1]]$message))
+    rv$weights <- orig_weights
+
+    # 3e. Opening manure modal and triggering cascade observers works without error
+    session$setInputs(open_modal_manure = 1)
+    session$setInputs(modal_input_manure_system_base = "liquid_slurry")
+    expect_true(TRUE)
+
+    # 3f. Confirming Clear All Data writes 0-row CSVs to user_data_tmp on disk
+    session$setInputs(reset_data = 1, confirm_reset_data = 1)
+    census_disk <- app_env$read_clean(file.path(user_data_tmp, "livestock_census.csv"))
+    expect_equal(nrow(census_disk), 0)
+  })
+})
+
