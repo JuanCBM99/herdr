@@ -173,7 +173,7 @@ Running `generate_impact_assessment()` returns a list with two tables (`results$
 Reports the direct physical inventory and per-head footprint of each cohort:
 
 * **Identification & Role:** `farm_id`, `region`, `subregion`, `animal_tag`, `animal_type`, `animal_subtype`, `production_role`, `population`.
-* **Feed & Protein Intake:** `DMI_kgday` (kg DM/head/day), `feed_intake_kg` (kg DM/year), `feed_CP_total_kg` (kg CP/year), `feed_CP_cropland_kg` (kg arable cropland CP/year).
+* **Feed & Protein Intake:** `DMI_kgday` (kg DM/head/day), `feed_intake_kg` (kg DM/year), `feed_CP_total_kg` (kg CP/year), `feed_CP_human_edible_kg` (kg human-edible feed CP/year), `feed_HDP_kg` (kg DIAAS-adjusted human-digestible feed protein/year).
 * **Native Gas Emissions (Gg/year):** `CH4_enteric_Gg`, `CH4_manure_Gg`, `N2O_direct_Gg`, `N2O_vol_Gg`, `N2O_lea_Gg`, `N2O_indirect_Gg`.
 * **Scope 1 & Scope 3 Feed Carbon Footprints (Gg CO2e/year):** `CO2eq_enteric`, `CO2eq_manure`, `CO2eq_N2O_direct`, `CO2eq_N2O_indirect`, `CO2eq_N2O`, `CO2eq_feed_fossil_Gg`, `CO2eq_feed_luc_Gg`, `CO2eq_feed_Gg`, `CO2eq_Total_Gg` (Scope 1), `CO2eq_cradle_to_farm_Gg` (Scope 1 + Feed).
 * **Agroecological Land & Water Footprints:** `Land_cropland_m2`, `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`, `Land_other_m2`, `Land_m2`, `Water_feed_m3` ($\text{m}^3\text{ depriv.}$).
@@ -182,14 +182,14 @@ Reports the direct physical inventory and per-head footprint of each cohort:
 ### 2. Table 2: `results$intensities` (`output/product_intensities.csv`)
 Reports physical outputs and enterprise-integrated intensities for each cohort:
 
-* **Physical Outputs (kg/year):** `milk_FPCM_kg`, `meat_carcass_weight_kg`, `egg_fresh_kg`, `wool_kg`, `total_protein_kg`.
+* **Physical Outputs (kg/year):** `milk_FPCM_kg`, `meat_carcass_weight_kg`, `egg_fresh_kg`, `wool_kg`, `total_protein_kg`, `total_HDP_kg` (DIAAS-adjusted human-digestible animal protein).
 * **Commercial Product Intensities:**
   * **Milk (per kg FPCM):** `GHG_intensity_milk`, `GHG_cradle_to_farm_milk`, `Land_intensity_milk`, `Water_intensity_milk`.
   * **Meat (per kg carcass weight):** `GHG_intensity_meat`, `GHG_cradle_to_farm_meat`, `Land_intensity_meat`, `Water_intensity_meat`.
   * **Eggs (per kg fresh eggs):** `GHG_intensity_egg`, `GHG_cradle_to_farm_egg`, `Land_intensity_egg`, `Water_intensity_egg`.
   * **Wool (per kg greasy wool):** `GHG_intensity_wool`, `GHG_cradle_to_farm_wool`, `Land_intensity_wool`, `Water_intensity_wool`.
 * **Nutritional Protein Intensities (per kg edible protein):** `GHG_intensity_protein`, `GHG_cradle_to_farm_protein`, `Land_intensity_protein`, `Water_intensity_protein`.
-* **Protein Feed Efficiency (Mottet et al. 2017):** `Protein_FCR_total`, `Protein_FCR_cropland`.
+* **Protein Feed Efficiency & Quality (Mottet et al. 2017; Ertl et al. 2016a, 2016b):** `Protein_FCR_total`, `Protein_FCR_human_edible`, `EPCR_DIAAS`, `PQR`.
 
 ---
 
@@ -217,7 +217,9 @@ Connects diet ingredients to statutory crop yield statistics and Life Cycle Asse
 * `ea_reference`: Reference multi-output SimaPro / Agribalyse process or literature source from which the economic and physical co-product allocation parameters are sourced.
 * `economic_allocation`: Economic revenue share (0.0 to 1.0) of the multi-output process allocated to the co-product batch (e.g. `1.0` for primary crops; values $\le 0.33$ are also used as the baseline threshold to identify low-value agro-industrial by-products when assigning default `human_edible` flags).
 * `kg_coproduct_per_1ton_maincrop`: Physical mass of co-product as fed (kg, at the ingredient's `DM_pct`) obtained per $1,000\text{ kg}$ (1 ton) of fresh parent crop processed (`1000` for dry primary crops).
-* `human_edible`: Explicit food-competition flag (`0` or `1`, or fractional value in `[0, 1]`) used by `calculate_weighted_variable()` to compute `CP_cropland_pct` and `Protein_FCR_cropland`, decoupled from `land_type`. Default values are set to `1` for arable non-forage concentrates with `economic_allocation > 0.33` (plus commercial food-grade dairy feeds `casein` and `skimmed_milk`) and `0` for forages (including dehydrated alfalfa/forage meals), residues (`economic_allocation <= 0.33`), inedible/waste items (whole cottonseed, vetches, acorns, bakery/bread by-products), internal suckled milk, and non-agricultural additives.
+* `human_edible`: Explicit food-competition flag (`0` or `1`, or fractional value in `[0, 1]`) used by `calculate_weighted_variable()` to compute `CP_human_edible_pct` and `Protein_FCR_human_edible`, decoupled from `land_type`. Default values are set to `1` for arable non-forage concentrates with `economic_allocation > 0.33` (plus commercial food-grade dairy feeds `casein` and `skimmed_milk`) and `0` for forages (including dehydrated alfalfa/forage meals), residues (`economic_allocation <= 0.33`), inedible/waste items (whole cottonseed, vetches, acorns, bakery/bread by-products), internal suckled milk, and non-agricultural additives.
+* `diaas_pct`: Digestible Indispensable Amino Acid Score (`%`, FAO 2013 `0.5–3 yr` child reference pattern, untruncated) used to compute `HDP_feed_pct`, `EPCR_DIAAS`, and `PQR`.
+* `diaas_reference`: Primary literature reference documenting each `diaas_pct` value (backbone: Ertl et al., 2016b, *Die Bodenkultur* 67(2):91–103; supplemented by Ertl et al., 2016a, Rutherfurd et al., 2015, Cervantes-Pahm et al., 2014, Herreman et al., 2020, and Nosworthy et al., 2018).
 
 ### 3. `ecoalim.parquet` — Feed Life Cycle Inventory Database {#ecoalim}
 Bundled reference database containing environmental characterization factors from **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1 / v3.2** under the European Commission's **Environmental Footprint (EF 3.1)** standard (per kg fresh weight for concentrates via `DM_pct`, and per kg dry matter for `forage` items):

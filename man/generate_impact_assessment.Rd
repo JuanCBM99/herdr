@@ -49,8 +49,8 @@ generate_impact_assessment(
 }
 \value{
 A named list containing two dataframes:
-  \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).}
-  \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_cropland} weighted by the \code{human_edible} column in \code{mapping.csv}, crude protein basis without DIAAS/partial HEP).}
+  \item{totals}{Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year, including \code{feed_CP_total_kg}, \code{feed_CP_human_edible_kg}, and \code{feed_HDP_kg}), land (m2) and water (m3).}
+  \item{intensities}{Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (\code{Protein_FCR_total} across all feed CP; \code{Protein_FCR_human_edible} weighted by \code{human_edible} in \code{mapping.csv}; \code{EPCR_DIAAS} adjusting both feed and animal protein by DIAAS under FAO 2013 0.5-3 yr pattern; and \code{PQR = DIAAS_output / DIAAS_input}).}
 }
 \description{
 Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
@@ -60,11 +60,14 @@ and farm-level product, nutritional, and per-head environmental intensities.
 Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: \code{AF_k = Energy_k / Energy_total}. Specifically, \code{Protein_FCR_total} divides whole-herd
-total feed crude protein by edible animal protein (allocated by \code{af_protein}), whereas
-\code{Protein_FCR_cropland} weights feed crude protein by the explicit \code{human_edible} column in
+total feed crude protein by edible animal protein (allocated by \code{af_protein}),
+\code{Protein_FCR_human_edible} weights feed crude protein by the explicit \code{human_edible} column in
 \code{mapping.csv} (default binary \code{0/1} classification anchored on arable non-forage concentrates
 with \code{economic_allocation > 0.33}, excluding inedible/waste items and including commercial food-grade
-dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).
+dairy feeds), and \code{EPCR_DIAAS} adjusts both human-edible feed protein (\code{diaas_pct} in
+\code{mapping.csv}) and animal product protein (Ertl et al., 2016b, Table 5) by their Digestible
+Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child pattern, untruncated), alongside the
+Protein Quality Ratio (\code{PQR = DIAAS_output / DIAAS_input}).
 }
 \examples{
 \dontrun{

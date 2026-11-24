@@ -21,13 +21,19 @@ calculate_production(
 \item{pop_df}{Optional precalculated population dataframe.}
 }
 \value{
-Tibble with animal production summary.
+Tibble with annual animal production per cohort, including physical outputs
+  (\code{milk_fresh_kg}, \code{milk_FPCM_kg}, \code{meat_live_weight_kg},
+  \code{meat_carcass_weight_kg}, \code{egg_fresh_kg}, \code{wool_kg}), edible protein
+  (\code{milk_protein_kg}, \code{meat_protein_kg}, \code{egg_protein_kg},
+  \code{total_protein_kg}, kg/year), and DIAAS-adjusted human-digestible animal protein
+  (\code{total_HDP_kg}, kg HDP/year).
 }
 \description{
 Computes total production of milk, meat, eggs, and fibre in physical units
 (fresh milk, FPCM, live weight, carcass weight) and nutritional units
-(kg of edible protein and fibre) based on FAO/GLEAM (Equations 9.1 to 9.5)
-and IDF standards.
+(kg of edible protein, DIAAS-adjusted human-digestible protein, and fibre)
+based on FAO/GLEAM (Equations 9.1 to 9.5), IDF standards, and Ertl et al.
+(2016b, Table 5; FAO 2013 0.5-3 yr child scoring pattern, untruncated).
 }
 \examples{
 \dontrun{

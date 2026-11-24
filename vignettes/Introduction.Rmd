@@ -49,7 +49,7 @@ Most existing calculators evaluate emissions or feed land requirements in isolat
 3. **Animal Productivity & Edible Human Protein:**
    Implements the **FAO** methodology to translate herd throughput across functional roles (`mature`, `replacement`, `slaughter`) into physical commodities (Fat and Protein Corrected Milk, cold dressed carcass weight, boneless meat, greasy wool, and fresh eggs) and total digestible human protein (kg protein/year).
 4. **Enterprise Attribution, Biophysical Co-Product Allocation & Protein Feed Efficiency:**
-   Automatically integrates non-commercial rearing and breeding overheads (`replacement` and `mature` breeders) into commercial outputs, applies the **International Dairy Federation (IDF Bulletin 520/2022)** Net Energy physical allocation, and reports protein conversion and human food competition metrics (`Protein_FCR_total` and `Protein_FCR_cropland`).
+   Automatically integrates non-commercial rearing and breeding overheads (`replacement` and `mature` breeders) into commercial outputs, applies the **International Dairy Federation (IDF Bulletin 520/2022)** Net Energy physical allocation, and reports protein conversion, human food competition, and DIAAS protein-quality metrics (`Protein_FCR_total`, `Protein_FCR_human_edible`, `EPCR_DIAAS`, and `PQR`).
 5. **Upstream Feed LCA & Water Deprivation (EF 3.1 / AWARE):**
    Integrates INRAE/ADEME **ECOALIM v9** to evaluate upstream feed carbon footprints (fossil emissions vs. deforestation LUC) and freshwater deprivation ($\text{m}^3\text{ depriv.}$) characterized via the international **AWARE** model.
 
