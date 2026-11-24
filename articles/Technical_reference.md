@@ -187,7 +187,8 @@ cohort:
   `population`.
 - **Feed & Protein Intake:** `DMI_kgday` (kg DM/head/day),
   `feed_intake_kg` (kg DM/year), `feed_CP_total_kg` (kg CP/year),
-  `feed_CP_cropland_kg` (kg arable cropland CP/year).
+  `feed_CP_human_edible_kg` (kg human-edible feed CP/year),
+  `feed_HDP_kg` (kg DIAAS-adjusted human-digestible feed protein/year).
 - **Native Gas Emissions (Gg/year):** `CH4_enteric_Gg`, `CH4_manure_Gg`,
   `N2O_direct_Gg`, `N2O_vol_Gg`, `N2O_lea_Gg`, `N2O_indirect_Gg`.
 - **Scope 1 & Scope 3 Feed Carbon Footprints (Gg CO2e/year):**
@@ -211,7 +212,8 @@ cohort:
 
 - **Physical Outputs (kg/year):** `milk_FPCM_kg`,
   `meat_carcass_weight_kg`, `egg_fresh_kg`, `wool_kg`,
-  `total_protein_kg`.
+  `total_protein_kg`, `total_HDP_kg` (DIAAS-adjusted human-digestible
+  animal protein).
 - **Commercial Product Intensities:**
   - **Milk (per kg FPCM):** `GHG_intensity_milk`,
     `GHG_cradle_to_farm_milk`, `Land_intensity_milk`,
@@ -228,8 +230,9 @@ cohort:
 - **Nutritional Protein Intensities (per kg edible protein):**
   `GHG_intensity_protein`, `GHG_cradle_to_farm_protein`,
   `Land_intensity_protein`, `Water_intensity_protein`.
-- **Protein Feed Efficiency (Mottet et al. 2017):** `Protein_FCR_total`,
-  `Protein_FCR_cropland`.
+- **Protein Feed Efficiency & Quality (Mottet et al. 2017; Ertl et
+  al. 2016a, 2016b):** `Protein_FCR_total`, `Protein_FCR_human_edible`,
+  `EPCR_DIAAS`, `PQR`.
 
 ------------------------------------------------------------------------
 
@@ -275,14 +278,21 @@ ton) of fresh parent crop processed (`1000` for dry primary crops). \*
 `human_edible`: Explicit food-competition flag (`0` or `1`, or
 fractional value in `[0, 1]`) used by
 [`calculate_weighted_variable()`](https://juancbm99.github.io/herdr/reference/calculate_weighted_variable.md)
-to compute `CP_cropland_pct` and `Protein_FCR_cropland`, decoupled from
-`land_type`. Default values are set to `1` for arable non-forage
-concentrates with `economic_allocation > 0.33` (plus commercial
-food-grade dairy feeds `casein` and `skimmed_milk`) and `0` for forages
-(including dehydrated alfalfa/forage meals), residues
+to compute `CP_human_edible_pct` and `Protein_FCR_human_edible`,
+decoupled from `land_type`. Default values are set to `1` for arable
+non-forage concentrates with `economic_allocation > 0.33` (plus
+commercial food-grade dairy feeds `casein` and `skimmed_milk`) and `0`
+for forages (including dehydrated alfalfa/forage meals), residues
 (`economic_allocation <= 0.33`), inedible/waste items (whole cottonseed,
 vetches, acorns, bakery/bread by-products), internal suckled milk, and
-non-agricultural additives.
+non-agricultural additives. \* `diaas_pct`: Digestible Indispensable
+Amino Acid Score (`%`, FAO 2013 `0.5–3 yr` child reference pattern,
+untruncated) used to compute `HDP_feed_pct`, `EPCR_DIAAS`, and `PQR`. \*
+`diaas_reference`: Primary literature reference documenting each
+`diaas_pct` value (backbone: Ertl et al., 2016b, *Die Bodenkultur*
+67(2):91–103; supplemented by Ertl et al., 2016a, Rutherfurd et al.,
+2015, Cervantes-Pahm et al., 2014, Herreman et al., 2020, and Nosworthy
+et al., 2018).
 
 #### 3. `ecoalim.parquet` — Feed Life Cycle Inventory Database
 

@@ -5,21 +5,27 @@ and farm-level product, nutritional, and per-head environmental intensities.
 Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: AF_k = Energy_k / Energy_total. Specifically, Protein_FCR_total divides whole-herd
-total feed crude protein by edible animal protein (allocated by af_protein), whereas
-Protein_FCR_cropland weights feed crude protein by the explicit human_edible column in
+total feed crude protein by edible animal protein (allocated by af_protein),
+Protein_FCR_human_edible weights feed crude protein by the explicit human_edible column in
 mapping.csv (default binary 0/1 classification anchored on arable non-forage concentrates
 with economic_allocation &amp;gt; 0.33, excluding inedible/waste items and including commercial food-grade
-dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:description" content="Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
+dairy feeds), and EPCR_DIAAS adjusts both human-edible feed protein (diaas_pct in
+mapping.csv) and animal product protein (Ertl et al., 2016b, Table 5) by their Digestible
+Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child pattern, untruncated), alongside the
+Protein Quality Ratio (PQR = DIAAS_output / DIAAS_input)."><meta property="og:description" content="Integrates all upstream Tier 2 GHG emissions, agroecological land footprints,
 and GLEAM production outputs. Generates two distinct reports: an absolute environmental inventory (totals)
 and farm-level product, nutritional, and per-head environmental intensities.
 Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: AF_k = Energy_k / Energy_total. Specifically, Protein_FCR_total divides whole-herd
-total feed crude protein by edible animal protein (allocated by af_protein), whereas
-Protein_FCR_cropland weights feed crude protein by the explicit human_edible column in
+total feed crude protein by edible animal protein (allocated by af_protein),
+Protein_FCR_human_edible weights feed crude protein by the explicit human_edible column in
 mapping.csv (default binary 0/1 classification anchored on arable non-forage concentrates
 with economic_allocation &amp;gt; 0.33, excluding inedible/waste items and including commercial food-grade
-dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments)."><meta property="og:image" content="https://juancbm99.github.io/herdr/logo.png"></head><body>
+dairy feeds), and EPCR_DIAAS adjusts both human-edible feed protein (diaas_pct in
+mapping.csv) and animal product protein (Ertl et al., 2016b, Table 5) by their Digestible
+Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child pattern, untruncated), alongside the
+Protein Quality Ratio (PQR = DIAAS_output / DIAAS_input)."><meta property="og:image" content="https://juancbm99.github.io/herdr/logo.png"></head><body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
@@ -85,11 +91,14 @@ and farm-level product, nutritional, and per-head environmental intensities.</p>
 <p>Product intensities and Protein FCR (Table 2) are obtained by allocating the whole enterprise pool
 (GHG, land, water, feed protein) among its co-products using a biophysical (energy-based) allocation
 factor: <code>AF_k = Energy_k / Energy_total</code>. Specifically, <code>Protein_FCR_total</code> divides whole-herd
-total feed crude protein by edible animal protein (allocated by <code>af_protein</code>), whereas
-<code>Protein_FCR_cropland</code> weights feed crude protein by the explicit <code>human_edible</code> column in
+total feed crude protein by edible animal protein (allocated by <code>af_protein</code>),
+<code>Protein_FCR_human_edible</code> weights feed crude protein by the explicit <code>human_edible</code> column in
 <code>mapping.csv</code> (default binary <code>0/1</code> classification anchored on arable non-forage concentrates
 with <code>economic_allocation &gt; 0.33</code>, excluding inedible/waste items and including commercial food-grade
-dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).</p>
+dairy feeds), and <code>EPCR_DIAAS</code> adjusts both human-edible feed protein (<code>diaas_pct</code> in
+<code>mapping.csv</code>) and animal product protein (Ertl et al., 2016b, Table 5) by their Digestible
+Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child pattern, untruncated), alongside the
+Protein Quality Ratio (<code>PQR = DIAAS_output / DIAAS_input</code>).</p>
     </div>
 
     <div class="section level2">
@@ -171,10 +180,10 @@ dairy feeds; crude protein basis, without DIAAS or partial HEP adjustments).</p>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>A named list containing two dataframes:</p>
 <dl><dt>totals</dt>
-<dd><p>Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year), land (m2) and water (m3).</p></dd>
+<dd><p>Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg CO2eq), feed (kg/year, including <code>feed_CP_total_kg</code>, <code>feed_CP_human_edible_kg</code>, and <code>feed_HDP_kg</code>), land (m2) and water (m3).</p></dd>
 
   <dt>intensities</dt>
-<dd><p>Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (<code>Protein_FCR_total</code> across all feed CP; <code>Protein_FCR_cropland</code> weighted by the <code>human_edible</code> column in <code>mapping.csv</code>, crude protein basis without DIAAS/partial HEP).</p></dd>
+<dd><p>Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or edible protein) and enterprise-level nutritional intensities (<code>Protein_FCR_total</code> across all feed CP; <code>Protein_FCR_human_edible</code> weighted by <code>human_edible</code> in <code>mapping.csv</code>; <code>EPCR_DIAAS</code> adjusting both feed and animal protein by DIAAS under FAO 2013 0.5-3 yr pattern; and <code>PQR = DIAAS_output / DIAAS_input</code>).</p></dd>
 
 </dl></div>
 

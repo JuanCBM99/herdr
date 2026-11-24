@@ -54,8 +54,9 @@ flows into a **single, internally consistent modeling engine**.
     rearing and breeding overheads (`replacement` and `mature` breeders)
     into commercial outputs, applies the **International Dairy
     Federation (IDF Bulletin 520/2022)** Net Energy physical allocation,
-    and reports protein conversion and human food competition metrics
-    (`Protein_FCR_total` and `Protein_FCR_cropland`).
+    and reports protein conversion, human food competition, and DIAAS
+    protein-quality metrics (`Protein_FCR_total`,
+    `Protein_FCR_human_edible`, `EPCR_DIAAS`, and `PQR`).
 5.  **Upstream Feed LCA & Water Deprivation (EF 3.1 / AWARE):**
     Integrates INRAE/ADEME **ECOALIM v9** to evaluate upstream feed
     carbon footprints (fossil emissions vs. deforestation LUC) and

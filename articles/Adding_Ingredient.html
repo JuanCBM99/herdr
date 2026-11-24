@@ -336,26 +336,48 @@ fresh weight of the parent crop in FAOSTAT (for example, dehydrated
 tubers adjust for the water removed from the fresh crop).</p>
 </div>
 <div class="section level4">
-<h4 id="human_edible">
-<code>human_edible</code><a class="anchor" aria-label="anchor" href="#human_edible"></a>
+<h4 id="human_edible-diaas_pct-and-diaas_reference">
+<code>human_edible</code>, <code>diaas_pct</code>, and
+<code>diaas_reference</code><a class="anchor" aria-label="anchor" href="#human_edible-diaas_pct-and-diaas_reference"></a>
 </h4>
 <p>Food-feed competition in <code><a href="../reference/calculate_weighted_variable.html">calculate_weighted_variable()</a></code>
-(and downstream <code>Protein_FCR_cropland</code> in
-<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) is controlled directly by the
-explicit <code>human_edible</code> column in <code>mapping.csv</code>
-(<code>0</code> or <code>1</code>; fractional values in
-<code>[0, 1]</code> are also supported), decoupling food competition
-cleanly from <code>land_type</code>. In <code>herdr</code>’s bundled
-<code>mapping.csv</code>, default values follow a binary classification
-anchored on arable non-forage concentrates with
-<code>economic_allocation &gt; 0.33</code> (<code>1</code> for primary
-grains, pulses, soybean/linseed meals, protein concentrates/isolates,
-and commercial food-grade dairy feeds like <code>casein</code> and
-<code>skimmed_milk</code>; <code>0</code> for forages including
-dehydrated alfalfa/forage meals, low-value residues with
-<code>economic_allocation &lt;= 0.33</code>, inedible/waste items such
-as whole cottonseed, vetches, acorns, and bakery/bread by-products,
-internal suckled milk, and non-agricultural additives).</p>
+(and downstream <code>Protein_FCR_human_edible</code>,
+<code>EPCR_DIAAS</code>, and <code>PQR</code> in
+<code><a href="../reference/generate_impact_assessment.html">generate_impact_assessment()</a></code>) is controlled directly by
+three columns in <code>mapping.csv</code>, decoupling food competition
+cleanly from <code>land_type</code>:</p>
+<ul>
+<li>
+<strong><code>human_edible</code></strong> (<code>0</code> or
+<code>1</code>; fractional values in <code>[0, 1]</code> are also
+supported): in <code>herdr</code>’s bundled <code>mapping.csv</code>,
+default values follow a binary classification anchored on arable
+non-forage concentrates with <code>economic_allocation &gt; 0.33</code>
+(<code>1</code> for primary grains, pulses, soybean/linseed meals,
+protein concentrates/isolates, and commercial food-grade dairy feeds
+like <code>casein</code> and <code>skimmed_milk</code>; <code>0</code>
+for forages including dehydrated alfalfa/forage meals, low-value
+residues with <code>economic_allocation &lt;= 0.33</code>,
+inedible/waste items such as whole cottonseed, vetches, acorns, and
+bakery/bread by-products, internal suckled milk, and non-agricultural
+additives).</li>
+<li>
+<strong><code>diaas_pct</code></strong> (<code>%</code>, FAO 2013
+<code>0.5–3 yr</code> child reference pattern, untruncated) and
+<strong><code>diaas_reference</code></strong>: protein quality score for
+computing DIAAS-adjusted human-digestible feed protein
+(<code>HDP_feed_pct</code>) and <code>EPCR_DIAAS</code>. The bundled
+table uses <strong>Ertl et al. (2016b)</strong> (<em>Die
+Bodenkultur</em> 67(2):91–103, Table 4 &amp; Table 5) as its primary
+backbone, supplemented with <strong>Ertl et al. (2016a)</strong>
+(sunflower expeller) and primary ileal assays (<strong>Rutherfurd et
+al. 2015</strong>, <strong>Cervantes-Pahm et al. 2014</strong>
+harmonized to <code>0.5–3 yr</code>, <strong>Herreman et
+al. 2020</strong>, and <strong>Nosworthy et al. 2018</strong>). Leave
+<code>NA</code> when adding a non-edible ingredient
+(<code>human_edible = 0</code>) or a minor crop lacking a reliable ileal
+assay.</li>
+</ul>
 </div>
 <div class="section level4">
 <h4 id="yield_name">

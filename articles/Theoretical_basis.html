@@ -1451,9 +1451,9 @@ efficiency on producing cohorts (<code>mature</code> and
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math>
 </li>
 <li>
-<strong>Human-Edible / Cropland Protein Feed Conversion Ratio
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg human-edible feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
+<strong>Human-Edible Protein Feed Conversion Ratio
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}}</annotation></semantics></math>):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg human-edible feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
 <li>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, human-edible}}</annotation></semantics></math>
 weights each ingredient’s crude protein directly by the explicit
@@ -1479,13 +1479,63 @@ by-products
 such as cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed
 cakes), biologically inedible or food-waste items (whole cottonseed,
 vetches, acorns, bakery/bread by-products), internal suckled milk, and
-non-agricultural additives (urea, minerals, synthetic amino acids).
-Calculations are reported on a crude protein basis without DIAAS or
-partial milling-extraction HEP adjustments.</li>
+non-agricultural additives (urea, minerals, synthetic amino acids).</li>
 <li>When
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">cropland</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{cropland}} &lt; 1.0</annotation></semantics></math>,
-the enterprise is a <strong>net producer</strong> of human-edible
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}} &lt; 1.0</annotation></semantics></math>,
+the enterprise is a <strong>net producer</strong> of crude human-edible
 protein relative to competing human-edible feed protein consumed.</li>
+</ul>
+</li>
+<li>
+<strong>DIAAS-Adjusted Edible Protein Conversion Ratio
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">EPCR</mtext><mtext mathvariant="normal">DIAAS</mtext></msub><annotation encoding="application/x-tex">\text{EPCR}_{\text{DIAAS}}</annotation></semantics></math>)
+and Protein Quality Ratio
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">PQR</mtext><annotation encoding="application/x-tex">\text{PQR}</annotation></semantics></math>):</strong>
+Following <strong>FAO (2013)</strong> and <strong>Ertl et al. (2016a,
+2016b)</strong>, <code>herdr</code> also accounts for differences in
+indispensable amino acid profiles and true ileal digestibility between
+plant feeds and animal-source foods using the untruncated
+<strong>Digestible Indispensable Amino Acid Score (DIAAS,
+<code>0.5–3 yr</code> child reference pattern)</strong>:
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">EPCR</mtext><mtext mathvariant="normal">DIAAS</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub></mfrac><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mtext mathvariant="normal">PQR</mtext></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mtext mathvariant="normal">PQR</mtext><mo>=</mo><mfrac><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">output</mtext></msub><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">input</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">\text{EPCR}_{\text{DIAAS}} = \frac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \frac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}, \qquad \text{PQR} = \frac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}</annotation></semantics></math>
+where
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{HDP}}</annotation></semantics></math>
+weights each human-edible feed ingredient’s crude protein by
+<code>diaas_pct / 100</code> from <code>mapping.csv</code> (backbone:
+Ertl et al., 2016b, Table 4, supplemented by Ertl et al., 2016a,
+Rutherfurd et al., 2015, Cervantes-Pahm et al., 2014 harmonized via
+<code>48/57</code>, Herreman et al., 2020, and Nosworthy et al., 2018),
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Animal}_{\text{HDP}}</annotation></semantics></math>
+weights commercial animal protein streams by species-specific DIAAS
+values from <strong>Ertl et al. (2016b, Table 5)</strong>: cow milk
+(<code>115.9%</code>), sheep milk (<code>109.1%</code>), goat milk
+(<code>123.5%</code>), beef (<code>109.3%</code>), sheep/goat meat
+(<code>116.8%</code>), pork (<code>113.9%</code>), chicken meat
+(<code>108.2%</code>), and whole egg (<code>116.4%</code>).
+<ul>
+<li>
+<strong>Transparency notes:</strong> (i) Following Ertl et
+al. (2016b, Section 2.6), when
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>80</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\ge 80\%</annotation></semantics></math>
+(but
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&lt; 100\%</annotation></semantics></math>)
+of human-edible feed CP has a DIAAS entry, the weighted-average DIAAS of
+known ingredients is applied to total human-edible CP (emitting a
+warning whenever
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&gt; 5\%</annotation></semantics></math>
+lacks DIAAS, and returning <code>NA</code> if
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>80</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&lt; 80\%</annotation></semantics></math>
+is covered); (ii) <code>EPCR_DIAAS</code> uses weighted-average
+ingredient DIAAS at the farm gate (raw feedstuffs, without modeling
+cereal–legume amino acid complementarity in mixed human diets) and
+untruncated
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&gt; 100\%</annotation></semantics></math>
+scores for animal products (reflecting their ability to complement
+lower-quality plant proteins in mixed diets); therefore,
+<code>EPCR_DIAAS</code> is always reported alongside unadjusted
+<code>Protein_FCR_human_edible</code> and
+<code>Protein_FCR_total</code>.</li>
 </ul>
 </li>
 </ol>
@@ -1499,13 +1549,33 @@ characterization model for water scarcity footprint: assessing impacts
 of water consumption based on available water remaining (AWARE)</em>.
 <strong>The International Journal of Life Cycle Assessment</strong>,
 23(2), 368–378.</li>
+<li>Cervantes-Pahm, S. K., Liu, Y., &amp; Stein, H. H. (2014).
+<em>Digestible indispensable amino acid score and digestible amino acids
+in eight cereal grains</em>. <strong>British Journal of
+Nutrition</strong>, 111(9), 1663–1672.</li>
+<li>Ertl, P., Knaus, W., &amp; Zollitsch, W. (2016a). <em>An approach to
+including protein quality when assessing the net contribution of
+livestock to human food supply</em>. <strong>Animal</strong>, 10(11),
+1883–1889.</li>
+<li>Ertl, P., Steinwidder, A., Schönauer, M., Krimberger, K., Knaus, W.,
+&amp; Zollitsch, W. (2016b). <em>Net food production of different
+livestock: A national analysis for Austria including relative occupation
+of different land categories</em>. <strong>Die Bodenkultur</strong>,
+67(2), 91–103.</li>
 <li>European Commission (2021). <em>Commission Recommendation (EU)
 2021/2279 on the use of Environmental Footprint methods</em>.
 <strong>Official Journal of the European Union</strong>, L 471,
 1–396.</li>
+<li>FAO (2013). <em>Dietary protein quality evaluation in human
+nutrition: Report of an FAO Expert Consultation</em>. FAO Food and
+Nutrition Paper 92, Rome.</li>
 <li>FAO (2018). <em>Global Livestock Environmental Assessment Model
 (GLEAM) v3.0: Model description</em>. Food and Agriculture Organization
 of the United Nations, Rome.</li>
+<li>Herreman, L., Nommensen, P., Pennings, B., &amp; Laus, M. C. (2020).
+<em>Comprehensive overview of the quality of plant- and animal-sourced
+proteins based on the digestible indispensable amino acid score</em>.
+<strong>Food Science &amp; Nutrition</strong>, 8(10), 5379–5391.</li>
 <li>IDF (2022). <em>The C-footprint of dairy: Updated IDF standard for
 carbon footprinting of the dairy sector</em>. International Dairy
 Federation Bulletin 520/2022.</li>
@@ -1518,6 +1588,14 @@ Greenhouse Gas Inventories</em>. Volume 4: AFOLU, Chapter 10.</li>
 Gerber, P. (2017). <em>More fuel than food: Global food security and the
 role of livestock feed</em>. <strong>Global Food Security</strong>, 14,
 1–8.</li>
+<li>Nosworthy, M. G., et al. (2018). <em>Effect of processing on the in
+vitro and in vivo protein quality of red and green lentils</em>.
+<strong>Food Science &amp; Nutrition</strong>, 6(5), 1196–1205.</li>
+<li>Rutherfurd, S. M., Fanning, A. C., Miller, B. J., &amp; Moughan, P.
+J. (2015). <em>Protein digestibility-corrected amino acid scores and
+digestible indispensable amino acid scores differentially describe
+protein quality in growing male rats</em>. <strong>The Journal of
+Nutrition</strong>, 145(2), 372–379.</li>
 </ul>
 </div>
 </div>

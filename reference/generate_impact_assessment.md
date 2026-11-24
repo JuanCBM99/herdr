@@ -10,12 +10,16 @@ the whole enterprise pool (GHG, land, water, feed protein) among its
 co-products using a biophysical (energy-based) allocation factor:
 `AF_k = Energy_k / Energy_total`. Specifically, `Protein_FCR_total`
 divides whole-herd total feed crude protein by edible animal protein
-(allocated by `af_protein`), whereas `Protein_FCR_cropland` weights feed
+(allocated by `af_protein`), `Protein_FCR_human_edible` weights feed
 crude protein by the explicit `human_edible` column in `mapping.csv`
 (default binary `0/1` classification anchored on arable non-forage
 concentrates with `economic_allocation > 0.33`, excluding inedible/waste
-items and including commercial food-grade dairy feeds; crude protein
-basis, without DIAAS or partial HEP adjustments).
+items and including commercial food-grade dairy feeds), and `EPCR_DIAAS`
+adjusts both human-edible feed protein (`diaas_pct` in `mapping.csv`)
+and animal product protein (Ertl et al., 2016b, Table 5) by their
+Digestible Indispensable Amino Acid Score (FAO 2013 0.5-3 yr child
+pattern, untruncated), alongside the Protein Quality Ratio
+(`PQR = DIAAS_output / DIAAS_input`).
 
 ## Usage
 
@@ -116,15 +120,18 @@ A named list containing two dataframes:
 - totals:
 
   Absolute environmental inventory of emissions (Gg CH4, Gg N2O, Gg
-  CO2eq), feed (kg/year), land (m2) and water (m3).
+  CO2eq), feed (kg/year, including `feed_CP_total_kg`,
+  `feed_CP_human_edible_kg`, and `feed_HDP_kg`), land (m2) and water
+  (m3).
 
 - intensities:
 
   Farm-level product (per kg FPCM milk, carcass meat, eggs, wool or
   edible protein) and enterprise-level nutritional intensities
-  (`Protein_FCR_total` across all feed CP; `Protein_FCR_cropland`
-  weighted by the `human_edible` column in `mapping.csv`, crude protein
-  basis without DIAAS/partial HEP).
+  (`Protein_FCR_total` across all feed CP; `Protein_FCR_human_edible`
+  weighted by `human_edible` in `mapping.csv`; `EPCR_DIAAS` adjusting
+  both feed and animal protein by DIAAS under FAO 2013 0.5-3 yr pattern;
+  and `PQR = DIAAS_output / DIAAS_input`).
 
 ## Examples
 

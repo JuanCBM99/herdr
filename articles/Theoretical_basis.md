@@ -791,10 +791,10 @@ $`AF_{\text{protein}} = 1 - AF_{\text{wool}}`$:
     ``` math
     \text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})
     ```
-2.  **Human-Edible / Cropland Protein Feed Conversion Ratio
-    ($`\text{Protein\_FCR}_{\text{cropland}}`$):**
+2.  **Human-Edible Protein Feed Conversion Ratio
+    ($`\text{Protein\_FCR}_{\text{human\_edible}}`$):**
     ``` math
-    \text{Protein\_FCR}_{\text{cropland}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})
+    \text{Protein\_FCR}_{\text{human\_edible}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})
     ```
     - $`\text{Feed}_{\text{CP, human-edible}}`$ weights each
       ingredient’s crude protein directly by the explicit `human_edible`
@@ -814,12 +814,43 @@ $`AF_{\text{protein}} = 1 - AF_{\text{wool}}`$:
       cakes), biologically inedible or food-waste items (whole
       cottonseed, vetches, acorns, bakery/bread by-products), internal
       suckled milk, and non-agricultural additives (urea, minerals,
-      synthetic amino acids). Calculations are reported on a crude
-      protein basis without DIAAS or partial milling-extraction HEP
-      adjustments.
-    - When $`\text{Protein\_FCR}_{\text{cropland}} < 1.0`$, the
-      enterprise is a **net producer** of human-edible protein relative
-      to competing human-edible feed protein consumed.
+      synthetic amino acids).
+    - When $`\text{Protein\_FCR}_{\text{human\_edible}} < 1.0`$, the
+      enterprise is a **net producer** of crude human-edible protein
+      relative to competing human-edible feed protein consumed.
+3.  **DIAAS-Adjusted Edible Protein Conversion Ratio
+    ($`\text{EPCR}_{\text{DIAAS}}`$) and Protein Quality Ratio
+    ($`\text{PQR}`$):** Following **FAO (2013)** and **Ertl et
+    al. (2016a, 2016b)**, `herdr` also accounts for differences in
+    indispensable amino acid profiles and true ileal digestibility
+    between plant feeds and animal-source foods using the untruncated
+    **Digestible Indispensable Amino Acid Score (DIAAS, `0.5–3 yr` child
+    reference pattern)**:
+    ``` math
+    \text{EPCR}_{\text{DIAAS}} = \frac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \frac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}, \qquad \text{PQR} = \frac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}
+    ```
+    where $`\text{Feed}_{\text{HDP}}`$ weights each human-edible feed
+    ingredient’s crude protein by `diaas_pct / 100` from `mapping.csv`
+    (backbone: Ertl et al., 2016b, Table 4, supplemented by Ertl et al.,
+    2016a, Rutherfurd et al., 2015, Cervantes-Pahm et al., 2014
+    harmonized via `48/57`, Herreman et al., 2020, and Nosworthy et al.,
+    2018), and $`\text{Animal}_{\text{HDP}}`$ weights commercial animal
+    protein streams by species-specific DIAAS values from **Ertl et
+    al. (2016b, Table 5)**: cow milk (`115.9%`), sheep milk (`109.1%`),
+    goat milk (`123.5%`), beef (`109.3%`), sheep/goat meat (`116.8%`),
+    pork (`113.9%`), chicken meat (`108.2%`), and whole egg (`116.4%`).
+    - **Transparency notes:** (i) Following Ertl et al. (2016b, Section
+      2.6), when $`\ge 80\%`$ (but $`< 100\%`$) of human-edible feed CP
+      has a DIAAS entry, the weighted-average DIAAS of known ingredients
+      is applied to total human-edible CP (emitting a warning whenever
+      $`> 5\%`$ lacks DIAAS, and returning `NA` if $`< 80\%`$ is
+      covered); (ii) `EPCR_DIAAS` uses weighted-average ingredient DIAAS
+      at the farm gate (raw feedstuffs, without modeling cereal–legume
+      amino acid complementarity in mixed human diets) and untruncated
+      $`> 100\%`$ scores for animal products (reflecting their ability
+      to complement lower-quality plant proteins in mixed diets);
+      therefore, `EPCR_DIAAS` is always reported alongside unadjusted
+      `Protein_FCR_human_edible` and `Protein_FCR_total`.
 
 ------------------------------------------------------------------------
 
@@ -829,12 +860,29 @@ $`AF_{\text{protein}} = 1 - AF_{\text{wool}}`$:
   model for water scarcity footprint: assessing impacts of water
   consumption based on available water remaining (AWARE)*. **The
   International Journal of Life Cycle Assessment**, 23(2), 368–378.
+- Cervantes-Pahm, S. K., Liu, Y., & Stein, H. H. (2014). *Digestible
+  indispensable amino acid score and digestible amino acids in eight
+  cereal grains*. **British Journal of Nutrition**, 111(9), 1663–1672.
+- Ertl, P., Knaus, W., & Zollitsch, W. (2016a). *An approach to
+  including protein quality when assessing the net contribution of
+  livestock to human food supply*. **Animal**, 10(11), 1883–1889.
+- Ertl, P., Steinwidder, A., Schönauer, M., Krimberger, K., Knaus, W., &
+  Zollitsch, W. (2016b). *Net food production of different livestock: A
+  national analysis for Austria including relative occupation of
+  different land categories*. **Die Bodenkultur**, 67(2), 91–103.
 - European Commission (2021). *Commission Recommendation (EU) 2021/2279
   on the use of Environmental Footprint methods*. **Official Journal of
   the European Union**, L 471, 1–396.
+- FAO (2013). *Dietary protein quality evaluation in human nutrition:
+  Report of an FAO Expert Consultation*. FAO Food and Nutrition Paper
+  92, Rome.
 - FAO (2018). *Global Livestock Environmental Assessment Model (GLEAM)
   v3.0: Model description*. Food and Agriculture Organization of the
   United Nations, Rome.
+- Herreman, L., Nommensen, P., Pennings, B., & Laus, M. C. (2020).
+  *Comprehensive overview of the quality of plant- and animal-sourced
+  proteins based on the digestible indispensable amino acid score*.
+  **Food Science & Nutrition**, 8(10), 5379–5391.
 - IDF (2022). *The C-footprint of dairy: Updated IDF standard for carbon
   footprinting of the dairy sector*. International Dairy Federation
   Bulletin 520/2022.
@@ -846,3 +894,11 @@ $`AF_{\text{protein}} = 1 - AF_{\text{wool}}`$:
 - Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., &
   Gerber, P. (2017). *More fuel than food: Global food security and the
   role of livestock feed*. **Global Food Security**, 14, 1–8.
+- Nosworthy, M. G., et al. (2018). *Effect of processing on the in vitro
+  and in vivo protein quality of red and green lentils*. **Food Science
+  & Nutrition**, 6(5), 1196–1205.
+- Rutherfurd, S. M., Fanning, A. C., Miller, B. J., & Moughan, P. J.
+  (2015). *Protein digestibility-corrected amino acid scores and
+  digestible indispensable amino acid scores differentially describe
+  protein quality in growing male rats*. **The Journal of Nutrition**,
+  145(2), 372–379.
