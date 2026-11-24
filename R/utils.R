@@ -61,6 +61,13 @@ herdr_validate_manure_allocation <- function(user_manure, tolerance = 1e-3) {
     return(invisible(NULL))
   }
 
+  alloc_num <- suppressWarnings(as.numeric(user_manure$allocation))
+  if (any(!is.na(alloc_num) & alloc_num < 0)) {
+    bad_tags <- unique(user_manure$animal_tag[!is.na(alloc_num) & alloc_num < 0])
+    stop("Data Error: Negative manure allocation found for cohorts: ",
+         paste(bad_tags, collapse = ", "), ".", call. = FALSE)
+  }
+
   allocation_sums <- user_manure %>%
     dplyr::filter(!is.na(allocation)) %>%
     dplyr::group_by(dplyr::across(dplyr::any_of(c("farm_id", "region", "subregion", "animal_tag")))) %>%
@@ -102,7 +109,11 @@ herdr_validate_manure_coverage <- function(pop_df, user_manure) {
   key_of <- function(df) do.call(paste, c(lapply(df[intersect(keys, names(df))], as.character), sep = " | "))
 
   populated <- pop_df[!is.na(pop_df$population) & pop_df$population > 0, , drop = FALSE]
-  covered <- user_manure[!is.na(user_manure$system_base), , drop = FALSE]
+  covered <- user_manure[
+    !is.na(user_manure$system_base) & nzchar(trimws(as.character(user_manure$system_base))),
+    ,
+    drop = FALSE
+  ]
 
   missing_tags <- unique(populated$animal_tag[!key_of(populated) %in% key_of(covered)])
   if (length(missing_tags) > 0) {
@@ -601,6 +612,52 @@ herdr_normalize_diets <- function(diets, ingredients) {
   list(diets = diets, ingredients = ingredients, diet_join_keys = diet_join_keys)
 }
 
+#' Read Standard herdr Input CSV With Character Identifier Keys
+#'
+#' Preserves leading zeros (e.g., `"001"`, `"08019"`) and prevents `<chr>` vs `<dbl>`
+#' join mismatches across pipeline modules by parsing canonical key columns as character
+#' at read time.
+#'
+#' @param path File path to the CSV.
+#' @param optional Logical. If TRUE and file does not exist, return an empty typed tibble.
+#' @param extra_char_cols Additional column names to parse as character if present.
+#' @param empty_cols Column names to include when returning an empty optional tibble.
+#' @return A tibble.
+#' @noRd
+herdr_read_input_csv <- function(path,
+                                 optional = FALSE,
+                                 extra_char_cols = character(),
+                                 empty_cols = c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")) {
+  if (!file.exists(path)) {
+    if (isTRUE(optional)) {
+      cols_list <- stats::setNames(
+        rep(list(character()), length(empty_cols)),
+        empty_cols
+      )
+      return(tibble::as_tibble(cols_list))
+    }
+    stop("Data Error: Required input file not found: '", path, "'.", call. = FALSE)
+  }
+
+  hdr <- names(readr::read_csv(path, n_max = 0, show_col_types = FALSE))
+  key_char_cols <- unique(c(
+    "farm_id", "region", "subregion", "animal_tag", "diet_tag",
+    "animal_type", "animal_subtype", "production_role",
+    extra_char_cols
+  ))
+  present_char <- intersect(key_char_cols, hdr)
+  col_spec <- if (length(present_char) > 0) {
+    do.call(readr::cols, stats::setNames(
+      rep(list(readr::col_character()), length(present_char)),
+      present_char
+    ))
+  } else {
+    readr::cols()
+  }
+
+  readr::read_csv(path, col_types = col_spec, show_col_types = FALSE)
+}
+
 #' Read Manure Management or IPCC Master CSV With Safe Character Keys
 #' @noRd
 herdr_read_manure_table <- function(path) {
@@ -609,13 +666,7 @@ herdr_read_manure_table <- function(path) {
     "system_base", "management_months", "system_climate", "system_subclimate",
     "climate_zone", "system_variant", "climate_moisture", "b_0"
   )
-  df <- readr::read_csv(
-    path,
-    col_types = readr::cols(management_months = readr::col_character()),
-    show_col_types = FALSE
-  )
-  df %>%
-    dplyr::mutate(dplyr::across(dplyr::any_of(char_cols), as.character))
+  herdr_read_input_csv(path, optional = FALSE, extra_char_cols = char_cols)
 }
 
 #' Normalize Positional rate_parameters / definitions Arguments
@@ -635,10 +686,15 @@ herdr_normalize_rate_params <- function(rate_parameters, definitions) {
 #' Load livestock_weights.csv Conditionally
 #' @noRd
 herdr_load_weights_df <- function(weights, data_dir) {
-  if (!is.null(weights)) return(weights)
+  if (!is.null(weights)) {
+    return(
+      weights %>%
+        dplyr::mutate(dplyr::across(dplyr::any_of(c("farm_id", "region", "subregion", "animal_tag")), as.character))
+    )
+  }
   weights_path <- file.path(data_dir, "livestock_weights.csv")
   if (file.exists(weights_path)) {
-    suppressMessages(readr::read_csv(weights_path, show_col_types = FALSE))
+    suppressMessages(herdr_read_input_csv(weights_path))
   } else {
     NULL
   }

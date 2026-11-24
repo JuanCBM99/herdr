@@ -100,3 +100,20 @@ test_that("calculate_population_swine handles feedlot-only swine farm gracefully
   expect_equal(res$animal_tag, "fattening_pigs")
   expect_equal(res$population, 5000)
 })
+
+test_that("calculate_population_swine works standalone when definitions is NULL", {
+  census_swine <- tibble::tribble(
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "breeder_sows", "spain", NA_character_, 1000
+  )
+  rate_parameters <- tibble::tribble(
+    ~animal_tag, ~parameter, ~value,
+    "breeder_sows", "replacement_rate", "0.25",
+    "breeder_sows", "farrowing_rate", "2.35",
+    "breeder_sows", "piglets_per_litter", "12.0"
+  )
+
+  res <- calculate_population_swine(census_swine, rate_parameters, definitions = NULL)
+  expect_setequal(res$animal_tag, c("breeder_sows", "replacement_sows", "fattening_pigs"))
+  expect_true(all(res$population > 0))
+})

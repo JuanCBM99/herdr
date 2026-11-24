@@ -54,7 +54,10 @@ calculate_population_swine <- function(census_swine, rate_parameters = NULL, def
   }
 
   if (length(valid_swine_tags) == 0) {
-    valid_swine_tags <- unique(census_swine$animal_tag)
+    valid_swine_tags <- union(
+      unique(census_swine$animal_tag),
+      c("breeder_sows", "boars", "replacement_sows", "fattening_pigs")
+    )
   }
 
   base_tags <- c("breeder_sows", "boars")

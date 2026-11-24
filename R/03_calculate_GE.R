@@ -44,22 +44,28 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
   ))
 
   if (need_ne) {
-    weights_shared <- readr::read_csv(
+    weights_shared <- herdr_read_input_csv(
       file.path(data_dir, "livestock_weights.csv"),
-      col_types = readr::cols(farm_id = "c", subregion = "c"),
-      show_col_types = FALSE
+      optional = TRUE
     )
-    categories_shared <- readr::read_csv(
+    categories_shared <- herdr_read_input_csv(
       file.path(data_dir, "ruminant_definitions.csv"),
-      col_types = readr::cols(farm_id = "c", subregion = "c", c = "c", a = "c", b = "c"),
-      show_col_types = FALSE
+      extra_char_cols = c("c", "a", "b"),
+      optional = TRUE
     )
-    coefficients_shared <- readr::read_csv(
-      file.path(data_dir, "ipcc_coefficients.csv"),
-      col_types = readr::cols(description = "c"),
-      show_col_types = FALSE
-    )
-    herdr_validate_ruminant_coefficients(categories_shared, coefficients_shared)
+    coeff_path <- file.path(data_dir, "ipcc_coefficients.csv")
+    coefficients_shared <- if (file.exists(coeff_path)) {
+      readr::read_csv(
+        coeff_path,
+        col_types = readr::cols(description = "c"),
+        show_col_types = FALSE
+      )
+    } else {
+      tibble::tibble(description = character(), value = numeric())
+    }
+    if (nrow(categories_shared) > 0) {
+      herdr_validate_ruminant_coefficients(categories_shared, coefficients_shared)
+    }
   }
 
   get_ne <- function(df, func, col_name, ...) {
@@ -111,7 +117,7 @@ calculate_ge <- function(saveoutput = TRUE, data_dir = "user_data",
     dplyr::left_join(NE_wool_df, by = join_keys_univ) %>%
     # 4. Calculations and Cleanup
     dplyr::mutate(
-      across(
+      dplyr::across(
         c(DE_pct, NEm_MJday, NEa_MJday, NEg_MJday, NEl_MJday, NEwork_MJday, NEpregnancy_MJday, NEwool_MJday),
         ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)
       ),

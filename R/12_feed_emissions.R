@@ -92,8 +92,8 @@ calculate_feed_emissions <- function(automatic_cycle = FALSE,
     population_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   }
 
-  diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
-  diet_ingredients_raw <- readr::read_csv(file.path(data_dir, "diet_ingredients.csv"), show_col_types = FALSE)
+  diet_profiles <- herdr_read_input_csv(file.path(data_dir, "diet_profiles.csv"))
+  diet_ingredients_raw <- herdr_read_input_csv(file.path(data_dir, "diet_ingredients.csv"))
 
   norm_diets <- herdr_normalize_diets(diet_profiles, diet_ingredients_raw)
   diet_profiles <- norm_diets$diets

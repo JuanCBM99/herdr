@@ -24,7 +24,9 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
   # --- 1. Load Dependencies and Inputs ---
   if (is.null(ge_req)) ge_req <- suppressMessages(calculate_ge(saveoutput = FALSE, data_dir = data_dir))
   if (is.null(diet_char)) diet_char <- suppressMessages(calculate_weighted_variable(saveoutput = FALSE, data_dir = data_dir))
-  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"), optional = TRUE, empty_cols = c("farm_id", "region", "subregion", "animal_tag"))
+  if (!"initial_weight_kg" %in% names(weights)) weights$initial_weight_kg <- numeric(nrow(weights))
+  if (!"final_weight_kg" %in% names(weights)) weights$final_weight_kg <- numeric(nrow(weights))
   if (is.null(mono)) mono <- suppressMessages(calculate_monogastric_energy(saveoutput = FALSE, data_dir = data_dir))
 
   join_keys <- c("farm_id", "region", "subregion", "animal_tag")
@@ -54,10 +56,10 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
 
       # --- 3. Compute DMI by Species Type ---
       DMI_kgday = dplyr::case_when(
-        animal_type == "poultry" & poultry_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / poultry_ME_kcal_kg,
-        animal_type == "swine" & swine_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / swine_ME_kcal_kg,
-        animal_type == "poultry" & poultry_ME_kcal_kg <= 0 ~ 0,
-        animal_type == "swine" & swine_ME_kcal_kg <= 0 ~ 0,
+        tolower(animal_type) == "poultry" & poultry_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / poultry_ME_kcal_kg,
+        tolower(animal_type) == "swine" & swine_ME_kcal_kg > 0 ~ (ME_total_kcal_day) / swine_ME_kcal_kg,
+        tolower(animal_type) == "poultry" & poultry_ME_kcal_kg <= 0 ~ 0,
+        tolower(animal_type) == "swine" & swine_ME_kcal_kg <= 0 ~ 0,
         # For ruminants: GE (MJ) to kcal conversion factor is 239.005 (1 MJ = 239.005 kcal)
         GE_feed_kcal_kg > 0 ~ GE_MJday / GE_feed_kcal_kg * 239.005,
         TRUE ~ 0
@@ -84,9 +86,9 @@ calculate_DMI <- function(saveoutput = TRUE, data_dir = "user_data",
   # --- 4. Upper Bound Biological Threshold Checks ---
   warn_high <- results %>%
     dplyr::filter(
-      (animal_type == "cattle" & DMI_bw_pct > 4.4) |
-        (animal_type == "sheep" & DMI_bw_pct > 5.5) |
-        (animal_type == "goat" & DMI_bw_pct > 6.7)
+      (tolower(animal_type) == "cattle" & DMI_bw_pct > 4.4) |
+        (tolower(animal_type) == "sheep" & DMI_bw_pct > 5.5) |
+        (tolower(animal_type) == "goat" & DMI_bw_pct > 6.7)
     )
 
   if (nrow(warn_high) > 0) {

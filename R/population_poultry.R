@@ -59,7 +59,13 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
   }
 
   if (length(valid_poultry_tags) == 0) {
-    valid_poultry_tags <- unique(census_poultry$animal_tag)
+    valid_poultry_tags <- union(
+      unique(census_poultry$animal_tag),
+      c(
+        "breeder_meat_hens", "laying_hens", "free_range_laying_hens",
+        "replacement_meat_pullets", "replacement_layer_pullets", "broilers"
+      )
+    )
   }
 
   base_tags <- c("breeder_meat_hens", "laying_hens", "free_range_laying_hens")
@@ -80,16 +86,21 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     dplyr::filter(!animal_tag %in% c(base_tags, "replacement_meat_pullets", "replacement_layer_pullets"),
                   population > 0)
 
-  user_has_broilers       <- any(non_base_census$animal_tag == "broilers")
-  broilers_in_definitions <- "broilers" %in% valid_poultry_tags
-  auto_model_broilers     <- !user_has_broilers && broilers_in_definitions
-
   grouped_keys <- c("farm_id", "region", "subregion")
+  broilers_in_definitions <- "broilers" %in% valid_poultry_tags
+  user_has_broilers <- any(non_base_census$animal_tag == "broilers")
+
+  manual_broiler_strata <- non_base_census %>%
+    dplyr::filter(animal_tag == "broilers") %>%
+    dplyr::distinct(dplyr::across(dplyr::all_of(grouped_keys))) %>%
+    dplyr::mutate(.has_manual_broilers = TRUE)
 
   base_wide <- adult_census %>%
     dplyr::group_by(dplyr::across(dplyr::all_of(grouped_keys)), animal_tag) %>%
     dplyr::summarise(population = sum(population, na.rm = TRUE), .groups = "drop") %>%
-    tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0)
+    tidyr::pivot_wider(names_from = animal_tag, values_from = population, values_fill = 0) %>%
+    dplyr::left_join(manual_broiler_strata, by = grouped_keys) %>%
+    dplyr::mutate(.has_manual_broilers = tidyr::replace_na(.has_manual_broilers, FALSE))
 
   for (tag in base_tags) {
     if (!tag %in% names(base_wide)) base_wide[[tag]] <- 0
@@ -146,9 +157,9 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
       pop_replacement_meat_pullets  = annual_meat_pullets * (pullet_meat_days / 365),
       pop_replacement_layer_pullets = annual_layer_pullets * (pullet_layer_days / 365),
 
-      # 4c. Standing population of broilers auto-modeled from breeder hens (IPCC Eq. 10.1 AAP)
+      # 4c. Standing population of broilers auto-modeled per stratum when manual broilers are absent
       pop_broilers = dplyr::if_else(
-        auto_model_broilers & breeder_meat_hens > 0,
+        !.has_manual_broilers & broilers_in_definitions & breeder_meat_hens > 0,
         breeder_meat_hens * eggs_per_day * fertility_breeder * broiler_days,
         0
       )
@@ -163,7 +174,7 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
     "replacement_meat_pullets",
     "replacement_layer_pullets"
   )
-  if (auto_model_broilers) {
+  if (broilers_in_definitions) {
     gen_select_cols <- c(gen_select_cols, "broilers")
   }
 
@@ -197,18 +208,18 @@ calculate_population_poultry <- function(census_poultry, rate_parameters = NULL,
 
   if (tot_broilers > 0) {
     annual_broiler_harvest <- tot_broilers * (365 / broiler_days[1])
-    if (user_has_broilers) {
-      message(sprintf("   \u2022 Broilers: %s standing barn places (%.0f days feed -> %s finished/yr)",
-                      format(round(tot_broilers), big.mark = ","),
-                      broiler_days[1],
-                      format(round(annual_broiler_harvest), big.mark = ",")))
-    } else if (auto_model_broilers && any(calculated$pop_broilers > 0)) {
+    if (any(calculated$pop_broilers > 0) && !any(calculated$.has_manual_broilers)) {
       message(sprintf("   \u2022 Broilers: %s standing barn places (%.0f days feed -> %s finished/yr) (auto-modeled from breeder hens: %.2f eggs/day, %.1f%% hatch)",
                       format(round(tot_broilers), big.mark = ","),
                       broiler_days[1],
                       format(round(annual_broiler_harvest), big.mark = ","),
                       eggs_per_day[1],
                       fertility_breeder[1] * 100))
+    } else {
+      message(sprintf("   \u2022 Broilers: %s standing barn places (%.0f days feed -> %s finished/yr)",
+                      format(round(tot_broilers), big.mark = ","),
+                      broiler_days[1],
+                      format(round(annual_broiler_harvest), big.mark = ",")))
     }
   }
 

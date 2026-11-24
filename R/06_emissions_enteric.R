@@ -28,7 +28,7 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
   if (is.null(pop_df)) pop_df <- suppressMessages(calculate_population(automatic_cycle = automatic_cycle, saveoutput = FALSE, data_dir = data_dir))
   ruminant_file <- file.path(data_dir, "ruminant_definitions.csv")
   livestock_definitions <- if (file.exists(ruminant_file)) {
-    suppressMessages(readr::read_csv(ruminant_file, show_col_types = FALSE))
+    suppressMessages(herdr_read_input_csv(ruminant_file))
   } else {
     NULL
   }
@@ -66,18 +66,18 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
       dplyr::across(c(DE_pct, NDF_pct, GE_MJday, population), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       milk_yield_kg_year = if ("milk_yield_kg_year" %in% names(.)) tidyr::replace_na(suppressWarnings(as.numeric(milk_yield_kg_year)), 0) else 0,
       Ym_pct = dplyr::case_when(
-        animal_type == "sheep" ~ 6.7,
-        animal_type == "goat" ~ 5.5,
+        tolower(animal_type) == "sheep" ~ 6.7,
+        tolower(animal_type) == "goat" ~ 5.5,
         # [IPCC 2019 Refinement, Vol 4, Ch 10, Table 10.12] Lactating Dairy Cows Ym (%)
-        animal_type == "cattle" & animal_subtype == "dairy" & milk_yield_kg_year > 0 ~ dplyr::case_when(
-          DE_pct >= 70 & NDF_pct < 35 ~ 5.7,
-          DE_pct >= 70 & NDF_pct >= 35 ~ 6.0,
+        tolower(animal_type) == "cattle" & tolower(animal_subtype) == "dairy" & milk_yield_kg_year > 0 ~ dplyr::case_when(
+          DE_pct >= 70 & NDF_pct <= 35 ~ 5.7,
+          DE_pct >= 70 & NDF_pct > 35 ~ 6.0,
           DE_pct > 62 & DE_pct < 70 & NDF_pct <= 37 ~ 6.0,
           DE_pct > 62 & DE_pct < 70 & NDF_pct > 37 ~ 6.3,
           DE_pct <= 62 ~ 6.5,
           TRUE ~ 6.5
         ),
-        animal_type == "cattle" ~ dplyr::case_when(
+        tolower(animal_type) == "cattle" ~ dplyr::case_when(
           DE_pct >= 75 ~ 3.0,
           DE_pct >= 72 ~ 4.0,
           DE_pct > 62 & DE_pct < 72 ~ 6.3,
@@ -91,9 +91,9 @@ calculate_emissions_enteric <- function(automatic_cycle = FALSE, saveoutput = TR
       EF_kgheadyear = dplyr::case_when(
         # [IPCC 2019 Refinement, Vol 4, Ch 10, Table 10.10 + Eq. 10.19] Swine Tier 1,
         # high productivity systems (kg CH4/head/year)
-        animal_type == "swine" ~ 1.5,
+        tolower(animal_type) == "swine" ~ 1.5,
         # Ruminants Tier 2 energy balance
-        animal_type %in% c("cattle", "sheep", "goat") ~ (GE_MJday * (Ym_pct / 100) * 365) / 55.65,
+        tolower(animal_type) %in% c("cattle", "sheep", "goat") ~ (GE_MJday * (Ym_pct / 100) * 365) / 55.65,
         # Poultry and non-producing categories: negligible enteric emissions
         TRUE ~ 0
       ),

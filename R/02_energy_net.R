@@ -20,11 +20,19 @@ calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data",
   message("Calculating Net Energy for Maintenance (NEm)...")
 
   # --- 1. Data Loading from user_data ---
-  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"))
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
   if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
 
   if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
+
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEm_MJday = numeric()
+    ))
+  }
 
   # --- 2. Calculation Pipeline ---
   results <- weights %>%
@@ -40,7 +48,7 @@ calculate_NEm <- function(saveoutput = TRUE, data_dir = "user_data",
       by = "cfi_tag"
     ) %>%
     dplyr::mutate(
-      across(c(initial_weight_kg, final_weight_kg, cfi_value), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      dplyr::across(c(initial_weight_kg, final_weight_kg, cfi_value), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       NEm_MJday = cfi_value * (((initial_weight_kg + final_weight_kg) / 2)^0.75)
     ) %>%
     dplyr::select(farm_id, region, subregion, animal_tag, animal_type, animal_subtype, NEm_MJday)
@@ -71,9 +79,16 @@ calculate_NEa <- function(saveoutput = TRUE, data_dir = "user_data", nem_df = NU
   message("Calculating Net Energy for Activity (NEa)...")
 
   # --- 1. Data Loading ---
-  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(weights)) weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"))
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
   if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEa_MJday = numeric()
+    ))
+  }
   if (is.null(nem_df)) {
     nem_df <- calculate_NEm(
       saveoutput = FALSE, data_dir = data_dir,
@@ -136,21 +151,19 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data",
 
   # --- 1. Data Loading (Robust reading) ---
   if (is.null(weights)) {
-    weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"),
-      col_types = readr::cols(farm_id = "c", subregion = "c"),
-      show_col_types = FALSE
-    )
+    weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"))
   } else {
-    weights <- dplyr::mutate(weights, dplyr::across(dplyr::any_of(c("farm_id", "subregion")), as.character))
+    weights <- dplyr::mutate(weights, dplyr::across(dplyr::any_of(c("farm_id", "region", "subregion", "animal_tag")), as.character))
   }
 
   if (is.null(categories)) {
-    categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"),
-      col_types = readr::cols(farm_id = "c", subregion = "c", c = "c", a = "c", b = "c"),
-      show_col_types = FALSE
+    categories <- herdr_read_input_csv(
+      file.path(data_dir, "ruminant_definitions.csv"),
+      optional = TRUE,
+      extra_char_cols = c("c", "a", "b")
     )
   } else {
-    categories <- dplyr::mutate(categories, dplyr::across(dplyr::any_of(c("farm_id", "subregion", "c", "a", "b")), as.character))
+    categories <- dplyr::mutate(categories, dplyr::across(dplyr::any_of(c("farm_id", "region", "subregion", "animal_tag", "c", "a", "b")), as.character))
   }
 
   if (is.null(coefficients)) {
@@ -160,6 +173,14 @@ calculate_NEg <- function(saveoutput = TRUE, data_dir = "user_data",
     )
   } else {
     coefficients <- dplyr::mutate(coefficients, dplyr::across(dplyr::any_of("description"), as.character))
+  }
+
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEg_MJday = numeric()
+    ))
   }
 
   if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
@@ -223,8 +244,15 @@ calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data", categories 
   message("Calculating Net Energy for Lactation (NEl)...")
 
   # --- 1. Data Loading from user_data ---
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
+  if (is.null(weights)) weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"))
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEl_MJday = numeric()
+    ))
+  }
   weights_keys <- weights %>%
     dplyr::select(farm_id, region, subregion, animal_tag) %>%
     dplyr::distinct()
@@ -233,7 +261,7 @@ calculate_NEl <- function(saveoutput = TRUE, data_dir = "user_data", categories 
   results <- categories %>%
     dplyr::inner_join(weights_keys, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
     dplyr::mutate(
-      across(c(milk_yield_kg_year, fat_content_pct), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      dplyr::across(c(milk_yield_kg_year, fat_content_pct), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       Milk_yield_kg_day = milk_yield_kg_year / 365,
       NEl_MJday = dplyr::case_when(
         tolower(animal_type) == "cattle" ~ Milk_yield_kg_day * (1.47 + 0.4 * fat_content_pct),
@@ -270,9 +298,16 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
   message("Calculating Net Energy for Work (NE_work)...")
 
   # --- 1. Data Loading from user_data ---
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEwork_MJday = numeric()
+    ))
+  }
 
-  if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
+  if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir, categories = categories)
 
   # --- 2. Calculation Pipeline ---
   results <- nem_df %>%
@@ -282,7 +317,7 @@ calculate_NE_work <- function(saveoutput = TRUE, data_dir = "user_data", nem_df 
       by = c("farm_id", "animal_tag", "region", "subregion")
     ) %>%
     dplyr::mutate(
-      across(c(work_hours, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
+      dplyr::across(c(work_hours, NEm_MJday), ~ tidyr::replace_na(suppressWarnings(as.numeric(.)), 0)),
       NEwork_MJday = 0.10 * work_hours * NEm_MJday
     ) %>%
     # --- 3. Final Selection and Cleanup ---
@@ -317,8 +352,15 @@ calculate_NE_wool <- function(saveoutput = TRUE, data_dir = "user_data", categor
   message("Calculating Net Energy for Wool (NE_wool)...")
 
   # --- 1. Data Loading from user_data ---
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  if (is.null(weights)) weights <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
+  if (is.null(weights)) weights <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"))
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEwool_MJday = numeric()
+    ))
+  }
   weights_keys <- weights %>%
     dplyr::select(farm_id, region, subregion, animal_tag) %>%
     dplyr::distinct()
@@ -359,12 +401,25 @@ calculate_NE_pregnancy <- function(saveoutput = TRUE, data_dir = "user_data", ne
   message("Calculating Net Energy for Pregnancy (NE_pregnancy)...")
 
   # --- 1. Data Loading ---
-  if (is.null(categories)) categories <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
+  if (is.null(categories)) categories <- herdr_read_input_csv(file.path(data_dir, "ruminant_definitions.csv"), optional = TRUE)
   if (is.null(coefficients)) coefficients <- readr::read_csv(file.path(data_dir, "ipcc_coefficients.csv"), show_col_types = FALSE)
+
+  if (nrow(categories) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      NEpregnancy_MJday = numeric()
+    ))
+  }
 
   if (isTRUE(validate)) herdr_validate_ruminant_coefficients(categories, coefficients)
 
-  if (is.null(nem_df)) nem_df <- calculate_NEm(saveoutput = FALSE, data_dir = data_dir)
+  if (is.null(nem_df)) {
+    nem_df <- calculate_NEm(
+      saveoutput = FALSE, data_dir = data_dir,
+      categories = categories, coefficients = coefficients, validate = FALSE
+    )
+  }
 
   c_preg_col <- intersect(c("c_pregnancy_cattle", "c_pregnancy"), names(categories))
   if (length(c_preg_col) == 0) {

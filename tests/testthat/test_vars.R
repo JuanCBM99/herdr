@@ -217,3 +217,51 @@ test_that("calculate_weighted_variable computes HDP_feed_pct accurately from dia
   expect_true(grepl("linseed_meal", diaas_warns, fixed = TRUE))
   expect_false(grepl("unused_template_diet_no_diaas", diaas_warns, fixed = TRUE))
 })
+
+test_that("calculate_weighted_variable preserves cohorts with optional NA region and feed_characteristics has valid GE", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  dir.create(file.path(temp_test_dir, "user_data"))
+  dairy_files <- list.files(system.file("Examples", "Level1_Spain_Dairy_Cattle_2015", package = "herdr"), full.names = TRUE)
+  if (length(dairy_files) == 0) {
+    dairy_files <- list.files("inst/Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE)
+  }
+  file.copy(dairy_files, file.path(temp_test_dir, "user_data"))
+
+  withr::with_dir(temp_test_dir, {
+    fc <- read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE)
+    expect_true(all(fc$GE_feed_kcal_kg >= 0, na.rm = TRUE))
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "urea"], 2530)
+    zero_check <- c(
+      "calcium_carbonate", "dolomitic_carbonate", "sodium_bicarbonate",
+      "sodium_carbonate", "iron_carbonate_ii_siderita", "cobalt_ii_carbonate",
+      "coated_granulated_cobalt_ii_carbonate", "potassium_carbonate",
+      "dicalcium_phosphate_dihydrated", "mg_oxide_calcined_magnesite",
+      "ammonium_chloride", "Vitamin/mineral_supplement"
+    )
+    expect_true(all(fc$GE_feed_kcal_kg[fc$ingredient %in% zero_check] == 0))
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "dl_methionine"], 5670)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "l_lysine_hcl"], 4810)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "l_triptophane"], 6530)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "formic_acid"], 1320)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "butiric_acid"], 5980)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "choline_chloride_75"], 0)
+    expect_equal(fc$GE_feed_kcal_kg[fc$ingredient == "sodium_butyrate"], 0)
+    expect_true("source_GE" %in% names(fc))
+    expect_false(any(is.na(fc$source_GE)))
+    expect_equal(fc$source_GE[fc$ingredient == "urea"], "INRAE-CIRAD-AFZ FeedTables")
+    expect_equal(fc$source_GE[fc$ingredient == "formic_acid"], "NIST / FEDNA (combustion enthalpy)")
+    expect_equal(fc$source_GE[fc$ingredient == "choline_chloride_75"], "Non-energetic additive (0)")
+    expect_equal(fc$source_GE[fc$ingredient == "corn"], "Ewan (1989)")
+
+    # Clear region across definitions -> cohort must NOT be dropped
+    rum <- read_csv("user_data/ruminant_definitions.csv", col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      mutate(region = NA_character_)
+    write_csv(rum, "user_data/ruminant_definitions.csv")
+
+    res <- suppressWarnings(calculate_weighted_variable(saveoutput = FALSE))
+    expect_equal(nrow(res), 1)
+    expect_equal(res$animal_tag, "mature_dairy_cattle")
+    expect_true(is.na(res$region))
+  })
+})

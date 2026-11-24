@@ -53,14 +53,14 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
       # --- 3. Compute Volatile Solids (VS) via Category-Specific Methods ---
       VS_kgday = dplyr::case_when(
         # Poultry: VS derived via DMI and the proportion of non-metabolizable organic matter
-        animal_type == "poultry" & GE_feed_kcal_kg > 0 ~
+        tolower(animal_type) == "poultry" & GE_feed_kcal_kg > 0 ~
           (DMI_kgday * (1 - (poultry_ME_kcal_kg / GE_feed_kcal_kg)) * (1 - (ASH_pct / 100))),
-        animal_type == "poultry" & GE_feed_kcal_kg <= 0 ~ 0,
+        tolower(animal_type) == "poultry" & GE_feed_kcal_kg <= 0 ~ 0,
 
         # Swine: VS derived via DMI, accounting for Digestible Energy and a 2% urinary loss adjustment
-        animal_type == "swine" & GE_feed_kcal_kg > 0 ~
+        tolower(animal_type) == "swine" & GE_feed_kcal_kg > 0 ~
           (DMI_kgday * (1 - (swine_DE_eff / GE_feed_kcal_kg) + 0.02) * (1 - (ASH_pct / 100))),
-        animal_type == "swine" & GE_feed_kcal_kg <= 0 ~ 0,
+        tolower(animal_type) == "swine" & GE_feed_kcal_kg <= 0 ~ 0,
 
         # Ruminants (Default): IPCC Tier 2 Formula
         # Converts remaining energy (fecal + urinary loss) into mass using the 18.45 MJ/kg DM conversion factor
@@ -69,7 +69,7 @@ calculate_vs <- function(urinary_energy = 0.04, saveoutput = TRUE, data_dir = "u
       VS_kgday = pmax(0, VS_kgday)
     )
 
-  if (any(results$animal_type == "swine" & results$GE_feed_kcal_kg > 0 & results$swine_DE_eff <= 0, na.rm = TRUE)) {
+  if (any(tolower(results$animal_type) == "swine" & results$GE_feed_kcal_kg > 0 & results$swine_DE_eff <= 0, na.rm = TRUE)) {
     warning("[herdr] Missing both swine_DE_kcal_kg and swine_ME_kcal_kg for swine diet(s); VS calculation may overestimate fecal energy.", call. = FALSE)
   }
 

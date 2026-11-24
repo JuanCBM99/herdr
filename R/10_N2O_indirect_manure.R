@@ -26,8 +26,15 @@ herdr_calculate_N2O_indirect <- function(mode = c("volatilization", "leaching"),
 
   if (has_prejoined) {
     base_df <- direct_N2O_df %>%
-      dplyr::select(dplyr::all_of(prejoined_cols)) %>%
-      dplyr::distinct()
+      dplyr::select(dplyr::all_of(prejoined_cols))
+    if (!is.null(pop_df)) {
+      base_df <- base_df %>%
+        dplyr::select(-population) %>%
+        dplyr::left_join(
+          pop_df %>% dplyr::select(dplyr::all_of(join_keys), population),
+          by = join_keys
+        )
+    }
   } else {
     user_manure <- herdr_read_manure_table(file.path(data_dir, "manure_management.csv"))
 

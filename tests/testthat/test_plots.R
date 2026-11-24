@@ -349,5 +349,57 @@ test_that("plot_herdr_results generates dynamic plots from calculated pipeline o
   exp_epcr <- (1.10 * (31000 * 1.15) + 0.80 * (63000 * 1.15)) / ((31000 + 63000) * 1.15)
   epcr_val <- p_fcr_diaas$data$value[p_fcr_diaas$data$metric_raw == "epcr_diaas"]
   expect_equal(epcr_val, exp_epcr, tolerance = 1e-6)
+
+  # 20. Primary-product selection in functional_unit = "product" respects animal_subtype
+  #     (layers use eggs, not cull meat; multi-cohort dairy uses milk only, without mixing milk + meat)
+  prod_sub_df <- tibble::tibble(
+    animal_tag = c("laying_hens", "mature_dairy_cattle", "dairy_calves"),
+    animal_subtype = c("layer", "dairy", "dairy"),
+    region = c("spain", "spain", "spain"),
+    CH4_enteric_Gg = c(0, 1.0, 0.2),
+    CH4_manure_Gg = c(0.1, 0.2, 0.05),
+    N2O_direct_Gg = c(0.01, 0.02, 0.005),
+    N2O_vol_Gg = c(0.005, 0.01, 0.002),
+    N2O_lea_Gg = c(0.002, 0.005, 0.001),
+    Land_m2 = c(1000000, 4000000, 1000000),
+    milk_FPCM_kg = c(0, 5000000, 0),
+    meat_carcass_weight_kg = c(50000, 100000, 80000),
+    egg_fresh_kg = c(500000, 0, 0)
+  )
+  p_prod_sub <- plot_herdr_results(
+    prod_sub_df,
+    group_cols = "animal_subtype",
+    func_name = "generate_impact_assessment",
+    functional_unit = "product"
+  )
+  expect_s3_class(p_prod_sub, "ggplot")
+  layer_land <- p_prod_sub$data %>%
+    dplyr::filter(as.character(plot_label) == "layer", grepl("Land", as.character(panel))) %>%
+    dplyr::pull(value)
+  # 1,000,000 m2 / 500,000 kg eggs = 2.0 m2/kg (NOT 1,000,000 / 50,000 cull meat = 20.0)
+  expect_equal(sum(layer_land), 2.0, tolerance = 1e-6)
+  dairy_land <- p_prod_sub$data %>%
+    dplyr::filter(as.character(plot_label) == "dairy", grepl("Land", as.character(panel))) %>%
+    dplyr::pull(value)
+  # Dairy uses milk_FPCM_kg (5,000,000 kg) with biophysical milk allocation (< 1.0 due to beef co-product)
+  nel_d <- herdr:::herdr_energy_coef$milk_other * 5000000
+  neg_d <- herdr:::herdr_energy_coef$meat_cull * (180000 / 0.54)
+  exp_dairy_land <- (nel_d / (nel_d + neg_d)) * (5000000 / 5000000)
+  expect_equal(sum(dairy_land), exp_dairy_land, tolerance = 1e-4)
+
+  # 21. Aggregation regex: sum CO2eq_cradle_to_farm_Gg & feed_dmi_kg_year; mean N_excreted_kgheadyear & DMI_kgday
+  agg_regex_df <- data.frame(
+    animal_tag = c("cow_a", "cow_a"),
+    region = c("spain", "spain"),
+    CO2eq_cradle_to_farm_Gg = c(2.0, 3.0),
+    feed_dmi_kg_year = c(1000, 2000),
+    N_excreted_kgheadyear = c(100, 140),
+    DMI_kgday = c(18, 22)
+  )
+  p_agg_reg <- plot_herdr_results(agg_regex_df, group_cols = "animal_tag", func_name = "calculate_DMI")
+  expect_equal(p_agg_reg$data$CO2eq_cradle_to_farm_Gg, 5.0)
+  expect_equal(p_agg_reg$data$feed_dmi_kg_year, 3000)
+  expect_equal(p_agg_reg$data$N_excreted_kgheadyear, 120)
+  expect_equal(p_agg_reg$data$DMI_kgday, 20)
 })
 

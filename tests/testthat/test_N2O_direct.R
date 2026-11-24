@@ -120,5 +120,55 @@ test_that("herdr_validate_manure_coverage stops when a populated cohort has no m
   # Fully covered herd passes silently
   manure_full <- rbind(manure, transform(manure, animal_tag = "beef_cows"))
   expect_true(herdr:::herdr_validate_manure_coverage(pop, manure_full))
+
+  # Blank system_base must NOT count as covered
+  manure_blank <- rbind(manure, data.frame(region = "R1", subregion = "S1", animal_tag = "beef_cows", system_base = "   ", stringsAsFactors = FALSE))
+  expect_error(
+    herdr:::herdr_validate_manure_coverage(pop, manure_blank),
+    "beef_cows"
+  )
+
+  # Negative manure allocation must be rejected even if rows sum to 1.0
+  alloc_neg <- data.frame(
+    farm_id = "f1", region = "R1", subregion = "S1",
+    animal_tag = c("dairy_cows", "dairy_cows"),
+    system_base = c("Lagoon", "Solid storage"),
+    allocation = c(1.2, -0.2),
+    stringsAsFactors = FALSE
+  )
+  expect_error(
+    herdr:::herdr_validate_manure_allocation(alloc_neg),
+    "Negative manure allocation"
+  )
+})
+
+test_that("calculate_N2O_direct_manure ignores biological imbalance on zero-population cohorts", {
+  temp_test_dir <- tempfile()
+  dir.create(temp_test_dir)
+  dir.create(file.path(temp_test_dir, "user_data"))
+  dairy_files <- list.files(system.file("Examples", "Level1_Spain_Dairy_Cattle_2015", package = "herdr"), full.names = TRUE)
+  if (length(dairy_files) == 0) {
+    dairy_files <- list.files("inst/Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE)
+  }
+  file.copy(dairy_files, file.path(temp_test_dir, "user_data"))
+
+  withr::with_dir(temp_test_dir, {
+    # Set population to 0 and extreme milk yield -> should NOT abort
+    census <- read_csv("user_data/livestock_census.csv", show_col_types = FALSE) %>%
+      mutate(population = 0)
+    write_csv(census, "user_data/livestock_census.csv")
+
+    rum <- read_csv("user_data/ruminant_definitions.csv", show_col_types = FALSE) %>%
+      mutate(milk_yield_kg_year = 250000)
+    write_csv(rum, "user_data/ruminant_definitions.csv")
+
+    feed <- read_csv("user_data/feed_characteristics.csv", show_col_types = FALSE) %>%
+      mutate(CP_pct = 0.1)
+    write_csv(feed, "user_data/feed_characteristics.csv")
+
+    res <- suppressWarnings(calculate_N2O_direct_manure(automatic_cycle = FALSE, saveoutput = FALSE))
+    expect_s3_class(res, "data.frame")
+    expect_true(all(res$direct_N2O_kgyear == 0))
+  })
 })
 

@@ -18,11 +18,20 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
   message("Calculating Weighted Nutritional Variables...")
 
   # --- 1. Load Data Assets ---
-  diets <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
-  ingredients <- readr::read_csv(file.path(data_dir, "diet_ingredients.csv"), show_col_types = FALSE)
+  diets <- herdr_read_input_csv(file.path(data_dir, "diet_profiles.csv"))
+  ingredients <- herdr_read_input_csv(file.path(data_dir, "diet_ingredients.csv"))
   characteristics <- readr::read_csv(file.path(data_dir, "feed_characteristics.csv"), show_col_types = FALSE)
-  definitions <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  monogastric <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
+  def_empty_cols <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype", "diet_tag")
+  definitions <- herdr_read_input_csv(
+    file.path(data_dir, "ruminant_definitions.csv"),
+    optional = TRUE,
+    empty_cols = def_empty_cols
+  )
+  monogastric <- herdr_read_input_csv(
+    file.path(data_dir, "monogastric_definitions.csv"),
+    optional = TRUE,
+    empty_cols = def_empty_cols
+  )
 
   mapping_path <- file.path(data_dir, "mapping.csv")
   if (file.exists(mapping_path)) {
@@ -113,21 +122,22 @@ calculate_weighted_variable <- function(saveoutput = TRUE, data_dir = "user_data
     )
 
   # --- 4. Consolidate Ruminant and Monogastric Mappings ---
+  normalize_repl <- function(df) {
+    if ("replacement_rate" %in% names(df)) {
+      df$replacement_rate <- suppressWarnings(as.numeric(as.character(df$replacement_rate)))
+    }
+    df
+  }
   unified_definitions <- dplyr::bind_rows(
-    definitions %>%
-      dplyr::mutate(
-        replacement_rate = as.numeric(as.character(replacement_rate))
-      ),
-    monogastric %>%
-      dplyr::mutate(
-        replacement_rate = as.numeric(as.character(replacement_rate))
-      )
+    normalize_repl(definitions),
+    normalize_repl(monogastric)
   )
 
+  # `region` is optional; filter only completely blank rows lacking `animal_tag`
   full_data <- unified_definitions %>%
     dplyr::select(farm_id, region, subregion, animal_tag, animal_type, animal_subtype, diet_tag, dplyr::any_of("production_role")) %>%
-    dplyr::left_join(diet_profiles, by = diet_join_keys) %>%
-    dplyr::filter(!is.na(region))
+    dplyr::filter(!is.na(animal_tag) & nzchar(trimws(as.character(animal_tag)))) %>%
+    dplyr::left_join(diet_profiles, by = diet_join_keys)
 
   if (!"production_role" %in% names(full_data)) {
     full_data$production_role <- NA_character_

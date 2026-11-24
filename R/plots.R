@@ -90,17 +90,38 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
     e_kg <- if ("egg_fresh_kg" %in% names(df)) tidyr::replace_na(df$egg_fresh_kg, 0) else rep(0, nrow(df))
     w_kg <- if ("wool_kg" %in% names(df)) tidyr::replace_na(df$wool_kg, 0) else rep(0, nrow(df))
 
+    sub_lc <- if ("animal_subtype" %in% names(df)) tolower(trimws(as.character(df$animal_subtype))) else rep(NA_character_, nrow(df))
+    pick_primary <- function(milk_v, meat_v, egg_v, wool_v) {
+      dplyr::case_when(
+        sub_lc == "dairy" ~ milk_v,
+        sub_lc == "layer" ~ egg_v,
+        sub_lc == "meat"  ~ meat_v,
+        TRUE              ~ dplyr::coalesce(milk_v, egg_v, meat_v, wool_v)
+      )
+    }
+
     df <- df %>%
       dplyr::mutate(
-        GHG_intensity_product = dplyr::coalesce(GHG_intensity_milk, GHG_intensity_meat, GHG_intensity_egg, GHG_intensity_wool),
-        GHG_cradle_to_farm_product = dplyr::coalesce(GHG_cradle_to_farm_milk, GHG_cradle_to_farm_meat, GHG_cradle_to_farm_egg, GHG_cradle_to_farm_wool),
-        Land_intensity_product = if ("Land_intensity_milk" %in% names(df)) dplyr::coalesce(Land_intensity_milk, Land_intensity_meat, Land_intensity_egg, Land_intensity_wool) else NA_real_,
-        Water_intensity_product = if ("Water_intensity_milk" %in% names(df)) dplyr::coalesce(Water_intensity_milk, Water_intensity_meat, Water_intensity_egg, Water_intensity_wool) else NA_real_
+        GHG_intensity_product = pick_primary(GHG_intensity_milk, GHG_intensity_meat, GHG_intensity_egg, GHG_intensity_wool),
+        GHG_cradle_to_farm_product = pick_primary(GHG_cradle_to_farm_milk, GHG_cradle_to_farm_meat, GHG_cradle_to_farm_egg, GHG_cradle_to_farm_wool),
+        Land_intensity_product = if ("Land_intensity_milk" %in% names(df)) {
+          pick_primary(Land_intensity_milk, Land_intensity_meat, Land_intensity_egg, Land_intensity_wool)
+        } else {
+          NA_real_
+        },
+        Water_intensity_product = if ("Water_intensity_milk" %in% names(df)) {
+          pick_primary(Water_intensity_milk, Water_intensity_meat, Water_intensity_egg, Water_intensity_wool)
+        } else {
+          NA_real_
+        }
       )
     df$product_weight_kg <- dplyr::case_when(
+      sub_lc == "dairy" & !is.na(df$GHG_intensity_milk) & m_kg > 0 ~ m_kg,
+      sub_lc == "layer" & !is.na(df$GHG_intensity_egg)  & e_kg > 0 ~ e_kg,
+      sub_lc == "meat"  & !is.na(df$GHG_intensity_meat) & c_kg > 0 ~ c_kg,
       !is.na(df$GHG_intensity_milk) & m_kg > 0 ~ m_kg,
-      !is.na(df$GHG_intensity_meat) & c_kg > 0 ~ c_kg,
       !is.na(df$GHG_intensity_egg)  & e_kg > 0 ~ e_kg,
+      !is.na(df$GHG_intensity_meat) & c_kg > 0 ~ c_kg,
       !is.na(df$GHG_intensity_wool) & w_kg > 0 ~ w_kg,
       TRUE ~ m_kg + c_kg + e_kg + w_kg
     )
@@ -209,7 +230,7 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
               rep(1, length(x))
             }
             wmean_safe(x, w_sh)
-          } else if (grepl("pct|ef|factor|intensity|cradle_to_farm|rate|dmi|_head|_mjday|_kcal|_kgday|^rem$|^reg$|^adg_gday$|^cfi_maintenance$", col_name, ignore.case = TRUE)) {
+          } else if (grepl("pct|ef|factor|intensity|^ghg_cradle_to_farm_|rate|^dmi_kgday$|^dmi_bw_pct$|_head|kghead|_mjday|_kcal|_kgday|^rem$|^reg$|^adg_gday$|^cfi_maintenance$", col_name, ignore.case = TRUE)) {
             w_pop <- if ("population" %in% names(cur_grp)) cur_grp$population else rep(1, length(x))
             wmean_safe(x, w_pop)
           } else {
@@ -667,16 +688,16 @@ plot_herdr_results <- function(df, group_cols = c("farm_id", "animal_tag", "regi
         prod_yield <- dplyr::case_when(
           is_non_milking_dairy ~ 0,
           milk_kg > 0 ~ milk_kg,
-          meat_kg > 0 ~ meat_kg,
           egg_kg > 0 ~ egg_kg,
+          meat_kg > 0 ~ meat_kg,
           wool_kg > 0 & af_wool_calc > 0 ~ wool_kg,
           TRUE ~ 0
         )
         af <- dplyr::case_when(
           is_non_milking_dairy ~ 0,
           milk_kg > 0 ~ af_milk_calc,
-          meat_kg > 0 ~ af_meat_calc,
           egg_kg > 0 ~ af_egg_calc,
+          meat_kg > 0 ~ af_meat_calc,
           wool_kg > 0 & af_wool_calc > 0 ~ af_wool_calc,
           TRUE ~ 0
         )

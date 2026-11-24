@@ -22,11 +22,27 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
   message("Calculating direct N2O emissions from manure...")
 
   # --- 1. Data Loading ---
-  cat_csv <- readr::read_csv(file.path(data_dir, "ruminant_definitions.csv"), show_col_types = FALSE)
-  weights_csv <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  cat_csv <- herdr_read_input_csv(
+    file.path(data_dir, "ruminant_definitions.csv"),
+    optional = TRUE,
+    empty_cols = c("farm_id", "region", "subregion", "animal_tag", "milk_yield_kg_year", "fat_content_pct", "protein_content_pct")
+  )
+  weights_csv <- herdr_read_input_csv(
+    file.path(data_dir, "livestock_weights.csv"),
+    optional = TRUE,
+    empty_cols = c("farm_id", "region", "subregion", "animal_tag", "initial_weight_kg", "final_weight_kg", "productive_period_days")
+  )
   user_manure <- herdr_read_manure_table(file.path(data_dir, "manure_management.csv"))
   ipcc_master <- herdr_read_manure_table(file.path(data_dir, "ipcc_mm.csv"))
-  mono_csv <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
+  mono_csv <- herdr_read_input_csv(
+    file.path(data_dir, "monogastric_definitions.csv"),
+    optional = TRUE,
+    empty_cols = c(
+      "farm_id", "region", "subregion", "animal_tag",
+      "eggs_per_year", "egg_weight_g", "sows_gestation_days", "sows_lactation_days",
+      "piglets_born", "piglets_suckling", "piglet_birth_weight_kg", "piglet_weaning_weight_kg"
+    )
+  )
 
   # Calculate daily egg mass internally for IPCC N retention: (eggs_per_year / 365) * egg_weight_g
   mono_csv$egg_mass_g_day <- herdr_calc_egg_mass_g_day(mono_csv)
@@ -157,7 +173,7 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
       # [IPCC 2019] Sow body weight change from parturition to parturition (Skg)
       ipcc_swine_Skg = dplyr::if_else(
-        animal_type == "swine" & piglets_born > 0,
+        tolower(animal_type) == "swine" & piglets_born > 0,
         ((piglets_born * piglet_birth_weight_kg) / 0.806),
         0
       ),
@@ -167,14 +183,14 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
 
       # [IPCC 2019] Eq 10.33b: Exported nitrogen content inside weaned piglets annual pool (kg N/animal/year)
       ipcc_swine_N_weaned_piglets = dplyr::if_else(
-        animal_type == "swine" & piglets_suckling > 0,
-        (0.025 * piglets_suckling * ipcc_swine_fr * ((piglet_weaning_weight_kg - piglet_birth_weight_kg)) / 0.98),
+        tolower(animal_type) == "swine" & piglets_suckling > 0,
+        (0.025 * piglets_suckling * ipcc_swine_fr * pmax(0, piglet_weaning_weight_kg - piglet_birth_weight_kg) / 0.98),
         0
       ),
 
       # Daily Nitrogen Feed Intake (kg N / animal / day)
       N_intake_kgheadday = dplyr::if_else(
-        animal_type %in% c("poultry", "swine"),
+        tolower(animal_type) %in% c("poultry", "swine"),
         DMI_kgday * (CP_pct / 100 / 6.25),
         (GE_MJday / 18.45) * (CP_pct / 100 / 6.25)
       ),
@@ -182,26 +198,26 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
       # --- Unified Daily Nitrogen Retention Switch (kg N / animal / day) ---
       N_retention_kg_day = dplyr::case_when(
         # Poultry lifecycle retention rate (Layers)
-        animal_type == "poultry" & egg_mass_g_day > 0 ~
+        tolower(animal_type) == "poultry" & egg_mass_g_day > 0 ~
           (0.028 * pmax(0, daily_gain)) + ((0.0185 * egg_mass_g_day) / 1000),
 
         # Poultry lifecycle retention rate (Pullets and Broilers)
-        animal_type == "poultry" & productive_period_days > 0 ~
+        tolower(animal_type) == "poultry" & productive_period_days > 0 ~
           (pmax(0, final_weight_kg - initial_weight_kg) * 0.028) / productive_period_days,
 
         # Small Ruminants baseline retention rate (IPCC 2019 Table 10.20 Option 1: 10% of N intake)
-        animal_type %in% c("sheep", "goat") ~ 0.10 * N_intake_kgheadday,
+        tolower(animal_type) %in% c("sheep", "goat") ~ 0.10 * N_intake_kgheadday,
 
         # IPCC 2019 SWINE Scenario 1: Active Reproductora Mothers (Switch activated by gestation/lactation days)
-        animal_type == "swine" & (sows_gestation_days > 0 | sows_lactation_days > 0) ~
+        tolower(animal_type) == "swine" & (sows_gestation_days > 0 | sows_lactation_days > 0) ~
           (ipcc_swine_N_gain_sow + ipcc_swine_N_weaned_piglets) / 365,
 
         # IPCC 2019 SWINE Scenario 2: Standard Growing Animals (Switch activated when lifecycle phase days are 0)
-        animal_type == "swine" & productive_period_days > 0 & sows_gestation_days == 0 & sows_lactation_days == 0 ~
+        tolower(animal_type) == "swine" & productive_period_days > 0 & sows_gestation_days == 0 & sows_lactation_days == 0 ~
           (pmax(0, final_weight_kg - initial_weight_kg) * ipcc_swine_n_gain_factor) / productive_period_days,
 
         # Cattle: milk protein retention + tissue growth retention (IPCC 2019 Eq. 10.33)
-        animal_type == "cattle" ~
+        tolower(animal_type) == "cattle" ~
           dplyr::if_else(daily_milk > 0, (daily_milk * (milk_protein / 100)) / 6.38, 0) +
           dplyr::if_else(
             daily_gain > 0 & NEg_MJday > 0,
@@ -220,8 +236,9 @@ calculate_N2O_direct_manure <- function(automatic_cycle = FALSE, saveoutput = TR
     )
 
   # Physical mass conservation check: Nitrogen retention cannot exceed Nitrogen intake
+  # Only evaluate active cohorts (population > 0) so inactive template rows do not abort a run.
   imbalanced_n <- results %>%
-    dplyr::filter(N_retention_kg_day > N_intake_kgheadday + 1e-4)
+    dplyr::filter(population > 0, N_retention_kg_day > N_intake_kgheadday + 1e-4)
 
   if (nrow(imbalanced_n) > 0) {
     details <- paste0(

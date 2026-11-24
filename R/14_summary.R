@@ -357,7 +357,7 @@ build_totals_table <- function(cohort_df, group_by_identification = TRUE) {
 # - milk_goat:  3.0 MJ/kg fresh milk at 3.8% fat (IPCC 2019 Refinement, Vol 4, Ch 10; AFRC 1998)
 # - meat_cull:  15.0 MJ/kg live weight for culled mature breeding animals (IDF Bulletin 520/2022)
 # - meat_young: 11.0 MJ/kg live weight for slaughter cohorts & bred heifers (IDF Bulletin 520/2022)
-# - wool:       24.0 MJ/kg greasy wool before scouring (IPCC 2019 Refinement, Vol 4, Ch 10, Eq. 10.20; AFRC 1995)
+# - wool:       24.0 MJ/kg greasy wool before scouring (IPCC 2019 Refinement, Vol 4, Ch 10, Eq. 10.12; AFRC 1995)
 # - egg:        6.0 MJ/kg fresh eggs (FAO LEAP Poultry Guidelines / GLEAM v3.0 default)
 herdr_energy_coef <- list(
   milk_sheep = 4.6,
@@ -378,6 +378,29 @@ herdr_empty_intensity <- c(
 #' Build Table 2: Enterprise-allocated product intensities and Protein FCR per cohort.
 #' @noRd
 build_intensities_table <- function(cohort_df) {
+  if (nrow(cohort_df) == 0) {
+    return(tibble::tibble(
+      farm_id = character(), region = character(), subregion = character(),
+      animal_tag = character(), animal_type = character(), animal_subtype = character(),
+      production_role = character(), population = numeric(),
+      milk_FPCM_kg = numeric(), meat_carcass_weight_kg = numeric(),
+      egg_fresh_kg = numeric(), wool_kg = numeric(),
+      total_protein_kg = numeric(), total_HDP_kg = numeric(),
+      GHG_intensity_milk = numeric(), GHG_cradle_to_farm_milk = numeric(),
+      Land_intensity_milk = numeric(), Water_intensity_milk = numeric(),
+      GHG_intensity_meat = numeric(), GHG_cradle_to_farm_meat = numeric(),
+      Land_intensity_meat = numeric(), Water_intensity_meat = numeric(),
+      GHG_intensity_egg = numeric(), GHG_cradle_to_farm_egg = numeric(),
+      Land_intensity_egg = numeric(), Water_intensity_egg = numeric(),
+      GHG_intensity_wool = numeric(), GHG_cradle_to_farm_wool = numeric(),
+      Land_intensity_wool = numeric(), Water_intensity_wool = numeric(),
+      GHG_intensity_protein = numeric(), GHG_cradle_to_farm_protein = numeric(),
+      Land_intensity_protein = numeric(), Water_intensity_protein = numeric(),
+      Protein_FCR_total = numeric(), Protein_FCR_human_edible = numeric(),
+      EPCR_DIAAS = numeric(), PQR = numeric()
+    ))
+  }
+
   cohort_df %>%
     dplyr::mutate(.orig_row_id = dplyr::row_number()) %>%
     dplyr::group_by(farm_id, region, subregion, animal_type, animal_subtype) %>%
@@ -550,6 +573,7 @@ build_enterprise_intensities <- function(df_enterprise, animal_type) {
 #'   (sum to 1) and af_protein (= 1 - af_wool).
 #' @noRd
 calc_biophysical_af <- function(cur_type, enterprise) {
+  cur_type <- tolower(trimws(as.character(cur_type)))
   coef <- herdr_energy_coef
   e_milk_coef <- dplyr::case_when(
     cur_type == "sheep" ~ coef$milk_sheep,
@@ -650,7 +674,7 @@ load_production_roles <- function(data_dir) {
   for (def_file in c("ruminant_definitions.csv", "monogastric_definitions.csv")) {
     def_path <- file.path(data_dir, def_file)
     if (!file.exists(def_path)) next
-    def_df <- suppressMessages(readr::read_csv(def_path, show_col_types = FALSE))
+    def_df <- suppressMessages(herdr_read_input_csv(def_path))
     if ("production_role" %in% names(def_df)) {
       roles_list[[length(roles_list) + 1]] <- dplyr::select(def_df, dplyr::all_of(role_cols))
     }

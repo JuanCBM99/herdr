@@ -400,3 +400,69 @@ test_that("Table 2 integrates mature dairy + replacement + slaughter calves into
     expect_equal(mat_row$Protein_FCR_human_edible, exp_dairy_fcr_he)
   })
 })
+
+test_that("generate_impact_assessment handles leading-zero IDs, NA region, 0-row filter, and single-species folders", {
+  # 1. Ruminant-only folder (no monogastric_definitions.csv), leading-zero numeric farm_id/subregion, NA region
+  rum_dir <- tempfile()
+  dir.create(rum_dir)
+  dir.create(file.path(rum_dir, "user_data"))
+  dairy_files <- list.files(system.file("Examples", "Level1_Spain_Dairy_Cattle_2015", package = "herdr"), full.names = TRUE)
+  if (length(dairy_files) == 0) {
+    dairy_files <- list.files("inst/Examples/Level1_Spain_Dairy_Cattle_2015", full.names = TRUE)
+  }
+  file.copy(dairy_files, file.path(rum_dir, "user_data"))
+  unlink(file.path(rum_dir, "user_data", "monogastric_definitions.csv"))
+
+  withr::with_dir(rum_dir, {
+    for (f in c("livestock_census.csv", "ruminant_definitions.csv", "livestock_weights.csv", "manure_management.csv")) {
+      p <- file.path("user_data", f)
+      df <- read_csv(p, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+        mutate(farm_id = "001", region = NA_character_, subregion = "08019")
+      write_csv(df, p)
+    }
+
+    res_rum <- suppressWarnings(
+      generate_impact_assessment(farm_country = "Spain", year = 2022, saveoutput = FALSE)
+    )
+    expect_equal(nrow(res_rum$totals), 1)
+    expect_equal(nrow(res_rum$intensities), 1)
+    expect_identical(res_rum$totals$farm_id, "001")
+    expect_identical(res_rum$totals$subregion, "08019")
+    expect_true(is.na(res_rum$totals$region))
+    expect_gt(res_rum$totals$CO2eq_Total_Gg, 0)
+    expect_gt(res_rum$intensities$GHG_intensity_milk, 0)
+
+    # 2. Filtering to nonexistent farm_id returns empty 0-row tibbles cleanly
+    res_empty <- suppressWarnings(
+      generate_impact_assessment(farm_id = "does_not_exist", farm_country = "Spain", year = 2022, saveoutput = FALSE)
+    )
+    expect_equal(nrow(res_empty$totals), 0)
+    expect_equal(nrow(res_empty$intensities), 0)
+    expect_true("GHG_intensity_milk" %in% names(res_empty$intensities))
+  })
+
+  # 3. Monogastric-only folder (no ruminant_definitions.csv)
+  mono_dir <- tempfile()
+  dir.create(mono_dir)
+  dir.create(file.path(mono_dir, "user_data"))
+  mono_files <- list.files(system.file("Examples", "Monogastric_Example", package = "herdr"), full.names = TRUE)
+  if (length(mono_files) == 0) {
+    mono_files <- list.files("inst/Examples/Monogastric_Example", full.names = TRUE)
+  }
+  file.copy(mono_files, file.path(mono_dir, "user_data"))
+  unlink(file.path(mono_dir, "user_data", "ruminant_definitions.csv"))
+
+  withr::with_dir(mono_dir, {
+    path_diet <- "user_data/diet_ingredients.csv"
+    df <- read_csv(path_diet, col_types = cols(.default = "c"), show_col_types = FALSE) %>%
+      mutate(country_of_origin = ifelse(is.na(country_of_origin) | !nzchar(country_of_origin), "Spain", country_of_origin))
+    write_csv(df, path_diet)
+
+    res_mono <- suppressWarnings(
+      generate_impact_assessment(farm_country = "Spain", year = 2022, saveoutput = FALSE)
+    )
+    expect_gt(nrow(res_mono$totals), 0)
+    expect_gt(nrow(res_mono$intensities), 0)
+    expect_true(all(res_mono$totals$animal_type %in% c("swine", "poultry")))
+  })
+})

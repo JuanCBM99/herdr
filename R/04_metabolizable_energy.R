@@ -16,19 +16,59 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
   message("Calculating Monogastric Metabolizable Energy (kcal/day)...")
 
   # 1. Read input data files
-  mono_csv <- readr::read_csv(file.path(data_dir, "monogastric_definitions.csv"), show_col_types = FALSE)
-  weights_csv <- readr::read_csv(file.path(data_dir, "livestock_weights.csv"), show_col_types = FALSE)
+  mono_csv <- herdr_read_input_csv(file.path(data_dir, "monogastric_definitions.csv"), optional = TRUE)
+  weights_csv <- herdr_read_input_csv(file.path(data_dir, "livestock_weights.csv"), optional = TRUE)
 
   # Platform standard joining keys
   join_keys <- c("farm_id", "region", "subregion", "animal_tag", "animal_type", "animal_subtype")
+
+  empty_me_result <- function() {
+    tibble::tibble(
+      farm_id = character(),
+      region = character(),
+      subregion = character(),
+      animal_tag = character(),
+      animal_type = character(),
+      animal_subtype = character(),
+      diet_tag = character(),
+      initial_weight_kg = numeric(),
+      final_weight_kg = numeric(),
+      productive_period_days = numeric(),
+      adg_gday = numeric(),
+      alpha = numeric(),
+      cfi_maintenance = numeric(),
+      ME_mant_kcal = numeric(),
+      ME_crec_kcal = numeric(),
+      ME_eggs_kcal = numeric(),
+      ME_gestation_kcal = numeric(),
+      ME_lactation_kcal = numeric(),
+      ME_total_kcal_day = numeric()
+    )
+  }
+
+  if (nrow(mono_csv) == 0) {
+    return(empty_me_result())
+  }
 
   # Calculate daily egg mass internally for bioenergetics: (eggs_per_year / 365) * egg_weight_g
   mono_csv$egg_mass_g_day <- herdr_calc_egg_mass_g_day(mono_csv)
 
   # 2. Join definition and weight files
-  master <- mono_csv %>%
-    dplyr::left_join(weights_csv, by = c("farm_id", "region", "subregion", "animal_tag")) %>%
-    dplyr::filter(animal_type %in% c("poultry", "swine"))
+  if (nrow(weights_csv) > 0) {
+    master <- mono_csv %>%
+      dplyr::left_join(weights_csv, by = c("farm_id", "region", "subregion", "animal_tag"))
+  } else {
+    master <- mono_csv
+  }
+  for (col in c("initial_weight_kg", "final_weight_kg", "productive_period_days")) {
+    if (!col %in% names(master)) master[[col]] <- NA_real_
+  }
+  master <- master %>%
+    dplyr::filter(tolower(animal_type) %in% c("poultry", "swine"))
+
+  if (nrow(master) == 0) {
+    return(empty_me_result())
+  }
 
   # 3. Process daily energy equations
   results <- master %>%
@@ -53,8 +93,8 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
       ),
       W_mean = (initial_weight_kg + final_weight_kg) / 2,
       W_metabolic = dplyr::case_when(
-        animal_type == "poultry" ~ W_mean^0.75,
-        animal_type == "swine" & alpha > 0 ~ W_mean^alpha,
+        tolower(animal_type) == "poultry" ~ W_mean^0.75,
+        tolower(animal_type) == "swine" & alpha > 0 ~ W_mean^alpha,
         TRUE ~ W_mean^0.75
       ),
       ME_maint_kcal_day = cfi_maintenance * W_metabolic,
@@ -98,9 +138,9 @@ calculate_monogastric_energy <- function(saveoutput = TRUE, data_dir = "user_dat
 
       # --- Additional requirements (Growth and eggs) ---
       ME_standard_growth_day = dplyr::case_when(
-        animal_type == "poultry" ~
+        tolower(animal_type) == "poultry" ~
           (13.4 * frac_fat_pct * adg_gday) + (12.0 * frac_protein_pct * adg_gday),
-        animal_type == "swine" & sows_gestation_days == 0 & sows_lactation_days == 0 ~
+        tolower(animal_type) == "swine" & sows_gestation_days == 0 & sows_lactation_days == 0 ~
           (12.8 * frac_fat_pct * adg_gday) + (12.1 * frac_protein_pct * adg_gday),
         TRUE ~ 0
       ),

@@ -193,6 +193,36 @@ test_that("calculate_population_poultry automatically models broilers from breed
   expect_equal(pullet_pop, 10000 * (140 / 365), tolerance = 1e-2)
 })
 
+test_that("calculate_population_poultry works standalone with definitions = NULL and handles multi-farm broilers per stratum", {
+  # 1. Standalone definitions = NULL preserves generated replacement pullets
+  census_solo <- tibble::tribble(
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_1", "laying_hens", "spain", NA_character_, 10000
+  )
+  rate_empty <- tibble::tibble(animal_tag = character(), parameter = character(), value = numeric())
+  res_solo <- calculate_population_poultry(census_solo, rate_empty, definitions = NULL)
+  expect_setequal(res_solo$animal_tag, c("laying_hens", "replacement_layer_pullets"))
+
+  # 2. Multi-farm: farm_A supplies manual broilers, farm_B has only breeder_meat_hens -> farm_B still auto-models broilers
+  census_multi <- tibble::tribble(
+    ~farm_id, ~animal_tag, ~region, ~subregion, ~population,
+    "farm_A", "breeder_meat_hens", "spain", NA_character_, 1000,
+    "farm_A", "broilers",          "spain", NA_character_, 5000,
+    "farm_B", "breeder_meat_hens", "spain", NA_character_, 2000
+  )
+  defs_multi <- tibble::tribble(
+    ~animal_tag, ~animal_type, ~animal_subtype,
+    "breeder_meat_hens", "poultry", "meat",
+    "replacement_meat_pullets", "poultry", "meat",
+    "broilers", "poultry", "meat"
+  )
+  res_multi <- calculate_population_poultry(census_multi, rate_empty, definitions = defs_multi)
+  broilers_A <- res_multi %>% filter(farm_id == "farm_A", animal_tag == "broilers") %>% pull(population)
+  broilers_B <- res_multi %>% filter(farm_id == "farm_B", animal_tag == "broilers") %>% pull(population)
+  expect_equal(broilers_A, 5000)
+  expect_gt(broilers_B, 0)
+})
+
 test_that("calculate_population_poultry uses default fallbacks for egg_weight_g and fertility_rate when omitted", {
   census <- tibble::tribble(
     ~farm_id, ~animal_tag, ~region, ~subregion, ~population,

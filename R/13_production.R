@@ -38,13 +38,13 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
     dplyr::distinct()
 
   weights_file <- file.path(data_dir, "livestock_weights.csv")
-  weights <- if (file.exists(weights_file)) readr::read_csv(weights_file, show_col_types = FALSE) else tibble::tibble()
+  weights <- if (file.exists(weights_file)) herdr_read_input_csv(weights_file) else tibble::tibble()
 
   ruminants_file <- file.path(data_dir, "ruminant_definitions.csv")
-  ruminants <- if (file.exists(ruminants_file)) readr::read_csv(ruminants_file, show_col_types = FALSE) else tibble::tibble()
+  ruminants <- if (file.exists(ruminants_file)) herdr_read_input_csv(ruminants_file) else tibble::tibble()
 
   monogastrics_file <- file.path(data_dir, "monogastric_definitions.csv")
-  monogastrics <- if (file.exists(monogastrics_file)) readr::read_csv(monogastrics_file, show_col_types = FALSE) else tibble::tibble()
+  monogastrics <- if (file.exists(monogastrics_file)) herdr_read_input_csv(monogastrics_file) else tibble::tibble()
 
   # Consolidate Definitions
   if (nrow(ruminants) > 0) {
@@ -188,7 +188,11 @@ calculate_production <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   if (nrow(weights) > 0) {
     results <- results %>% dplyr::left_join(weights, by = intersect(names(weights), join_keys))
   }
+  for (wcol in c("productive_period_days", "adult_weight_kg", "final_weight_kg")) {
+    if (!wcol %in% names(results)) results[[wcol]] <- 0
+  }
   results <- results %>%
+    dplyr::mutate(animal_type = tolower(trimws(as.character(animal_type)))) %>%
     dplyr::left_join(production_constants, by = "animal_type") %>%
     dplyr::mutate(
       has_replacement_rate = tidyr::replace_na(has_replacement_rate, FALSE),

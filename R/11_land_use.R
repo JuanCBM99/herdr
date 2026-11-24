@@ -123,15 +123,14 @@ calculate_land_use <- function(automatic_cycle = FALSE,
   DMI_df <- DMI_df %>%
     dplyr::distinct(farm_id, region, diet_tag, subregion, animal_tag, .keep_all = TRUE)
 
-  diet_profiles <- readr::read_csv(file.path(data_dir, "diet_profiles.csv"), show_col_types = FALSE)
-  diet_ingredients_raw <- readr::read_csv(
+  diet_profiles <- herdr_read_input_csv(file.path(data_dir, "diet_profiles.csv"))
+  diet_ingredients_raw <- herdr_read_input_csv(
     file.path(data_dir, "diet_ingredients.csv"),
-    col_types = readr::cols(
-      custom_yield_kg_ha = readr::col_character(),
-      .default = readr::col_guess()
-    ),
-    show_col_types = FALSE
+    extra_char_cols = "custom_yield_kg_ha"
   )
+  if (!"custom_yield_kg_ha" %in% names(diet_ingredients_raw)) {
+    diet_ingredients_raw$custom_yield_kg_ha <- NA_character_
+  }
 
   norm_diets <- herdr_normalize_diets(diet_profiles, diet_ingredients_raw)
   diet_profiles <- norm_diets$diets
@@ -204,8 +203,7 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::mutate(dplyr::across(c(Production, Total_Import, Total_Export), ~ tidyr::replace_na(., 0))) %>%
       dplyr::mutate(
         Apparent_Consumption   = Production + Total_Import - Total_Export,
-        Apparent_Consumption   = ifelse(Apparent_Consumption <= 0, 1, Apparent_Consumption),
-        Self_Sufficiency_Ratio = Production / Apparent_Consumption
+        Self_Sufficiency_Ratio = dplyr::if_else(Apparent_Consumption > 0, Production / Apparent_Consumption, 0)
       )
 
     # --- 3b. Bounded recursive traceback ---
@@ -283,7 +281,8 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dplyr::filter(!is.na(yield_name)) %>%
       dplyr::left_join(fao_dictionary, by = c("yield_name" = "Item")) %>%
       dplyr::mutate(Calculated_Origin = tidyr::replace_na(Calculated_Origin, farm_country)) %>%
-      dplyr::select(ingredient, Calculated_Origin, fallback_yield)
+      dplyr::select(ingredient, Calculated_Origin, fallback_yield) %>%
+      dplyr::distinct(ingredient, .keep_all = TRUE)
 
     diet_ingredients <- diet_ingredients_raw %>%
       dplyr::left_join(final_dictionary, by = "ingredient") %>%
@@ -357,7 +356,10 @@ calculate_land_use <- function(automatic_cycle = FALSE,
       dm_yield = dplyr::case_when(
         !is.na(custom_yield_kg_ha)                                   ~ raw_yield,
         !is.na(spain_forage_yield) | ingredient_type == "forage"     ~ raw_yield,
-        !is.na(raw_yield) & raw_yield > 0                           ~ raw_yield * (suppressWarnings(as.numeric(DM_pct)) / 100),
+        !is.na(raw_yield) & raw_yield > 0 ~ {
+          dm_eff <- suppressWarnings(as.numeric(DM_pct))
+          raw_yield * (dplyr::if_else(is.na(dm_eff) | dm_eff <= 0, 100, dm_eff) / 100)
+        },
         TRUE                                                         ~ raw_yield
       ),
       ha_per_kg = dplyr::if_else(!is.na(dm_yield) & dm_yield > 0, 1 / dm_yield, 0)

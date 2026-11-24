@@ -43,44 +43,24 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
   # =========================================================================
   # Step 1: Load Input Tables Safely
   # =========================================================================
-  census_raw <- readr::read_csv(
-    file.path(data_dir, "livestock_census.csv"),
-    col_types = readr::cols(farm_id = "c", subregion = "c"),
-    show_col_types = FALSE
-  )
+  census_raw <- herdr_read_input_csv(file.path(data_dir, "livestock_census.csv"))
 
   rum_file <- file.path(data_dir, "ruminant_definitions.csv")
-  definitions_ruminant <- if (file.exists(rum_file)) {
-    readr::read_csv(
-      rum_file,
-      col_types = readr::cols(farm_id = "c", subregion = "c"),
-      show_col_types = FALSE
-    )
-  } else {
-    tibble::tibble(farm_id = character(), animal_tag = character(), region = character(), subregion = character(), animal_type = character(), animal_subtype = character())
-  }
+  definitions_ruminant <- herdr_read_input_csv(rum_file, optional = TRUE)
 
   if ("replacement_rate" %in% names(definitions_ruminant)) {
     definitions_ruminant$replacement_rate <- suppressWarnings(as.numeric(definitions_ruminant$replacement_rate))
   }
 
   mono_file <- file.path(data_dir, "monogastric_definitions.csv")
-  definitions_monogastric <- if (file.exists(mono_file)) {
-    readr::read_csv(
-      mono_file,
-      col_types = readr::cols(farm_id = "c", subregion = "c"),
-      show_col_types = FALSE
-    )
-  } else {
-    tibble::tibble(farm_id = character(), animal_tag = character(), region = character(), subregion = character(), animal_type = character(), animal_subtype = character())
-  }
+  definitions_monogastric <- herdr_read_input_csv(mono_file, optional = TRUE)
   if ("replacement_rate" %in% names(definitions_monogastric)) {
     definitions_monogastric$replacement_rate <- suppressWarnings(as.numeric(definitions_monogastric$replacement_rate))
   }
 
   weights_file <- file.path(data_dir, "livestock_weights.csv")
   weights_df <- if (file.exists(weights_file)) {
-    readr::read_csv(weights_file, show_col_types = FALSE)
+    herdr_read_input_csv(weights_file)
   } else {
     NULL
   }
@@ -163,7 +143,13 @@ calculate_population <- function(automatic_cycle = FALSE, saveoutput = TRUE, dat
       results_list$poultry <- calculate_population_poultry(df_poultry, definitions_monogastric, weights = weights_df, data_dir = data_dir)
     }
 
-    if (length(results_list) == 0) return(tibble::tibble())
+    if (length(results_list) == 0) {
+      return(tibble::tibble(
+        farm_id = character(), region = character(), subregion = character(),
+        animal_tag = character(), animal_type = character(), animal_subtype = character(),
+        population = numeric()
+      ))
+    }
 
     final_pop_raw <- dplyr::bind_rows(results_list)
   }

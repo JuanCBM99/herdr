@@ -57,7 +57,7 @@ if(getRversion() >= "2.15.1") {
     "breeder_meat_hens", "laying_hens", "free_range_laying_hens",
     "replacement_meat_pullets", "replacement_layer_pullets", "broilers",
     "annual_meat_pullets", "annual_layer_pullets",
-    "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers",
+    "pop_replacement_meat_pullets", "pop_replacement_layer_pullets", "pop_broilers", ".has_manual_broilers",
 
     # --- Net Energy Components ---
     "NEm_MJday", "NEa_MJday", "NEg_MJday", "NEl_MJday", "NEwork_MJday",
