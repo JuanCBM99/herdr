@@ -41,10 +41,10 @@ calculate_CH4_manure(
 
 ## Value
 
-A tibble with manure management methane emission factors
-(`EF_CH4_mm_kgheadyear`, kg CH4/head/year) and total emissions
-(`total_CH4_mm_kgyear`, kg CH4/year) by animal cohort and management
-system.
+A tibble with manure management methane emission factors (`EF_kgyear`,
+kg CH4/head/year), volatile solids (`VS_kgday`), `B0_m3kg`, `MCF_pct`,
+and total emissions (`total_CH4_mm_kgyear`, kg CH4/year) by animal
+cohort and management system.
 
 ## Examples
 

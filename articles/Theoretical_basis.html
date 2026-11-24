@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -301,7 +301,8 @@ content.</p>
 <tr class="even">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><msub><mi>V</mi><mrow><mi>m</mi><mi>i</mi><mi>l</mi><mi>k</mi></mrow></msub></mrow><annotation encoding="application/x-tex">EV_{milk}</annotation></semantics></math></td>
 <td align="left">Energy required to produce 1 kg of milk (MJ/kg)</td>
-<td align="left"><code>ipcc_coefficients.csv</code></td>
+<td align="left">Internal constant (<code>4.6</code> sheep;
+<code>3.0</code> goat; IPCC 2019 Eq. 10.9)</td>
 </tr>
 </tbody>
 </table>
@@ -357,7 +358,10 @@ content.</p>
 <tr class="even">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>C</mi><mrow><mi>p</mi><mi>r</mi><mi>e</mi><mi>g</mi><mi>n</mi><mi>a</mi><mi>n</mi><mi>c</mi><mi>y</mi></mrow></msub><annotation encoding="application/x-tex">C_{pregnancy}</annotation></semantics></math></td>
 <td align="left">Pregnancy energy coefficient</td>
-<td align="left"><code>ipcc_coefficients.csv</code></td>
+<td align="left">
+<code>ipcc_coefficients.csv</code> (cattle);
+interpolated from <code>pr_sheep_goat</code> (sheep/goats; IPCC 2019
+Table 10.7)</td>
 </tr>
 </tbody>
 </table>
@@ -456,6 +460,28 @@ required to sustain all physiological functions.</p>
 </tr>
 </tbody>
 </table>
+</div>
+<div class="section level3">
+<h3 id="dry-matter-intake-calculate_dmi">8. Dry Matter Intake (<code>calculate_DMI</code>)<a class="anchor" aria-label="anchor" href="#dry-matter-intake-calculate_dmi"></a>
+</h3>
+<p>Daily Dry Matter Intake
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi></mrow><annotation encoding="application/x-tex">DMI</annotation></semantics></math>,
+kg DM/head/day) is derived directly from physiological energy demand
+divided by the weighted energy density of the assigned diet:</p>
+<ul>
+<li>
+<strong>Ruminants (cattle, sheep, goats):</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi><mo>=</mo><mfrac><mrow><mi>G</mi><msub><mi>E</mi><mtext mathvariant="normal">MJ/day</mtext></msub></mrow><mrow><mi>G</mi><msub><mi>E</mi><mtext mathvariant="normal">feed, kcal/kg</mtext></msub><mo>×</mo><mn>0.004184</mn></mrow></mfrac></mrow><annotation encoding="application/x-tex">DMI = \frac{GE_{\text{MJ/day}}}{GE_{\text{feed, kcal/kg}} \times 0.004184}</annotation></semantics></math>
+</li>
+<li>
+<strong>Swine:</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi><mo>=</mo><mfrac><mrow><mi>M</mi><msub><mi>E</mi><mtext mathvariant="normal">total, kcal/day</mtext></msub></mrow><mrow><mi>M</mi><msub><mi>E</mi><mtext mathvariant="normal">swine, kcal/kg</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">DMI = \frac{ME_{\text{total, kcal/day}}}{ME_{\text{swine, kcal/kg}}}</annotation></semantics></math>
+</li>
+<li>
+<strong>Poultry:</strong>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>M</mi><mi>I</mi><mo>=</mo><mfrac><mrow><mi>M</mi><msub><mi>E</mi><mtext mathvariant="normal">total, kcal/day</mtext></msub></mrow><mrow><mi>M</mi><msub><mi>E</mi><mtext mathvariant="normal">poultry, kcal/kg</mtext></msub></mrow></mfrac></mrow><annotation encoding="application/x-tex">DMI = \frac{ME_{\text{total, kcal/day}}}{ME_{\text{poultry, kcal/kg}}}</annotation></semantics></math>
+</li>
+</ul>
 <hr>
 </div>
 </div>
@@ -684,13 +710,20 @@ gain in kcal/day.</em></p>
 <div class="section level3">
 <h3 id="total-metabolizable-energy">6. Total Metabolizable Energy<a class="anchor" aria-label="anchor" href="#total-metabolizable-energy"></a>
 </h3>
-<p>The total daily metabolizable energy requirement is:</p>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><msub><mi>E</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>m</mi><mi>a</mi><mi>i</mi><mi>n</mi><mi>t</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>g</mi><mi>r</mi><mi>o</mi><mi>w</mi><mi>t</mi><mi>h</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>e</mi><mi>g</mi><mi>g</mi><mi>s</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">ME_{total} = ME_{maint} + ME_{growth} + ME_{eggs} + ME_{gestation} + ME_{lactation}</annotation></semantics></math></p>
+<p>For growing/finishing cohorts and poultry, total daily metabolizable
+energy is the direct sum of active components. For breeding sows that
+undergo both gestation and lactation within a reproductive cycle
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">CycleDays</mtext><mo>=</mo><mrow><mi mathvariant="normal">max</mi><mo>⁡</mo></mrow><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">productive_period_days</mtext><mo>,</mo><mspace width="0.167em"></mspace><mi>D</mi><mi>a</mi><mi>y</mi><msub><mi>s</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>+</mo><mi>D</mi><mi>a</mi><mi>y</mi><msub><mi>s</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi></mrow></msub><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{CycleDays} = \max(\text{productive\_period\_days},\, Days_{gest} + Days_{lact})</annotation></semantics></math>),
+gestation-phase and lactation-phase requirements are weighted by their
+fraction of the reproductive cycle
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>=</mo><mi>D</mi><mi>a</mi><mi>y</mi><msub><mi>s</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mi>/</mi><mtext mathvariant="normal">CycleDays</mtext></mrow><annotation encoding="application/x-tex">w_{gest} = Days_{gest} / \text{CycleDays}</annotation></semantics></math>,
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>w</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi></mrow></msub><mo>=</mo><mi>D</mi><mi>a</mi><mi>y</mi><msub><mi>s</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi></mrow></msub><mi>/</mi><mtext mathvariant="normal">CycleDays</mtext></mrow><annotation encoding="application/x-tex">w_{lact} = Days_{lact} / \text{CycleDays}</annotation></semantics></math>):</p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>M</mi><msub><mi>E</mi><mrow><mi>t</mi><mi>o</mi><mi>t</mi><mi>a</mi><mi>l</mi></mrow></msub><mo>=</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>m</mi><mi>a</mi><mi>i</mi><mi>n</mi><mi>t</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>g</mi><mi>r</mi><mi>o</mi><mi>w</mi><mi>t</mi><mi>h</mi></mrow></msub><mo>+</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>e</mi><mi>g</mi><mi>g</mi><mi>s</mi></mrow></msub><mo>+</mo><msub><mi>w</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi></mrow></msub><mo>⋅</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>g</mi><mi>e</mi><mi>s</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub><mo>+</mo><msub><mi>w</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi></mrow></msub><mo>⋅</mo><mi>M</mi><msub><mi>E</mi><mrow><mi>l</mi><mi>a</mi><mi>c</mi><mi>t</mi><mi>a</mi><mi>t</mi><mi>i</mi><mi>o</mi><mi>n</mi></mrow></msub></mrow><annotation encoding="application/x-tex">ME_{total} = ME_{maint} + ME_{growth} + ME_{eggs} + w_{gest} \cdot ME_{gestation} + w_{lact} \cdot ME_{lactation}</annotation></semantics></math></p>
 <hr>
 </div>
 </div>
 <div class="section level2">
-<h2 id="iii--methane-module">III. Methane Module<a class="anchor" aria-label="anchor" href="#iii--methane-module"></a>
+<h2 id="iii-methane-module">III. Methane Module<a class="anchor" aria-label="anchor" href="#iii-methane-module"></a>
 </h2>
 <div class="section level3">
 <h3 id="enteric-fermentation-ch_4">1. Enteric Fermentation
@@ -728,7 +761,110 @@ gain in kcal/day.</em></p>
 <tr class="odd">
 <td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math></td>
 <td align="left">Methane conversion factor (%)</td>
-<td align="left">Calculated from diet NDF &amp; DE</td>
+<td align="left">IPCC 2019 Table 10.12 (see below)</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="section level4">
+<h4 id="methane-conversion-factor-y_m-ipcc-2019-table-10-12">Methane Conversion Factor
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math>,
+IPCC 2019 Table 10.12)<a class="anchor" aria-label="anchor" href="#methane-conversion-factor-y_m-ipcc-2019-table-10-12"></a>
+</h4>
+<table class="table">
+<colgroup>
+<col width="33%">
+<col width="33%">
+<col width="33%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Livestock Category</th>
+<th align="left">Diet Condition</th>
+<th align="right">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mi>Y</mi><mi>m</mi></msub><annotation encoding="application/x-tex">Y_m</annotation></semantics></math>
+(%)</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left">
+<strong>Lactating dairy cattle</strong>
+(<code>milk_yield_kg_year &gt; 0</code>)</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi><mo>≥</mo><mn>70</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">DE \ge 70\%</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi><mo>≤</mo><mn>35</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">NDF \le 35\%</annotation></semantics></math>
+</td>
+<td align="right"><strong>5.7</strong></td>
+</tr>
+<tr class="even">
+<td align="left">
+<strong>Lactating dairy cattle</strong>
+(<code>milk_yield_kg_year &gt; 0</code>)</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi><mo>≥</mo><mn>70</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">DE \ge 70\%</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi><mo>&gt;</mo><mn>35</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">NDF &gt; 35\%</annotation></semantics></math>
+</td>
+<td align="right"><strong>6.0</strong></td>
+</tr>
+<tr class="odd">
+<td align="left">
+<strong>Lactating dairy cattle</strong>
+(<code>milk_yield_kg_year &gt; 0</code>)</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>62</mn><mi>%</mi><mo>&lt;</mo><mi>D</mi><mi>E</mi><mo>&lt;</mo><mn>70</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">62\% &lt; DE &lt; 70\%</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi><mo>≤</mo><mn>37</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">NDF \le 37\%</annotation></semantics></math>
+</td>
+<td align="right"><strong>6.0</strong></td>
+</tr>
+<tr class="even">
+<td align="left">
+<strong>Lactating dairy cattle</strong>
+(<code>milk_yield_kg_year &gt; 0</code>)</td>
+<td align="left">
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>62</mn><mi>%</mi><mo>&lt;</mo><mi>D</mi><mi>E</mi><mo>&lt;</mo><mn>70</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">62\% &lt; DE &lt; 70\%</annotation></semantics></math>
+and
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi><mo>&gt;</mo><mn>37</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">NDF &gt; 37\%</annotation></semantics></math>
+</td>
+<td align="right"><strong>6.3</strong></td>
+</tr>
+<tr class="odd">
+<td align="left">
+<strong>Lactating dairy cattle</strong>
+(<code>milk_yield_kg_year &gt; 0</code>)</td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi><mo>≤</mo><mn>62</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">DE \le 62\%</annotation></semantics></math></td>
+<td align="right"><strong>6.5</strong></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Non-dairy / non-lactating cattle</strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi><mo>≥</mo><mn>75</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">DE \ge 75\%</annotation></semantics></math></td>
+<td align="right"><strong>3.0</strong></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Non-dairy / non-lactating cattle</strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>72</mn><mi>%</mi><mo>≤</mo><mi>D</mi><mi>E</mi><mo>&lt;</mo><mn>75</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">72\% \le DE &lt; 75\%</annotation></semantics></math></td>
+<td align="right"><strong>4.0</strong></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Non-dairy / non-lactating cattle</strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>62</mn><mi>%</mi><mo>&lt;</mo><mi>D</mi><mi>E</mi><mo>&lt;</mo><mn>72</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">62\% &lt; DE &lt; 72\%</annotation></semantics></math></td>
+<td align="right"><strong>6.3</strong></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Non-dairy / non-lactating cattle</strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>D</mi><mi>E</mi><mo>≤</mo><mn>62</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">DE \le 62\%</annotation></semantics></math></td>
+<td align="right"><strong>7.0</strong></td>
+</tr>
+<tr class="even">
+<td align="left"><strong>Sheep</strong></td>
+<td align="left">All diets</td>
+<td align="right"><strong>6.7</strong></td>
+</tr>
+<tr class="odd">
+<td align="left"><strong>Goats</strong></td>
+<td align="left">All diets</td>
+<td align="right"><strong>5.5</strong></td>
 </tr>
 </tbody>
 </table>
@@ -1216,7 +1352,7 @@ based on strict functional cohort roles
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">milk_yield_kg_year</mtext></mrow><annotation encoding="application/x-tex">\text{Milk}_{\text{fresh}} = AAP \times \text{milk\_yield\_kg\_year}</annotation></semantics></math></p>
 <p>To standardize milk across breeds and diets, Fat and Protein
 Corrected Milk (FPCM) is calculated following the <strong>IDF
-(2015)</strong> standard:
+(2022)</strong> standard:
 <math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>×</mo><mrow><mo stretchy="true" form="prefix">[</mo><mn>0.1226</mn><mo>⋅</mo><mtext mathvariant="normal">Fat</mtext><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mn>0.0776</mn><mo>⋅</mo><mtext mathvariant="normal">Protein</mtext><mo stretchy="false" form="prefix">(</mo><mi>%</mi><mo stretchy="false" form="postfix">)</mo><mo>+</mo><mn>0.2534</mn><mo stretchy="true" form="postfix">]</mo></mrow></mrow><annotation encoding="application/x-tex">\text{Milk}_{\text{FPCM}} = \text{Milk}_{\text{fresh}} \times \left[ 0.1226 \cdot \text{Fat} (\%) + 0.0776 \cdot \text{Protein} (\%) + 0.2534 \right]</annotation></semantics></math></p>
 </div>
 <div class="section level3">
@@ -1299,9 +1435,10 @@ Corrected Milk (FPCM) is calculated following the <strong>IDF
 </table>
 </div>
 <div class="section level3">
-<h3 id="egg-production-total-edible-protein">4. Egg Production &amp; Total Edible Protein<a class="anchor" aria-label="anchor" href="#egg-production-total-edible-protein"></a>
+<h3 id="egg-production-greasy-wool-and-total-edible-digestible-protein">4. Egg Production, Greasy Wool, and Total Edible / Digestible
+Protein<a class="anchor" aria-label="anchor" href="#egg-production-greasy-wool-and-total-edible-digestible-protein"></a>
 </h3>
-<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mtext mathvariant="normal">Egg</mtext><mtext mathvariant="normal">mass</mtext></msub><mo>×</mo><mn>365</mn></mrow><mn>1000</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>×</mo><mn>0.1240</mn></mrow><annotation encoding="application/x-tex">\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP, \qquad \text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}</annotation></semantics></math></p>
+<p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">(</mo><mfrac><mrow><msub><mtext mathvariant="normal">Egg</mtext><mtext mathvariant="normal">mass</mtext></msub><mo>×</mo><mn>365</mn></mrow><mn>1000</mn></mfrac><mo stretchy="true" form="postfix">)</mo></mrow><mo>×</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>,</mo><mspace width="2.0em"></mspace><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Eggs</mtext><mtext mathvariant="normal">fresh</mtext></msub><mo>×</mo><mn>0.1240</mn></mrow><annotation encoding="application/x-tex">\text{Eggs}_{\text{fresh}} = \left( \frac{\text{Egg}_{\text{mass}} \times 365}{1000} \right) \times AAP, \qquad \text{Protein}_{\text{eggs}} = \text{Eggs}_{\text{fresh}} \times 0.1240</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Wool</mtext><mtext mathvariant="normal">greasy</mtext></msub><mo>=</mo><mi>A</mi><mi>A</mi><mi>P</mi><mo>×</mo><mtext mathvariant="normal">wool_yield_kg_year</mtext></mrow><annotation encoding="application/x-tex">\text{Wool}_{\text{greasy}} = AAP \times \text{wool\_yield\_kg\_year}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">meat</mtext></msub><mo>+</mo><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">eggs</mtext></msub></mrow><annotation encoding="application/x-tex">\text{Protein}_{\text{total}} = \text{Protein}_{\text{milk}} + \text{Protein}_{\text{meat}} + \text{Protein}_{\text{eggs}}</annotation></semantics></math><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">HDP</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><munder><mo>∑</mo><mrow><mi>s</mi><mo>∈</mo><mo stretchy="false" form="prefix">{</mo><mtext mathvariant="normal">milk, meat, eggs</mtext><mo stretchy="false" form="postfix">}</mo></mrow></munder><msub><mtext mathvariant="normal">Protein</mtext><mi>s</mi></msub><mo>×</mo><mfrac><msub><mtext mathvariant="normal">DIAAS</mtext><mi>s</mi></msub><mn>100</mn></mfrac></mrow><annotation encoding="application/x-tex">\text{HDP}_{\text{total}} = \sum_{s \in \{\text{milk, meat, eggs}\}} \text{Protein}_s \times \frac{\text{DIAAS}_s}{100}</annotation></semantics></math></p>
 <hr>
 </div>
 </div>
@@ -1340,7 +1477,7 @@ Refinement; FAO LEAP):</p>
 <p>Where net energy requirements per unit of production are: *
 <strong>Milk
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{milk}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Cattle &amp;other bovines; IDF 2022</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>4.6</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Sheep, 7%fat; IPCC 2019 / AFRC 1993, 1995</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>3.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Goat, 3.8%fat; IPCC 2019 / AFRC 1998</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} &amp; (\text{Cattle \&amp; other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} &amp; (\text{Sheep, 7\% fat; IPCC 2019 / AFRC 1993, 1995}) \\ 3.0 \times \text{Milk}_{\text{fresh}} &amp; (\text{Goat, 3.8\% fat; IPCC 2019 / AFRC 1998}) \end{cases}</annotation></semantics></math>
+<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">milk</mtext></msub><mo>=</mo><mrow><mo stretchy="true" form="prefix">{</mo><mtable><mtr><mtd columnalign="left" style="text-align: left"><mn>3.1</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">FPCM</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Cattle &amp;other bovines; IDF 2022</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>4.6</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Sheep, 7%fat; IPCC 2019</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr><mtr><mtd columnalign="left" style="text-align: left"><mn>3.0</mn><mo>×</mo><msub><mtext mathvariant="normal">Milk</mtext><mtext mathvariant="normal">fresh</mtext></msub></mtd><mtd columnalign="left" style="text-align: left"><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">Goat, 3.8%fat; IPCC 2019</mtext><mo stretchy="false" form="postfix">)</mo></mtd></mtr></mtable></mrow></mrow><annotation encoding="application/x-tex">\text{E}_{\text{milk}} = \begin{cases} 3.1 \times \text{Milk}_{\text{FPCM}} &amp; (\text{Cattle \&amp; other bovines; IDF 2022}) \\ 4.6 \times \text{Milk}_{\text{fresh}} &amp; (\text{Sheep, 7\% fat; IPCC 2019}) \\ 3.0 \times \text{Milk}_{\text{fresh}} &amp; (\text{Goat, 3.8\% fat; IPCC 2019}) \end{cases}</annotation></semantics></math>
 * <strong>Culled Mature Meat
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">cull</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{cull}}</annotation></semantics></math>):</strong>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg live weight</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0\text{ MJ/kg live weight}</annotation></semantics></math>
@@ -1351,8 +1488,8 @@ for fattened calves, lambs, pigs, and broilers (IDF 2022). *
 <strong>Greasy Wool
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">wool</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{wool}}</annotation></semantics></math>):</strong>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>24.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">24.0\text{ MJ/kg}</annotation></semantics></math>
-for wool weighed after drying before scouring (IPCC 2019, Eq. 10.20;
-AFRC 1995). * <strong>Fresh Eggs
+for wool weighed after drying before scouring (IPCC 2019, Eq. 10.12). *
+<strong>Fresh Eggs
 (<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">E</mtext><mtext mathvariant="normal">egg</mtext></msub><annotation encoding="application/x-tex">\text{E}_{\text{egg}}</annotation></semantics></math>):</strong>
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>6.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg</mtext></mrow></mrow><annotation encoding="application/x-tex">6.0\text{ MJ/kg}</annotation></semantics></math>
 (FAO LEAP / GLEAM v3.0).</p>
@@ -1435,120 +1572,120 @@ counting.</li>
 </div>
 </div>
 <div class="section level3">
-<h3 id="protein-feed-conversion-and-human-food-competition-mottet-et-al--2017">2. Protein Feed Conversion and Human Food Competition (Mottet et
-al., 2017)<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-and-human-food-competition-mottet-et-al--2017"></a>
+<h3 id="protein-feed-conversion-human-food-competition-and-protein-quality">2. Protein Feed Conversion, Human Food Competition, and Protein
+Quality<a class="anchor" aria-label="anchor" href="#protein-feed-conversion-human-food-competition-and-protein-quality"></a>
 </h3>
-<p>Following Mottet et al. (2017, <em>Global Food Security</em>, 14,
-1–8), <code>herdr</code> evaluates enterprise-level protein conversion
+<p><code>herdr</code> evaluates enterprise-level protein conversion
 efficiency on producing cohorts (<code>mature</code> and
 <code>slaughter</code>), integrating whole-herd feed intake (including
 <code>replacement</code> cohorts) allocated to edible protein by
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">wool</mtext></msub></mrow><annotation encoding="application/x-tex">AF_{\text{protein}} = 1 - AF_{\text{wool}}</annotation></semantics></math>:</p>
-<ol style="list-style-type: decimal">
-<li>
-<strong>Total Protein Feed Conversion Ratio
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">total</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{total}} = \frac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg feed CP} / \text{kg edible protein})</annotation></semantics></math>
-</li>
-<li>
-<strong>Human-Edible Protein Feed Conversion Ratio
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}}</annotation></semantics></math>):</strong>
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac><mspace width="1.0em"></mspace><mo stretchy="false" form="prefix">(</mo><mtext mathvariant="normal">kg human-edible feed CP</mtext><mi>/</mi><mtext mathvariant="normal">kg edible protein</mtext><mo stretchy="false" form="postfix">)</mo></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}} = \frac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}} \quad (\text{kg human-edible feed CP} / \text{kg edible protein})</annotation></semantics></math><ul>
-<li>
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, human-edible}}</annotation></semantics></math>
-weights each ingredient’s crude protein directly by the explicit
-<code>human_edible</code> column (<code>0</code> or <code>1</code>, also
-accepting fractions in
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math>)
-in <code>mapping.csv</code>, cleanly separating food competition from
-land-use classification (<code>land_type</code>).</li>
-<li>
-<strong>Default <code>human_edible</code> classification criterion
-in <code>mapping.csv</code>:</strong> anchored on arable non-forage
-concentrates with
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>&gt;</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} &gt; 0.33</annotation></semantics></math>
-(<code>1</code> for primary cereal grains, pulses, soybean/linseed
-meals, and protein concentrates/isolates, plus commercial food-grade
-dairy feeds <code>casein</code> and <code>skimmed_milk</code>), while
-assigning <code>0</code> to all forages (including dehydrated alfalfa
-and forage meals;
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mi>h</mi><mi>e</mi></msub><mo>=</mo><mn>0</mn></mrow><annotation encoding="application/x-tex">h_e = 0</annotation></semantics></math>
-per Wilkinson 2011; Mottet et al. 2017), secondary agro-industrial
-by-products
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">economic_allocation</mtext><mo>≤</mo><mn>0.33</mn></mrow><annotation encoding="application/x-tex">\text{economic\_allocation} \le 0.33</annotation></semantics></math>,
-such as cereal straw, hulls, pulps, brans, DDGS, and secondary oilseed
-cakes), biologically inedible or food-waste items (whole cottonseed,
-vetches, acorns, bakery/bread by-products), internal suckled milk, and
-non-agricultural additives (urea, minerals, synthetic amino acids).</li>
-<li>When
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mo>&lt;</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\text{Protein\_FCR}_{\text{human\_edible}} &lt; 1.0</annotation></semantics></math>,
-the enterprise is a <strong>net producer</strong> of crude human-edible
-protein relative to competing human-edible feed protein consumed.</li>
-</ul>
-</li>
-<li>
-<strong>DIAAS-Adjusted Edible Protein Conversion Ratio
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">EPCR</mtext><mtext mathvariant="normal">DIAAS</mtext></msub><annotation encoding="application/x-tex">\text{EPCR}_{\text{DIAAS}}</annotation></semantics></math>)
-and Protein Quality Ratio
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mtext mathvariant="normal">PQR</mtext><annotation encoding="application/x-tex">\text{PQR}</annotation></semantics></math>):</strong>
-Following <strong>FAO (2013)</strong> and <strong>Ertl et al. (2016a,
-2016b)</strong>, <code>herdr</code> also accounts for differences in
-indispensable amino acid profiles and true ileal digestibility between
-plant feeds and animal-source foods using the untruncated
-<strong>Digestible Indispensable Amino Acid Score (DIAAS,
-<code>0.5–3 yr</code> child reference pattern)</strong>:
-<math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><msub><mtext mathvariant="normal">EPCR</mtext><mtext mathvariant="normal">DIAAS</mtext></msub><mo>=</mo><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub></mfrac><mo>=</mo><mfrac><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mtext mathvariant="normal">PQR</mtext></mfrac><mo>,</mo><mspace width="2.0em"></mspace><mtext mathvariant="normal">PQR</mtext><mo>=</mo><mfrac><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">output</mtext></msub><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">input</mtext></msub></mfrac></mrow><annotation encoding="application/x-tex">\text{EPCR}_{\text{DIAAS}} = \frac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \frac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}, \qquad \text{PQR} = \frac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}</annotation></semantics></math>
-where
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{HDP}}</annotation></semantics></math>
-weights each human-edible feed ingredient’s crude protein by
-<code>diaas_pct / 100</code> from <code>mapping.csv</code> (backbone:
-Ertl et al., 2016b, Table 4, supplemented by Ertl et al., 2016a,
-Rutherfurd et al., 2015, Cervantes-Pahm et al., 2014 harmonized via
-<code>48/57</code>, Herreman et al., 2020, and Nosworthy et al., 2018),
-and
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Animal}_{\text{HDP}}</annotation></semantics></math>
-weights commercial animal protein streams by species-specific DIAAS
-values from <strong>Ertl et al. (2016b, Table 5)</strong>: cow milk
-(<code>115.9%</code>), sheep milk (<code>109.1%</code>), goat milk
-(<code>123.5%</code>), beef (<code>109.3%</code>), sheep/goat meat
-(<code>116.8%</code>), pork (<code>113.9%</code>), chicken meat
-(<code>108.2%</code>), and whole egg (<code>116.4%</code>).
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub><mo>=</mo><mn>1</mn><mo>−</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">wool</mtext></msub></mrow><annotation encoding="application/x-tex">AF_{\text{protein}} = 1 - AF_{\text{wool}}</annotation></semantics></math>.</p>
+<table class="table">
+<colgroup>
+<col width="25%">
+<col width="25%">
+<col width="25%">
+<col width="25%">
+</colgroup>
+<thead><tr class="header">
+<th align="left">Metric</th>
+<th align="left">Formula</th>
+<th align="left">Interpretation</th>
+<th align="left">Framework</th>
+</tr></thead>
+<tbody>
+<tr class="odd">
+<td align="left"><strong><code>Protein_FCR_total</code></strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, total</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{\text{Feed}_{\text{CP, total}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}}</annotation></semantics></math></td>
+<td align="left">Total kg feed crude protein per kg edible animal
+protein (overall biological N efficiency).</td>
+<td align="left">Crude protein balance</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><code>Protein_FCR_human_edible</code></strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Protein</mtext><mtext mathvariant="normal">total</mtext></msub></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{\text{Feed}_{\text{CP, human-edible}} \times AF_{\text{protein}}}{\text{Protein}_{\text{total}}}</annotation></semantics></math></td>
+<td align="left">Competing human-edible feed CP per kg edible animal
+protein (<code>&lt; 1.0</code> = net crude-protein producer).</td>
+<td align="left">Wilkinson (2011); Ertl et al. (2016a)</td>
+</tr>
+<tr class="odd">
+<td align="left"><strong><code>EPCR_DIAAS</code></strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mstyle displaystyle="true"><mfrac><mrow><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><mo>×</mo><mi>A</mi><msub><mi>F</mi><mtext mathvariant="normal">protein</mtext></msub></mrow><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub></mfrac></mstyle><mo>=</mo><mstyle displaystyle="true"><mfrac><msub><mtext mathvariant="normal">Protein_FCR</mtext><mtext mathvariant="normal">human_edible</mtext></msub><mtext mathvariant="normal">PQR</mtext></mfrac></mstyle></mrow><annotation encoding="application/x-tex">\dfrac{\text{Feed}_{\text{HDP}} \times AF_{\text{protein}}}{\text{Animal}_{\text{HDP}}} = \dfrac{\text{Protein\_FCR}_{\text{human\_edible}}}{\text{PQR}}</annotation></semantics></math></td>
+<td align="left">Quality-adjusted human-digestible feed protein per kg
+human-digestible animal protein (<code>&lt; 1.0</code> = net
+digestible-protein producer).</td>
+<td align="left">FAO (2013); Ertl et al. (2016a, 2016b)</td>
+</tr>
+<tr class="even">
+<td align="left"><strong><code>PQR</code></strong></td>
+<td align="left"><math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mstyle displaystyle="true"><mfrac><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">output</mtext></msub><msub><mtext mathvariant="normal">DIAAS</mtext><mtext mathvariant="normal">input</mtext></msub></mfrac></mstyle><annotation encoding="application/x-tex">\dfrac{\text{DIAAS}_{\text{output}}}{\text{DIAAS}_{\text{input}}}</annotation></semantics></math></td>
+<td align="left">Protein Quality Ratio: amino-acid quality upgrade from
+human-edible plant feeds to animal food (<code>&gt; 1.0</code> = net
+quality upgrade).</td>
+<td align="left">Ertl et al. (2016a, 2016b)</td>
+</tr>
+</tbody>
+</table>
+<div class="section level4">
+<h4 id="key-implementation-conventions">Key Implementation Conventions<a class="anchor" aria-label="anchor" href="#key-implementation-conventions"></a>
+</h4>
 <ul>
 <li>
-<strong>Transparency notes:</strong> (i) Following Ertl et
-al. (2016b, Section 2.6), when
+<strong>Human-edible feed protein
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">CP, human-edible</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{CP, human-edible}}</annotation></semantics></math>):</strong>
+Each ingredient’s crude protein is weighted by the explicit
+<code>human_edible</code> column (<code>0</code>, <code>1</code>, or any
+fraction in
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false" form="prefix">[</mo><mn>0</mn><mo>,</mo><mn>1</mn><mo stretchy="false" form="postfix">]</mo></mrow><annotation encoding="application/x-tex">[0, 1]</annotation></semantics></math>)
+in <code>mapping.csv</code>, decoupling food-feed competition cleanly
+from land classification (<code>land_type</code>). As an editable
+default convention in <code>herdr</code>, arable non-forage concentrates
+with <code>economic_allocation &gt; 0.33</code> (primary grains, pulses,
+soybean/linseed meals, protein concentrates/isolates, plus commercial
+<code>casein</code> and <code>skimmed_milk</code>) default to
+<code>1</code>, whereas all forages (including dehydrated alfalfa/forage
+meals), secondary by-products
+(<code>economic_allocation &lt;= 0.33</code>), inedible/waste items
+(whole cottonseed, vetches, acorns, bakery by-products), suckled milk,
+and mineral/synthetic additives default to <code>0</code>.</li>
+<li>
+<strong>DIAAS scores (<code>0.5–3 yr</code> child pattern,
+untruncated):</strong> Feed human-digestible protein
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Feed</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Feed}_{\text{HDP}}</annotation></semantics></math>)
+weights each human-edible ingredient’s CP by
+<code>diaas_pct / 100</code> from <code>mapping.csv</code> (backbone:
+Ertl et al., 2016b, Table 4, supplemented by Ertl et al., 2016a,
+Cervantes-Pahm et al., 2014, Rutherfurd et al., 2015, Nosworthy et al.,
+2018, and Herreman et al., 2020). Animal output
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><msub><mtext mathvariant="normal">Animal</mtext><mtext mathvariant="normal">HDP</mtext></msub><annotation encoding="application/x-tex">\text{Animal}_{\text{HDP}}</annotation></semantics></math>)
+uses species-specific DIAAS values from Ertl et al. (2016b, Table 5):
+cow milk (<code>115.9%</code>), sheep milk (<code>109.1%</code>), goat
+milk (<code>123.5%</code>), beef (<code>109.3%</code>), sheep/goat meat
+(<code>116.8%</code>), pork (<code>113.9%</code>), chicken meat
+(<code>108.2%</code>), and whole egg (<code>116.4%</code>).</li>
+<li>
+<strong>Coverage &amp; farm-gate transparency:</strong> Following
+Ertl et al. (2016b, Section 2.6), if
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>≥</mo><mn>80</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">\ge 80\%</annotation></semantics></math>
 (but
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&lt; 100\%</annotation></semantics></math>)
-of human-edible feed CP has a DIAAS entry, the weighted-average DIAAS of
-known ingredients is applied to total human-edible CP (emitting a
-warning whenever
+of human-edible feed CP has a DIAAS entry, the known weighted-average
+DIAAS is applied to total human-edible CP (emitting a warning whenever
 <math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>5</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&gt; 5\%</annotation></semantics></math>
-lacks DIAAS, and returning <code>NA</code> if
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>80</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&lt; 80\%</annotation></semantics></math>
-is covered); (ii) <code>EPCR_DIAAS</code> uses weighted-average
-ingredient DIAAS at the farm gate (raw feedstuffs, without modeling
-cereal–legume amino acid complementarity in mixed human diets) and
-untruncated
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&gt;</mo><mn>100</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&gt; 100\%</annotation></semantics></math>
-scores for animal products (reflecting their ability to complement
-lower-quality plant proteins in mixed diets); therefore,
-<code>EPCR_DIAAS</code> is always reported alongside unadjusted
+lacks DIAAS, and returning <code>NA</code> if coverage
+<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>&lt;</mo><mn>80</mn><mi>%</mi></mrow><annotation encoding="application/x-tex">&lt; 80\%</annotation></semantics></math>).
+Because <code>EPCR_DIAAS</code> evaluates raw feedstuffs at the farm
+gate without modeling cereal–legume amino-acid complementarity in mixed
+human diets, it is always reported alongside unadjusted
 <code>Protein_FCR_human_edible</code> and
 <code>Protein_FCR_total</code>.</li>
 </ul>
-</li>
-</ol>
 <hr>
+</div>
 <div class="section level4">
 <h4 id="references">📚 References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h4>
 <ul>
-<li>Boulay, A.-M., et al. (2018). <em>The WULCA-consensus
-characterization model for water scarcity footprint: assessing impacts
-of water consumption based on available water remaining (AWARE)</em>.
-<strong>The International Journal of Life Cycle Assessment</strong>,
-23(2), 368–378.</li>
 <li>Cervantes-Pahm, S. K., Liu, Y., &amp; Stein, H. H. (2014).
 <em>Digestible indispensable amino acid score and digestible amino acids
 in eight cereal grains</em>. <strong>British Journal of
@@ -1562,16 +1699,16 @@ livestock to human food supply</em>. <strong>Animal</strong>, 10(11),
 livestock: A national analysis for Austria including relative occupation
 of different land categories</em>. <strong>Die Bodenkultur</strong>,
 67(2), 91–103.</li>
-<li>European Commission (2021). <em>Commission Recommendation (EU)
-2021/2279 on the use of Environmental Footprint methods</em>.
-<strong>Official Journal of the European Union</strong>, L 471,
-1–396.</li>
 <li>FAO (2013). <em>Dietary protein quality evaluation in human
 nutrition: Report of an FAO Expert Consultation</em>. FAO Food and
 Nutrition Paper 92, Rome.</li>
 <li>FAO (2018). <em>Global Livestock Environmental Assessment Model
 (GLEAM) v3.0: Model description</em>. Food and Agriculture Organization
 of the United Nations, Rome.</li>
+<li>FEDNA (2019). <em>Tablas FEDNA de composición y valor nutritivo de
+alimentos para la fabricación de piensos compuestos</em> (4ª ed.).
+Fundación Española para el Desarrollo de la Nutrición Animal,
+Madrid.</li>
 <li>Herreman, L., Nommensen, P., Pennings, B., &amp; Laus, M. C. (2020).
 <em>Comprehensive overview of the quality of plant- and animal-sourced
 proteins based on the digestible indispensable amino acid score</em>.
@@ -1579,9 +1716,6 @@ proteins based on the digestible indispensable amino acid score</em>.
 <li>IDF (2022). <em>The C-footprint of dairy: Updated IDF standard for
 carbon footprinting of the dairy sector</em>. International Dairy
 Federation Bulletin 520/2022.</li>
-<li>INRAE (2023). <em>ECOALIM dataset v9: Life Cycle Assessment datasets
-for animal feed ingredients</em>. Institut National de Recherche pour
-l’Agriculture, l’Alimentation et l’Environnement (INRAE).</li>
 <li>IPCC (2019). <em>Refinement to the 2006 IPCC Guidelines for National
 Greenhouse Gas Inventories</em>. Volume 4: AFOLU, Chapter 10.</li>
 <li>Mottet, A., de Haan, C., Falcucci, A., Tempio, G., Opio, C., &amp;
@@ -1596,6 +1730,8 @@ J. (2015). <em>Protein digestibility-corrected amino acid scores and
 digestible indispensable amino acid scores differentially describe
 protein quality in growing male rats</em>. <strong>The Journal of
 Nutrition</strong>, 145(2), 372–379.</li>
+<li>Wilkinson, J. M. (2011). <em>Re-defining efficiency of feed use by
+livestock</em>. <strong>Animal</strong>, 5(7), 1014–1022.</li>
 </ul>
 </div>
 </div>

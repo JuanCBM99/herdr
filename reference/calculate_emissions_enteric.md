@@ -49,9 +49,10 @@ calculate_emissions_enteric(
 
 ## Value
 
-A tibble with enteric fermentation emission factors (`EF`, kg
-CH4/head/year) and total enteric methane emissions
-(`CH4_enteric_kgyear`, kg CH4/year) by animal cohort.
+A tibble with enteric fermentation methane conversion factor (`Ym_pct`,
+emission factor (`EF_kgheadyear`, kg CH4/head/year), and total enteric
+methane emissions (`total_CH4_enteric_Ggyear`, Gg CH4/year) by animal
+cohort.
 
 ## Examples
 

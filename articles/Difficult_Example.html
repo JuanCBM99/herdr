@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -772,25 +772,34 @@ group:
 <code>meat</code>):</strong> The overhead footprint of
 <code>breeder_meat_hens</code> (<code>mature</code>) and
 <code>replacement_meat_pullets</code> (<code>replacement</code>) is
-integrated with <code>broilers</code> (<code>slaughter</code>) over the
-total meat produced (broilers + culled breeders).
-<code>replacement_meat_pullets</code> shows <code>NA</code> for product
-intensities because its emissions are already absorbed into the meat
-enterprise.</li>
+integrated with <code>broilers</code> (<code>slaughter</code>), with
+biophysical energy allocation partitioning meat between young slaughter
+broilers
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg LW</mtext></mrow></mrow><annotation encoding="application/x-tex">11.0\text{ MJ/kg LW}</annotation></semantics></math>)
+and culled breeders
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg LW</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0\text{ MJ/kg LW}</annotation></semantics></math>).
+<code>replacement_meat_pullets</code> shows <code>NA</code> for
+commercial product intensities because its emissions are absorbed into
+the meat enterprise.</li>
 <li>
 <strong>Poultry Layers (<code>poultry</code>,
-<code>layer</code>):</strong> Each laying cohort
-(<code>laying_hens</code> and <code>free_range_laying_hens</code>) keeps
-its own direct footprint plus a population-proportional share
-(<code>90%</code> and <code>10%</code>, respectively) of the
-<code>replacement_layer_pullets</code> overhead, divided by its
-respective egg production (<code>egg_fresh_kg</code>).</li>
+<code>layer</code>):</strong> Because <code>laying_hens</code>,
+<code>free_range_laying_hens</code>, and
+<code>replacement_layer_pullets</code> share the same enterprise key
+<code>(farm_id = "farm_1", animal_type = "poultry", animal_subtype = "layer")</code>,
+they are pooled into a single egg-producing enterprise (assign distinct
+<code>farm_id</code> values — e.g. <code>farm_barn</code>
+vs. <code>farm_freerange</code> — if you want separate intensities per
+housing system).</li>
 <li>
 <strong>Swine Meat (<code>swine</code>, <code>meat</code>):</strong>
 The breeding herd overhead (<code>breeder_sows</code> +
 <code>boars</code> + <code>replacement_sows</code>) is integrated with
-<code>fattening_pigs</code> over total carcass pork output (finished
-pigs + culled sows/boars).</li>
+<code>fattening_pigs</code>, partitioning carcass pork intensities
+biophysically between slaughter pigs
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>11.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg LW</mtext></mrow></mrow><annotation encoding="application/x-tex">11.0\text{ MJ/kg LW}</annotation></semantics></math>)
+and culled sows/boars
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>15.0</mn><mrow><mspace width="0.333em"></mspace><mtext mathvariant="normal"> MJ/kg LW</mtext></mrow></mrow><annotation encoding="application/x-tex">15.0\text{ MJ/kg LW}</annotation></semantics></math>).</li>
 </ul>
 </li>
 </ol>
@@ -818,22 +827,22 @@ pigs + culled sows/boars).</li>
 <span><span class="va">results</span><span class="op">$</span><span class="va">totals</span></span>
 <span><span class="va">results</span><span class="op">$</span><span class="va">intensities</span></span>
 <span></span>
-<span><span class="co"># 1. Compare Carbon Footprint per kg of Edible Protein across cohorts</span></span>
+<span><span class="co"># 1. Compare Carbon Footprint per kg of Edible Protein across enterprises</span></span>
 <span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
-<span>  group_cols      <span class="op">=</span> <span class="st">"animal_tag"</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"animal_subtype"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
 <span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
 <span>  functional_unit <span class="op">=</span> <span class="st">"protein"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 2. Compare Egg Carbon Intensity between caged/barn vs. free-range hens</span></span>
+<span><span class="co"># 2. Compare Protein Feed Efficiency (Total CP, Human-Edible CP, and DIAAS EPCR)</span></span>
 <span><span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
-<span>  group_cols      <span class="op">=</span> <span class="st">"animal_tag"</span>,</span>
+<span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"animal_subtype"</span><span class="op">)</span>,</span>
 <span>  func_name       <span class="op">=</span> <span class="st">"generate_impact_assessment"</span>,</span>
-<span>  impact_category <span class="op">=</span> <span class="st">"ghg"</span>,</span>
-<span>  functional_unit <span class="op">=</span> <span class="st">"egg"</span></span>
+<span>  impact_category <span class="op">=</span> <span class="st">"fcr"</span>,</span>
+<span>  functional_unit <span class="op">=</span> <span class="st">"fcr"</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <hr>
 </div>

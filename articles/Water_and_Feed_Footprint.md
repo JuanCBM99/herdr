@@ -115,13 +115,14 @@ land-use change / deforestation
 
 > **Co-product fallback allocation:** When an ingredient maps directly
 > to a dedicated co-product LCI process in `ecoalim.parquet` (such as
-> soybean meal, wheat bran, or brewer’s grains), its characterization
+> soybean meal, wheat bran, or maize gluten feed), its characterization
 > factor $`EF_i`$ already incorporates economic allocation at the LCA
 > database level and is applied with a multiplier of $`1.0`$.
 > Conversely, when a co-product (`economic_allocation < 1` in
-> `mapping.csv`, such as cereal straw or hulls) is linked to an
-> unallocated parent grain or oilseed process in `agribalyse_name`,
-> `herdr` automatically scales the parent crop’s emission factor by
+> `mapping.csv`, such as cereal straw, hulls, or brewers grains mapped
+> to barley) is linked to an unallocated parent grain or oilseed process
+> in `agribalyse_name`, `herdr` automatically scales the parent crop’s
+> emission factor by
 > $`\dfrac{EconomicAllocation_i}{kg\_coproduct\_per\_1ton\_maincrop_i / 1000}`$.
 >
 > **Database note (`ecoalim.parquet` extensions):** 1. *General food

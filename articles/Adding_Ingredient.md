@@ -46,9 +46,9 @@ This is herdr’s nutritional database — every ingredient referenced
 anywhere in a diet must have a row here first. Add one, filling in every
 column:
 
-| ingredient | ingredient_type | land_type | DM_pct | ASH_pct | CP_pct | EE_pct | NDF_pct | DE_pct | swine_DE_kcal_kg | GE_feed_kcal_kg | source_DE |
-|:---|:---|:---|---:|---:|---:|---:|---:|---:|:---|---:|---:|
-| `brewers_grains_wet` | `concentrate` | `cropland` | 24.0 | 3.8 | 25.5 | 8.0 | 46.0 | 68.0 | `NA` | 4,566 | `Feedipedia` |
+| ingredient | ingredient_type | land_type | DM_pct | ASH_pct | CP_pct | EE_pct | NDF_pct | DE_pct | swine_DE_kcal_kg | GE_feed_kcal_kg | source_DE | source_GE |
+|:---|:---|:---|---:|---:|---:|---:|---:|---:|:---|---:|:---|:---|
+| `brewers_grains_wet` | `concentrate` | `cropland` | 24.0 | 3.8 | 25.5 | 8.0 | 46.0 | 68.0 | `NA` | 4566 | `Feedipedia` | `Ewan (1989)` |
 
 *(Note: table truncated for display purposes. Make sure all monogastric
 energy columns are also included in your actual file.)*
@@ -89,17 +89,19 @@ A few notes on where these numbers come from and how herdr uses them:
   analysis or a recognized feed table (FEDNA is herdr’s default source
   for most of its bundled ingredients; Feedipedia is a good alternative
   for by-products like this one).
-- **`source_DE`**: this column documents the origin of the Digestible
-  Energy (`DE_pct`) value.
-- **Forages (`DE_pct`)**: If a measured value is not available, Energy
-  Digestibility ($`Ed`$) is derived from Organic Matter digestibility
-  ($`OMd`$) and proximate analysis ($`CP`$, $`EE`$, $`NDF`$, $`Ash`$).
-  See the exact regression formulas in the [Technical Reference: Feed
-  Characteristics](https://juancbm99.github.io/herdr/articles/Technical_reference.html#feed_characteristics).
-- **Gross Energy (`GE_feed_kcal_kg`)**: If unmeasured by bomb
-  calorimetry, calculate using the NRC (1989) Ewan equation documented
-  in the [Technical
-  Reference](https://juancbm99.github.io/herdr/articles/Technical_reference.html#feed_characteristics).
+- **`source_DE` & `source_GE`**: document the origin of Digestible
+  Energy (`DE_pct`) and Gross Energy (`GE_feed_kcal_kg`) values.
+- **Forages (`DE_pct`)**: Source from **Feedipedia**, **INRAE-CIRAD-AFZ
+  FeedTables**, or **FEDNA** (when measured values are unavailable,
+  energy digestibility can be approximated from organic matter
+  digestibility).
+- **Gross Energy (`GE_feed_kcal_kg`)**: For organic feeds without bomb
+  calorimetry measurements, `herdr` uses the **Ewan (1989)** equation
+  ($`\text{GE} = 4140 - 44\,\text{ASH} + 15\,\text{CP} + 56\,\text{EE}`$,
+  kcal/kg DM). For inorganic minerals and non-energetic trace additives,
+  set `GE_feed_kcal_kg = 0`; for pure amino acids, urea (`2530`
+  kcal/kg), or organic acids, use INRAE-CIRAD-AFZ FeedTables or
+  NIST/FEDNA standard combustion enthalpy directly.
 - Leave the swine/poultry energy columns as `NA` if the ingredient is
   only fed to ruminants (as here) — herdr only needs them for
   monogastric diets.
@@ -117,9 +119,9 @@ vignette for the full column definitions.
 which powers the land-use and upstream footprint calculations. Add a row
 here too:
 
-| ingredient | yield_name | agribalyse_name | ea_reference | economic_allocation | kg_coproduct_per_1ton_maincrop |
-|:---|:---|:---|:---|---:|---:|
-| `brewers_grains_wet` | `Barley` | `Brewer's grains, fresh, at brewery {FR} U` | `Brewer's grains, fresh, at brewery {FR} U` | 0.056 | 210 |
+| ingredient | yield_name | agribalyse_name | ea_reference | economic_allocation | kg_coproduct_per_1ton_maincrop | human_edible | diaas_pct | diaas_reference |
+|:---|:---|:---|:---|---:|---:|---:|---:|:---|
+| `brewers_grains_wet` | `Barley` | `Brewer's grains, fresh, at brewery {FR} U` | `Brewer's grains, fresh, at brewery {FR} U` | 0.056 | 210 | 0 | `NA` | `NA` |
 
 Three of these columns need a bit more care:
 
@@ -252,7 +254,7 @@ Keep these practical rules in mind when entering ingredients:
   - **Leaving it blank or `NA`**: If `country_of_origin` is `NA`, herdr
     automatically estimates the genuine producer country through dynamic
     international trade flows (see the [Land Use
-    Methodology](https://juancbm99.github.io/herdr/articles/land_use.html#feed-origin--dynamic-trade-allocation)
+    Methodology](https://juancbm99.github.io/herdr/articles/land_use.md)
     vignette for how trade flows and re-export hubs are traced).
 
 ------------------------------------------------------------------------

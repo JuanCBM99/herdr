@@ -65,7 +65,7 @@ is an excerpt of the concentrate portion for Spain South:
 |:---|:---|:---|---:|:---|---:|
 | `diet_dairy_mature_south` | `concentrate` | `corn` | 44.85 | `Spain` | `NA` |
 | `diet_dairy_mature_south` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature_south` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| `diet_dairy_mature_south` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
 
 > 🌍 **Missing origins:** `country_of_origin` for soybean and rapeseed
 > meals is left as `NA`. `herdr` resolves both automatically using the
@@ -73,9 +73,9 @@ is an excerpt of the concentrate portion for Spain South:
 > threshold — see [Land Use
 > Methodology](https://juancbm99.github.io/herdr/articles/land_use.md).
 >
-> 🎯 **Overriding the yield:** setting `custom_yield_kg_ha = 3200`
-> instructs `herdr` to use that farm-specific dry matter yield directly
-> instead of querying FAOSTAT.
+> 🎯 **Overriding the yield:** leaving `custom_yield_kg_ha` as `NA` uses
+> FAOSTAT statistics; entering a custom dry matter yield (e.g. `3200`)
+> overrides FAOSTAT directly.
 
 ------------------------------------------------------------------------
 
@@ -88,8 +88,8 @@ coefficients.
 
 | farm_id | animal_tag | region | subregion | animal_type | animal_subtype | production_role | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | pregnancy_rate | replacement_rate |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|---:|---:|
-| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_north` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,295.0 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
-| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_south` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9,044.0 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_north` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8295 | 3.73 | 3.39 | `cattle and buffalo` | 0.86 | 0.27 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `cattle` | `dairy` | `mature` | `diet_dairy_mature_south` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 9044 | 3.73 | 3.39 | `cattle and buffalo` | 0.86 | 0.27 |
 
 ------------------------------------------------------------------------
 
@@ -119,8 +119,8 @@ agroclimatic conditions:
 |:---|:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
 | `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `anaerobic_lagoon` | `uncovered` | — | `cool` | `temperate` | `zone_moist` | `wet` | `dairy cattle_high_productivity` | 0.0537 |
 | `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy cattle_high_productivity` | 0.3432 |
-| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `default` | `dairy cattle_high_productivity` | 0.3551 |
-| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy cattle_high_productivity` | 0.3551 |
+| `farm_north` | `mature_dairy_cattle` | `spain` | `north` | `solid_storage` | — | — | `cool` | — | — | `wet` | `dairy cattle_high_productivity` | 0.3552 |
+| `farm_south` | `mature_dairy_cattle` | `spain` | `south` | `solid_storage` | — | — | `cool` | — | — | `dry` | `dairy cattle_high_productivity` | 0.3552 |
 
 > ⚠️ **Illustrative snippet:** Some rows were omitted above for brevity.
 > In

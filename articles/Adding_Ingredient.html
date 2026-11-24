@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -145,20 +145,21 @@ is exact and case-sensitive.</p>
 <p>This is herdr’s nutritional database — every ingredient referenced
 anywhere in a diet must have a row here first. Add one, filling in every
 column:</p>
-<table class="table">
+<table style="width:100%;" class="table">
 <colgroup>
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
-<col width="8%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
+<col width="7%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">ingredient</th>
@@ -172,7 +173,8 @@ column:</p>
 <th align="right">DE_pct</th>
 <th align="left">swine_DE_kcal_kg</th>
 <th align="right">GE_feed_kcal_kg</th>
-<th align="right">source_DE</th>
+<th align="left">source_DE</th>
+<th align="left">source_GE</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>brewers_grains_wet</code></td>
@@ -185,8 +187,9 @@ column:</p>
 <td align="right">46.0</td>
 <td align="right">68.0</td>
 <td align="left"><code>NA</code></td>
-<td align="right">4,566</td>
-<td align="right"><code>Feedipedia</code></td>
+<td align="right">4566</td>
+<td align="left"><code>Feedipedia</code></td>
+<td align="left"><code>Ewan (1989)</code></td>
 </tr></tbody>
 </table>
 <p><em>(Note: table truncated for display purposes. Make sure all
@@ -242,26 +245,25 @@ feed table (FEDNA is herdr’s default source for most of its bundled
 ingredients; Feedipedia is a good alternative for by-products like this
 one).</li>
 <li>
-<strong><code>source_DE</code></strong>: this column documents the
-origin of the Digestible Energy (<code>DE_pct</code>) value.</li>
+<strong><code>source_DE</code> &amp;
+<code>source_GE</code></strong>: document the origin of Digestible
+Energy (<code>DE_pct</code>) and Gross Energy
+(<code>GE_feed_kcal_kg</code>) values.</li>
 <li>
-<strong>Forages (<code>DE_pct</code>)</strong>: If a measured value
-is not available, Energy Digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">Ed</annotation></semantics></math>)
-is derived from Organic Matter digestibility
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>O</mi><mi>M</mi><mi>d</mi></mrow><annotation encoding="application/x-tex">OMd</annotation></semantics></math>)
-and proximate analysis
-(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>C</mi><mi>P</mi></mrow><annotation encoding="application/x-tex">CP</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mi>E</mi></mrow><annotation encoding="application/x-tex">EE</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>N</mi><mi>D</mi><mi>F</mi></mrow><annotation encoding="application/x-tex">NDF</annotation></semantics></math>,
-<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>A</mi><mi>s</mi><mi>h</mi></mrow><annotation encoding="application/x-tex">Ash</annotation></semantics></math>).
-See the exact regression formulas in the <a href="Technical_reference.html#feed_characteristics">Technical
-Reference: Feed Characteristics</a>.</li>
+<strong>Forages (<code>DE_pct</code>)</strong>: Source from
+<strong>Feedipedia</strong>, <strong>INRAE-CIRAD-AFZ
+FeedTables</strong>, or <strong>FEDNA</strong> (when measured values are
+unavailable, energy digestibility can be approximated from organic
+matter digestibility).</li>
 <li>
-<strong>Gross Energy (<code>GE_feed_kcal_kg</code>)</strong>: If
-unmeasured by bomb calorimetry, calculate using the NRC (1989) Ewan
-equation documented in the <a href="Technical_reference.html#feed_characteristics">Technical
-Reference</a>.</li>
+<strong>Gross Energy (<code>GE_feed_kcal_kg</code>)</strong>: For
+organic feeds without bomb calorimetry measurements, <code>herdr</code>
+uses the <strong>Ewan (1989)</strong> equation
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mtext mathvariant="normal">GE</mtext><mo>=</mo><mn>4140</mn><mo>−</mo><mn>44</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">ASH</mtext><mo>+</mo><mn>15</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">CP</mtext><mo>+</mo><mn>56</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">EE</mtext></mrow><annotation encoding="application/x-tex">\text{GE} = 4140 - 44\,\text{ASH} + 15\,\text{CP} + 56\,\text{EE}</annotation></semantics></math>,
+kcal/kg DM). For inorganic minerals and non-energetic trace additives,
+set <code>GE_feed_kcal_kg = 0</code>; for pure amino acids, urea
+(<code>2530</code> kcal/kg), or organic acids, use INRAE-CIRAD-AFZ
+FeedTables or NIST/FEDNA standard combustion enthalpy directly.</li>
 <li>Leave the swine/poultry energy columns as <code>NA</code> if the
 ingredient is only fed to ruminants (as here) — herdr only needs them
 for monogastric diets.</li>
@@ -279,12 +281,15 @@ LCA process it comes from</em>, which powers the land-use and upstream
 footprint calculations. Add a row here too:</p>
 <table style="width:100%;" class="table">
 <colgroup>
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
-<col width="16%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
+<col width="11%">
 </colgroup>
 <thead><tr class="header">
 <th align="left">ingredient</th>
@@ -293,6 +298,9 @@ footprint calculations. Add a row here too:</p>
 <th align="left">ea_reference</th>
 <th align="right">economic_allocation</th>
 <th align="right">kg_coproduct_per_1ton_maincrop</th>
+<th align="right">human_edible</th>
+<th align="right">diaas_pct</th>
+<th align="left">diaas_reference</th>
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>brewers_grains_wet</code></td>
@@ -301,6 +309,9 @@ footprint calculations. Add a row here too:</p>
 <td align="left"><code>Brewer's grains, fresh, at brewery {FR} U</code></td>
 <td align="right">0.056</td>
 <td align="right">210</td>
+<td align="right">0</td>
+<td align="right"><code>NA</code></td>
+<td align="left"><code>NA</code></td>
 </tr></tbody>
 </table>
 <p>Three of these columns need a bit more care:</p>
@@ -474,9 +485,8 @@ number directly and label the origin as <code>"Custom Data"</code>.</li>
 <strong>Leaving it blank or <code>NA</code></strong>: If
 <code>country_of_origin</code> is <code>NA</code>, herdr automatically
 estimates the genuine producer country through dynamic international
-trade flows (see the <a href="land_use.html#feed-origin--dynamic-trade-allocation">Land Use
-Methodology</a> vignette for how trade flows and re-export hubs are
-traced).</li>
+trade flows (see the <a href="land_use.html">Land Use Methodology</a>
+vignette for how trade flows and re-export hubs are traced).</li>
 </ul>
 </li>
 </ul>

@@ -41,20 +41,26 @@ in your R console or project root:
 herdr_init()
 ```
 
-This generates three standard folders:
+This creates two standard folders in your working directory (an
+`output/` folder is created automatically when saving results with
+`saveoutput = TRUE`):
 
-- **`user_data/`**: The active working directory containing editable CSV
-  scenario templates and reference libraries (`ipcc_coefficients.csv`,
-  `ipcc_mm.csv`, `feed_characteristics.csv`, `mapping.csv`). Background
-  databases (`forages.parquet`, `fao_crops.parquet`,
-  `fao_trade_matrix.parquet`, `ecoalim.parquet`) are resolved
-  automatically via bundled assets and central cache.
+- **`user_data/`**: The active working directory containing 11 CSV files
+  split cleanly into two groups:
+  - **7 Farm Scenario Files (edit these):** `livestock_census.csv`,
+    `livestock_weights.csv`, `ruminant_definitions.csv`,
+    `monogastric_definitions.csv`, `diet_profiles.csv`,
+    `diet_ingredients.csv`, and `manure_management.csv` *(single-species
+    projects only need their own definitions file)*.
+  - **4 Reference Libraries (leave untouched unless adding custom
+    ingredients/factors):** `feed_characteristics.csv`, `mapping.csv`,
+    `ipcc_coefficients.csv`, and `ipcc_mm.csv`. Background databases
+    (`forages.parquet`, `fao_crops.parquet`, `fao_trade_matrix.parquet`,
+    `ecoalim.parquet`) are resolved automatically via bundled assets and
+    central cache.
 - **`Examples/`**: Pre-configured baseline datasets (`Blank_IPCC_2019`,
   `Level1_Spain_Dairy_Cattle_2015`, `Level2_Spain_Dairy_Cattle_2015`,
   `Monogastric_Example`, `Video_Example`) ready to use as templates.
-- **`output/`**: Destination directory where results
-  (`total_emissions_and_land_use.csv` and `product_intensities.csv`) are
-  automatically saved.
 
 ------------------------------------------------------------------------
 
@@ -76,9 +82,10 @@ cohort keys**:
 > ⚠️ **Critical Join & Ordering Rules:** 1. **Exact Key Matching:**
 > Every unique combination of `farm_id`, `animal_tag`, `region`, and
 > `subregion` declared in `livestock_census.csv` must match the
-> definition, weight, and manure tables exactly. Identifiers are
-> **strictly lowercase** with **underscores** (no spaces or uppercase
-> letters). 2. **Spatial vs. Management Grouping:** Together,
+> definition, weight, and manure tables exactly (all four keys are read
+> as character strings, preserving leading zeros such as `"001"` or
+> `"08019"`). Canonical IPCC/system descriptors use lowercase with
+> underscores. 2. **Spatial vs. Management Grouping:** Together,
 > `(farm_id, region, subregion)` define a physical farm/location.
 > Different management phases or housing variants within the same farm
 > (e.g., lactating vs. dry cows, or caged vs. free-range hens) should
@@ -145,8 +152,9 @@ list with two dataframes**:
   Bio-Environmental Inventory & Per-Head Metrics** for every cohort.
 - **`results$intensities`** (saved to `output/product_intensities.csv`):
   **Table 2 — Enterprise-Integrated Commercial & Nutritional
-  Intensities** across milk, meat, eggs, wool, edible protein, and
-  Mottet (2017) Protein FCRs.
+  Intensities** across milk, meat, eggs, wool, edible protein,
+  human-edible Protein FCRs (Wilkinson, 2011), and DIAAS-adjusted
+  `EPCR_DIAAS` / `PQR` (Ertl et al., 2016a, 2016b).
 
 ``` r
 
@@ -266,7 +274,7 @@ p_head_water <- plot_herdr_results(
   functional_unit = "head"
 )
 
-# 5. Protein Feed Conversion & Human Food Competition (Mottet et al. 2017)
+# 5. Protein Feed Conversion, Human Food Competition & DIAAS Quality (Wilkinson 2011; Ertl et al. 2016b)
 p_fcr <- plot_herdr_results(
   df              = results,
   group_cols      = c("animal_type", "animal_subtype"),

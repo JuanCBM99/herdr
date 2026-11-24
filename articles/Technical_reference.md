@@ -140,7 +140,7 @@ feedstuffs.
 |:---|:--:|:--:|:--:|:---|
 | `diet_tag` | character | — | **Yes** | Diet identifier linking to `diet_profiles.csv`. |
 | `ingredient_type` | character | — | **Yes** | Category: `forage`, `concentrate`, `milk`, or `milk_replacer`. |
-| `ingredient` | character | — | **Yes** | Name matching `feed_characteristics.csv` exactly (e.g. `corn_silage`). |
+| `ingredient` | character | — | **Yes** | Name matching `feed_characteristics.csv` exactly (e.g. `corn_silage_30_35`, `corn`, `soybean_meal_44_cp`). |
 | `ingredient_share` | numeric | % | **Yes** | Proportion within that specific `ingredient_type` (must sum to **100%** per category). |
 | `country_of_origin` | character | — | No | Cultivation country. If left `NA`, the model traces origin via bilateral FAO trade matrices. |
 | `custom_yield_kg_ha` | numeric | kg DM/ha | No | Optional farm-measured yield. Overrides national FAO statistics and tags origin as `"Custom Data"`. |
@@ -230,9 +230,9 @@ cohort:
 - **Nutritional Protein Intensities (per kg edible protein):**
   `GHG_intensity_protein`, `GHG_cradle_to_farm_protein`,
   `Land_intensity_protein`, `Water_intensity_protein`.
-- **Protein Feed Efficiency & Quality (Mottet et al. 2017; Ertl et
-  al. 2016a, 2016b):** `Protein_FCR_total`, `Protein_FCR_human_edible`,
-  `EPCR_DIAAS`, `PQR`.
+- **Protein Feed Efficiency & Quality (Wilkinson 2011; Ertl et
+  al. 2016a, 2016b; FAO 2013):** `Protein_FCR_total`,
+  `Protein_FCR_human_edible`, `EPCR_DIAAS`, `PQR`.
 
 ------------------------------------------------------------------------
 
@@ -252,10 +252,19 @@ Agroecological land category: `cropland`, `grassland_convertible`,
 percentage (% as-fed). \* `CP_pct`, `NDF_pct`, `ASH_pct`, `EE_pct`:
 Crude Protein, Neutral Detergent Fiber, Ash, and Ether Extract (% DM).
 \* `DE_pct`: Energy digestibility percentage for ruminants (% DE). \*
-`GE_feed_kcal_kg`: Gross energy content (kcal/kg DM). \*
+`GE_feed_kcal_kg`: Gross energy content (kcal/kg DM). Estimated via Ewan
+(1989) ($`4140 - 44\,\text{ASH} + 15\,\text{CP} + 56\,\text{EE}`$) for
+organic feeds, set directly from INRAE-CIRAD-AFZ FeedTables for
+inorganic minerals (`0`), urea (`2530`), and pure amino acids, from
+NIST/FEDNA standard combustion enthalpy for pure organic acids and
+propylene glycol, and `0` for non-energetic trace additives. \*
 `swine_DE_kcal_kg`, `swine_ME_kcal_kg`: Digestible and metabolizable
 energy for pigs (kcal/kg DM). \* `poultry_ME_kcal_kg`: Metabolizable
-energy for poultry (kcal/kg DM).
+energy for poultry (kcal/kg DM). \* `source_DE`: Scientific reference
+documenting ruminant `DE_pct` (`Feedipedia`, `feedtables`, `MAPA`). \*
+`source_GE`: Provenance of `GE_feed_kcal_kg` (`Ewan (1989)`,
+`INRAE-CIRAD-AFZ FeedTables`, `NIST / FEDNA (combustion enthalpy)`, or
+`Non-energetic additive (0)`).
 
 #### 2. `mapping.csv` — Agricultural & LCA Connector
 
@@ -300,7 +309,11 @@ Bundled reference database containing environmental characterization
 factors from **INRAE / ADEME ECOALIM v9** and **AGRIBALYSE v3.1 / v3.2**
 under the European Commission’s **Environmental Footprint (EF 3.1)**
 standard (per kg fresh weight for concentrates via `DM_pct`, and per kg
-dry matter for `forage` items): \*
+dry matter for `forage` items): \* `Simapro LCI name`, `Feedstuff`,
+`Types of feedstuffs for livestock`: Process identifier (matched against
+`agribalyse_name` in `mapping.csv`), common feedstuff label, and ECOALIM
+feedstuff category. \* `Climate change - EF 3.1 (kg CO2 eq)`: Total
+cradle-to-feed-mill greenhouse gas emissions per kg of feed. \*
 `Climate change - Fossil (kg CO2 eq/kg)`: Fossil greenhouse gas
 emissions per kg of feed. \*
 `Climate change - Land use and LU change (kg CO2 eq/kg)`: Direct

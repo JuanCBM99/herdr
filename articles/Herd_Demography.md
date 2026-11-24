@@ -132,10 +132,15 @@ management concepts**:
 #### Concept B: Replacement Logic — Who Gets Replaced and How?
 
 - **Ruminants (Cattle, Sheep, Goats):**  
-  Adult breeding males live on the farm alongside breeding females.
-  Consequently, **the farm retains both female and male replacement
-  offspring** to ensure the generational renewal of both sexes
-  (`replacement_rate`).
+  In beef cattle (`mature_beef_cattle`, `mature_beef_bull`), sheep, and
+  goats, adult breeding males live on the farm alongside breeding
+  females, so **the farm retains both female and male replacement
+  offspring** (`replacement_rate`). In commercial dairy cattle
+  (`mature_dairy_cattle`), reproduction relies on artificial
+  insemination, so only **female replacements**
+  (`dairy_calves_female_replacement` and
+  `dairy_yearlings_female_replacement`) are retained and surplus
+  male/female calves go to feedlot slaughter.
 - **Swine:**  
   Internal herd replacement focuses exclusively on the **future breeding
   mothers** (replacement gilts and sows). Breeding boars are not raised
@@ -149,8 +154,9 @@ management concepts**:
   *By default, replacement pullet requirements are derived from batch
   turnover ($`365 / \text{productive\_period\_days}`$)*. However,
   `herdr` also supports defining custom replacement rates for
-  `laying_hens` and `breeder_meat_hens` in `monogastric_definitions.csv`
-  for flexible multi-cycle or molting scenarios.
+  `laying_hens`, `free_range_laying_hens`, and `breeder_meat_hens` in
+  `monogastric_definitions.csv` for flexible multi-cycle or molting
+  scenarios.
 
 ------------------------------------------------------------------------
 
@@ -181,20 +187,20 @@ two distinct biological purposes depending on the animal cohort:
 
 1.  **For Adult Breeding Females (except laying hens): Inter-Parturition
     Interval**  
-    For cows, ewes, does, and sows, `productive_period_days` represents
-    the **period between consecutive births** (calving, lambing,
-    kidding, or farrowing interval):
+    For ewes, does, and sows, `productive_period_days` represents the
+    **period between consecutive births** (lambing, kidding, or
+    farrowing interval), giving an annual parturition frequency of
+    $`365 / \text{productive\_period\_days}`$:
 
-    - **Cattle:** Typically `365` days (or `365`–`400` days) for a
-      single annual calving.
     - **Sheep and Goats:** `365` days in annual seasonal systems, or
       shortened (e.g., `200` to `240` days) in accelerated intensive
       breeding schedules.
     - **Swine:** Averages `149` days (115 d gestation + 21–28 d
       lactation + return to estrus), yielding $`365 / 149 \approx 2.45`$
-      farrowings per sow per year.  
-      The annual reproduction frequency is calculated as
-      $`365 / \text{productive\_period\_days}`$.
+      farrowings per sow per year.
+    - **Cattle:** Typically `365` days (1 calving opportunity per year;
+      actual annual births are scaled directly by `pregnancy_rate`
+      rather than $`365 / \text{productive\_period\_days}`$).
 
 2.  **For Laying Hens & Poultry Breeders: Flock Laying Cycle**  
     Birds follow an all-in / all-out batch dynamic.
@@ -230,11 +236,11 @@ two distinct biological purposes depending on the animal cohort:
 
 | Species | Base Adult Tag in `livestock_census.csv` | Productivity Column & Source File | Replacement Column & Source File | Cycle Duration Column (`productive_period_days` in `livestock_weights.csv`) |
 |:---|:---|:---|:---|:---|
-| **Cattle** | `mature_dairy_cattle`, `mature_beef_cattle`, `mature_beef_bull` | `pregnancy_rate` (`ruminant_definitions.csv`) | `replacement_rate` (`ruminant_definitions.csv` — both sexes) | Calving interval (e.g. 365 d) for cows; feeding duration for feedlot calves |
+| **Cattle** | `mature_dairy_cattle`, `mature_beef_cattle`, `mature_beef_bull` | `pregnancy_rate` (`ruminant_definitions.csv`) | `replacement_rate` (`ruminant_definitions.csv` — females in dairy; both sexes in beef) | `365` d for cows; feeding duration for feedlot calves |
 | **Sheep** | `mature_sheep_female_*`, `mature_sheep_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`ruminant_definitions.csv` — both sexes) | Lambing interval (e.g. 200–365 d) for ewes; feeding duration for lambs |
 | **Goats** | `mature_goat_female_*`, `mature_goat_male_*` | `pr_sheep_goat` (`ruminant_definitions.csv`) | `replacement_rate` (`ruminant_definitions.csv` — both sexes) | Kidding interval (e.g. 200–365 d) for does; feeding duration for kids |
 | **Swine** | `breeder_sows`, `boars` | `piglets_suckling` (`monogastric_definitions.csv`) | `replacement_rate` (`monogastric_definitions.csv` — sows only) | Farrowing interval (e.g. 149 d) for sows; feeding duration (110 d) for pigs |
-| **Poultry** | `laying_hens`, `breeder_meat_hens` | `fertility_rate`, `eggs_per_year` (`monogastric_definitions.csv`) | `replacement_rate` (`monogastric_definitions.csv`) | Laying flock cycle (e.g. 511 d) for hens; life cycle (e.g. 42 d) for broilers |
+| **Poultry** | `laying_hens`, `free_range_laying_hens`, `breeder_meat_hens` | `fertility_rate`, `eggs_per_year` (`monogastric_definitions.csv`) | `replacement_rate` (`monogastric_definitions.csv`) | Laying flock cycle (e.g. 441–511 d) for hens; life cycle (e.g. 42 d) for broilers |
 
 ------------------------------------------------------------------------
 

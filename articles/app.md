@@ -128,7 +128,7 @@ identified across tables by the four keys **`farm_id`**,
     (GHG)** (Scope 1 + Feed Fossil + Feed LUC), **Land Use Footprint**
     (Cropland vs. Convertible/Unconvertible Grassland), **Water
     Deprivation (AWARE)**, **Multi-Impact Overview** (3-panel
-    comparison), and **Protein Feed Efficiency (Mottet FCR)**.
+    comparison), and **Protein Efficiency (FCR & EPCR DIAAS)**.
   - **Functional Unit Selector:** Benchmark impacts as **Total
     Inventory** (`Gg CO2e`, `ha`, `Mm3 depriv.`), **Per Commercial
     Product** (`milk`, `meat`, `egg`, `wool`), **Per kg Edible

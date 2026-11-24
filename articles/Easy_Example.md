@@ -53,17 +53,18 @@ Ingredient](https://juancbm99.github.io/herdr/articles/Adding_Ingredient.md)).
 
 | diet_tag | forage_share | concentrate_share | milk_share | milk_replacer_share |
 |:---|---:|---:|---:|---:|
-| `diet_dairy_mature` | 60 | 40 | 0 | 0 |
+| `diet_dairy_mature` | 55 | 45 | 0 | 0 |
 
 #### C. Ingredient breakdown — `diet_ingredients.csv`
 
-Repeat the same `diet_tag` once per ingredient.
+Repeat the same `diet_tag` once per ingredient (excerpt of key
+concentrates from `Level1_Spain_Dairy_Cattle_2015`):
 
 | diet_tag | ingredient_type | ingredient | ingredient_share | country_of_origin | custom_yield_kg_ha |
 |:---|:---|:---|---:|:---|---:|
 | `diet_dairy_mature` | `concentrate` | `corn` | 44.85 | `Spain` | `NA` |
 | `diet_dairy_mature` | `concentrate` | `soybean_meal_44_cp` | 17.12 | `NA` | `NA` |
-| `diet_dairy_mature` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | 3200 |
+| `diet_dairy_mature` | `concentrate` | `rapeseed_meal_00_33_cp` | 28.71 | `NA` | `NA` |
 
 > ✅ **Shares sum to 100% *within* each category** — ensure all
 > `ingredient_share` values within `concentrate` and `forage` each total
@@ -94,7 +95,7 @@ species (`animal_type`), production target (`animal_subtype`: strictly
 
 | farm_id | animal_tag | region | animal_type | animal_subtype | production_role | diet_tag | cfi | ca | c | milk_yield_kg_year | fat_content_pct | protein_content_pct | c_pregnancy_cattle | pregnancy_rate | replacement_rate |
 |:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|---:|---:|---:|:---|---:|---:|
-| `farm_1` | `mature_dairy_cattle` | `spain` | `cattle` | `dairy` | `mature` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8,894.38 | 3.73 | 3.39 | `cattle and buffalo` | 0.90 | 0.27 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `cattle` | `dairy` | `mature` | `diet_dairy_mature` | `cattle_buffalo [lactating cows]` | `stall` | `females` | 8894.38 | 3.73 | 3.39 | `cattle and buffalo` | 0.86 | 0.27 |
 
 > 💡 **Why `replacement_rate = 0.27` matters even when
 > `automatic_cycle = FALSE`:**  
@@ -137,8 +138,13 @@ census exactly.
 
 | farm_id | animal_tag | region | system_base | system_variant | management_months | system_climate | system_subclimate | climate_zone | climate_moisture | b_0 | allocation |
 |:---|:---|:---|:---|:---|---:|:---|:---|:---|:---|:---|---:|
-| `farm_1` | `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `warm` | `temperate` | `zone_dry` | `dry` | `dairy cattle_high_productivity` | 0.3 |
-| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `warm` | — | — | `default` | `dairy cattle_high_productivity` | 0.7 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `liquid_slurry` | `with_natural_crust_cover` | 3 | `cool` | `temperate` | `zone_moist` | `wet` | `dairy cattle_high_productivity` | 0.3433 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `cool` | — | — | `wet` | `dairy cattle_high_productivity` | 0.3552 |
+| `farm_1` | `mature_dairy_cattle` | `spain` | `solid_storage` | — | — | `temperate` | — | — | `dry` | `dairy cattle_high_productivity` | 0.0694 |
+
+> ⚠️ **Excerpt:** In the bundled
+> `Level1_Spain_Dairy_Cattle_2015/manure_management.csv`, all 10
+> national climate/system rows sum to exactly **1.0**.
 
 ------------------------------------------------------------------------
 

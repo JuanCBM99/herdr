@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -209,8 +209,8 @@ every required column is filled in (see <a href="Adding_Ingredient.html">Adding 
 </tr></thead>
 <tbody><tr class="odd">
 <td align="left"><code>diet_dairy_mature</code></td>
-<td align="right">60</td>
-<td align="right">40</td>
+<td align="right">55</td>
+<td align="right">45</td>
 <td align="right">0</td>
 <td align="right">0</td>
 </tr></tbody>
@@ -219,7 +219,8 @@ every required column is filled in (see <a href="Adding_Ingredient.html">Adding 
 <div class="section level4">
 <h4 id="c--ingredient-breakdown-diet_ingredients-csv">C. Ingredient breakdown — <code>diet_ingredients.csv</code><a class="anchor" aria-label="anchor" href="#c--ingredient-breakdown-diet_ingredients-csv"></a>
 </h4>
-<p>Repeat the same <code>diet_tag</code> once per ingredient.</p>
+<p>Repeat the same <code>diet_tag</code> once per ingredient (excerpt of
+key concentrates from <code>Level1_Spain_Dairy_Cattle_2015</code>):</p>
 <table style="width:100%;" class="table">
 <colgroup>
 <col width="16%">
@@ -260,7 +261,7 @@ every required column is filled in (see <a href="Adding_Ingredient.html">Adding 
 <td align="left"><code>rapeseed_meal_00_33_cp</code></td>
 <td align="right">28.71</td>
 <td align="left"><code>NA</code></td>
-<td align="right">3200</td>
+<td align="right"><code>NA</code></td>
 </tr>
 </tbody>
 </table>
@@ -344,11 +345,11 @@ strictly <code>mature</code>, <code>replacement</code>, or
 <td align="left"><code>cattle_buffalo [lactating cows]</code></td>
 <td align="left"><code>stall</code></td>
 <td align="left"><code>females</code></td>
-<td align="right">8,894.38</td>
+<td align="right">8894.38</td>
 <td align="right">3.73</td>
 <td align="right">3.39</td>
 <td align="left"><code>cattle and buffalo</code></td>
-<td align="right">0.90</td>
+<td align="right">0.86</td>
 <td align="right">0.27</td>
 </tr></tbody>
 </table>
@@ -460,12 +461,12 @@ life-stage duration</strong> (days on feed).</p>
 <td align="left"><code>liquid_slurry</code></td>
 <td align="left"><code>with_natural_crust_cover</code></td>
 <td align="right">3</td>
-<td align="left"><code>warm</code></td>
+<td align="left"><code>cool</code></td>
 <td align="left"><code>temperate</code></td>
-<td align="left"><code>zone_dry</code></td>
-<td align="left"><code>dry</code></td>
+<td align="left"><code>zone_moist</code></td>
+<td align="left"><code>wet</code></td>
 <td align="left"><code>dairy cattle_high_productivity</code></td>
-<td align="right">0.3</td>
+<td align="right">0.3433</td>
 </tr>
 <tr class="even">
 <td align="left"><code>farm_1</code></td>
@@ -474,15 +475,34 @@ life-stage duration</strong> (days on feed).</p>
 <td align="left"><code>solid_storage</code></td>
 <td align="left">—</td>
 <td align="right">—</td>
-<td align="left"><code>warm</code></td>
+<td align="left"><code>cool</code></td>
 <td align="left">—</td>
 <td align="left">—</td>
-<td align="left"><code>default</code></td>
+<td align="left"><code>wet</code></td>
 <td align="left"><code>dairy cattle_high_productivity</code></td>
-<td align="right">0.7</td>
+<td align="right">0.3552</td>
+</tr>
+<tr class="odd">
+<td align="left"><code>farm_1</code></td>
+<td align="left"><code>mature_dairy_cattle</code></td>
+<td align="left"><code>spain</code></td>
+<td align="left"><code>solid_storage</code></td>
+<td align="left">—</td>
+<td align="right">—</td>
+<td align="left"><code>temperate</code></td>
+<td align="left">—</td>
+<td align="left">—</td>
+<td align="left"><code>dry</code></td>
+<td align="left"><code>dairy cattle_high_productivity</code></td>
+<td align="right">0.0694</td>
 </tr>
 </tbody>
 </table>
+<blockquote>
+<p>⚠️ <strong>Excerpt:</strong> In the bundled
+<code>Level1_Spain_Dairy_Cattle_2015/manure_management.csv</code>, all
+10 national climate/system rows sum to exactly <strong>1.0</strong>.</p>
+</blockquote>
 <hr>
 </div>
 <div class="section level3">

@@ -67,9 +67,11 @@ calculate_land_use(
 
 ## Value
 
-A tibble with total feed-related land use (`Total_Land_m2`, m2/year)
-broken down by land category (`Forages_m2`, `Grains_m2`, `Maize_Soy_m2`,
-`Grazing_m2`, `Cropland_m2`) per animal cohort.
+A tibble with feed-related land use per animal
+(`land_use_per_animal_m2`, m2/head/year) and total cohort land use
+(`total_land_use_m2`, m2/year) grouped by cohort, `ingredient`,
+`land_type` (`cropland`, `grassland_convertible`,
+`grassland_unconvertible`, `none`), and `country_of_origin`.
 
 ## Examples
 

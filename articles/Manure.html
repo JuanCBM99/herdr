@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -121,10 +121,11 @@ Basis</a>.</p>
 <div class="section level4">
 <h4 id="rule-1-allocation-must-equal-exactly-1-0-per-cohort">Rule 1: Allocation Must Equal Exactly 1.0 per Cohort<a class="anchor" aria-label="anchor" href="#rule-1-allocation-must-equal-exactly-1-0-per-cohort"></a>
 </h4>
-<p>For each unique animal cohort (defined by <code>animal_tag</code>,
-<code>region</code>, and <code>subregion</code>), the sum of the
-<code>allocation</code> column across all assigned manure systems must
-equal <strong>1.0</strong> (100%):</p>
+<p>For each unique animal cohort (defined by <code>farm_id</code>,
+<code>animal_tag</code>, <code>region</code>, and
+<code>subregion</code>), the sum of the <code>allocation</code> column
+across all assigned manure systems must equal <strong>1.0</strong>
+(100%):</p>
 <p><math display="block" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo>∑</mo><mtext mathvariant="normal">allocation</mtext><mo>=</mo><mn>1.0</mn></mrow><annotation encoding="application/x-tex">\sum \text{allocation} = 1.0</annotation></semantics></math></p>
 <p><em>Example:</em> If dairy cows spend 7 months indoors with liquid
 slurry and 5 months grazing on pasture, declare two rows for that
@@ -460,7 +461,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong><code>composting</code></strong></td>
@@ -473,7 +477,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong><code>anaerobic_digester</code></strong></td>
@@ -488,7 +495,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong><code>aerobic_treatment</code></strong></td>
@@ -500,7 +510,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong><code>pasture_range_paddock</code></strong></td>
@@ -509,7 +522,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong><code>daily_spread</code></strong></td>
@@ -518,7 +534,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong><code>dry_lot</code></strong></td>
@@ -527,7 +546,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="even">
 <td align="left"><strong><code>burned_for_fuel</code></strong></td>
@@ -536,7 +558,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 <tr class="odd">
 <td align="left"><strong><code>poultry_manure</code></strong></td>
@@ -548,7 +573,10 @@ those columns blank.</p>
 <code>cool</code>, <code>temperate</code>, or
 <code>warm</code>
 </td>
-<td align="center"><code>default</code></td>
+<td align="center">
+<code>default</code>, <code>dry</code>, or
+<code>wet</code>
+</td>
 </tr>
 </tbody>
 </table>
@@ -594,7 +622,12 @@ use <strong><code>dry</code></strong>.</li>
 </ul>
 </li>
 <li>For <strong>Standard Systems:</strong> Use
-<strong><code>default</code></strong>.</li>
+<strong><code>wet</code></strong> or <strong><code>dry</code></strong>
+when regional moisture is known (IPCC 2019 distinguishes
+<code>EF4</code> volatilization factors between wet <code>0.014</code>
+and dry <code>0.005</code> climates), or
+<strong><code>default</code></strong> (<code>0.010</code>) when climate
+moisture is disaggregated/unknown.</li>
 </ul>
 <hr>
 </div>

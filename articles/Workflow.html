@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -130,17 +130,32 @@ AWARE), agroecological land competition, and edible protein outputs.</p>
 <p>Run <code><a href="../reference/herdr_init.html">herdr_init()</a></code> in your R console or project root:</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/herdr_init.html">herdr_init</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p>This generates three standard folders:</p>
+<p>This creates two standard folders in your working directory (an
+<code>output/</code> folder is created automatically when saving results
+with <code>saveoutput = TRUE</code>):</p>
 <ul>
 <li>
 <strong><code>user_data/</code></strong>: The active working
-directory containing editable CSV scenario templates and reference
-libraries (<code>ipcc_coefficients.csv</code>, <code>ipcc_mm.csv</code>,
-<code>feed_characteristics.csv</code>, <code>mapping.csv</code>).
-Background databases (<code>forages.parquet</code>,
-<code>fao_crops.parquet</code>, <code>fao_trade_matrix.parquet</code>,
-<code>ecoalim.parquet</code>) are resolved automatically via bundled
-assets and central cache.</li>
+directory containing 11 CSV files split cleanly into two groups:
+<ul>
+<li>
+<strong>7 Farm Scenario Files (edit these):</strong>
+<code>livestock_census.csv</code>, <code>livestock_weights.csv</code>,
+<code>ruminant_definitions.csv</code>,
+<code>monogastric_definitions.csv</code>,
+<code>diet_profiles.csv</code>, <code>diet_ingredients.csv</code>, and
+<code>manure_management.csv</code> <em>(single-species projects only
+need their own definitions file)</em>.</li>
+<li>
+<strong>4 Reference Libraries (leave untouched unless adding custom
+ingredients/factors):</strong> <code>feed_characteristics.csv</code>,
+<code>mapping.csv</code>, <code>ipcc_coefficients.csv</code>, and
+<code>ipcc_mm.csv</code>. Background databases
+(<code>forages.parquet</code>, <code>fao_crops.parquet</code>,
+<code>fao_trade_matrix.parquet</code>, <code>ecoalim.parquet</code>) are
+resolved automatically via bundled assets and central cache.</li>
+</ul>
+</li>
 <li>
 <strong><code>Examples/</code></strong>: Pre-configured baseline
 datasets (<code>Blank_IPCC_2019</code>,
@@ -148,10 +163,6 @@ datasets (<code>Blank_IPCC_2019</code>,
 <code>Level2_Spain_Dairy_Cattle_2015</code>,
 <code>Monogastric_Example</code>, <code>Video_Example</code>) ready to
 use as templates.</li>
-<li>
-<strong><code>output/</code></strong>: Destination directory where
-results (<code>total_emissions_and_land_use.csv</code> and
-<code>product_intensities.csv</code>) are automatically saved.</li>
 </ul>
 <hr>
 </div>
@@ -173,10 +184,11 @@ primary demographic cohort keys</strong>:</p>
 <strong>Exact Key Matching:</strong> Every unique combination of
 <code>farm_id</code>, <code>animal_tag</code>, <code>region</code>, and
 <code>subregion</code> declared in <code>livestock_census.csv</code>
-must match the definition, weight, and manure tables exactly.
-Identifiers are <strong>strictly lowercase</strong> with
-<strong>underscores</strong> (no spaces or uppercase letters). 2.
-<strong>Spatial vs. Management Grouping:</strong> Together,
+must match the definition, weight, and manure tables exactly (all four
+keys are read as character strings, preserving leading zeros such as
+<code>"001"</code> or <code>"08019"</code>). Canonical IPCC/system
+descriptors use lowercase with underscores. 2. <strong>Spatial
+vs. Management Grouping:</strong> Together,
 <code>(farm_id, region, subregion)</code> define a physical
 farm/location. Different management phases or housing variants within
 the same farm (e.g., lactating vs. dry cows, or caged vs. free-range
@@ -377,8 +389,9 @@ every cohort.</li>
 <strong><code>results$intensities</code></strong> (saved to
 <code>output/product_intensities.csv</code>): <strong>Table 2 —
 Enterprise-Integrated Commercial &amp; Nutritional Intensities</strong>
-across milk, meat, eggs, wool, edible protein, and Mottet (2017) Protein
-FCRs.</li>
+across milk, meat, eggs, wool, edible protein, human-edible Protein FCRs
+(Wilkinson, 2011), and DIAAS-adjusted <code>EPCR_DIAAS</code> /
+<code>PQR</code> (Ertl et al., 2016a, 2016b).</li>
 </ul>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://juancbm99.github.io/herdr">herdr</a></span><span class="op">)</span></span>
@@ -553,7 +566,7 @@ individual modules sequentially:</p>
 <span>  functional_unit <span class="op">=</span> <span class="st">"head"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 5. Protein Feed Conversion &amp; Human Food Competition (Mottet et al. 2017)</span></span>
+<span><span class="co"># 5. Protein Feed Conversion, Human Food Competition &amp; DIAAS Quality (Wilkinson 2011; Ertl et al. 2016b)</span></span>
 <span><span class="va">p_fcr</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/plot_herdr_results.html">plot_herdr_results</a></span><span class="op">(</span></span>
 <span>  df              <span class="op">=</span> <span class="va">results</span>,</span>
 <span>  group_cols      <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"animal_type"</span>, <span class="st">"animal_subtype"</span><span class="op">)</span>,</span>

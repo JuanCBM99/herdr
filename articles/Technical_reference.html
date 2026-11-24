@@ -71,10 +71,10 @@
 </li>
       </ul>
 <ul class="navbar-nav">
-<li class="nav-item"><a class="nav-link" href="../reference/index.html"><span class="fa fa-file-code-o"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip"><span class="fa fa-download"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr"><span class="fa fa-github"></span></a></li>
-<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9"><span class="fa fa-youtube"></span></a></li>
+<li class="nav-item"><a class="nav-link" href="../reference/index.html" aria-label="Function Reference"><span class="fa fas fa-code"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr/archive/refs/heads/main.zip" aria-label="Download Repository"><span class="fa fas fa-download"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://github.com/JuanCBM99/herdr" aria-label="GitHub Repository"><span class="fa fab fa-github"></span></a></li>
+<li class="nav-item"><a class="external-link nav-link" href="https://www.youtube.com/@JuanCBM9" aria-label="Video Tutorial"><span class="fa fab fa-youtube"></span></a></li>
       </ul>
 </div>
 
@@ -240,9 +240,10 @@ maintenance energy, growth, and throughput modeling.</p>
 <td align="left"><code>adult_weight_kg</code></td>
 <td align="center">numeric</td>
 <td align="center">kg</td>
-<td align="center"><strong>Yes</strong></td>
+<td align="center">Ruminants/Poultry</td>
 <td align="left">Average mature live weight of an adult animal of this
-breed/species.</td>
+breed/species (optional/blank for swine, which use
+<code>initial_weight_kg</code> and <code>final_weight_kg</code>).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>productive_period_days</code></td>
@@ -277,41 +278,44 @@ production phase.</td>
 <td align="left"><code>sows_gestation_days</code></td>
 <td align="center">numeric</td>
 <td align="center">days</td>
-<td align="center">Swine</td>
-<td align="left">Gestation duration for breeding sows (default:
-<code>115</code> days).</td>
+<td align="center">Swine Sows</td>
+<td align="left">Gestation duration for breeding sows (typical:
+<code>115</code> days; treated as <code>0</code> if left blank).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>sows_lactation_days</code></td>
 <td align="center">numeric</td>
 <td align="center">days</td>
-<td align="center">Swine</td>
-<td align="left">Lactation duration for breeding sows (default:
-<code>28</code> days).</td>
+<td align="center">Swine Sows</td>
+<td align="left">Lactation duration for breeding sows (typical:
+<code>21</code>–<code>28</code> days; treated as <code>0</code> if left
+blank).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>piglet_birth_weight_kg</code></td>
 <td align="center">numeric</td>
 <td align="center">kg</td>
-<td align="center">Swine</td>
-<td align="left">Average live weight of newborn piglet (default:
-<code>1.4</code> kg).</td>
+<td align="center">Swine Sows</td>
+<td align="left">Average live weight of newborn piglet (typical:
+<code>1.4</code> kg; treated as <code>0</code> if left blank).</td>
 </tr>
 <tr class="odd">
 <td align="left"><code>piglet_weaning_weight_kg</code></td>
 <td align="center">numeric</td>
 <td align="center">kg</td>
-<td align="center">Swine</td>
-<td align="left">Average live weight of piglet at weaning (default:
-<code>6.5</code> kg).</td>
+<td align="center">Swine Sows</td>
+<td align="left">Average live weight of piglet at weaning (typical:
+<code>5.9</code>–<code>6.5</code> kg; treated as <code>0</code> if left
+blank).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>sow_reserve_gain_kg</code></td>
 <td align="center">numeric</td>
 <td align="center">kg</td>
-<td align="center">Swine</td>
+<td align="center">Swine Sows</td>
 <td align="left">Net maternal tissue reserve recovery during gestation
-(default: <code>15.0</code> kg).</td>
+(typical: <code>5.0</code>–<code>15.0</code> kg; treated as
+<code>0</code> if left blank).</td>
 </tr>
 </tbody>
 </table>
@@ -756,7 +760,8 @@ feedstuffs.</p>
 <td align="center">—</td>
 <td align="center"><strong>Yes</strong></td>
 <td align="left">Name matching <code>feed_characteristics.csv</code>
-exactly (e.g. <code>corn_silage</code>).</td>
+exactly (e.g. <code>corn_silage_30_35</code>, <code>corn</code>,
+<code>soybean_meal_44_cp</code>).</td>
 </tr>
 <tr class="even">
 <td align="left"><code>ingredient_share</code></td>
@@ -1003,8 +1008,8 @@ protein):</strong> <code>GHG_intensity_protein</code>,
 <code>Land_intensity_protein</code>,
 <code>Water_intensity_protein</code>.</li>
 <li>
-<strong>Protein Feed Efficiency &amp; Quality (Mottet et al. 2017;
-Ertl et al. 2016a, 2016b):</strong> <code>Protein_FCR_total</code>,
+<strong>Protein Feed Efficiency &amp; Quality (Wilkinson 2011; Ertl
+et al. 2016a, 2016b; FAO 2013):</strong> <code>Protein_FCR_total</code>,
 <code>Protein_FCR_human_edible</code>, <code>EPCR_DIAAS</code>,
 <code>PQR</code>.</li>
 </ul>
@@ -1035,10 +1040,22 @@ land category: <code>cropland</code>,
 <code>EE_pct</code>: Crude Protein, Neutral Detergent Fiber, Ash, and
 Ether Extract (% DM). * <code>DE_pct</code>: Energy digestibility
 percentage for ruminants (% DE). * <code>GE_feed_kcal_kg</code>: Gross
-energy content (kcal/kg DM). * <code>swine_DE_kcal_kg</code>,
+energy content (kcal/kg DM). Estimated via Ewan (1989)
+(<math display="inline" xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mn>4140</mn><mo>−</mo><mn>44</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">ASH</mtext><mo>+</mo><mn>15</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">CP</mtext><mo>+</mo><mn>56</mn><mspace width="0.167em"></mspace><mtext mathvariant="normal">EE</mtext></mrow><annotation encoding="application/x-tex">4140 - 44\,\text{ASH} + 15\,\text{CP} + 56\,\text{EE}</annotation></semantics></math>)
+for organic feeds, set directly from INRAE-CIRAD-AFZ FeedTables for
+inorganic minerals (<code>0</code>), urea (<code>2530</code>), and pure
+amino acids, from NIST/FEDNA standard combustion enthalpy for pure
+organic acids and propylene glycol, and <code>0</code> for non-energetic
+trace additives. * <code>swine_DE_kcal_kg</code>,
 <code>swine_ME_kcal_kg</code>: Digestible and metabolizable energy for
 pigs (kcal/kg DM). * <code>poultry_ME_kcal_kg</code>: Metabolizable
-energy for poultry (kcal/kg DM).</p>
+energy for poultry (kcal/kg DM). * <code>source_DE</code>: Scientific
+reference documenting ruminant <code>DE_pct</code>
+(<code>Feedipedia</code>, <code>feedtables</code>, <code>MAPA</code>). *
+<code>source_GE</code>: Provenance of <code>GE_feed_kcal_kg</code>
+(<code>Ewan (1989)</code>, <code>INRAE-CIRAD-AFZ FeedTables</code>,
+<code>NIST / FEDNA (combustion enthalpy)</code>, or
+<code>Non-energetic additive (0)</code>).</p>
 </div>
 <div class="section level4">
 <h4 id="mapping">2. <code>mapping.csv</code> — Agricultural &amp; LCA Connector<a class="anchor" aria-label="anchor" href="#mapping"></a>
@@ -1095,7 +1112,12 @@ factors from <strong>INRAE / ADEME ECOALIM v9</strong> and
 <strong>AGRIBALYSE v3.1 / v3.2</strong> under the European Commission’s
 <strong>Environmental Footprint (EF 3.1)</strong> standard (per kg fresh
 weight for concentrates via <code>DM_pct</code>, and per kg dry matter
-for <code>forage</code> items): *
+for <code>forage</code> items): * <code>Simapro LCI name</code>,
+<code>Feedstuff</code>, <code>Types of feedstuffs for livestock</code>:
+Process identifier (matched against <code>agribalyse_name</code> in
+<code>mapping.csv</code>), common feedstuff label, and ECOALIM feedstuff
+category. * <code>Climate change - EF 3.1 (kg CO2 eq)</code>: Total
+cradle-to-feed-mill greenhouse gas emissions per kg of feed. *
 <code>Climate change - Fossil (kg CO2 eq/kg)</code>: Fossil greenhouse
 gas emissions per kg of feed. *
 <code>Climate change - Land use and LU change (kg CO2 eq/kg)</code>:

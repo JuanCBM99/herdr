@@ -23,7 +23,7 @@ flows into a **single, internally consistent modeling engine**.
 │  1. IPCC TIER 2 GHGs     │  2. AGROECOLOGICAL LAND     │  3. FOOD PRODUCTIVITY & FCR   │
 │  • Enteric CH4           │  • Cropland vs Grassland    │  • GLEAM Milk, Meat, Eggs     │
 │  • Manure CH4            │  • Mottet (2017) Framework  │  • IDF (2022) Physical Alloc. │
-│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Mottet (2017) Protein FCRs │
+│  • Direct & Indirect N2O │  • FAOSTAT Bilateral Trade  │  • Protein FCR & DIAAS EPCR   │
 ├──────────────────────────┴─────────────────────────────┴───────────────────────────────┤
 │  4. UPSTREAM FEED LCA & WATER DEPRIVATION (EF 3.1)                                     │
 │  • ECOALIM v9 & AGRIBALYSE v3.1 (Fossil vs. LUC CO2e)                                  │
@@ -47,8 +47,8 @@ flows into a **single, internally consistent modeling engine**.
     **FAO** methodology to translate herd throughput across functional
     roles (`mature`, `replacement`, `slaughter`) into physical
     commodities (Fat and Protein Corrected Milk, cold dressed carcass
-    weight, boneless meat, greasy wool, and fresh eggs) and total
-    digestible human protein (kg protein/year).
+    weight, greasy wool, and fresh eggs) and edible human protein (crude
+    `total_protein_kg` and DIAAS-adjusted `total_HDP_kg`).
 4.  **Enterprise Attribution, Biophysical Co-Product Allocation &
     Protein Feed Efficiency:** Automatically integrates non-commercial
     rearing and breeding overheads (`replacement` and `mature` breeders)

@@ -44,22 +44,26 @@
     allocation method for dairy systems (3.1 MJ/kg FPCM milk vs. 15.0
     MJ/kg live weight gain) to partition impacts and feed intake between
     milk and surplus meat co-products.
-  - Implemented the **Mottet et al. (2017)** Protein Feed Efficiency and
-    Human Food Security framework: replaced legacy dry-matter FCRs with
-    `feed_CP_total_kg`, `feed_CP_cropland_kg`, `Protein_FCR_total`
-    (biological nitrogen efficiency), and `Protein_FCR_cropland`
-    (cropland human food competition ratio).
+  - Implemented the human-edible Protein FCR (**Wilkinson, 2011**) &
+    **DIAAS-adjusted (FAO 2013; Ertl et al., 2016a, 2016b)** Protein
+    Feed Efficiency and Quality framework: reports `feed_CP_total_kg`,
+    `feed_CP_human_edible_kg`, `feed_HDP_kg`, `total_HDP_kg`,
+    `Protein_FCR_total`, `Protein_FCR_human_edible`, `EPCR_DIAAS`
+    (quality-adjusted Edible Protein Conversion Ratio), and `PQR`
+    (Protein Quality Ratio).
   - Enhanced land use reporting with complete agroecological
-    partitioning: `Land_cropland_m2`, `Land_grassland_convertible_m2`,
-    `Land_grassland_unconvertible_m2`, and `Land_other_m2`.
+    partitioning following **Mottet et al. (2017)**: `Land_cropland_m2`,
+    `Land_grassland_convertible_m2`, `Land_grassland_unconvertible_m2`,
+    and `Land_other_m2`.
 - **Enhanced Interactive Shiny Application**:
   - Added dynamic grouping selector supporting species (`animal_type`)
     and production subtype (`animal_subtype`) alongside cohort and
     regional keys.
   - Symmetrical 2-level impact selection: primary choice of Impact
-    Category (Carbon GHG, Land Use, Water Deprivation, Overview, Mottet
-    FCR) followed by Functional Unit and Commercial Product subselector
-    applied uniformly across Carbon, Land, and Water.
+    Category (Carbon GHG, Land Use, Water Deprivation, Overview, Protein
+    Efficiency FCR & EPCR DIAAS) followed by Functional Unit and
+    Commercial Product subselector applied uniformly across Carbon,
+    Land, and Water.
   - Interactive preview table with sorted column previews and CSV/PNG
     download handlers.
 - **User-Defined Milk Protein Percentage (`protein_content_pct`)**:
@@ -103,30 +107,38 @@
   `reproduction_parameters.csv` file across all demographic modeling
   functions, vignettes, example files, and the Shiny application data
   dictionary.
-- **Dairy Feedlot Meat Accounting**: Refined `is_non_milking_dairy`
-  detection in `R/14_summary.R` and `R/plots.R` to check
-  `(animal_subtype == "dairy") & (milk_kg == 0) & (meat_kg == 0)`.
-  Cohorts born from dairy herds that yield meat
-  (e.g. `feedlot_calves_male`, `feedlot_calves_female`) are no longer
-  excluded as non-milking phases, ensuring their meat yields, greenhouse
-  gas and land use intensities, and Mottet FCR are fully accounted for
-  and displayed in summary outputs and plots.
+- **Dairy Feedlot Meat Accounting**: Refined dairy co-product detection
+  in `R/14_summary.R` and `R/plots.R` so cohorts born from dairy herds
+  that yield meat (e.g. `feedlot_calves_male`, `feedlot_calves_female`)
+  are integrated into the dairy enterprise pool and accounted for in
+  meat intensities, Protein FCRs, and `EPCR_DIAAS`.
 - **Dry Phase Meat Allocation**: True non-milking, non-meat phases
   (e.g. `dry_phase` where both milk and meat are 0) have `AF_meat = 0`,
   `AF_milk = 0`, and intensities set to `NA` (rendered as empty bars in
   charts) to avoid 100% allocation of dry-period emissions to cull meat.
+- **Feed Database & Input Robustness**: Corrected `GE_feed_kcal_kg` for
+  inorganic minerals, salts, urea (`2530` kcal/kg), pure amino acids
+  (INRAE-CIRAD-AFZ FeedTables), organic acids (NIST/FEDNA combustion
+  enthalpy), and non-energetic additives, adding a `source_GE`
+  provenance column; unified character-typed CSV key loading
+  (`herdr_read_input_csv()`); made `region` strictly optional; added
+  single-species and 0-row filter guards; and hardened Shiny
+  UI/validation (`frac_fat_pct`/`frac_protein_pct` 0–1 docs, 0-row
+  `save_clean()`, manure modal cascades, NA-safe validation).
 - Resolved factor level duplication error in
   [`plot_herdr_results()`](https://juancbm99.github.io/herdr/reference/plot_herdr_results.md)
-  when grouping solely by species (`animal_type`).
+  when grouping solely by species (`animal_type`), and fixed
+  `functional_unit = "product"` primary-product selection for layers and
+  multi-cohort dairy systems.
 - Decoupled dairy cohort detection in aggregation routines to support
   arbitrary demographic grouping combinations without losing co-product
   allocation rules.
-- Cleaned up forage data lookup in `R/fao_data.R`, deprecating legacy
-  `fao_forages.parquet` in favor of standard `forages.parquet`.
-- Fully registered package global variables to ensure 0 notes and clean
-  R CMD check execution.
-- Comprehensive test suite expansion to 356 unit tests with 100% pass
-  rate.
+- Standardized forage data lookup in `R/utils.R`, deprecating legacy
+  `fao_forages.parquet` in favor of bundled `forages.parquet`.
+- Fully registered package global variables to ensure 0 errors, 0
+  warnings, and 0 notes under `R CMD check --as-cran`.
+- Expanded test suite to 644 passing unit test assertions across 29 test
+  suites.
 - Reorganized and updated all documentation vignettes
   (`Introduction.Rmd`, `Herd_Demography.Rmd`, `Manure.Rmd`,
   `Technical_reference.Rmd`, `Theoretical_basis.Rmd`, `Workflow.Rmd`,
